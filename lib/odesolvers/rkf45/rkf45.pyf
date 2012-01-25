@@ -1,0 +1,31 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module advance__user__routines 
+    interface advance_user_interface 
+        subroutine f(neqn,t,y,ydot) 
+            integer optional,depend(y) :: neqn=len(y)
+            double precision dimension(neqn),intent(in) :: y
+            double precision intent(in):: t
+            double precision dimension(*), intent(out) :: ydot
+        end subroutine f
+    end interface advance_user_interface
+end python module advance__user__routines
+python module _rkf45 ! in 
+    interface  ! in :_rkf45
+        subroutine advance(f,neqn,y,t,tout,relerr,abserr,iflag) ! in :_rkf45:advance_rkf45.f
+            use advance__user__routines
+            external f
+            integer optional,check(len(y)>=neqn),depend(y) :: neqn=len(y)
+            double precision dimension(neqn), intent(in,out) :: y
+            double precision intent(in) :: t
+            double precision intent(in) :: tout
+            double precision intent(in) :: relerr
+            double precision intent(in) :: abserr
+            integer intent(out) :: iflag
+        end subroutine advance
+    end interface 
+end python module _rkf45
+
+! This file was auto-generated with f2py (version:1).
+! See http://cens.ioc.ee/projects/f2py2e/

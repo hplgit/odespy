@@ -1,0 +1,17 @@
+1st column: old names used in the thesis
+2nd column: new (improved) names used in the software
+
+# Done:
+_arg_dict _parameters
+_mandatory_arg_names _required_parameters
+_optional_arg_names _optional_parameters
+self._legal_args self._parameters
+get_all_solver_names_info   list_solvers
+
+
+# Plans:
+set_parameter_properties adjust_parameters
+set_internal_parameters initialize_for_solve
+valid_data validate_data
+_tu _f77
+
