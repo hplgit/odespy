@@ -8,7 +8,7 @@ st.figure()
 
 exceptions=['RKC', 'Lsodes', 'Leapfrog', 'Lsodi', 'Lsodis', 'Lsoibt', 
                 'MyRungeKutta', 'MySolver', 'AdaptiveResidual']
-solvers = [solver for solver in list_solvers() if solver not in exceptions]
+solvers = [solver for solver in list_available_solvers() if solver not in exceptions]
 
 f = lambda (u00,u11),t: [u11, 3.*(1 - u00**2)*u11 - u00]
 jac = lambda (u00,u11),t: \

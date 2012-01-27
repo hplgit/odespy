@@ -135,8 +135,11 @@ Associate Methods for users:
   Return a dictionary containing information (name, type, range, etc..) for
   all the legal input parameters in current solver.
 
-8. odesolvers.list_solvers() :
+8. odesolvers.list_all_solvers() :
  Return string list for all solvers in this module.
+
+9. odesolvers.list_available_solvers() :
+ Return string list for available solvers.
 
 #############################################################
 #            Part 3  For Future Developers                  #
@@ -1414,7 +1417,7 @@ class Solver:
 
         """
         # Extract name list of all the subclasses in this module
-        solver_list = list_solvers()
+        solver_list = list_all_solvers()
         error_message = '''
         Input error! Your input %s is not a valid solver name!
         Valid names are %s ''' % (str(solver_target), str(solver_list))
@@ -2660,8 +2663,6 @@ def list_available_solvers():
                 # Perhaps the required dependency is not installed.
                 pass
     return available_solvers
-
-list_solvers = list_available_solvers
 
 # Update doc strings with common info
 class_, doc_str, classname = None, None, None

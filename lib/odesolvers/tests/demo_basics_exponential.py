@@ -12,7 +12,7 @@ st.figure()
 
 exceptions=['Lsodi', 'Lsodis', 'Lsoibt', 'MyRungeKutta',
             'MySolver', 'Lsodes']
-solvers = [solver for solver in list_solvers() if solver not in exceptions]
+solvers = [solver for solver in list_available_solvers() if solver not in exceptions]
 
 f=lambda u,t:-u
 u0, time_points = 1., np.linspace(0., 10., 100)

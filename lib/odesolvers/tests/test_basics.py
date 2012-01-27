@@ -106,7 +106,7 @@ class TestBasics(TestCase):
         self.load_problem(problem)
 
         solver_no = 0      # Number of successful solvers    
-        solvers = [solver for solver in odesolvers.list_solvers() \
+        solvers = [solver for solver in odesolvers.list_available_solvers() \
                        if solver not in self.exceptions]
         
         print self.help
