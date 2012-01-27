@@ -10,8 +10,8 @@ class RungeKutta(Adaptive):
     
     Available subclasses are:
     MyRungeKutta(User-supplied RungeKutta methods),
-    RungeKutta2_RK, RungeKutta3_RK, ForwardEuler_RK, DormandPrince_RK,
-    RungeKutta4_RK, FehlBerg_RK, CashKarp_RK, BogackiShampine_RK.
+    RungeKutta2, RungeKutta3, ForwardEuler, DormandPrince,
+    RungeKutta4, FehlBerg, CashKarp, BogackiShampine.
              
     """
     _method_order = None
@@ -159,7 +159,7 @@ class RungeKutta(Adaptive):
             u_new = u_n + dt * (np.dot(factors_u_new,k))
         return u_new
     
-class RungeKutta2_RK(RungeKutta):
+class RungeKutta2(RungeKutta):
     '''Standard Runge-Kutta method with order 2. '''
     _butcher_tableau = np.array(\
         [[0., 0., 0.],
@@ -167,7 +167,7 @@ class RungeKutta2_RK(RungeKutta):
          [0., 0., 1.]])
     _method_order = 2
 
-class RungeKutta3_RK(RungeKutta):
+class RungeKutta3(RungeKutta):
     '''Standard Runge-Kutta method with order 3. '''
     _butcher_tableau = np.array(\
         [[0., 0., 0., 0.],
@@ -176,14 +176,14 @@ class RungeKutta3_RK(RungeKutta):
          [0., .16666667, .66666667, .16666667]])
     _method_order = 3
 
-class ForwardEuler_RK(RungeKutta):
+class ForwardEuler(RungeKutta):
     '''Forward Euler method.  '''
     _butcher_tableau = np.array(\
         [[0., 0.],
          [0., 1.]])
     _method_order = 1
 
-class DormandPrince_RK(RungeKutta):
+class DormandPrince(RungeKutta):
     '''Dormand&Prince Runge-Kutta method with order (5, 4). '''
     _butcher_tableau = np.array(\
         [[0., 0., 0., 0., 0., 0., 0., 0.],
@@ -197,7 +197,7 @@ class DormandPrince_RK(RungeKutta):
          [0.,.08991319, 0.,.45348907,.6140625,-.27151238,.08904762,.025]])
     _method_order = (5,4)
 
-class RungeKutta4_RK(RungeKutta):
+class RungeKutta4(RungeKutta):
     '''Standard Runge-Kutta method with order 4. '''
     _butcher_tableau = np.array(\
         [[0., 0., 0., 0., 0.],
@@ -207,7 +207,7 @@ class RungeKutta4_RK(RungeKutta):
          [0., .16666667, .33333333, .33333333, .16666667]])
     _method_order = 4
 
-class Fehlberg_RK(RungeKutta):
+class Fehlberg(RungeKutta):
     '''Fehlberg Runge-Kutta method with order (4, 5). '''
     _butcher_tableau = np.array(\
         [[0., 0., 0., 0., 0., 0., 0.],
@@ -220,7 +220,7 @@ class Fehlberg_RK(RungeKutta):
          [0., .11851852, 0., .51898635, .50613149, -.18, .03636364]])
     _method_order = (4,5)
 
-class CashKarp_RK(RungeKutta):
+class CashKarp(RungeKutta):
     '''CashKarp Runge-Kutta method with order (5, 4). '''
     _butcher_tableau = np.array(\
         [[0., 0., 0., 0., 0., 0., 0.],
@@ -233,7 +233,7 @@ class CashKarp_RK(RungeKutta):
          [0., .10217737, 0., .3839079, .24459274, .01932199, .25]])
     _method_order = (5,4)
 
-class BogackiShampine_RK(RungeKutta):
+class BogackiShampine(RungeKutta):
     '''BogackiShampine Runge-Kutta method with order (3, 2). '''
     _butcher_tableau = np.array(\
         [[0., 0., 0., 0., 0.],
@@ -260,8 +260,8 @@ class MyRungeKutta(RungeKutta):
     _optional_parameters =  RungeKutta._optional_parameters + \
                            ['method_order',]
                                  
-    def valid_data(self):
-        if not RungeKutta.valid_data(self):
+    def validate_data(self):
+        if not RungeKutta.validate_data(self):
             return False
 
         # Check for dimension of user-defined butcher table.

@@ -62,10 +62,10 @@ u,t = m.solve(time_points)
 st.plot(t, u[:,0], '*', title="Python function f",
         legend="Lsode", hold="on")
 
-# Test case 3: RungeKuttaFehlberg
-m = m.switch_to(RungeKuttaFehlberg)
+# Test case 3: RKFehlberg
+m = m.switch_to(RKFehlberg)
 u,t = m.solve(time_points)
 st.plot(t, u[:,0], '*', title="Python function f", 
-        legend="RungeKuttaFehlberg", hold="on")
+        legend="RKFehlberg", hold="on")
 
 

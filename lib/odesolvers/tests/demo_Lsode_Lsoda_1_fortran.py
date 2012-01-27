@@ -9,7 +9,6 @@ This example intends to show users how to improve efficiency with
 call-back functions composed in Fortran language. 
 """
 from odesolvers import *
-#import scitools.basics,easyviz as st
 import scitools.std as st
 import numpy as np
 import os
@@ -41,9 +40,6 @@ Cf2py intent(out) pd
       return
       end
 """
-
-
-
 
 import sys
 try:

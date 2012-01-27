@@ -10,10 +10,10 @@ st.figure()
 
 complex_solvers = ['AdamsBashMoulton2', 'AdamsBashMoulton3', 'AdamsBashforth2',
                    'AdamsBashforth3', 'AdamsBashforth4', 'AdaptiveResidual',
-                   'Backward2Step', 'BackwardEuler', 'ForwardEuler', 
+                   'Backward2Step', 'BackwardEuler', 'Euler', 
                    'Heun', 'Leapfrog', 'LeapfrogFiltered', 
-                   'MidpointImplicit', 'MidpointIter', 'RungeKutta3', 
-                   'RungeKutta2', 'RungeKutta4', 'RungeKuttaFehlberg', 
+                   'MidpointImplicit', 'MidpointIter', 'RK3', 
+                   'RK2', 'RK4', 'RKFehlberg', 
                    'ThetaRule', 'Trapezoidal']
 
 fail_solvers = [name for name in list_solvers() if name not in complex_solvers]

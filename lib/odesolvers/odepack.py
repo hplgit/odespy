@@ -534,7 +534,7 @@ class Odepack(Solver):
     _rwork_index = {4:'first_step', 5:'max_step', 6:'min_step'}
     # Index in rwork_in to supply optional inputs.    
             
-    def set_parameter_properties(self):
+    def adjust_parameters(self):
         """ Special settings for properties of input parameters."""
         # If f is input in form of f(u,t), wrap f to f_f77 for Fortran code.
         if 'f' in self._parameters:
@@ -567,7 +567,7 @@ class Odepack(Solver):
             self._parameters['jac_f77']['paralist_old'] = 't,u'
             self._parameters['jac_f77']['paralist_new'] = 'u,t'
             self._parameters['jac_f77']['name_wrapped'] = 'jac'
-        Solver.set_parameter_properties(self)
+        Solver.adjust_parameters(self)
         return None
 
     def initialize(self):
@@ -650,7 +650,7 @@ class Odepack(Solver):
                     if iaja_check[error_index]:
                         raise ValueError, err_messages[error_index]
     
-    def valid_data(self):
+    def validate_data(self):
         '''
         Common validity check in Odepack.
         '''
@@ -659,7 +659,7 @@ class Odepack(Solver):
             if hasattr(self, name):
                 self._parameters[name]['range'] = (0, self.neq+1)
                 
-        if not Solver.valid_data(self):
+        if not Solver.validate_data(self):
             return False
         self.check_tol()
         self.check_pars()
@@ -905,7 +905,7 @@ class Odepack(Solver):
 
         self.t = np.asarray(time_points)
         self.set_internal_parameters()
-        if not self.valid_data():
+        if not self.validate_data():
             raise ValueError('Invalid data in "%s":\n%s' % \
                 (self.__class__.__name__,pprint.pformat(self.__dict__)))
 
@@ -1082,7 +1082,7 @@ class Lsode(Odepack):
 
     _extra_args_fortran = {}
 
-    def set_parameter_properties(self):
+    def adjust_parameters(self):
 	"""Properties for new parameters in this solver."""
        # If jac_banded is input in form of jac(u,t,ml,mu), 
         # wrap jac_banded to jac_banded_f77 for Fortran code
@@ -1117,7 +1117,7 @@ class Lsode(Odepack):
             '      Jacobian matrix.                           '\
             '   5: Chord iteration with internally generated  '\
             '      banded Jacobian matrix.                    '        
-        Odepack.set_parameter_properties(self)
+        Odepack.adjust_parameters(self)
         
     def set_extra_args(self):
 	# ml & mu are required to be extra parameters for banded Jacobian.
@@ -1190,7 +1190,7 @@ class Lsoda(Odepack):
     Length of RWORK or IWORK are too small to proceed, but the integration
     was successful as far as '''
        
-    def set_parameter_properties(self):
+    def adjust_parameters(self):
 	"""Properties for new parameters in this solver."""
         # If jac_banded is input in form of jac(u,t,ml,mu), 
         # wrap jac_banded to jac_banded_f77 for Fortran code
@@ -1218,7 +1218,7 @@ class Lsoda(Odepack):
             '   4:   User-supplied banded Jacobian matrix     '\
             '   5:   Internally generated banded Jacobian     '\
             '        matrix                                   '    
-        Odepack.set_parameter_properties(self)
+        Odepack.adjust_parameters(self)
 
 
     def set_extra_args(self):
@@ -1298,7 +1298,7 @@ class Lsodar(Odepack):
     Length of RWORK or IWORK are too small to proceed, but the integration
     was successful as far as '''
        
-    def set_parameter_properties(self):
+    def adjust_parameters(self):
 	"""Properties for new parameters in this solver."""
         # If jac_banded is input in form of jac(u,t,ml,mu), 
         # wrap jac_banded to jac_banded_f77 for Fortran code
@@ -1336,7 +1336,7 @@ class Lsodar(Odepack):
             '         --> Default value                       '\
             '4:   User-supplied banded Jacobian matrix        '\
             '5:   Internally generated banded Jacobian matrix '
-        Odepack.set_parameter_properties(self)
+        Odepack.adjust_parameters(self)
 
     
     def set_extra_args(self):
@@ -1415,7 +1415,7 @@ class Lsodes(Odepack):
     The integration was successful as far as '''
 
 
-    def set_parameter_properties(self):
+    def adjust_parameters(self):
 	"""Properties for new parameters in this solver."""
         # If jac_column is input in form of jac(u,t,j), 
         # wrap jac_column to jac_column_f77(t,u,j-1) for Fortran code.
@@ -1456,7 +1456,7 @@ class Lsodes(Odepack):
             '      sparse Jacobian matrix.                    '\
             '   3: Chord iteration with internally generated  '\
             '      diagonal Jacobian matrix.                  '
-        Odepack.set_parameter_properties(self)
+        Odepack.adjust_parameters(self)
 
     def set_iter_method(self):
         with_jac_column = hasattr(self,'jac_column') or \
@@ -1561,7 +1561,7 @@ class Lsodi(Odepack):
         # set f with dummy definition for general constructor
         Odepack.__init__(self, None, **kwargs)
 
-    def set_parameter_properties(self):
+    def adjust_parameters(self):
         self._parameters['iter_method']['range'] = [1,2,4,5]
         self._parameters['iter_method']['condition-list'] = \
                          {'1':[('jac_lsodi','jac_lsodi_f77'),
@@ -1587,7 +1587,7 @@ class Lsodi(Odepack):
             '  5: Chord iteration with an internally generated'\
             '     banded Jacobian matrix. Using "ml"+"mu"+2   '\
             '     extra calls to "res" per dr/du evaluation.  '
-        Odepack.set_parameter_properties(self)
+        Odepack.adjust_parameters(self)
 
     def set_extra_args(self):
         if self.iter_method == 4:
@@ -1712,7 +1712,7 @@ class Lsodis(Odepack):
         # set f with dummy definition for general constructor
         Odepack.__init__(self, None, **kwargs)
 
-    def set_parameter_properties(self):
+    def adjust_parameters(self):
         self._parameters['iter_method']['range'] = [1,2]
         self._parameters['iter_method']['condition-list'] = \
                          {'1':['jac_lsodis',],}
@@ -1741,7 +1741,7 @@ class Lsodis(Odepack):
                initial calls to RES and NEQ initial calls to ADDA.
           3:   like MOSS = 1, except user has supplied IA and JA.
           4:   like MOSS = 2, except user has supplied IA and JA ''',
-        Odepack.set_parameter_properties(self)
+        Odepack.adjust_parameters(self)
  
     def set_iter_method(self):
         with_jac = hasattr(self, 'jac_lsodis')
@@ -1853,7 +1853,7 @@ class Lsoibt(Odepack):
         # set f with dummy definition for general constructor
         Odepack.__init__(self, None, **kwargs)
 
-    def set_parameter_properties(self):
+    def adjust_parameters(self):
         self._parameters['iter_method']['range'] = [1,2]
         self._parameters['iter_method']['condition-list'] = \
                          {'1':('jac_lsoibt',),}
@@ -1865,7 +1865,7 @@ class Lsoibt(Odepack):
         '     (difference quotient) block-tridiagonal     '\
         '     Jacobian matrix. This uses 3*mb+1 calls to  '\
         '     "res" per dr/du evaluation.-->Default value.'      
-        Odepack.set_parameter_properties(self)
+        Odepack.adjust_parameters(self)
 
     def set_iter_method(self):
         with_jac = hasattr(self, 'jac_lsoibt')
@@ -1901,8 +1901,8 @@ class Lsoibt(Odepack):
     def set_iopt(self):
         self.iopt = int(any(self.iwork[4:7]>0) or any(self.rwork[4:7]>0))
 
-    def valid_data(self):
-        if not Odepack.valid_data(self):
+    def validate_data(self):
+        if not Odepack.validate_data(self):
             return False
         if self.mb*self.nb != self.neq:
                 raise ValueError,'''

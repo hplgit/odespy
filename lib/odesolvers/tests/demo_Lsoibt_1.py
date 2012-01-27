@@ -71,7 +71,7 @@ m = method(rtol=rtol, atol=atol, res=res, adda_lsoibt=adda,
            mb=mb, nb=nb, jac_lsoibt=jac)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], title="Lsoibt with Python functions",
+st.plot(t, u[:,0], 'b-', title="Lsoibt with Python functions",
         legend="with res, jac & adda", hold="on")
 
 # Test case 2: Lsoibt, with res, adda, mb, nb
@@ -79,7 +79,7 @@ m = method(rtol=rtol, atol=atol, res=res, adda_lsoibt=adda,
            mb=mb, nb=nb)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], title="Lsoibt with Python functions",
+st.plot(t, u[:,0], 'g*', title="Lsoibt with Python functions",
         legend="with res & adda", hold="on")
 
 

@@ -28,7 +28,7 @@ class TestBasics(TestCase):
     def test_switch_to(self):
         for problem in [Exponential, Sine]:
             self.load_problem(problem)
-            method = odesolvers.RungeKuttaFehlberg(self.f, **self.kwargs)
+            method = odesolvers.RKFehlberg(self.f, **self.kwargs)
             method.set_initial_condition(self.u0)
             u, t = method.solve(self.time_points)    
 
@@ -38,7 +38,7 @@ class TestBasics(TestCase):
             assert_array_almost_equal(\
                 u, u_new,
                 err_msg='''
-       Failed for switch from RungeKuttaFehlberg to Lsode with problem %s''' \
+       Failed for switch from RKFehlberg to Lsode with problem %s''' \
                     % self.help,
                 decimal=2, verbose=False)
 
@@ -47,7 +47,7 @@ class TestBasics(TestCase):
             self.load_problem(problem)
             
             method = None
-            method = odesolvers.RungeKuttaFehlberg(self.f, **self.kwargs)
+            method = odesolvers.RKFehlberg(self.f, **self.kwargs)
             method.set_initial_condition(self.u0)
             u, t = method.solve(self.time_points, terminate=self.terminate) 
             
@@ -59,9 +59,9 @@ class TestBasics(TestCase):
         self.load_problem(Exponential)
 
         method = None
-        method = odesolvers.RungeKuttaFehlberg(self.f_with_args, 
-                                               f_args=self.f_args, 
-                                               **self.kwargs)
+        method = odesolvers.RKFehlberg(self.f_with_args, 
+                                       f_args=self.f_args, 
+                                       **self.kwargs)
         method.set_initial_condition(self.u0)
         u, t = method.solve(self.time_points)
 
@@ -75,9 +75,9 @@ class TestBasics(TestCase):
         self.load_problem(Exponential)
 
         method = None
-        method = odesolvers.RungeKuttaFehlberg(self.f_with_kwargs, 
-                                               f_kwargs=self.f_kwargs, 
-                                               **self.kwargs)
+        method = odesolvers.RKFehlberg(self.f_with_kwargs, 
+                                       f_kwargs=self.f_kwargs, 
+                                       **self.kwargs)
         method.set_initial_condition(self.u0)
         u, t = method.solve(self.time_points)
 
@@ -185,13 +185,14 @@ Complex_pi = dict(
     f=lambda u, t: 1./(t - 1. + 1j),
     time_points=np.linspace(0., 2., 15),
     u0=0.,
-    exceptions=['BogackiShampine_RK', 'CashKarp_RK', 'Dop853', 'Dopri5', 
-                'DormandPrince_RK', 'Fehlberg_RK', 'ForwardEuler_RK', 
+    exceptions=['BogackiShampine', 'CashKarp', 'Dop853', 'Dopri5', 
+                'DormandPrince', 'Fehlberg', 'ForwardEuler', 
                 'Lsoda', 'Lsodar', 'Lsode', 'Lsodes', 'Lsodi', 'Lsodis', 
                 'Lsoibt', 'MyRungeKutta', 'MySolver', 'RKC', 'RKF45', 
-                'RungeKutta2_RK', 'RungeKutta3_RK', 'RungeKutta4_RK', 
+                'RungeKutta2', 'RungeKutta3', 'RungeKutta4', 
                 'SymPy_odefun', 'Vode'],
     exact_final=(7.27645842122e-08-1.57079632742j))
 
 if __name__ == "__main__":
     run_module_suite()
+

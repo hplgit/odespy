@@ -15,9 +15,7 @@
   
 """
 
-
 from odesolvers import *
-#import scitools.basics,easyviz as st
 import scitools.std as st
 import numpy as np
 
@@ -96,6 +94,6 @@ st.plot(t, u[:,0], '*', title="RKC with Python functions",
 m = method(f, rtol=rtol, atol=atol, spcrad=spcrad)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], title="RKC with Python functions",
+st.plot(t, u[:,0], 'go', title="RKC with Python functions",
         legend="with f, spcrad", hold="on")
 
