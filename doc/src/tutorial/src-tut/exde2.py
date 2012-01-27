@@ -4,7 +4,7 @@ def myrhs(y, x):
     return -y
 
 import odesolvers
-method = odesolvers.RungeKutta4(myrhs)
+method = odesolvers.RK4(myrhs)
 method.set_initial_condition(1)
 
 import numpy

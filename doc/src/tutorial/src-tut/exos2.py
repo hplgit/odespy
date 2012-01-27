@@ -20,7 +20,7 @@ solvers = [
     odesolvers.ThetaRule(problem, theta=0),   # Forward Euler
     odesolvers.ThetaRule(problem, theta=0.5), # Midpoint
     odesolvers.ThetaRule(problem, theta=1),   # Backward Euler
-    odesolvers.RungeKutta4(problem),
+    odesolvers.RK4(problem),
     odesolvers.MidpointIter(problem, max_iter=2, eps_iter=0.01),
     odesolvers.LeapfrogFiltered(problem),
     ]

@@ -7,7 +7,7 @@ _arg_dict _parameters
 _mandatory_arg_names _required_parameters
 _optional_arg_names _optional_parameters
 _legal_args _parameters
-get_all_solver_names_info   list_solvers
+get_all_solver_names_info   list_all_solvers
 set_parameter_properties adjust_parameters
 valid_data validate_data
 RungeKutta2 RK2

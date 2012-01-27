@@ -747,20 +747,8 @@ class Odepack(Solver):
         for name in ('jac_f77', 'f_f77'):
             if getattr(self, name, None) is None:
                 setattr(self, name, lambda x,y:0.)  
-        for name in ('jac_column_f77', 'adda_lsodi_f77'):
-            if getattr(self, name, None) is None:
-                setattr(self, name, lambda x,y,z:0.) 
-        for name in ('jac_lsodis_f77', 'adda_lsodis_f77'):
-            if getattr(self, name, None) is None:
-                setattr(self, name, lambda x,y,z,i,j,k:0.)  
-        if getattr(self, 'jac_lsoibt_f77', None) is None:
-            self.jac_lsoibt_f77 = lambda x,y,z:(0., 0., 0.)  
-        if getattr(self, 'adda_lsoibt_f77', None) is None:
-            self.adda_lsoibt_f77 = lambda x,y,z,i,j:(0., 0., 0.) 
-        if getattr(self, 'jac_lsodi_f77', None) is None:
-            self.jac_lsodi_f77 = lambda x,y,z: 0.  
-        if getattr(self, 'res_f77', None) is None:
-            self.res_f77 = lambda x,y,z,i: (0., 0)  
+        if getattr(self, 'jac_column_f77', None) is None:
+            self.jac_column_f77 = lambda x,y,z: 0.
         if getattr(self, 'g_f77', None) is None:
             self.g_f77 = lambda x,y: np.array(())
         if getattr(self, 'ng', None) is None:
@@ -1391,8 +1379,7 @@ class Lsodar(Odepack):
         Unsufficient input! ng must be specified if g is input as a 
         Fortran subroutine. '''
         return Odepack.solve(self,time_points, terminate=terminate)
-    
-
+   
 ### End of Lsodar ###
 
 class Lsodes(Odepack):
@@ -1657,6 +1644,12 @@ class Lsodi(Odepack):
     def set_iopt(self):
         self.iopt = int(any(self.iwork[4:7]>0) or any(self.rwork[4:7]>0))
 
+    def set_dummy_functions(self):
+        if getattr(self, 'adda_lsodi_f77', None) is None:
+            self.adda_lsodi_f77 = lambda x,y,z: 0.
+        if getattr(self, 'jac_lsodi_f77', None) is None:
+            self.jac_lsodi_f77 = lambda x,y,z: 0.  
+
     def solve(self, time_points, terminate=None):
         # Call Solver.solve(), which will direct to Odepack.advance() 
         # to step forward.
@@ -1800,6 +1793,11 @@ class Lsodis(Odepack):
     def set_iopt(self):
         self.iopt = int(any(self.iwork[4:7])>0 or any(self.rwork[4:7])>0)
 
+    def set_dummy_functions(self):
+        for name in ('jac_lsodis_f77', 'adda_lsodis_f77'):
+            if getattr(self, name, None) is None:
+                setattr(self, name, lambda x,y,z,i,j,k:0.)  
+
     def solve(self, time_points, terminate=None):
         # Call Solver.solve(), which will direct to Odepack.advance() 
         # to step forward.
@@ -1900,6 +1898,12 @@ class Lsoibt(Odepack):
 
     def set_iopt(self):
         self.iopt = int(any(self.iwork[4:7]>0) or any(self.rwork[4:7]>0))
+
+    def set_dummy_functions(self):
+        if getattr(self, 'jac_lsoibt_f77', None) is None:
+            self.jac_lsoibt_f77 = lambda x,y,z:(0., 0., 0.)  
+        if getattr(self, 'adda_lsoibt_f77', None) is None:
+            self.adda_lsoibt_f77 = lambda x,y,z,i,j:(0., 0., 0.) 
 
     def validate_data(self):
         if not Odepack.validate_data(self):

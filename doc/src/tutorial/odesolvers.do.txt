@@ -138,7 +138,7 @@ the time interval $[0,10]$, with $N=30$ time steps, looks like this:
 
 @@@CODE src-tut/exgr1.py  fromto: c = @
 
-With the `RungeKutta4` method and other non-adaptive methods
+With the `RK4` method and other non-adaptive methods
 the time steps are dictated by the `time_points` array.
 A constant time step of size `time_points[1] - time_points[0] = 1/3`
 is implied in the present example.
@@ -362,14 +362,14 @@ AdamsBashforth4
 AdaptiveResidual
 Backward2Step
 BackwardEuler
-BogackiShampine_RK
-CashKarp_RK
+BogackiShampine
+CashKarp
 Dop853
 Dopri5
-DormandPrince_RK
-Fehlberg_RK
+DormandPrince
+Fehlberg
+Euler
 ForwardEuler
-ForwardEuler_RK
 Heun
 Leapfrog
 LeapfrogFiltered
@@ -386,13 +386,13 @@ MyRungeKutta
 MySolver
 RKC
 RKF45
+RK2
 RungeKutta2
-RungeKutta2_RK
+RK3
 RungeKutta3
-RungeKutta3_RK
+RK4
 RungeKutta4
-RungeKutta4_RK
-RungeKuttaFehlberg
+RKFehlberg
 SymPy_odefun
 ThetaRule
 Trapezoidal
@@ -458,9 +458,9 @@ $r$ values:
 With 4 periods we get
 !bc dat
 ThetaRule(theta=0)   r: 2.9, 1.9, 1.4, 1.2 E_min=1.1E-01
-RungeKutta2          r: 2.1, 2.0, 2.0, 2.0 E_min=8.4E-04
+RK2          r: 2.1, 2.0, 2.0, 2.0 E_min=8.4E-04
 ThetaRule(theta=1)   r: 0.3, 0.5, 0.7, 0.8 E_min=9.0E-02
-RungeKutta4          r: 4.0, 4.0, 4.0, 4.0 E_min=2.6E-08
+RK4          r: 4.0, 4.0, 4.0, 4.0 E_min=2.6E-08
 ThetaRule            r: 2.0, 2.0, 2.0, 2.0 E_min=4.2E-04
 Leapfrog             r: 2.1, 2.0, 2.0, 2.0 E_min=8.5E-04
 LeapfrogFiltered     r: 0.2, 0.4, 0.6, 0.8 E_min=1.3E-01
@@ -477,9 +477,9 @@ Extending the time domain to 20 periods makes many of the
 simplest methods inaccurate:
 !bc dat
 ThetaRule(theta=0)   r: 10.4, 22.0, 18.2, 10.4 E_min=3.3E+02
-RungeKutta2          r: 51.4, 16.1, 2.3, 2.1 E_min=1.1E-01
+RK2          r: 51.4, 16.1, 2.3, 2.1 E_min=1.1E-01
 ThetaRule(theta=1)   r: 11.2, 0.0, 0.1 E_min=5.0E-01
-RungeKutta4          r: 1.0, 3.6, 4.0, 4.0 E_min=8.2E-05
+RK4          r: 1.0, 3.6, 4.0, 4.0 E_min=8.2E-05
 ThetaRule            r: 87.8, 0.2, 1.7, 2.0 E_min=5.3E-02
 Leapfrog             r: 95.9, 18.0, 1.0, 2.0 E_min=1.1E-01
 LeapfrogFiltered     r: -0.0, 121.2, 0.3, 0.1 E_min=5.2E-01

@@ -7,13 +7,13 @@ import odesolvers
 def f(u, t, c):
     return c*u
 
-method = odesolvers.RungeKutta4(f, f_args=[c])
+method = odesolvers.RK4(f, f_args=[c])
 
 # Alternative: f has extra keyword argument
 def f(u, t, c=1):
     return c*u
 
-method = odesolvers.RungeKutta4(f, f_kwargs={'c': c})
+method = odesolvers.RK4(f, f_kwargs={'c': c})
 method.set_initial_condition(A)
 
 import numpy

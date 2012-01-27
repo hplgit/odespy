@@ -6,7 +6,7 @@ def f(u, t):
     return c*u
 
 import odesolvers
-method = odesolvers.RungeKutta4(f)
+method = odesolvers.RK4(f)
 method.set_initial_condition(A)
 
 import numpy
