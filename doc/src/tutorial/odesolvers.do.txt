@@ -226,7 +226,7 @@ of `time_points`.
 
 ===== Example: The Pendulum Equation =====
 
-The angle $\theta$|$theta$ of a pendulum with mass $m$ and length$L$
+The angle $\theta$|$theta$ of a pendulum with mass $m$ and length $L$
 is governed by the equation
 (neglecting air resistance for simplicity)
 # #if FORMAT == "latex" or FORMAT == "sphinx"
