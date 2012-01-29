@@ -13,7 +13,7 @@ class ExponentialGrowth:
 f = ExponentialGrowth(c=0.1, A=1.5)
 
 import odesolvers
-method = odesolvers.RungeKutta4(f)
+method = odesolvers.RK4(f)
 method.set_initial_condition(f.A)
 
 import numpy

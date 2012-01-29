@@ -14,7 +14,6 @@ lot with composing these functions in Fortran Language.
 """
 
 from odesolvers import *
-#import scitools.basics,easyviz as st
 import scitools.std as st
 import numpy as np
 import os

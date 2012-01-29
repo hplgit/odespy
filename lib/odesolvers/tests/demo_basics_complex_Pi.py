@@ -10,13 +10,13 @@ st.figure()
 
 complex_solvers = ['AdamsBashMoulton2', 'AdamsBashMoulton3', 'AdamsBashforth2',
                    'AdamsBashforth3', 'AdamsBashforth4', 'AdaptiveResidual',
-                   'Backward2Step', 'BackwardEuler', 'ForwardEuler', 
+                   'Backward2Step', 'BackwardEuler', 'Euler', 
                    'Heun', 'Leapfrog', 'LeapfrogFiltered', 
-                   'MidpointImplicit', 'MidpointIter', 'RungeKutta3', 
-                   'RungeKutta2', 'RungeKutta4', 'RungeKuttaFehlberg', 
+                   'MidpointImplicit', 'MidpointIter', 'RK3', 
+                   'RK2', 'RK4', 'RKFehlberg', 
                    'ThetaRule', 'Trapezoidal']
 
-fail_solvers = [name for name in list_solvers() if name not in complex_solvers]
+fail_solvers = [name for name in list_available_solvers() if name not in complex_solvers]
 
 f = lambda u, t: 1./(t - 10. + 1j)
 u0, time_points = 0, np.linspace(0., 20., 200)

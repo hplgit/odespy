@@ -29,69 +29,68 @@ instance).
 
 Including following subclasses:
 
-  1. ForwardEuler      : Forward Euler
-  2. RungeKutta4       : 4th-order Runge-Kutta method
-  3. MidpointIter      : Iterated Midpoint strategy
-  4. RungeKutta2       : 2nd-order Runge-Kutta
-  5. RungeKutta3       : 3rd-order Runge-Kutta method
-  6. RungeKutta4       : 4th-order Runge-Kutta method
-  7. Heun              : Heun's method
-  8. Leapfrog          : Plain Leapfrog method
-  9. LeapfrogFiltered  : Filtered Leapfrog method
- 10. AdamsBashforth2   : 2nd-order Adams-Bashforth method
- 11. AdamsBashforth3   : 3rd-order Adams-Bashforth method
- 12. AdamsBashforth4   : 4th-order Adams-Bashforth method
- 13. AdamsBashMoulton2 : 2-step Adams-Bash-Moulton method
- 14. AdamsBashMoulton3 : 3-step Adams-Bash-Moulton method
- 15. MySolver          : User-defined method
- 16. Vode_PyDS         : Wrapper for VODE_ODESystem in package PyDSTool.
- 17. Sympy_odefun      : Wrapper for sympy.mpmath.odefun, which uses a
+  1. Euler             : Forward Euler
+  2. MidpointIter      : Iterated Midpoint strategy
+  3. RK2               : 2nd-order Runge-Kutta
+  4. RK3               : 3rd-order Runge-Kutta method
+  5. RK4               : 4th-order Runge-Kutta method
+  6. Heun              : Heun's method
+  7. Leapfrog          : Plain Leapfrog method
+  8. LeapfrogFiltered  : Filtered Leapfrog method
+  9. AdamsBashforth2   : 2nd-order Adams-Bashforth method
+ 10. AdamsBashforth3   : 3rd-order Adams-Bashforth method
+ 11. AdamsBashforth4   : 4th-order Adams-Bashforth method
+ 12. AdamsBashMoulton2 : 2-step Adams-Bash-Moulton method
+ 13. AdamsBashMoulton3 : 3-step Adams-Bash-Moulton method
+ 14. MySolver          : User-defined method
+ 15. Vode_PyDS         : Wrapper for VODE_ODESystem in package PyDSTool.
+ 16. Sympy_odefun      : Wrapper for sympy.mpmath.odefun, which uses a
                          high-order Taylor series method.
 SolverImplicit:
 Implicit ODE solvers within either Newton or Picard nonlinear iteration.
- 18. BackwardEuler     : Backward Euler method
- 19. ThetaRule         : Theta rule method
- 20. Backward2step     : Three-level backward scheme
- 21. MidpointImplicit  : Implicit Midpoint method.
+ 17. BackwardEuler     : Backward Euler method
+ 18. ThetaRule         : Theta rule method
+ 19. Backward2step     : Three-level backward scheme
+ 20. MidpointImplicit  : Implicit Midpoint method.
 
 Adaptive:
- 22. RungeKuttaFehlberg: 4-5-th order Runge-Kutta-Fehlberg
- 23. AdaptiveResidual  : Accept a specified solver, calculate residual
+ 21. RKFehlberg        : 4-5-th order Runge-Kutta-Fehlberg
+ 22. AdaptiveResidual  : Accept a specified solver, calculate residual
                          as the error-check criteria.
- 24. Rkc               : Wrapper for rkc.f.
- 25. Rkf45             : Wrapper for Rkf45.f.
+ 23. Rkc               : Wrapper for rkc.f.
+ 24. Rkf45             : Wrapper for Rkf45.f.
 
 ODEPACK:  Collection for solvers in ODEPACK.
- 26. Lsode             : Basic solver dlsode().
- 27. Lsodes            : dlsodes() for ODE problems with Jacobian matrix
+ 25. Lsode             : Basic solver dlsode().
+ 26. Lsodes            : dlsodes() for ODE problems with Jacobian matrix
                          in general sparse form.
- 28. Lsoda             : dlsoda(), which automatically selects between
+ 27. Lsoda             : dlsoda(), which automatically selects between
                          nonstiff (Adams) and stiff (BDF) methods.
- 29. Lsodar            : dlsodar(), dlsoda with a rootfinding capability
+ 28. Lsodar            : dlsodar(), dlsoda with a rootfinding capability
                          added.
- 30. Lsodi             : dlsodi(), which solves linearly implicit systems.
- 31. Lsoibt            : dlsoibt(), which solves linearly implicit systems
+ 29. Lsodi             : dlsodi(), which solves linearly implicit systems.
+ 30. Lsoibt            : dlsoibt(), which solves linearly implicit systems
                          in which the matrices involved are assumed to be
                          block-tridiagonal.
- 32. Lsodis            : dlsodis(), which solves linearly implicit systems
+ 31. Lsodis            : dlsodis(), which solves linearly implicit systems
                          in which the matrices involved are assumed to be
                          sparse.
 
 RungeKutta: Collection for explicit Rungekutta methods.
- 33. RungeKutta2_RK    : Standard RungeKutta2
- 34. RungeKutta3_RK    : Standard RungeKutta3
- 35. RungeKutta4_RK    : Standard RungeKutta4
- 36. ForwardEuler_RK   : Forward Euler
- 37. DormandPrince_RK  : Dormand & Prince method
- 38. Fehlberg_RK       : RungeKutta Fehlberg method
- 39. CashKarp_RK       : Case Karp method
- 40. BogackiShampine_RK: Bogacki Shampine method
- 41. MyRungeKutta      : Specially for user-defined methods.
+ 32. RungeKutta2       : Standard RungeKutta2
+ 33. RungeKutta3       : Standard RungeKutta3
+ 34. RungeKutta4       : Standard RungeKutta4
+ 35. ForwardEuler      : Forward Euler
+ 36. DormandPrince     : Dormand & Prince method
+ 37. Fehlberg          : RungeKutta Fehlberg method
+ 38. CashKarp          : Case Karp method
+ 39. BogackiShampine   : Bogacki Shampine method
+ 40. MyRungeKutta      : Specially for user-defined methods.
 
 Ode_scipy:   Wrapper for scipy.integrate.ode
- 42. Vode              : vode.f
- 43. Dopri             : Dormand&Prince order 5
- 44. Dop853            : Dormand&Prince order 8(5,3).
+ 41. Vode              : vode.f
+ 42. Dopri             : Dormand&Prince order 5
+ 43. Dop853            : Dormand&Prince order 8(5,3).
 
 
 ############################################################
@@ -136,8 +135,11 @@ Associate Methods for users:
   Return a dictionary containing information (name, type, range, etc..) for
   all the legal input parameters in current solver.
 
-8. odesolvers.list_solvers() :
+8. odesolvers.list_all_solvers() :
  Return string list for all solvers in this module.
+
+9. odesolvers.list_available_solvers() :
+ Return string list for available solvers.
 
 #############################################################
 #            Part 3  For Future Developers                  #
@@ -201,9 +203,9 @@ ered as legal in new solver.
 
 Furthermore, if a parameter in new solver has some properties
 different from general settings in _parameters, developers can reset(or
-supplement) these properties in function set_parameter_properties().
+supplement) these properties in function adjust_parameters().
 
-3. Special check in valid_data()
+3. Special check in validate_data()
 
 For some complicated solvers with many relevant input parameters,
 there are possibly special relationship requirements inbetween some
@@ -218,7 +220,7 @@ ments for the values of two input integer arrays ia and ja:
 Most of the automatic checking are taken in initialization step. We
 need to take extra check for the above requirements after all the
 inputs are initialized. Thus a new function check_iaja() is defined
-in odesolvers.Lsodes, and injected into function valid_data().
+in odesolvers.Lsodes, and injected into function validate_data().
 
 4. Internal settings in set_internal_parameters()
 
@@ -260,7 +262,7 @@ iteration directly in function solve().
 >>> # Example 1:  Scalar ODE problem : Exponential
 >>> # u'=-u, --> u = exp(-t)
 >>> import odesolvers
->>> name = odesolvers.RungeKutta4  # example solver
+>>> name = odesolvers.RK4  # example solver
 >>> def f(u, t):
 ...     return -u   # right-hand side of ODE
 >>> method = name(f)
@@ -280,7 +282,7 @@ array([ 0. ,  0.3,  0.6,  0.9,  1.2,  1.5,  1.8,  2.1,  2.4,  2.7,  3. ])
 
 >>> # Example 2: ODE systems with 2 equations: Sine
 >>> # u'' = -u    -->   u = sin(t)
->>> name = odesolvers.RungeKutta4  # example
+>>> name = odesolvers.RK4  # example
 >>> def f(u, t):
 ...     return [u[1], -u[0]]
 >>> method = name(f)
@@ -314,20 +316,20 @@ array([ 0.        ,  0.62831853,  1.25663706,  1.88495559,  2.51327412,
 ...     return [u[1], -u[0]]
 >>> time_points = np.linspace(0, 2*np.pi, 11)
 >>> exact_u = np.sin(time_points)
->>> from odesolvers import Vode, RungeKuttaFehlberg, RungeKutta4
->>> for solver in [Vode, RungeKuttaFehlberg, RungeKutta4]:
+>>> from odesolvers import Vode, RKFehlberg, RK4
+>>> for solver in [Vode, RKFehlberg, RK4]:
 ...     method = solver(f)
 ...     method.set_initial_condition([0.,1.])
 ...     u,t = method.solve(time_points)
 ...     max_err = max(u[:,0] - exact_u)
 ...     print 'Maximum error for %s is %g.' % (solver.__name__, max_error)
 Maximum error for Vode is 3.1743e-05.
-Maximum error for RungeKuttaFehlberg is 3.1743e-05.
-Maximum error for RungeKutta4 is 3.1743e-05.
+Maximum error for RKFehlberg is 3.1743e-05.
+Maximum error for RK4 is 3.1743e-05.
 
 >>> # Example 4: Extra parameter for function f(u,t,a)
 >>> # u' = -a*u   -->   u = exp(-a*t)
->>> name = odesolvers.RungeKutta4  # example solver
+>>> name = odesolvers.RK4  # example solver
 >>> def f_with_a(u, t, a):    # extra parameter 'a'
 ...     return -a*u   # right-hand side of ODE
 >>> method = name(f_with_a, f_args=(2.,))      # set 'a' as 2.0
@@ -341,7 +343,7 @@ array([ 1.        ,  0.5494    ,  0.30184036,  0.16583109,  0.0911076 ,
 
 >>> # Example 5: Stop events for logistic population model
 >>> # u' = 1.2*u*(1-u) , stop when u exceed 0.9
->>> name = odesolvers.RungeKutta4
+>>> name = odesolvers.RK4
 >>> def termin(u,t,step_no):    # return a boolean value for stop event
 ...     return u[step_no]>0.9
 >>> def f_logistic(u,t):
@@ -350,7 +352,7 @@ array([ 1.        ,  0.5494    ,  0.30184036,  0.16583109,  0.0911076 ,
 >>> method.set_initial_condition(.5)
 >>> time_points = np.linspace(0, 2, 201)
 >>> u, t = method.solve(time_points,terminate=termin)
-RungeKutta4 terminated at t=1.84
+RK4 terminated at t=1.84
 """
 
 import pprint, sys, os, inspect
@@ -402,7 +404,7 @@ _parameters = dict(
 
     start_method = dict(
         help='Method for the first steps in multi-step solvers',
-        default='RungeKutta2',
+        default='RK2',
         type=str),
 
     nonlinear_solver = dict(
@@ -467,7 +469,7 @@ _parameters = dict(
     solver = dict(
         help='Name of solver class in solvers that need an extra solver '\
              '(e.g., AdaptiveResidual)',
-        default='RungeKutta4',
+        default='RK4',
         type=str),
 
     butcher_tableau = dict(
@@ -893,7 +895,7 @@ class Solver:
         This constructor makes a dictionary ``self._parameters``
         holding all the required and optional parameters for this solver
         (fetched from the global ``_parameters`` dictionary in this module).
-        The method ``set_parameter_properties`` (implemented in subclasses)
+        The method ``adjust_parameters`` (implemented in subclasses)
         is called to adjust default parameter settings if needed.
         Then all keys in ``self._parameters`` become class attributes,
         filled with default values. Thereafter, all keyword arguments
@@ -923,7 +925,7 @@ class Solver:
         f, kwargs = self.compile_string_functions(f, **kwargs)
 
         # Adjust self._parameters
-        self.set_parameter_properties()
+        self.adjust_parameters()
 
         # Set default values for all parameters, remove all parameters
         # with value None, and then apply set() to all the user-provided
@@ -973,6 +975,11 @@ class Solver:
         if isinstance(f, str):
             str_funcs['f'] = f
 
+        try:
+            os.remove('_callback.so')
+        except:
+            pass
+
         string_to_compile = '\n'.join(str_funcs.values())
         if string_to_compile is not '':
             try:
@@ -993,7 +1000,7 @@ class Solver:
                  % (string_to_compile, str_funcs.keys())
         return f, kwargs
 
-    def set_parameter_properties(self):
+    def adjust_parameters(self):
         '''
         This method allows subclasses to adjust (modify or add)
         entries in the self._parameters dictionary.
@@ -1034,7 +1041,7 @@ class Solver:
 
         Types and ranges of attributes are defined in self._parameters,
         which is initialized with default settings and optionally
-        modified in the set_parameter_properties method.
+        modified in the adjust_parameters method.
         """
 
         # if new string functions are supplemented
@@ -1211,16 +1218,15 @@ class Solver:
                 value_specified = True \
                     if 'default' not in self._parameters[name] \
                     else value != self._parameters[name]['default']
-                if default or value_specified:
+                if default or value_specified: 
                     types = self._parameters[name]['type']
                     if types in (callable, (str, callable)):
                         value = getattr(value, '__name__', \
-                                        value.__class__.__name__)
+                                            value.__class__.__name__)
                     args.append('%s=%s' % (name, value))
 
         args = ', '.join(args)
-        if args:
-            s += '(%s)' % args
+        s += '(%s)' % args
         return s
 
     def __repr__(self):
@@ -1272,7 +1278,7 @@ class Solver:
         The algorithm steps in this ``solve`` method goes as follows.
         The set_internal_parameters method is called to initialize
         various data needed in the solution process (self. u, for instance).
-        Thereafter, ``valid_data`` is called to perform a consistency
+        Thereafter, ``validate_data`` is called to perform a consistency
         check on data. We are then ready for the core of the method:
         the time loop.
 
@@ -1284,10 +1290,8 @@ class Solver:
             terminate = lambda u, t, step_no: False
 
         self.t = np.asarray(time_points)
-
         self.set_internal_parameters()
-
-        self.valid_data()
+        self.validate_data()
 
         # The time loop
         N = self.t.size - 1  # no of intervals
@@ -1348,7 +1352,7 @@ class Solver:
                            np.linspace(self.t[0], self.t[-1], len(self.t)))
 
 
-    def valid_data(self):
+    def validate_data(self):
         """
         This function is used for extra check after all the attributes,
         (including inputs and internal parameters), have been
@@ -1390,7 +1394,7 @@ class Solver:
 
         Input:
             solver_target:   Either as a string(for class name) or
-                             as a class, e.g. RungeKutta4 or 'RungeKutta4'
+                             as a class, e.g. RK4 or 'RK4'
             kwargs       :   Optional inputs to reset/supplement values of
                              valid input argmenters in new solver.
         Output:
@@ -1401,19 +1405,19 @@ class Solver:
         >>> f = lambda u,t: -u
         >>> time_points = np.linspace(0.,2.,11)
         >>> exact_u = np.exp(-time_points)
-        >>> m1 = odesolvers.RungeKutta2(f)
+        >>> m1 = odesolvers.RK2(f)
         >>> m1.set_initial_condition(1.)
         >>> u1, t = m1.solve(time_points)
-        >>> print 'Normarized error with RungeKutta2 is %g' % np.linalg.norm(u1 - exact_u)
-        Normarized error with RungeKutta2 is 0.0077317
-        >>> m2 = m1.switch_to(odesolvers.RungeKuttaFehlberg, rtol=1e-18)
+        >>> print 'Normarized error with RK2 is %g' % np.linalg.norm(u1 - exact_u)
+        Normarized error with RK2 is 0.0077317
+        >>> m2 = m1.switch_to(odesolvers.RKFehlberg, rtol=1e-18)
         >>> u2, t = m2.solve(time_points)
-        >>> print 'Normarized error with RungeKuttaFehlberg is %g' % np.linalg.norm(u2 - exact_u)
-        Normarized error with RungeKuttaFehlberg is 8.55517e-08
+        >>> print 'Normarized error with RKFehlberg is %g' % np.linalg.norm(u2 - exact_u)
+        Normarized error with RKFehlberg is 8.55517e-08
 
         """
         # Extract name list of all the subclasses in this module
-        solver_list = list_solvers()
+        solver_list = list_all_solvers()
         error_message = '''
         Input error! Your input %s is not a valid solver name!
         Valid names are %s ''' % (str(solver_target), str(solver_list))
@@ -1465,7 +1469,7 @@ class Solver:
         if printInfo:
             # neglected attributes in new solver
             diff_args = set(self.__dict__.keys()) - set(new.__dict__.keys()) \
-                - set(('u','t','n','dtype'))
+                - set(('u','t','n','dtype'))            
             if diff_args:
                 print 'These attributes are neglected in %s: %s\n' \
                     % (solver_target.__name__, str(diff_args)[5:-2])
@@ -1485,7 +1489,7 @@ class Solver:
 
         Future developers can apply these functions at appropriate
         locations with corresponding property-setting in
-        set_parameter_properties().
+        adjust_parameters().
 
         For example, in Lsode_ODEPACK, when iter_method is set to 4, it
         indicates that ODEPACK would apply user-supplied banded Jacoabian
@@ -1572,7 +1576,7 @@ class Solver:
         ones in ODEPACK, it is very useful and convenient.
 
         Future developers can call this functions with appropriate locations
-        and corresponding property-setting in set_parameter_properties().
+        and corresponding property-setting in adjust_parameters().
 
         '''
         import numpy as np
@@ -1649,7 +1653,7 @@ class MySolver(Solver):
 
 ### End of class Solver ###
 
-class ForwardEuler(Solver):
+class Euler(Solver):
     """
     Forward Euler scheme::
 
@@ -1724,7 +1728,7 @@ class LeapfrogFiltered(Solver):
 
 class Heun(Solver):
     """
-    Heun's method, also known as an RK2 or Trapezoidal method.
+    Heun's method, also known as an RungeKutta2 or Trapezoidal method.
     Basically, it is a central difference method, with one
     iteration and the Forward Euler scheme as start value.
     In this sense, it is a predictor-corrector method.
@@ -1746,9 +1750,9 @@ class Heun(Solver):
 Trapezoidal = Heun   # alias for solver Heun
 
 
-class RungeKutta2(Solver):
+class RK2(Solver):
     """
-    Standard RK2 method::
+    Standard Runge-Kutta 2nd method::
 
         u[n+1] = u[n] + dt*f(u[n] + 0.5*(dt*f(u[n],t[n])),t[n] + 0.5*dt)
     """
@@ -1763,7 +1767,7 @@ class RungeKutta2(Solver):
 
 
 
-class RungeKutta4(Solver):
+class RK4(Solver):
     """
     Standard RK4 method::
 
@@ -1790,7 +1794,7 @@ class RungeKutta4(Solver):
 
 
 
-class RungeKutta3(Solver):
+class RK3(Solver):
     """
     RungeKutta3 method::
 
@@ -1822,7 +1826,7 @@ class AdamsBashforth2(Solver):
 
     for constant time step dt.
 
-    RungeKutta2 is used as default solver in first step.
+    RK2 is used as default solver in first step.
     """
 
     _optional_parameters = Solver._optional_parameters + ['start_method',]
@@ -1834,7 +1838,7 @@ class AdamsBashforth2(Solver):
         self.f_n_1 = None
         Solver.set_internal_parameters(self)
 
-    def valid_data(self):
+    def validate_data(self):
         if not self.constant_time_step():
             print '%s must have constant time step' % self.__name__
             return False
@@ -1869,7 +1873,7 @@ class AdamsBashforth3(Solver):
 
     for constant time step dt.
 
-    RungeKutta2 is used as default solver for first steps.
+    RK2 is used as default solver for first steps.
     """
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
@@ -1881,7 +1885,7 @@ class AdamsBashforth3(Solver):
         self.f_n_2 = None
         Solver.set_internal_parameters(self)
 
-    def valid_data(self):
+    def validate_data(self):
         if not self.constant_time_step():
             print '%s must have constant time step' % self.__name__
             return False
@@ -1921,7 +1925,7 @@ class AdamsBashMoulton2(Solver):
 
     for constant time step dt.
 
-    RungeKutta2 is used as default solver for first steps.
+    RK2 is used as default solver for first steps.
     """
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
@@ -1932,7 +1936,7 @@ class AdamsBashMoulton2(Solver):
         self.f_n_1, self.f_n_2 = None, None
         Solver.set_internal_parameters(self)
 
-    def valid_data(self):
+    def validate_data(self):
         if not self.constant_time_step():
             print '%s must have constant time step' % self.__name__
             return False
@@ -1973,7 +1977,7 @@ class AdamsBashforth4(Solver):
 
     for constant time step dt.
 
-    RungeKutta2 is used as default solver for first steps.
+    RK2 is used as default solver for first steps.
     """
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
@@ -1984,7 +1988,7 @@ class AdamsBashforth4(Solver):
         self.f_n_1, self.f_n_2, self.f_n_3 = None, None, None
         Solver.set_internal_parameters(self)
 
-    def valid_data(self):
+    def validate_data(self):
         if not self.constant_time_step():
             print '%s must have constant time step' % self.__name__
             return False
@@ -2028,7 +2032,7 @@ class AdamsBashMoulton3(Solver):
 
     for constant time step dt.
 
-    RungeKutta2 is used as default solver for first steps.
+    RK2 is used as default solver for first steps.
     """
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
@@ -2039,7 +2043,7 @@ class AdamsBashMoulton3(Solver):
         self.f_n_1, self.f_n_2, self.f_n_3 = None, None, None
         Solver.set_internal_parameters(self)
 
-    def valid_data(self):
+    def validate_data(self):
         if not self.constant_time_step():
             print '%s must have constant time step' % self.__name__
             return False
@@ -2085,7 +2089,7 @@ class MidpointIter(Solver):
     _optional_parameters = Solver._optional_parameters + \
                            ['max_iter', 'eps_iter']
 
-    def set_parameter_properties(self):
+    def adjust_parameters(self):
         self._parameters['max_iter']['default'] = 3
 
     def advance(self):
@@ -2380,7 +2384,7 @@ class AdaptiveResidual(Adaptive):
         if not isinstance(self.U0, (float,int)):
             raise TypeError('Initial condition is not scalar - '
                             'AdaptiveResidual can only work with scalar ODEs')
-        self.valid_data()
+        self.validate_data()
         self.u = [self.U0]
         self.t = [t[0]]
         self.solver.set_initial_condition(self.U0)
@@ -2415,7 +2419,7 @@ class AdaptiveResidual(Adaptive):
         return self.u, self.t
 
 
-class RungeKuttaFehlberg(Adaptive):
+class RKFehlberg(Adaptive):
     """The classical adaptive Runge-Kutta-Fehlberg method of order 4-5."""
 
     _optional_parameters = Adaptive._optional_parameters
@@ -2649,18 +2653,16 @@ def list_available_solvers():
             method = eval('odesolvers.%s' % solvername)(None)
             available_solvers.append(solvername)
         except:
-            try:
-                # Not all solvers take the f, some take a string
-                # with a function in a compiled language.
+            try:  
+                # Try the exception of linearly solvers in ODEPACK
+                # f is illegal for these solvers.
                 method = eval('odesolvers.%s' % solvername)()
                 available_solvers.append(solvername)
-            except:
-                # Failed to initialize this solver.
+            except:    
+                # Failed to initialize this solver. 
                 # Perhaps the required dependency is not installed.
                 pass
     return available_solvers
-
-list_solvers = list_available_solvers
 
 # Update doc strings with common info
 class_, doc_str, classname = None, None, None
@@ -2671,3 +2673,4 @@ for classname in classes:
     doc_str = getattr(class_, '__doc__')
     setattr(class_, '__doc__', doc_str + doc_string_table_of_parameters(class_))
 del class_, doc_str, classname  # do not pollute namespace
+

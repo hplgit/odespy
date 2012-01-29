@@ -8,7 +8,6 @@ Same example as in test_RKC_2.py with call-back function composed
  directly in Fortran. 
 """
 from odesolvers import *
-#import scitools.basics,easyviz as st
 import scitools.std as st
 import numpy as np
 import os

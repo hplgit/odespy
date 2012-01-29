@@ -8,7 +8,6 @@ This example intends to show users how to improve efficiency with
 call-back functions composed in Fortran language. 
 """
 from odesolvers import *
-#import scitools.basics,easyviz as st
 import scitools.std as st
 import numpy as np
 import os
@@ -86,8 +85,6 @@ f2py.compile(string_to_compile, modulename='callback', verbose=False)
 import callback
 f_f77, jac_banded_f77, jac_f77 = callback.f_f77, callback.jac_banded_f77, \
     callback.jac_f77
-
-
 
 st.figure()
 method = Lsode

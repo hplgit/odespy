@@ -111,7 +111,7 @@ m = method(res=res, rtol=rtol, atol=atol,
            adda_lsodi=adda_full, jac_lsodi=jac_full)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], title="Lsodi with Python functions",
+st.plot(t, u[:,0], 'r-', title="Lsodi with Python functions",
         legend="with res, adda_full & jac_full", hold="on")
 print 'Max error with test case 1 is %g' % max(u[-1] - exact_final)
 
@@ -120,7 +120,7 @@ print 'Max error with test case 1 is %g' % max(u[-1] - exact_final)
 m = method(res=res, rtol=rtol, atol=atol, adda_lsodi=adda_full)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], title="Lsodi with Python functions",
+st.plot(t, u[:,0], 'b*', title="Lsodi with Python functions",
         legend="with res & adda_full", hold="on")
 print 'Max error with test case 2 is %g' % max(u[-1] - exact_final)
 
@@ -131,7 +131,7 @@ m = method(res=res, rtol=rtol, atol=atol,
            ml=ml, mu=mu)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], title="Lsodi with Python functions",
+st.plot(t, u[:,0], 'go', title="Lsodi with Python functions",
         legend="with res, adda_banded, jac_banded, ml, mu", hold="on")
 print 'Max error with test case 3 is %g' % max(u[-1] - exact_final)
 
@@ -141,7 +141,7 @@ m = method(res=res, rtol=rtol, atol=atol,
            ml=ml, mu=mu)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], title="Lsodi with Python functions",
+st.plot(t, u[:,0], 'y-', title="Lsodi with Python functions",
         legend="with res, adda_banded, ml, mu", hold="on")
 print 'Max error with test case 4 is %g' % max(u[-1] - exact_final)
 

@@ -18,7 +18,7 @@ u0, t0, tn, n_points = 1., 0., 5., 10
 atol, rtol = 1e-1, 1e-1
 time_points = np.linspace(t0, tn, n_points)
 
-for solver in ('RungeKuttaFehlberg', 'RungeKutta2'):
+for solver in ('RKFehlberg', 'RungeKutta2'):
     m = AdaptiveResidual(f, solver=solver, atol=atol, rtol=rtol)
     m.set_initial_condition(u0)
     u,t = m.solve(time_points, printInfo=True)

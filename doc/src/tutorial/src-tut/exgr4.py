@@ -8,7 +8,7 @@ def f(u, t):
 import odesolvers, numpy
 from matplotlib.pyplot import plot, hold, show
 
-method = odesolvers.RungeKutta4(f)
+method = odesolvers.RK4(f)
 
 # Split time domain into subdomains and
 # integrate the ODE in each subdomain

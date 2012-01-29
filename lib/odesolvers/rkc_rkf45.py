@@ -49,7 +49,7 @@ class RKC(Adaptive):
     0:'''Iteration stops when function TERMINATE return with True.''',
     1:'''Iteration succeed.'''}
 
-    def set_parameter_properties(self):
+    def adjust_parameters(self):
         self._parameters['rtol']['type'] = float
         self._parameters['rtol']['range'] = (2.22e-15, 0.1)
 
@@ -62,9 +62,9 @@ class RKC(Adaptive):
 ATOL =%s should be either a scalar or a vector of length NEQ=%d.
            ''' % (str(atol), self.neq)
 
-    def valid_data(self):
+    def validate_data(self):
         self.check_atol()
-        return Adaptive.valid_data(self)
+        return Adaptive.validate_data(self)
 
     def set_internal_parameters(self):
         # INFO(4) is an integer array to specify how the problem
@@ -115,7 +115,7 @@ ATOL =%s should be either a scalar or a vector of length NEQ=%d.
         self.set_internal_parameters()
 
         # Validity-check for values of class attributes
-        if not self.valid_data():
+        if not self.validate_data():
             raise ValueError('Invalid data in "%s":\n%s' % \
                              (self.__class__.__name__,
                               pprint.pformat(self.__dict__)))
@@ -158,7 +158,7 @@ class RKF45(Adaptive):
     _optional_parameters.remove('min_step')
     _optional_parameters.remove('max_step')
 
-    def set_parameter_properties(self):
+    def adjust_parameters(self):
         self._parameters['rtol']['type'] = float
         self._parameters['rtol']['extra_check'] = lambda x: x >= 0.0
         self._parameters['atol']['type'] = float

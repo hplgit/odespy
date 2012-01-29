@@ -38,29 +38,25 @@ setup.py
 
 ODE.py
    Superclass Solver, which provides all the functionalities
- that are common for all solvers.
+ that are common for all solvers. Solvers included:
+   Euler, Leapfrog, LeapfrogFiltered, Heun, RK2, RK3, RK4, 
+   AdamsBashforth2, AdamsBashforth3, AdamsBashforth4,
+   AdamsBashMoulton2, AdamsBashMoulton3, MidpointIter, 
+   SymPy_odefun, SolverImplicit, BackwardEuler, Backward2Step, 
+   ThetaRule, MidpointImplicit, Ode_scipy, Vode, Dopri5, Dop853.
+   Adaptive, AdaptiveResidual, RKFehlberg.
 
-Unadaptive.py
-   Unadaptive ODE solvers, including ForwardEuler, Leapfrog, 
-LeapfrogFiltered, Heun, RungeKutta2, RungeKutta4, RungeKutta3,
-AdamsBashforth2, AdamsBashforth3, AdamsBashforth4, MidpointIter, 
-AdamsBashMoulton2, AdamsBashMoulton3, SymPy_odefun, 
-SolverImplicit, BackwardEuler, Backward2Step, ThetaRule,
-MidpointImplicit, Ode_scipy, Vode, Dopri5, Dop853.
-
-Adaptive.py
-   Adaptive ODE solvers, including Adaptive, AdaptiveResidual,
-RungeKuttaFehlberg, Rkc, Rkf45.
+rkc_rkf45.py
+   Rkc, Rkf45.
 
 OdePack.py
    Collection of ODEPACK solvers, including Lsode, Lsodes, 
 Lsoda, Lsodar, Lsodi, Lsodis, Lsoibt.
 
 RungeKutta.py
-   Collection of Runge-Kutta methods, including RungeKutta2_RK,
-RungeKutta3_RK, RungeKutta4_RK, ForwardEuler_RK, 
-DormandPrince_RK, Fehlberg_RK, CashKarp_RK, BogackiShampine_RK,
-MyRungeKutta.
+   Collection of Runge-Kutta methods, including RungeKutta2,
+   RungeKutta3, RungeKutta4, ForwardEuler, DormandPrince, 
+   Fehlberg, CashKarp, BogackiShampine, MyRungeKutta.
 
 rkc/
    Signature file and Fortran code of rkc.f, which is available

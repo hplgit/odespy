@@ -6,7 +6,7 @@ def f(u, t):
     return c*u
 
 import odesolvers
-method = odesolvers.AdaptiveResidual(f, solver='ForwardEuler', atol=1E-3)
+method = odesolvers.AdaptiveResidual(f, solver='Euler', atol=1E-3)
 method.set_initial_condition(A)
 
 import numpy
