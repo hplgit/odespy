@@ -81,7 +81,7 @@ ATOL =%s should be either a scalar or a vector of length NEQ=%d.
         if (np.iterable(self.atol) and (len(self.atol) == self.neq)):
             self.info[3] = 1   # ATOL is a sequence of length NEQ
 
-        if hasattr(self, 'f'):  
+        if hasattr(self, 'f'):
             # If f is input in form of f(u,t), wrap f to f_f77 for Fortran code.
             f = self.f
             self.f_f77 = lambda t,u: np.asarray(f(u,t))
@@ -90,13 +90,21 @@ ATOL =%s should be either a scalar or a vector of length NEQ=%d.
             # wrap f_f77 to the general form f(u,t) for switch_to()
             f_f77 = self.f_f77
             self.f = lambda u,t: np.asarray(f_f77(t,u))
-        # If spcrad is input in form of spcrad(u,t), 
+        # If spcrad is input in form of spcrad(u,t),
         # wrap spcrad to spcrad_f77 for Fortran code.
-        if hasattr(self, 'spcrad'):  
+        if hasattr(self, 'spcrad'):
             # If spcrad is in form of spcrad(u,t), wrap for Fortran code.
             spcrad = self.spcrad
             self.spcrad_f77 = lambda t,u: np.asarray(spcrad(u,t))
         Solver.set_internal_parameters(self)   # Common settings
+
+    def initialize(self):
+        '''Import extension module _rkc and check that it exists.'''
+        try:
+            import _rkc
+            self._rkc = _rkc
+        except ImportError:
+            raise ImportError('Cannot find the extension module _rkc.\nRun setup.py again and investigate why _rkc.so was not successfully built.')
 
 
     def solve(self, time_points, terminate=None):
@@ -121,7 +129,7 @@ ATOL =%s should be either a scalar or a vector of length NEQ=%d.
                               pprint.pformat(self.__dict__)))
 
         # Call extension module
-        from _rkc import solve
+        solve = self._rkc.solve
         # Fortran or Python function
         f = getattr(self.f_f77, '_cpointer', self.f_f77)
         spcrad = getattr(self.spcrad_f77, '_cpointer', self.spcrad_f77)
@@ -158,6 +166,14 @@ class RKF45(Adaptive):
     _optional_parameters.remove('min_step')
     _optional_parameters.remove('max_step')
 
+    def initialize(self):
+        '''Import extension module _rkf45 and check that it exists.'''
+        try:
+            import _rkf45
+            self._rkf45 = _rkf45
+        except ImportError:
+            raise ImportError('Cannot find the extension module _rkf45.\nRun setup.py again and investigate why _rkf45.so was not successfully built.')
+
     def adjust_parameters(self):
         self._parameters['rtol']['type'] = float
         self._parameters['rtol']['extra_check'] = lambda x: x >= 0.0
@@ -165,7 +181,7 @@ class RKF45(Adaptive):
         self._parameters['atol']['extra_check'] = lambda x: x >= 0.0
 
     def set_internal_parameters(self):
-        if hasattr(self, 'f'):  
+        if hasattr(self, 'f'):
             # If f is input in form of f(u,t), wrap f to f_f77 for Fortran code.
             f = self.f
             self.f_f77 = lambda t,u: np.asarray(f(u,t))
@@ -179,22 +195,9 @@ class RKF45(Adaptive):
     def advance(self):
         u, t, n, rtol, atol = self.u, self.t, self.n, self.rtol, self.atol
 
-        from _rkf45 import advance
+        advance = self._rkf.advance
         f = getattr(self.f_f77, '_cpointer', self.f_f77)
-        unew, istate = advance(f, u[n], t[n], t[n + 1], rtol, atol)
+        unew, istate = advance(f, u[n], t[n], t[n+1], rtol, atol)
         if istate > 2:
             sys.exit(1)
         return unew
-
-# Update doc strings with common info
-class_, doc_str, classname = None, None, None
-classes = [item[0] for item in locals().items() \
-               if inspect.isclass(item[1])]
-for classname in classes:
-    class_ = eval(classname)
-    doc_str = getattr(class_, '__doc__')
-    setattr(class_, '__doc__', 
-            doc_str + doc_string_table_of_parameters(class_, 
-                                                     fixed_width=(21,49)))
-del class_, doc_str, classname  # do not pollute namespace
-

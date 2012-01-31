@@ -1218,7 +1218,7 @@ class Solver:
                 value_specified = True \
                     if 'default' not in self._parameters[name] \
                     else value != self._parameters[name]['default']
-                if default or value_specified: 
+                if default or value_specified:
                     types = self._parameters[name]['type']
                     if types in (callable, (str, callable)):
                         value = getattr(value, '__name__', \
@@ -1469,7 +1469,7 @@ class Solver:
         if printInfo:
             # neglected attributes in new solver
             diff_args = set(self.__dict__.keys()) - set(new.__dict__.keys()) \
-                - set(('u','t','n','dtype'))            
+                - set(('u','t','n','dtype'))
             if diff_args:
                 print 'These attributes are neglected in %s: %s\n' \
                     % (solver_target.__name__, str(diff_args)[5:-2])
@@ -2653,24 +2653,15 @@ def list_available_solvers():
             method = eval('odesolvers.%s' % solvername)(None)
             available_solvers.append(solvername)
         except:
-            try:  
+            try:
                 # Try the exception of linearly solvers in ODEPACK
                 # f is illegal for these solvers.
                 method = eval('odesolvers.%s' % solvername)()
                 available_solvers.append(solvername)
-            except:    
-                # Failed to initialize this solver. 
+            except:
+                # Failed to initialize this solver.
                 # Perhaps the required dependency is not installed.
                 pass
     return available_solvers
 
-# Update doc strings with common info
-class_, doc_str, classname = None, None, None
-classes = [item[0] for item in locals().items() \
-               if inspect.isclass(item[1])]
-for classname in classes:
-    class_ = eval(classname)
-    doc_str = getattr(class_, '__doc__')
-    setattr(class_, '__doc__', doc_str + doc_string_table_of_parameters(class_))
-del class_, doc_str, classname  # do not pollute namespace
 

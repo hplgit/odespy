@@ -3,24 +3,24 @@ import numpy as np
 
 class RungeKutta(Adaptive):
     """
-    Super class for explicit 1-level- Runge-Kutta methods: 
+    Super class for explicit 1-level- Runge-Kutta methods:
     RungeKutta4, Rungekutta2,etc..
     or 2-levels adaptive Runge-Kutta methods:
     Dormand & Prince , CashKarp or Fehlberg, etc..
-    
+
     Available subclasses are:
     MyRungeKutta(User-supplied RungeKutta methods),
     RungeKutta2, RungeKutta3, ForwardEuler, DormandPrince,
     RungeKutta4, FehlBerg, CashKarp, BogackiShampine.
-             
+
     """
     _method_order = None
     # An integer for unadaptive method,
     # or a pair of integers for 2 levels in adaptive methods.
     _butcher_tableau = None
-    # (n, n) array for unadaptive methods, 
+    # (n, n) array for unadaptive methods,
     # or (n+1, n) array for adaptive ones.
-    
+
     _optional_parameters = Adaptive._optional_parameters + \
         ['min_step','max_step','first_step']
 
@@ -29,9 +29,9 @@ class RungeKutta(Adaptive):
         Return the order of current method, both for unadaptive methods
         and for adaptive ones.
         '''
-        order = getattr(self, 'method_order', None) 
+        order = getattr(self, 'method_order', None)
         if order is None:       # User-supplied method in MyRungeKutta
-            coefficients = self.butcher_tableau    
+            coefficients = self.butcher_tableau
             if coefficients.shape[0] == coefficients.shape[1]:
                 # Butcher_table is a square array
                 order = self.calculate_order_1_level(coefficients)
@@ -51,12 +51,12 @@ class RungeKutta(Adaptive):
     def calculate_order_1_level(self,coefficients):
         '''
         Calculate order of 1-level RungeKutta method
-        with help of the known solution u = -e**t.      
+        with help of the known solution u = -e**t.
 
         "Coefficients" is a square 2d-array(butcher tableau).
         '''
         test = MyRungeKutta(lambda u,t:-u,\
-                            butcher_tableau = coefficients)       
+                            butcher_tableau = coefficients)
         test.set_initial_condition(1.)
         u,t = test.solve([0.,.1,1.1])
 
@@ -68,7 +68,7 @@ class RungeKutta(Adaptive):
             u[-1] - np.exp(-t[-1]), u[-2] - np.exp(-t[-2])
         order = int(np.log(abs(error1/error2))/np.log(t[-1]/t[-2]))
         return order
-                   
+
     def advance(self):
         f, n, rtol, atol, neq = \
             self.f, self.n, self.rtol, self.atol, self.neq
@@ -94,13 +94,13 @@ class RungeKutta(Adaptive):
         factors_t = table[:k_len, 0]
         # coefficients for u_new
         factors_u_new = table[k_len, 1:]
-        
-        if len(table) == k_len + 2:    
+
+        if len(table) == k_len + 2:
             # (k+2, k+1) array -->  2-levels Adaptive methods
 
             # coefficients for local error between 2 levels
             factors_error = table[k_len+1, 1:] - factors_u_new
-            
+
             uwork, twork = [u_n,], [t_n,]                # work arrays
             u, t, h = u_n, t_n, first_step               # initial values
             k = np.zeros((k_len, self.neq), self.dtype)  # intern stages
@@ -109,7 +109,7 @@ class RungeKutta(Adaptive):
             while (abs(t - t_n) < abs(t_next - t_n)):
                 u, t = uwork[-1], twork[-1]
                 # internal steps
-                k[:, :] = 0.   # initialization for next step           
+                k[:, :] = 0.   # initialization for next step
                 for m in range(k_len):
                     k_factors = (np.dot(factors_u, k))[m]
                     #print u, u+h*k_factors, f(u+h*k_factor, 0.5), self.dtype
@@ -132,7 +132,7 @@ class RungeKutta(Adaptive):
                 error = np.asarray([(1e-16 if x == 0. else x) \
                                     for x in error])
 
-                # Normarized error rate 
+                # Normarized error rate
                 rms = error/tol
                 rms_norm = np.sqrt(np.sum(rms*rms)/self.neq)
 
@@ -141,13 +141,13 @@ class RungeKutta(Adaptive):
                 # Formula is from <Numerical Methods for Engineers,
                 #  Chappra & Cannle>
                 s = .8 *((1./rms_norm)**(1/order))
-                # scalar should in range(0.1, 4.) 
+                # scalar should in range(0.1, 4.)
                 # for better accuracy and smoothness
                 s = middle(s)
                 h *= s
 
                 # step size should in range(min_step, max_step)
-                h = middle(h, y=min_step, z=max_step) 
+                h = middle(h, y=min_step, z=max_step)
                 # in case for last intern step
                 h = min(h, t_next - twork[-1])
 
@@ -158,7 +158,7 @@ class RungeKutta(Adaptive):
                 k[m] = f(u_n + dt * k_factors,t_n + dt * factors_t[m])
             u_new = u_n + dt * (np.dot(factors_u_new,k))
         return u_new
-    
+
 class RungeKutta2(RungeKutta):
     '''Standard Runge-Kutta method with order 2. '''
     _butcher_tableau = np.array(\
@@ -253,13 +253,13 @@ class MyRungeKutta(RungeKutta):
     '''
     _butcher_tableau = None
     _method_order = None
-    
+
     _required_parameters = RungeKutta._required_parameters + \
                            ['butcher_tableau',]
-    
+
     _optional_parameters =  RungeKutta._optional_parameters + \
                            ['method_order',]
-                                 
+
     def validate_data(self):
         if not RungeKutta.validate_data(self):
             return False
@@ -288,12 +288,12 @@ class MyRungeKutta(RungeKutta):
         Your input is %s .''' % str(self.method_order)
             error_2level = '''
         method order should be a pair of adjacent positive integers,
-        with a supplied non-square butch table, which implies a 
+        with a supplied non-square butch table, which implies a
         2-level method. Your input is %s.''' % str(self.method_order)
             if array_shape[0] == array_shape[1] + 1:
                 # 2-level RungeKutta methods
                 if type(self.method_order) is int:
-                    raise ValueError, error_2level                
+                    raise ValueError, error_2level
                 try:
                     order1, order2 = self.method_order
                     if abs(order1-order2) != 1 or \
@@ -320,24 +320,12 @@ class MyRungeKutta(RungeKutta):
                                sum(self.butcher_tableau[i][1:])):
                 raise ValueError, '''
         Inconsistent data in Butcher_Tableau!
-        In each lines of stage-coefficients, first number should be 
-        equal to the sum of other numbers. 
+        In each lines of stage-coefficients, first number should be
+        equal to the sum of other numbers.
         That is, for a butcher_table with K columns,
             a[i][0] == a[i][1] + a[i][2] + ... + a[i][K - 1]
             where 1 <= i <= K - 1
         Your input for line %d is :%s
         ''' % (i,str(self.butcher_tableau[i]))
-          
+
         return True
-
-
-# Update doc strings with common info
-class_, doc_str, classname = None, None, None
-import inspect
-classes = [item[0] for item in locals().items() \
-               if inspect.isclass(item[1])]
-for classname in classes:
-    class_ = eval(classname)
-    doc_str = getattr(class_, '__doc__')
-    setattr(class_, '__doc__', doc_str + doc_string_table_of_parameters(class_))
-del class_, doc_str, classname  # do not pollute namespace
