@@ -1,5 +1,8 @@
 # Author: Liwei Wang, Hans Petter Langtangen
 
+# This doc string is to be replaced by something from odesolvers.do.txt
+# filtered to sphinx.
+
 """
 This module contains tools for solving ordinary differential
 equations (ODEs). Both scalar ODEs and systems of ODEs are supported.
