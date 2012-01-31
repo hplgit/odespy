@@ -1,0 +1,418 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+python module solve__user__routines 
+    interface solve_user_interface
+        subroutine termin(yrr,trr,n,nt,neq,valid) 
+            double precision dimension(nt,neq), depend(nt,neq) :: yrr
+            double precision dimension(nt), depend(nt) :: trr
+            integer :: n
+            integer intent(out) :: valid
+            integer :: nt
+            integer :: neq
+        end subroutine termin
+        subroutine f(neq,t,y,ydot) 
+            integer dimension(*),intent(hide) :: neq
+            double precision dimension(neq[0]) :: y
+            double precision :: t
+            double precision dimension(*), intent(out) :: ydot
+        end subroutine f
+        subroutine jac(neq,tn,y,ml,mu,pd,nrowpd) 
+            integer dimension(*),intent(hide) :: neq
+            double precision :: tn
+            double precision dimension(neq[0]) :: y
+            integer intent(hide) :: ml
+            integer intent(hide) :: mu
+            integer intent(hide) :: nrowpd
+            double precision dimension(*,*), intent(out) :: pd
+        end subroutine jac
+        subroutine jaccolumn(neq,t,y,j,ian,jan,pd) 
+            integer dimension(*),intent(hide) :: neq
+            double precision :: t
+            double precision dimension(neq[0]) :: y
+            integer :: j
+            integer dimension(neq[0]+1) :: ia
+            integer dimension(neq[1]) :: ja  
+            double precision dimension(*), intent(out) :: pd
+        end subroutine jaccolumn
+        subroutine g(neq,t,y,ng,gout) 
+            integer dimension(*),intent(hide) :: neq
+            double precision :: t
+            double precision dimension(neq[0]) :: y
+            integer intent(hide):: ng
+            double precision dimension(ng),intent(out) :: gout
+        end subroutine g
+    end interface solve_user_interface
+end python module solve__user__routines
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module dlsodi__user__routines
+    interface dlsodi_user_interface 
+        subroutine jac(neq,t,y,s,ml,mu,pd,nrowpd) 
+            integer dimension(*),intent(hide) :: neq
+            double precision :: t
+            double precision dimension(neq[0]) :: y
+            double precision dimension(neq[0]) :: s
+            integer intent(hide) :: ml
+            integer intent(hide) :: mu
+            integer intent(hide) :: nrowpd
+            double precision dimension(*,neq[0]),intent(out) :: pd
+        end subroutine jac
+        subroutine res(neq,t,y,s,r,ires)
+            integer dimension(*),intent(hide) :: neq
+            double precision :: t
+            double precision dimension(neq[0]) :: y
+            double precision dimension(neq[0]) :: s
+            double precision dimension(neq[0]),intent(out) :: r
+            integer intent(in,out):: ires
+        end subroutine res
+        subroutine adda(neq,t,y,ml,mu,p,nrowp) 
+            integer dimension(*),intent(hide) :: neq
+            double precision :: t
+            double precision dimension(neq[0]) :: y
+            integer intent(hide):: ml
+            integer intent(hide):: mu
+            double precision dimension(nrowp,neq[0]), intent(in,out) :: p
+            integer intent(hide):: nrowp
+        end subroutine adda
+    end interface dlsodi_user_interface
+end python module dlsodi__user__routines
+python module dlsoibt__user__routines
+    interface dlsoibt_user_interface 
+        subroutine jac(neq,t,y,s,mb,nb,pa,pb,pc) 
+            integer dimension(*),intent(hide) :: neq
+            double precision :: t
+            double precision dimension(neq[0]) :: y
+            double precision dimension(neq[0]) :: s
+            integer intent(hide) :: mb
+            integer intent(hide) :: nb
+            double precision dimension(mb,mb,nb),intent(out) :: pa
+            double precision dimension(mb,mb,nb),intent(out) :: pb
+            double precision dimension(mb,mb,nb),intent(out) :: pc
+        end subroutine jac
+        subroutine res(neq,t,y,s,r,ires)
+            integer dimension(*),intent(hide) :: neq
+            double precision :: t
+            double precision dimension(neq[0]) :: y
+            double precision dimension(neq[0]) :: s
+            double precision dimension(neq[0]),intent(out) :: r
+            integer intent(in,out):: ires
+        end subroutine res
+        subroutine adda(neq,t,y,mb,nb,pa,pb,pc) 
+            integer dimension(*),intent(hide) :: neq
+            double precision :: t
+            double precision dimension(neq[0]) :: y
+            integer intent(hide):: mb
+            integer intent(hide):: nb
+            double precision dimension(mb,mb,nb), intent(in,out) :: pa
+            double precision dimension(mb,mb,nb), intent(in,out) :: pb
+            double precision dimension(mb,mb,nb), intent(in,out) :: pc
+        end subroutine adda
+    end interface dlsoibt_user_interface
+end python module dlsoibt__user__routines
+python module dlsodis__user__routines
+    interface dlsodis_user_interface 
+        subroutine jac(neq,t,y,s,j,ia,ja,pdj) 
+            integer dimension(*),intent(hide) :: neq
+            double precision :: t
+            double precision dimension(neq[0]) :: y
+            double precision dimension(neq[0]) :: s
+            integer :: j
+            integer dimension(neq[0]+1) :: ia
+            integer dimension(*) :: ja
+            double precision dimension(neq[0]),intent(out) :: pdj
+        end subroutine jac
+        subroutine res(neq,t,y,s,r,ires)
+            integer dimension(*),intent(hide) :: neq
+            double precision :: t
+            double precision dimension(neq[0]) :: y
+            double precision dimension(neq[0]) :: s
+            double precision dimension(neq[0]),intent(out) :: r
+            integer intent(in,out):: ires
+        end subroutine res
+        subroutine adda(neq,t,y,j,ia,ja,p) 
+            integer dimension(*),intent(hide) :: neq
+            double precision :: t
+            double precision dimension(neq[0]) :: y
+            integer :: j
+            integer dimension(neq[0]+1):: ia
+            integer dimension(*):: ja
+            double precision dimension(neq[0]), intent(in,out) :: p
+        end subroutine adda
+    end interface dlsodis_user_interface
+end python module dlsodis__user__routines
+
+python module _odepack ! in 
+    interface  ! in :_odepack
+        subroutine dlsodi(res,adda,jac,neq,y,ydoti,t,tout,itol,rtol,atol,itask,istate,iopt,rwork,lrw,iwork,liw,mf) ! in :_odepack:opkdmain.f
+            use dlsodi__user__routines
+            external res
+            external adda
+            external jac
+            integer dimension(*) :: neq
+            double precision dimension(*) ,intent(in,out) :: y
+            double precision dimension(*) :: ydoti
+            double precision intent(in,out) :: t
+            double precision :: tout
+            integer :: itol
+            double precision dimension(*) :: rtol
+            double precision dimension(*) :: atol
+            integer :: itask
+            integer intent(in,out) :: istate
+            integer :: iopt
+            double precision dimension(lrw) ,intent(in), depend(lrw) :: rwork
+            integer intent(in) :: lrw
+            integer dimension(liw) ,intent(in,out), depend(liw) :: iwork
+            integer intent(in) :: liw
+            integer :: mf
+            double precision dimension(209) :: rowns
+            double precision :: ccmax
+            double precision :: el0
+            double precision :: h
+            double precision :: hmin
+            double precision :: hmxi
+            double precision :: hu
+            double precision :: rc
+            double precision :: tn
+            double precision :: uround
+            integer :: init
+            integer :: mxstep
+            integer :: mxhnil
+            integer :: nhnil
+            integer :: nslast
+            integer :: nyh
+            integer dimension(6) :: iowns
+            integer :: icf
+            integer :: ierpj
+            integer :: iersl
+            integer :: jcur
+            integer :: jstart
+            integer :: kflag
+            integer :: l
+            integer :: lyh
+            integer :: lewt
+            integer :: lacor
+            integer :: lsavf
+            integer :: lwm
+            integer :: liwm
+            integer :: meth
+            integer :: miter
+            integer :: maxord
+            integer :: maxcor
+            integer :: msbp
+            integer :: mxncf
+            integer :: n
+            integer :: nq
+            integer :: nst
+            integer :: nfe
+            integer :: nje
+            integer :: nqu
+            common /dls001/ rowns,ccmax,el0,h,hmin,hmxi,hu,rc,tn,uround,init,mxstep,mxhnil,nhnil,nslast,nyh,iowns,icf,ierpj,iersl,jcur,jstart,kflag,l,lyh,lewt,lacor,lsavf,lwm,liwm,meth,miter,maxord,maxcor,msbp,mxncf,n,nq,nst,nfe,nje,nqu
+        end subroutine dlsodi
+        subroutine dlsoibt(res,adda,jac,neq,y,ydoti,t,tout,itol,rtol,atol,itask,istate,iopt,rwork,lrw,iwork,liw,mf) ! in :odepack:opkdmain.f
+            use dlsoibt__user__routines
+            external res
+            external adda
+            external jac
+            integer dimension(*) :: neq
+            double precision dimension(*) ,intent(in,out) :: y
+            double precision dimension(*) :: ydoti
+            double precision intent(in,out) :: t
+            double precision :: tout
+            integer :: itol
+            double precision dimension(*) :: rtol
+            double precision dimension(*) :: atol
+            integer :: itask
+            integer intent(in,out) :: istate
+            integer :: iopt
+            double precision dimension(lrw) ,intent(in), depend(lrw) :: rwork
+            integer intent(in) :: lrw
+            integer dimension(liw) ,intent(in,out), depend(liw) :: iwork
+            integer intent(in) :: liw
+            integer :: mf
+            double precision dimension(209) :: rowns
+            double precision :: ccmax
+            double precision :: el0
+            double precision :: h
+            double precision :: hmin
+            double precision :: hmxi
+            double precision :: hu
+            double precision :: rc
+            double precision :: tn
+            double precision :: uround
+            integer :: init
+            integer :: mxstep
+            integer :: mxhnil
+            integer :: nhnil
+            integer :: nslast
+            integer :: nyh
+            integer dimension(6) :: iowns
+            integer :: icf
+            integer :: ierpj
+            integer :: iersl
+            integer :: jcur
+            integer :: jstart
+            integer :: kflag
+            integer :: l
+            integer :: lyh
+            integer :: lewt
+            integer :: lacor
+            integer :: lsavf
+            integer :: lwm
+            integer :: liwm
+            integer :: meth
+            integer :: miter
+            integer :: maxord
+            integer :: maxcor
+            integer :: msbp
+            integer :: mxncf
+            integer :: n
+            integer :: nq
+            integer :: nst
+            integer :: nfe
+            integer :: nje
+            integer :: nqu
+            common /dls001/ rowns,ccmax,el0,h,hmin,hmxi,hu,rc,tn,uround,init,mxstep,mxhnil,nhnil,nslast,nyh,iowns,icf,ierpj,iersl,jcur,jstart,kflag,l,lyh,lewt,lacor,lsavf,lwm,liwm,meth,miter,maxord,maxcor,msbp,mxncf,n,nq,nst,nfe,nje,nqu
+        end subroutine dlsoibt
+        subroutine dlsodis(res,adda,jac,neq,y,ydoti,t,tout,itol,rtol,atol,itask,istate,iopt,rwork,lrw,iwork,liw,mf) ! in :odepack:opkdmain.f
+            use dlsodis__user__routines
+            external res
+            external adda
+            external jac
+            integer dimension(*) :: neq
+            double precision dimension(*) ,intent(in,out) :: y
+            double precision dimension(*) :: ydoti
+            double precision intent(in,out) :: t
+            double precision :: tout
+            integer :: itol
+            double precision dimension(*) :: rtol
+            double precision dimension(*) :: atol
+            integer :: itask
+            integer intent(in,out) :: istate
+            integer :: iopt
+            double precision dimension(lrw) ,intent(in), depend(lrw) :: rwork
+            integer intent(in) :: lrw
+            integer dimension(liw) ,intent(in,out), depend(liw) :: iwork
+            integer intent(in) :: liw
+            integer :: mf
+            double precision :: con0
+            double precision :: conmin
+            double precision :: ccmxj
+            double precision :: psmall
+            double precision :: rbig
+            double precision :: seth
+            integer :: iplost
+            integer :: iesp
+            integer :: istatc
+            integer :: iys
+            integer :: iba
+            integer :: ibian
+            integer :: ibjan
+            integer :: ibjgp
+            integer :: ipian
+            integer :: ipjan
+            integer :: ipjgp
+            integer :: ipigp
+            integer :: ipr
+            integer :: ipc
+            integer :: ipic
+            integer :: ipisp
+            integer :: iprsp
+            integer :: ipa
+            integer :: lenyh
+            integer :: lenyhm
+            integer :: lenwk
+            integer :: lreq
+            integer :: lrat
+            integer :: lrest
+            integer :: lwmin
+            integer :: moss
+            integer :: msbj
+            integer :: nslj
+            integer :: ngp
+            integer :: nlu
+            integer :: nnz
+            integer :: nsp
+            integer :: nzl
+            integer :: nzu
+            double precision dimension(209) :: rowns
+            double precision :: ccmax
+            double precision :: el0
+            double precision :: h
+            double precision :: hmin
+            double precision :: hmxi
+            double precision :: hu
+            double precision :: rc
+            double precision :: tn
+            double precision :: uround
+            integer :: init
+            integer :: mxstep
+            integer :: mxhnil
+            integer :: nhnil
+            integer :: nslast
+            integer :: nyh
+            integer dimension(6) :: iowns
+            integer :: icf
+            integer :: ierpj
+            integer :: iersl
+            integer :: jcur
+            integer :: jstart
+            integer :: kflag
+            integer :: l
+            integer :: lyh
+            integer :: lewt
+            integer :: lacor
+            integer :: lsavf
+            integer :: lwm
+            integer :: liwm
+            integer :: meth
+            integer :: miter
+            integer :: maxord
+            integer :: maxcor
+            integer :: msbp
+            integer :: mxncf
+            integer :: n
+            integer :: nq
+            integer :: nst
+            integer :: nfe
+            integer :: nje
+            integer :: nqu
+            common /dlss01/ con0,conmin,ccmxj,psmall,rbig,seth,iplost,iesp,istatc,iys,iba,ibian,ibjan,ibjgp,ipian,ipjan,ipjgp,ipigp,ipr,ipc,ipic,ipisp,iprsp,ipa,lenyh,lenyhm,lenwk,lreq,lrat,lrest,lwmin,moss,msbj,nslj,ngp,nlu,nnz,nsp,nzl,nzu
+            common /dls001/ rowns,ccmax,el0,h,hmin,hmxi,hu,rc,tn,uround,init,mxstep,mxhnil,nhnil,nslast,nyh,iowns,icf,ierpj,iersl,jcur,jstart,kflag,l,lyh,lewt,lacor,lsavf,lwm,liwm,meth,miter,maxord,maxcor,msbp,mxncf,n,nq,nst,nfe,nje,nqu
+        end subroutine dlsodis
+        subroutine solve(termin,itermin,nt,nstart,nstop,f,neq,yin,trr,itol,rtol,atol,istate,iopt,rworkin,lrwin,lrw,iworkin,liwin,liw,jac,jaccolumn,mf,g,ng,rinfo,iinfo,subroutinename) ! in :_odepack:solve_odepack.f
+            use solve__user__routines
+            external termin
+            integer intent(in) :: itermin
+            integer intent(hide),depend(trr) :: nt=len(trr)
+            integer intent(in) :: nstart
+            integer intent(out) :: nstop
+            external f
+            integer intent(hide), check(shape(yin,1)==neq),depend(yin) :: neq=shape(yin,1)
+            double precision dimension(nt,neq),intent(in,out) :: yin
+            double precision dimension(nt),intent(in) :: trr
+            integer intent(in) :: itol
+            double precision dimension(*),intent(in) :: rtol
+            double precision dimension(*),intent(in) :: atol
+            integer intent(in, out) :: istate
+            integer intent(in) :: iopt
+            double precision dimension(lrwin),intent(in) :: rworkin
+            integer intent(hide),depend(rworkin) :: lrwin=len(rworkin)
+            integer intent(in) :: lrw
+            integer dimension(liwin),intent(in) :: iworkin
+            integer intent(hide),depend(iworkin) :: liwin=len(iworkin)
+            integer intent(in) :: liw
+            external jac
+            integer intent(in) :: mf
+            external g
+            external jaccolumn
+            integer ng
+            double precision dimension(5),intent(out) :: rinfo
+            integer dimension(17 + ng),intent(out) :: iinfo
+            character*(*) intent(in) :: subroutinename
+        end subroutine solve
+    end interface 
+end python module _odepack
+
+! This file was auto-generated with f2py (version:1).
+! See http://cens.ioc.ee/projects/f2py2e/

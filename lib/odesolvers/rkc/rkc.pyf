@@ -1,0 +1,58 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module solve__user__routines 
+    interface solve_user_interface 
+        subroutine termin(yrr,trr,n,nt,neq,valid)
+            double precision dimension(nt,neq), depend(nt,neq) :: yrr
+            double precision dimension(nt), depend(nt) :: trr
+            integer :: n
+            integer intent(out) :: valid
+            integer :: nt
+            integer :: neq
+        end subroutine termin
+        subroutine f(neq,t,y,ydot) 
+            integer intent(hide) :: neq
+            double precision dimension(neq) :: y
+            double precision :: t
+            double precision dimension(*), intent(out) :: ydot
+        end subroutine f
+        function spcrad(neq,t,y) 
+            integer intent(hide) :: neq
+            double precision dimension(neq), intent(in) :: y
+            double precision intent(in) :: t
+            double precision intent(out):: spcrad
+        end function spcrad
+    end interface solve_user_interface
+end python module solve__user__routines
+python module _rkc ! in 
+    interface  ! in :_rkc
+        subroutine solve(spcrad,neq,f,yin,yout,trr,nt,rtol,atol,info,idid,termin,itermin,nstop) ! in :_rkc:solve_rkc.f
+            use solve__user__routines
+            external spcrad
+            integer optional,check(len(yin)>=neq),depend(yin) :: neq=len(yin)
+            external f
+            double precision dimension(neq), intent(in) :: yin
+            double precision dimension(nt,neq),intent(out) :: yout
+            double precision dimension(nt), intent(in) :: trr
+            integer optional,depend(trr) :: nt=len(trr)
+            double precision :: rtol
+            double precision dimension(*), intent(in) :: atol
+            integer dimension(4) :: info
+            integer intent(out) :: idid
+            external termin
+            integer :: itermin
+            integer intent(out) :: nstop
+            integer :: nfe
+            integer :: nsteps
+            integer :: naccpt
+            integer :: nrejct
+            integer :: nfesig
+            integer :: maxm
+            common /rkcdid/ nfe,nsteps,naccpt,nrejct,nfesig,maxm
+        end subroutine solve
+    end interface 
+end python module _rkc
+
+! This file was auto-generated with f2py (version:1).
+! See http://cens.ioc.ee/projects/f2py2e/
