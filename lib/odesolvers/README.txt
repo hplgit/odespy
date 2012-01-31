@@ -87,7 +87,7 @@ Mandatory dependency:
 1. package Numpy, available at  numpy.scipy.org
 
 2. Package nose is used for basic tests, which requires a version later
-   than 0.10.0.
+   than 0.10.0, available at readthedocs.org/docs/nose/en/latest..
 
 Optional dependencies:
 
@@ -111,15 +111,15 @@ Package scitools is available at http://code.google.com/p/scitools/.
 Information
 ==========================================================
 
-1. odesolvers.list_solvers()
-   A function to list all possible solvers in this module.
+1. odesolvers.list_available_solvers()
+   A function to list all available solvers in this module.
 
-2. pydoc odesolvers.(desired solver_name)
+2. pydoc odesolvers.(name of desired solver)
    Example: pydoc odesolvers.RungeKutta4
    Print out useful information for desired solver, e.g. 
    parameters, methods, usage.
 
-3. get_parameter_info(self, printInfo=True) 
+3. get_parameter_info(self, print_info=True) 
    Print out information about legal parameters in current 
    solver, e.g. types, ranges, help_info, rtc..
 
