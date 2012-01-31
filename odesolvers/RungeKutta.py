@@ -1,4 +1,4 @@
-from ODE import Solver, doc_string_table_of_parameters, Adaptive
+from ODE import Solver, Adaptive
 import numpy as np
 
 class RungeKutta(Adaptive):
@@ -160,7 +160,12 @@ class RungeKutta(Adaptive):
         return u_new
 
 class RungeKutta2(RungeKutta):
-    '''Standard Runge-Kutta method with order 2. '''
+    """
+    Standard Runge-Kutta method of order 2.
+    Implementation in the general RungeKutta Python framework.
+    """
+    quick_description = "Explicit 2nd-order Runge-Kutta method"
+
     _butcher_tableau = np.array(\
         [[0., 0., 0.],
          [.5, .5, 0.],
@@ -168,7 +173,12 @@ class RungeKutta2(RungeKutta):
     _method_order = 2
 
 class RungeKutta3(RungeKutta):
-    '''Standard Runge-Kutta method with order 3. '''
+    """
+    Standard Runge-Kutta method of order 3.
+    Implementation in the general RungeKutta Python framework.
+    """
+    quick_description = "Explicit 3rd-order Runge-Kutta method"
+
     _butcher_tableau = np.array(\
         [[0., 0., 0., 0.],
          [.5, .5, 0., 0.],
@@ -176,15 +186,25 @@ class RungeKutta3(RungeKutta):
          [0., .16666667, .66666667, .16666667]])
     _method_order = 3
 
-class ForwardEuler(RungeKutta):
-    '''Forward Euler method.  '''
+class RungeKutta1(RungeKutta):
+    """
+    Explicit Forward Euler method implemented
+    in the general RungeKutta Python framework.
+    """
+    quick_description = "Explicit 1st-order Runge-Kutta method"
+
     _butcher_tableau = np.array(\
         [[0., 0.],
          [0., 1.]])
     _method_order = 1
 
 class DormandPrince(RungeKutta):
-    '''Dormand&Prince Runge-Kutta method with order (5, 4). '''
+    """
+    Dormand&Prince Runge-Kutta method of order (5, 4).
+    Implementation in the general RungeKutta Python framework.
+    """
+    quick_description = "Dormand & Prince RK method of order (5, 4)"
+
     _butcher_tableau = np.array(\
         [[0., 0., 0., 0., 0., 0., 0., 0.],
          [.2, .2, 0., 0., 0., 0., 0., 0.],
@@ -198,7 +218,12 @@ class DormandPrince(RungeKutta):
     _method_order = (5,4)
 
 class RungeKutta4(RungeKutta):
-    '''Standard Runge-Kutta method with order 4. '''
+    """
+    Standard Runge-Kutta method of order 4.
+    Implementation in the general RungeKutta Python framework.
+    """
+    quick_description = "Explicit 4th-order Runge-Kutta method"
+
     _butcher_tableau = np.array(\
         [[0., 0., 0., 0., 0.],
          [.5, .5, 0., 0., 0.],
@@ -208,7 +233,12 @@ class RungeKutta4(RungeKutta):
     _method_order = 4
 
 class Fehlberg(RungeKutta):
-    '''Fehlberg Runge-Kutta method with order (4, 5). '''
+    """
+    Adaptive Runge-Kutta-Fehlberg method of order (4, 5).
+    Implementation in the general RungeKutta Python framework.
+    """
+    quick_description = "Adaptive Runge-Kutta-Fehlberg (4,5) method"
+
     _butcher_tableau = np.array(\
         [[0., 0., 0., 0., 0., 0., 0.],
          [.25, .25, 0., 0., 0., 0., 0.],
@@ -221,8 +251,13 @@ class Fehlberg(RungeKutta):
     _method_order = (4,5)
 
 class CashKarp(RungeKutta):
-    '''CashKarp Runge-Kutta method with order (5, 4). '''
-    _butcher_tableau = np.array(\
+    """
+    Adaptive Cash-Karp Runge-Kutta method of order (5, 4).
+    Implementation in the general RungeKutta Python framework.
+    """
+    quick_description = "Adaptive Cash-Karp RK method of order (5, 4)"
+
+    _butcher_tableau = np.array(
         [[0., 0., 0., 0., 0., 0., 0.],
          [.2, .2, 0., 0., 0., 0., 0.],
          [.3, .075, .225, 0., 0., 0., 0.],
@@ -234,8 +269,13 @@ class CashKarp(RungeKutta):
     _method_order = (5,4)
 
 class BogackiShampine(RungeKutta):
-    '''BogackiShampine Runge-Kutta method with order (3, 2). '''
-    _butcher_tableau = np.array(\
+    """
+    Adaptive Bogacki-Shampine Runge-Kutta method of order (3, 2).
+    Implementation in the general RungeKutta Python framework.
+    """
+    quick_description = "Adaptive Bogacki-Shampine RK method of order (3, 2)"
+
+    _butcher_tableau = np.array(
         [[0., 0., 0., 0., 0.],
          [.5, .5, 0., 0., 0.],
          [.75, 0., .75, 0., 0.],
@@ -245,12 +285,12 @@ class BogackiShampine(RungeKutta):
     _method_order = (3,2)
 
 class MyRungeKutta(RungeKutta):
-    '''
+    """
     User-supplied RungeKutta method, which is defined by providing
     butcher-table in an 2d-array.
     Method order should be provided if it is known. If not, the order
     would be estimated automatically with function get_order().
-    '''
+    """
     _butcher_tableau = None
     _method_order = None
 

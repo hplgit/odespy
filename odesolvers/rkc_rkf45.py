@@ -1,4 +1,4 @@
-from ODE import Solver, Adaptive, doc_string_table_of_parameters
+from ODE import Solver, Adaptive
 import numpy as np
 import inspect, sys
 
@@ -29,6 +29,7 @@ class RKC(Adaptive):
 
     Source code for rkc.f can be obtained directly from website of netlib.
     '''
+    quick_description = "Explicit 2nd-order Runge-Kutta-Chebyshev method (rkc.f)"
     _optional_parameters = Adaptive._optional_parameters + \
         ['f_f77', 'spcrad', 'spcrad_f77', 'jac_constant']
     # The following step parameters are illegal for rkc.f
@@ -159,6 +160,7 @@ class RKF45(Adaptive):
 
     The FORTRAN source rkf45.f can be obtained from Netlib.
     """
+    quick_description = "Adaptive Runge-Kutta-Fehlberg (4,5) method (rkf45.f)"
 
     _optional_parameters = Adaptive._optional_parameters + ['f_f77']
     # The following step parameters are illegal for rkf45.f

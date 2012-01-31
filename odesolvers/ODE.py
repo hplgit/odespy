@@ -781,7 +781,7 @@ _parameters = dict(
     )
 
 
-def format_parameters_table(parameter_names, fixed_width=None):
+def _format_parameters_table(parameter_names, fixed_width=None):
     """
     Make a table of parameter names and their descriptions.
     The parameter_names list contains the names and the
@@ -830,7 +830,7 @@ def format_parameters_table(parameter_names, fixed_width=None):
     s += hrule
     return s
 
-def doc_string_table_of_parameters(classname, fixed_width=None):
+def table_of_parameters(classname, fixed_width=None):
     """
     Return a table (in reST format) of the required parameters
     in a class and a table of the optional parameters.
@@ -849,16 +849,29 @@ def doc_string_table_of_parameters(classname, fixed_width=None):
     s = """
 Required input arguments:
 
-""" + format_parameters_table(req_prm, fixed_width=fixed_width) + \
+""" + _format_parameters_table(req_prm, fixed_width=fixed_width) + \
 """
 Optional input arguments:
 
-""" + format_parameters_table(opt_prm, fixed_width=fixed_width)
+""" + _format_parameters_table(opt_prm, fixed_width=fixed_width)
     # Add indent:
     indent = 4
     newlines = [' '*indent + line for line in s.splitlines()]
     s = '\n'.join(newlines)
     return s
+
+def typeset_toc(toc):
+    toc = sorted(toc)
+    column1_width = max([len(classname) for classname, descr in toc])
+    column2_width = max([len(descr)     for classname, descr in toc])
+    hrule = '='*(column1_width + 1) + ' ' + '='*(column2_width)
+    def line(name, descr):
+        return '%%-%ds %%s' % (column1_width+1) % (name, descr)
+    lines = [hrule, line('Classname', 'Short description'), hrule] + \
+            [line(name, descr) for name, descr in toc]
+    return '\n'.join(lines)
+
+
 
 class Solver:
     """
@@ -1656,18 +1669,21 @@ class MySolver(Solver):
 
 ### End of class Solver ###
 
-class Euler(Solver):
+class ForwardEuler(Solver):
     """
     Forward Euler scheme::
 
         u[n+1] = u[n] + dt*f(u[n], t[n])
     """
+    quick_description = 'The simple explicit (forward) Euler scheme'
+
     def advance(self):
         u, f, n, t = self.u, self.f, self.n, self.t
         dt = t[n+1] - t[n]
         unew = u[n] + dt*f(u[n], t[n])
         return unew
 
+Euler = ForwardEuler   # synonym
 
 
 class Leapfrog(Solver):
@@ -1677,10 +1693,12 @@ class Leapfrog(Solver):
         u[n+1] = u[n-1] + dt2*f(u[n], t[n])
 
     with::
+
         dt2 = t[n+1] - t[n-1]
 
     Forward Euler is used for the first step.
     """
+    quick_description = 'Standard explicit Leapfrog scheme'
 
     def advance(self):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -1713,6 +1731,7 @@ class LeapfrogFiltered(Solver):
 
     with gamma=0.6 as in the NCAR Climate Model.
     """
+    quick_description = 'Filtered Leapfrog scheme'
 
     def advance(self):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -1740,6 +1759,7 @@ class Heun(Solver):
 
         u[n+1] = u[n] + 0.5*dt*(f(u[n],t[n]) + f(u[n]+dt*f(u[n],t[n]),t[n+1]))
     """
+    quick_description = "Heun's explicit method (similar to RK2)"
 
     def advance(self):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -1759,6 +1779,7 @@ class RK2(Solver):
 
         u[n+1] = u[n] + dt*f(u[n] + 0.5*(dt*f(u[n],t[n])),t[n] + 0.5*dt)
     """
+    quick_description = "Explicit 2nd-order Runge-Kutta method"
 
     def advance(self):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -1783,6 +1804,7 @@ class RK4(Solver):
            K3 = dt*f(u[n] + 0.5*K2, t[n] + 0.5*dt)
            K4 = dt*f(u[n] + K3, t[n] + dt)
     """
+    quick_description = "Explicit 4th-order Runge-Kutta method"
 
     def advance(self):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -1809,6 +1831,7 @@ class RK3(Solver):
         K2 = dt*f(u[n] + 0.5*K1, t[n] + 0.5*dt)
         K3 = dt*f(u[n] - K1 + 2*K2, t[n] + dt)
     """
+    quick_description = "Explicit 3rd-order Runge-Kutta method"
 
     def advance(self):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -1831,6 +1854,7 @@ class AdamsBashforth2(Solver):
 
     RK2 is used as default solver in first step.
     """
+    quick_description = "Explicit 2nd-order Adams-Bashforth method"
 
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
@@ -1878,6 +1902,8 @@ class AdamsBashforth3(Solver):
 
     RK2 is used as default solver for first steps.
     """
+    quick_description = "Explicit 3rd-order Adams-Bashforth method"
+
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
     def set_internal_parameters(self):
@@ -1930,6 +1956,8 @@ class AdamsBashMoulton2(Solver):
 
     RK2 is used as default solver for first steps.
     """
+    quick_description = "Explicit 2nd-order Adams-Bashforth-Moulton method"
+
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
     def set_internal_parameters(self):
@@ -1982,6 +2010,8 @@ class AdamsBashforth4(Solver):
 
     RK2 is used as default solver for first steps.
     """
+    quick_description = "Explicit 4th-order Adams-Bashforth method"
+
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
     def set_internal_parameters(self):
@@ -2037,6 +2067,8 @@ class AdamsBashMoulton3(Solver):
 
     RK2 is used as default solver for first steps.
     """
+    quick_description = "Explicit 3rd-order Adams-Bashforth-Moulton method"
+
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
     def set_internal_parameters(self):
@@ -2089,6 +2121,8 @@ class MidpointIter(Solver):
     The Forward Euler scheme is recovered if max_iter=1 and f(u,t)
     is independent of t. For max_iter=2 we have the Heun/RK2 scheme.
     """
+    quick_description = "Explicit 2nd-order iterated Midpoint method"
+
     _optional_parameters = Solver._optional_parameters + \
                            ['max_iter', 'eps_iter']
 
@@ -2137,11 +2171,13 @@ def approximate_Jacobian(f, u0, t0, h):
         J[i] = (np.asarray(f(u_new, t0)) - f0)/h
     return J.transpose()
 
+
 class SymPy_odefun(Solver):
     """
     Wrapper for the sympy.mpmath.odefun method, which applies a high-order
     Taylor series method to solve ODEs.
     """
+    quick_description = "Very accurate high order Taylor method (from SymPy)"
 
     def initialize(self):
         try:
@@ -2241,7 +2277,10 @@ class BackwardEuler(SolverImplicit):
 
        u[n+1] = u[n] + dt*f(t[n+1], u[n+1])
 
+    The nonlinear system is solved by Newton or Picard iteration.
     """
+    quick_description = "Implicit 1st-order Backward Euler method"
+
     def Picard_update(self, ukp1):
         u, f, n, t = self.u, self.f, self.n, self.t
         dt = t[n+1] - t[n]
@@ -2260,7 +2299,11 @@ class Backward2Step(SolverImplicit):
     Implicit Backward Euler method with 2 steps::
 
          u[n+1] = u[n]*4/3 - u[n-1]/3 + (t[n+1-t[n-1]])*f(t[n+1], u[n+1])/3
+
+    The 1st-order Backward Euler method is used for the first step.
     """
+    quick_description = "Implicit 2nd-order Backward Euler method"
+
     def Picard_update(self, ukp1):
         u, f, n, t = self.u, self.f, self.n, self.t
         if n == 0:
@@ -2292,7 +2335,11 @@ class ThetaRule(SolverImplicit):
        u[n+1] = u[n] + dt*(theta*f(u[n+1],t[n+1]) + (1 - theta)*f(u[n],t[n]))
 
     where theta is a float in [0,1].
+
+    The nonlinear system is solved by Picard or Newton iteration.
     """
+    quick_description = "Unified Forward/Backward Euler and Midpoint methods"
+
     _optional_parameters = SolverImplicit._optional_parameters + ['theta']
 
     def Picard_update(self, ukp1):
@@ -2313,7 +2360,10 @@ class MidpointImplicit(SolverImplicit):
     Midpoint Implicit method.
     Scheme:
        u[n+1] = u[n] + dt*f((u[n+1] + u[n])/2., t[n] + dt/2.)
+
+    The nonlinear system is solved by Picard or Newton iteration.
     '''
+    quick_description = "Implicit 2nd-order Midpoint method"
 
     def Picard_update(self, ukp1):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -2360,6 +2410,7 @@ class AdaptiveResidual(Adaptive):
     Currently, only scalar ODE problems can be applied for purpose of
     simplification.
     """
+    quick_description = "Very simple adaptive strategy based on the residual"
 
     _optional_parameters = Adaptive._optional_parameters + \
                            ['solver']
@@ -2424,6 +2475,7 @@ class AdaptiveResidual(Adaptive):
 
 class RKFehlberg(Adaptive):
     """The classical adaptive Runge-Kutta-Fehlberg method of order 4-5."""
+    quick_description = "Adaptive Runge-Kutta-Fehlberg (4,5) method"
 
     _optional_parameters = Adaptive._optional_parameters
 
@@ -2526,6 +2578,7 @@ class Ode_scipy(Adaptive):
     Super class wrapper for scipy.integrate.ode classes.
     Existing solvers in subclasses are: Vode, Dopri5, Dop853.
     """
+
     _optional_parameters = Solver._optional_parameters + \
         ['jac', 'jac_kwargs', 'jac_args', 'atol', 'rtol',
          'first_step', 'max_step', 'nsteps']
@@ -2596,6 +2649,8 @@ class Vode(Ode_scipy):
     type. The well-known vode.f solver applies backward differential
     formulae for iteration.
     '''
+    quick_description = "Adams/BDF Vode adaptive method (vode.f wrapper)"
+
     _optional_parameters = Ode_scipy._optional_parameters + \
                            ['adams_or_bdf', 'min_step', 'order']
 
@@ -2614,6 +2669,8 @@ class Dopri5(Ode_scipy):
     Wrapper for scipy.integrate.ode.dopri5, which applies the
     Dormand&Prince method of order 5.
     """
+    quick_description = "Dormand & Prince method of order 5 (SciPy)"
+
     _optional_parameters = Ode_scipy._optional_parameters + \
         ['ifactor', 'dfactor', 'beta', 'safety']
 
@@ -2626,6 +2683,8 @@ class Dop853(Ode_scipy):
     Wrapper for scipy.integrate.ode.dop853, which applies the
     Dormand&Prince method of order 8(5,3).
     """
+    quick_description = "Adaptive Dormand & Prince method of order 8(5,3) (SciPy)"
+
     _optional_parameters = Ode_scipy._optional_parameters + \
         ['ifactor', 'dfactor', 'beta', 'safety']
 

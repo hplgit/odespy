@@ -1,4 +1,4 @@
-from ODE import Solver, doc_string_table_of_parameters
+from ODE import Solver
 import numpy as np
 import sys, inspect
 
@@ -1057,6 +1057,7 @@ class Lsode(Odepack):
     du/dt = f(u,t),   or, in component form,
     du(i)/dt = f(u,t)[i] for i in 1,...,neq
     '''
+    quick_description = "LSODE solver for a stiff or nonstiff system"
 
     _optional_parameters = Odepack._optional_parameters + \
         ['jac_banded', 'jac_banded_f77', 'ml', 'mu', 'jac', 'jac_f77', 'order',
@@ -1160,6 +1161,7 @@ class Lsoda(Odepack):
     du/dt = f(u,t),   or, in component form,
     du(i)/dt = f(u,t)[i] for i in 1,...,neq
     '''
+    quick_description = "LSODA solver with stiff-nonstiff auto shift"
 
     _optional_parameters = Odepack._optional_parameters + \
         ['jac_banded', 'jac_banded_f77', 'ml', 'mu', 'jac', 'jac_f77',
@@ -1270,6 +1272,8 @@ class Lsodar(Odepack):
     At the same time, it locates the roots of any of a set of functions
        g(i) = g(i,t,u(1),...,u(NEQ))  (i = 1,...,ng).
     '''
+    quick_description = "LSODAR method with stiff-nonstiff auto shift"
+
     _optional_parameters = Odepack._optional_parameters + \
         ['jac_banded', 'jac_banded_f77', 'ml', 'mu', 'jac', 'jac_f77',
          'max_ordn', 'max_ords', 'g', 'g_f77', 'ng', 'f_f77']
@@ -1388,6 +1392,8 @@ class Lsodes(Odepack):
      du/dt = f(u,t),   or, in component form,
      du(i)/dt = f(u,t)[i] for i in 1,...,neq
     """
+    quick_description = "LSODES solver for sparse Jacobians"
+
     _optional_parameters = Odepack._optional_parameters + \
         ['order', 'moss','seth', 'jac_column', 'ia', 'ja', 'jac_column_f77',
          'f_f77']
@@ -1511,6 +1517,8 @@ class Lsodi(Odepack):
     Either res or res_f77 need to be supplied.
 
     '''
+    quick_description = "LSODI solver for linearly implicit systems"
+
     _optional_parameters = Odepack._optional_parameters + \
         ['adda_lsodi', 'adda_banded_lsodi', 'adda_lsodi_f77',
          'adda_banded_lsodi_f77', 'jac_lsodi', 'jac_banded_lsodi',
@@ -1671,6 +1679,7 @@ class Lsodis(Odepack):
            i      1   2       NEQ
     If A is singular, this is a differential-algebraic system.
     '''
+    quick_description = "LSODIS solver for linearly implicit sparse systems"
 
     _optional_parameters = Odepack._optional_parameters + \
         ['jac_lsodis', 'moss', 'ia', 'ja', 'ic', 'jc',
@@ -1817,6 +1826,7 @@ class Lsoibt(Odepack):
            i      1   2       NEQ
     If A is singular, this is a differential-algebraic system.
     '''
+    quick_description = "LSOIBIT solver for linearly implicit block tridiag systems"
 
     _optional_parameters = Odepack._optional_parameters + \
         ['jac_lsoibt', 'ydoti', 'order']
