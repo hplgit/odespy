@@ -197,7 +197,7 @@ class RKF45(Adaptive):
     def advance(self):
         u, t, n, rtol, atol = self.u, self.t, self.n, self.rtol, self.atol
 
-        advance = self._rkf.advance
+        advance = self._rkf45.advance
         f = getattr(self.f_f77, '_cpointer', self.f_f77)
         unew, istate = advance(f, u[n], t[n], t[n+1], rtol, atol)
         if istate > 2:

@@ -22,7 +22,7 @@ print """Scalar ODE: Exponential u = exp(-t), u' = -u"""
 # Loop for all possible solvers
 for solver in solvers:
     try:      
-        method = eval(solver)(f)
+        method = eval(solver)(f, atol=1e-6)
         method.set_initial_condition(u0)
         u,t = method.solve(time_points)
         if solver_no % 8 == 0:

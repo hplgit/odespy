@@ -804,9 +804,9 @@ With 4 periods we get
 .. code-block:: python
 
         ThetaRule(theta=0)   r: 2.9, 1.9, 1.4, 1.2 E_min=1.1E-01
-        RK2          r: 2.1, 2.0, 2.0, 2.0 E_min=8.4E-04
+        RK2                  r: 2.1, 2.0, 2.0, 2.0 E_min=8.4E-04
         ThetaRule(theta=1)   r: 0.3, 0.5, 0.7, 0.8 E_min=9.0E-02
-        RK4          r: 4.0, 4.0, 4.0, 4.0 E_min=2.6E-08
+        RK4                  r: 4.0, 4.0, 4.0, 4.0 E_min=2.6E-08
         ThetaRule            r: 2.0, 2.0, 2.0, 2.0 E_min=4.2E-04
         Leapfrog             r: 2.1, 2.0, 2.0, 2.0 E_min=8.5E-04
         LeapfrogFiltered     r: 0.2, 0.4, 0.6, 0.8 E_min=1.3E-01
@@ -825,9 +825,9 @@ simplest methods inaccurate:
 .. code-block:: python
 
         ThetaRule(theta=0)   r: 10.4, 22.0, 18.2, 10.4 E_min=3.3E+02
-        RK2          r: 51.4, 16.1, 2.3, 2.1 E_min=1.1E-01
+        RK2                  r: 51.4, 16.1, 2.3, 2.1 E_min=1.1E-01
         ThetaRule(theta=1)   r: 11.2, 0.0, 0.1 E_min=5.0E-01
-        RK4          r: 1.0, 3.6, 4.0, 4.0 E_min=8.2E-05
+        RK4                  r: 1.0, 3.6, 4.0, 4.0 E_min=8.2E-05
         ThetaRule            r: 87.8, 0.2, 1.7, 2.0 E_min=5.3E-02
         Leapfrog             r: 95.9, 18.0, 1.0, 2.0 E_min=1.1E-01
         LeapfrogFiltered     r: -0.0, 121.2, 0.3, 0.1 E_min=5.2E-01
@@ -984,8 +984,10 @@ del class_, doc_str, classname, classnames, toc, typeset_toc, \
 if __name__ == '__main__':
     from os.path import join
     from numpy.testing import rundocs, run_module_suite
+    from os import getcwd
+
     # Doctests
-    path = __path__[0]
+    path = getcwd()
     rundocs(join(path, 'ODE.py'))
     rundocs(join(path,'RungeKutta.py'))
 

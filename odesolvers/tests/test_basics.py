@@ -186,7 +186,7 @@ Complex_pi = dict(
     time_points=np.linspace(0., 2., 15),
     u0=0.,
     exceptions=['BogackiShampine', 'CashKarp', 'Dop853', 'Dopri5', 
-                'DormandPrince', 'Fehlberg', 'ForwardEuler', 
+                'DormandPrince', 'Fehlberg', 'RungeKutta1', 
                 'Lsoda', 'Lsodar', 'Lsode', 'Lsodes', 'Lsodi', 'Lsodis', 
                 'Lsoibt', 'MyRungeKutta', 'MySolver', 'RKC', 'RKF45', 
                 'RungeKutta2', 'RungeKutta3', 'RungeKutta4', 

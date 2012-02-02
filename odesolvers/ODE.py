@@ -1440,13 +1440,17 @@ class Solver:
 
         # Check whether input solver_target is a valid subclass of Solver
         try:
+            import odesolvers
             if type(solver_target) is str:
                 # Convert string to class name
-                solver_target = eval(solver_target)
-            if not issubclass(solver_target, Solver):
-                raise ValueError, error_message
+                solver_target = getattr(odesolvers, solver_target)
         except:
             raise ValueError, error_message
+
+        if not solver_target.__name__ in list_all_solvers():
+            raise ValueError, error_message
+
+
 
         # Neglect the attributes if they are illegal in target solver
         args_dict = {}
@@ -1888,6 +1892,7 @@ class AdamsBashforth2(Solver):
             u_starter, t_starter = self.starter.solve(time_points)
             unew = u_starter[-1]
             self.f_n_1 = f(u[0], t[0])
+
         return unew
 
 
@@ -2419,7 +2424,7 @@ class AdaptiveResidual(Adaptive):
         Adaptive.__init__(self, f, **kwargs)
         if 'solver' in kwargs:
             del kwargs['solver']
-        self.solver = eval(self.solver)(f, **kwargs)
+        self.solver = self.switch_to(self.solver)
 
     def residual(self, u_n, u_next, t_n, t_next):
         dt = t_next - t_n
@@ -2430,7 +2435,7 @@ class AdaptiveResidual(Adaptive):
         # Valid for scalar ODE only
         return abs(u_diff/dt - self.f(u_mean, t_mean))
 
-    def solve(self, time_points, terminate=None, printInfo=False):
+    def solve(self, time_points, terminate=None, print_info=False):
         self.users_time_points = np.asarray(time_points).copy()
         self.t = t = self.users_time_points
         self.set_internal_parameters()
@@ -2462,7 +2467,7 @@ class AdaptiveResidual(Adaptive):
                 self.solver.set_initial_condition(self.u[-1])
                 unew, tnew = self.solver.solve(time_points, terminate)
                 R = self.residual(unew[-2], unew[-1], tnew[-2], tnew[-1])
-                if printInfo:
+                if print_info:
                     print '\n%d time points in (t[%d], t[%d]) = (%.3g, %.3g)' \
                         % (ntpoints, k-1, k, t[k-1], t[k])
                     print 'Residual = %g, Tolerance = %g, calling %s' % \

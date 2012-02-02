@@ -30,6 +30,7 @@ for solver in solvers:
             solver_no = 1
         st.plot(t, u[:,0], hold="on", legend=solver, axis=[0.,10.,-4.,4.])
         solver_no += 1
+        print 'Succeed when solver is %s' % solver
     except:
         print 'Failed when solver is %s' % solver
 
