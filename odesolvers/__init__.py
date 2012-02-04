@@ -965,11 +965,15 @@ from rkc_rkf45 import *
 class_, doc_str, classname = None, None, None
 classnames = [name for name, obj in locals().items() \
                if inspect.isclass(obj)]
+
 toc = []
 for classname in classnames:
     class_ = eval(classname)
     doc_str = getattr(class_, '__doc__')
-    setattr(class_, '__doc__', doc_str + table_of_parameters(class_))
+    fixed_width = None if class_.__module__ in ('ODE', 'RungeKutta') \
+        else (21,49)
+    setattr(class_, '__doc__', 
+            doc_str + table_of_parameters(class_, fixed_width=fixed_width))
     if hasattr(class_, 'quick_description'):
         toc.append((classname, getattr(class_, 'quick_description')))
 
@@ -984,10 +988,10 @@ del class_, doc_str, classname, classnames, toc, typeset_toc, \
 if __name__ == '__main__':
     from os.path import join
     from numpy.testing import rundocs, run_module_suite
-    from os import getcwd
+    import odesolvers 
+    path = odesolvers.__path__[0]
 
     # Doctests
-    path = getcwd()
     rundocs(join(path, 'ODE.py'))
     rundocs(join(path,'RungeKutta.py'))
 
