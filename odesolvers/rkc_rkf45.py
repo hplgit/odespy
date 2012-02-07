@@ -23,11 +23,12 @@ ODE._parameters.update(_parameters_RKC)
 
 class RKC(Adaptive):
     '''
-    Wrapper for rkc.f, which intends to integrates initial value problems for
-    systems of first order ordinary differential equations. It is based on a
+    Wrapper for rkc.f integrates initial value problems for systems of
+    first order ordinary differential equations. It is based on a
     family of explicit Runge-Kutta-Chebyshev formulas of order two.
 
-    Source code for rkc.f can be obtained directly from website of netlib.
+    The source code for rkc.f can be obtained from netlib and contains
+    more details.
     '''
     quick_description = "Explicit 2nd-order Runge-Kutta-Chebyshev method (rkc.f)"
     _optional_parameters = Adaptive._optional_parameters + \
@@ -67,28 +68,31 @@ ATOL =%s should be either a scalar or a vector of length NEQ=%d.
         self.check_atol()
         return Adaptive.validate_data(self)
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         # INFO(4) is an integer array to specify how the problem
-        # would be solved
+        # is to be solved
         self.info = np.zeros(4, int)
 
-        self.info[0] = 1      # Compute solution at each time point.
+        self.info[0] = 1      # Compute solution at each time point
         if hasattr(self, 'spcrad_f77') or hasattr(self, 'spcrad'):
-            self.info[1] = 1  # SPCRAD is supplied.
+            self.info[1] = 1  # SPCRAD routine is supplied
         else:
             self.spcrad = lambda x,y: 0.0  # dummy function
-        # whether Jacobian is known to be constant.
+        # Is the Jacobian constant?
         self.info[2] = self.jac_constant
         if (np.iterable(self.atol) and (len(self.atol) == self.neq)):
             self.info[3] = 1   # ATOL is a sequence of length NEQ
 
         if hasattr(self, 'f'):
-            # If f is input in form of f(u,t), wrap f to f_f77 for Fortran code.
+            # If f is input in form of a Python function f(u,t),
+            # let self.f_f77 wrap f and have arguments t, u.
             f = self.f
             self.f_f77 = lambda t,u: np.asarray(f(u,t))
         elif hasattr(self, 'f_f77'):
-            # If f is input in form of f(t,u) (usually in Fortran),
-            # wrap f_f77 to the general form f(u,t) for switch_to()
+            # The right-hand side "f" is input as a Fortran function
+            # taking the arguments t,u.
+            # Set self.f to be f_f77 wrapped to the general form f(u,t)
+            # for switch_to().
             f_f77 = self.f_f77
             self.f = lambda u,t: np.asarray(f_f77(t,u))
         # If spcrad is input in form of spcrad(u,t),
@@ -97,7 +101,7 @@ ATOL =%s should be either a scalar or a vector of length NEQ=%d.
             # If spcrad is in form of spcrad(u,t), wrap for Fortran code.
             spcrad = self.spcrad
             self.spcrad_f77 = lambda t,u: np.asarray(spcrad(u,t))
-        Solver.set_internal_parameters(self)   # Common settings
+        Solver.initialize_for_solve(self)   # Common settings
 
     def initialize(self):
         '''Import extension module _rkc and check that it exists.'''
@@ -121,7 +125,7 @@ ATOL =%s should be either a scalar or a vector of length NEQ=%d.
         self.t = np.asarray(time_points)
 
         # Setting for internal parameters, (like self.u)
-        self.set_internal_parameters()
+        self.initialize_for_solve()
 
         # Validity-check for values of class attributes
         if not self.validate_data():
@@ -164,6 +168,7 @@ class RKF45(Adaptive):
 
     _optional_parameters = Adaptive._optional_parameters + ['f_f77']
     # The following step parameters are illegal for rkf45.f
+    # and therefore removed (class Adaptive adds them in the above statement)
     _optional_parameters.remove('first_step')
     _optional_parameters.remove('min_step')
     _optional_parameters.remove('max_step')
@@ -182,7 +187,7 @@ class RKF45(Adaptive):
         self._parameters['atol']['type'] = float
         self._parameters['atol']['extra_check'] = lambda x: x >= 0.0
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         if hasattr(self, 'f'):
             # If f is input in form of f(u,t), wrap f to f_f77 for Fortran code.
             f = self.f
@@ -192,7 +197,7 @@ class RKF45(Adaptive):
             # wrap f_f77 to the general form f(u,t) for switch_to()
             f_f77 = self.f_f77
             self.f = lambda u,t: np.asarray(f_f77(t,u))
-        Solver.set_internal_parameters(self)
+        Solver.initialize_for_solve(self)
 
     def advance(self):
         u, t, n, rtol, atol = self.u, self.t, self.n, self.rtol, self.atol

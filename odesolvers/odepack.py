@@ -4,6 +4,9 @@ import sys, inspect
 
 _parameters_Odepack = dict(
 
+    # Note that ODEPACK has its own convention for the
+    # arguments to the f and jac functions
+
     f_f77 = dict(
         help='Intend to supply a Fortran subroutine as f.      '\
              'This subroutine should be defined in form:       '\
@@ -762,7 +765,7 @@ class Odepack(Solver):
         '''
         raise NotImplementedError
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         '''
         In the long parameter-lists for solvers in ODEPACK, quite a few
         parameters can be set automatically with proper values depending
@@ -786,7 +789,7 @@ class Odepack(Solver):
         # as scarlars or vectors.
         self.itol = (not isinstance(self.rtol, (int, float)))*2 + \
             (not isinstance(self.atol, (int, float))) + 1
-        Solver.set_internal_parameters(self)   # Common settings in super class
+        Solver.initialize_for_solve(self)   # Common settings in super class
 
     def new_stepnr(self):
         '''
@@ -892,7 +895,7 @@ class Odepack(Solver):
                 int(terminate(u, t, step_no))
 
         self.t = np.asarray(time_points)
-        self.set_internal_parameters()
+        self.initialize_for_solve()
         if not self.validate_data():
             raise ValueError('Invalid data in "%s":\n%s' % \
                 (self.__class__.__name__,pprint.pformat(self.__dict__)))

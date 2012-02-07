@@ -11,9 +11,8 @@ try:
 except ImportError:
     mpl = False
 
-mpl = False
 if not mpl:
-    # Use scitools instead
+    # Use scitools instead and make it look as matplotlib
     try:
         import scitools.std
         sys.modules['matplotlib.pyplot'] = scitools.std  # essential

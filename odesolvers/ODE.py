@@ -225,7 +225,7 @@ need to take extra check for the above requirements after all the
 inputs are initialized. Thus a new function check_iaja() is defined
 in odesolvers.Lsodes, and injected into function validate_data().
 
-4. Internal settings in set_internal_parameters()
+4. Internal settings in initialize_for_solve()
 
 When I tried to wrap some complicated ODE software, some param-
 eters are found to be dependent on values of other parameters,
@@ -238,7 +238,7 @@ This kind of parameters are required by underlying software, but
 unnecessary to be valued from user's input. This is why I called them
 as internal parameters.
 
-Function set_internal_parameters() is used to initialize this kind of
+Function initialize_for_solve() is used to initialize this kind of
 parameters before they are passed to the underlying software.
 
 5. Step forward in advance()
@@ -1023,7 +1023,7 @@ class Solver:
         The method is called from the constructor.
 
         Further adjustments of self._parameters can be done in
-        set_internal_parameters when all data for the solver are available.
+        initialize_for_solve when all data for the solver are available.
         '''
         # Define start_method and method here since the range depends
         # on return value of list_all_solvers().
@@ -1173,35 +1173,40 @@ class Solver:
         Please check your input.''' % (name, str(value))
         return True
 
-    def get(self, parameter_name=None, printInfo=False):
+    def get(self, parameter_name=None, print_info=False):
         """
         Return value of specified input parameters.
         If parameter_name is None, return dict of all inputs.
         """
         if parameter_name is None:
-            # Python v2.7 dict comprehension
+            # Python v2.7 dict comprehension yields shorter code:
             # {name: getattr(self, name) for name in self._parameters}
             all_args = dict([(name, getattr(self, name, None)) \
                                  for name in self._parameters \
                                  if hasattr(self, name)])
-            if printInfo:
+            all_args['name of f'] = self.users_f.func_name})
+            if 'jac' in all_args:
+                all_args['name of jac'] = self.users_jac.func_name})
+
+            if print_info:
                 print pprint.pformat(all_args)
             return all_args
+
         else:
             if hasattr(self, parameter_name):
                 value = getattr(self, parameter_name)
-                if printInfo:
+                if print_info:
                     print "%s = %s" % (parameter_name, value)
                 return value
             else:
                 raise AttributeError('Parameter %s is not set' % parameter_name)
 
-    def get_parameter_info(self,printInfo=False):
+    def get_parameter_info(self,print_info=False):
         '''
         Return a dictionary containing properties of legal parameters in
         current subclass, e.g. self._parameters.
         '''
-        if printInfo:
+        if print_info:
             print 'Legal parameters for class %s are:' % self.__class__.__name__
             print pprint.pformat(self._parameters)
             return None
@@ -1292,7 +1297,7 @@ class Solver:
         that has a suitable ``solve`` functionality.
 
         The algorithm steps in this ``solve`` method goes as follows.
-        The set_internal_parameters method is called to initialize
+        The initialize_for_solve method is called to initialize
         various data needed in the solution process (self. u, for instance).
         Thereafter, ``validate_data`` is called to perform a consistency
         check on data. We are then ready for the core of the method:
@@ -1306,7 +1311,7 @@ class Solver:
             terminate = lambda u, t, step_no: False
 
         self.t = np.asarray(time_points)
-        self.set_internal_parameters()
+        self.initialize_for_solve()
         self.validate_data()
 
         # The time loop
@@ -1327,7 +1332,7 @@ class Solver:
         raise NotImplementedError
 
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         """
         Setting values of internal attributes to be used in iteration.
 
@@ -1403,7 +1408,7 @@ class Solver:
                     'solver %s.' % (arg,self.__class__.__name__)
         return True
 
-    def switch_to(self, solver_target, printInfo=False, **kwargs):
+    def switch_to(self, solver_target, print_info=False, **kwargs):
         """
         Create a new solver instance which switch to another subclass with
         same values of common attributes.
@@ -1486,7 +1491,7 @@ class Solver:
             new.set_initial_condition(self.U0)
 
         # Print out information if desired
-        if printInfo:
+        if print_info:
             # neglected attributes in new solver
             diff_args = set(self.__dict__.keys()) - set(new.__dict__.keys()) \
                 - set(('u','t','n','dtype'))
@@ -1862,12 +1867,12 @@ class AdamsBashforth2(Solver):
 
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         # New solver instance for first steps
         self.starter = self.switch_to(self.start_method)
         # Create variables for f at previous time levels
         self.f_n_1 = None
-        Solver.set_internal_parameters(self)
+        Solver.initialize_for_solve(self)
 
     def validate_data(self):
         if not self.constant_time_step():
@@ -1911,13 +1916,13 @@ class AdamsBashforth3(Solver):
 
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         # New solver instance for first steps
         self.starter = self.switch_to(self.start_method)
         # Create variables for f at previous time levels
         self.f_n_1 = None
         self.f_n_2 = None
-        Solver.set_internal_parameters(self)
+        Solver.initialize_for_solve(self)
 
     def validate_data(self):
         if not self.constant_time_step():
@@ -1965,12 +1970,12 @@ class AdamsBashMoulton2(Solver):
 
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         # New solver instance for first steps
         self.starter = self.switch_to(self.start_method)
         # Create variables for f at previous time levels
         self.f_n_1, self.f_n_2 = None, None
-        Solver.set_internal_parameters(self)
+        Solver.initialize_for_solve(self)
 
     def validate_data(self):
         if not self.constant_time_step():
@@ -2019,12 +2024,12 @@ class AdamsBashforth4(Solver):
 
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         # New solver instance for first steps
         self.starter = self.switch_to(self.start_method)
         # Create variables for f at previous time levels
         self.f_n_1, self.f_n_2, self.f_n_3 = None, None, None
-        Solver.set_internal_parameters(self)
+        Solver.initialize_for_solve(self)
 
     def validate_data(self):
         if not self.constant_time_step():
@@ -2076,12 +2081,12 @@ class AdamsBashMoulton3(Solver):
 
     _optional_parameters = Solver._optional_parameters + ['start_method',]
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         # New solver instance for first steps
         self.starter = self.switch_to(self.start_method)
         # Create variables for f at previous time levels
         self.f_n_1, self.f_n_2, self.f_n_3 = None, None, None
-        Solver.set_internal_parameters(self)
+        Solver.initialize_for_solve(self)
 
     def validate_data(self):
         if not self.constant_time_step():
@@ -2191,10 +2196,10 @@ class SymPy_odefun(Solver):
         except ImportError:
             raise ImportError,'sympy is not installed - needed for sympy_odefun'
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         # sympy.odefun requires f(t, u), not f(u, t, *args, **kwargs)
         self.f4odefun = lambda t, u: self.f(u, t, *self.f_args, **self.f_kwargs)
-        Solver.set_internal_parameters(self)
+        Solver.initialize_for_solve(self)
 
     def solve(self, time_points, terminate=None):
         """
@@ -2207,7 +2212,7 @@ class SymPy_odefun(Solver):
         if terminate is not None:
             print 'Warning: SymPy_odefun.solve ignores the terminate function!'
         self.t = np.asarray(time_points)
-        self.set_internal_parameters()
+        self.initialize_for_solve()
 
         self.sympy.mpmath.mp.dps = 15  # accuracy
         self.ufunc = self.sympy.mpmath.odefun(
@@ -2231,24 +2236,26 @@ class SolverImplicit(Solver):
         ['jac', 'jac_args', 'jac_kwargs', 'h_in_fd_jac',
          'nonlinear_solver', 'max_iter', 'eps_iter', 'relaxation']
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         # Set appropriate value of nonlinear_solver if undefined
         if getattr(self, 'jac', None) is None:   # no jac provided
             if getattr(self, 'nonlinear_solver', None) is None:
                 self.nonlinear_solver = 'Picard'  # default if no jac provided
             elif getattr(self, 'nonlinear_solver') == 'Newton':
                  # Approximate jacobian with finite difference approx
+                self.users_jac = approximate_Jacobian
                 self.jac = lambda u, t: \
-                    approximate_Jacobian(self.f, u, t, self.h_in_fd_jac)
+                    self.users_jac(self.f, u, t, self.h_in_fd_jac)
         else:
             if getattr(self, 'nonlinear_solver', None) is None:
                 self.nonlinear_solver = 'Newton'  # default if jac provided
             # Wrap user-supplied Jacobian in the way f is wrapped
-            jac = self.jac
+            self.users_jac = self.jac
+            jac = self.jac  # XXX will not just self.jac work below?
             self.jac = lambda u, t: \
                 np.asarray(jac(u, t, *self.jac_args, **self.jac_kwargs))
 
-        Solver.set_internal_parameters(self)
+        Solver.initialize_for_solve(self)
 
     def advance(self):
         n = self.n
@@ -2390,7 +2397,7 @@ class Adaptive(Solver):
     _optional_parameters = Solver._optional_parameters + \
         ['rtol', 'atol', 'first_step', 'min_step', 'max_step']
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         # Let first_step, min_step and max_ste, if not given, be
         # computed from the user's time points, available as self.t.
 
@@ -2404,7 +2411,7 @@ class Adaptive(Solver):
         if not hasattr(self, 'max_step'):
             # Use 10 times the user's greatest step
             self.set(max_step=10*time_steps.max())
-        Solver.set_internal_parameters(self)
+        Solver.initialize_for_solve(self)
 
 
 class AdaptiveResidual(Adaptive):
@@ -2438,7 +2445,7 @@ class AdaptiveResidual(Adaptive):
     def solve(self, time_points, terminate=None, print_info=False):
         self.users_time_points = np.asarray(time_points).copy()
         self.t = t = self.users_time_points
-        self.set_internal_parameters()
+        self.initialize_for_solve()
         # Assume scalar equation...
         if not isinstance(self.U0, (float,int)):
             raise TypeError('Initial condition is not scalar - '
@@ -2485,8 +2492,8 @@ class RKFehlberg(Adaptive):
     _optional_parameters = Adaptive._optional_parameters
 
 
-    def set_internal_parameters(self):
-        Solver.set_internal_parameters(self)
+    def initialize_for_solve(self):
+        Solver.initialize_for_solve(self)
 
     def advance(self):
         # auxilatory function to pick up the middle number from 3 floats
@@ -2602,7 +2609,7 @@ class Ode_scipy(Adaptive):
                               'in order to use class %s' % \
                               self.__class__.__name__)
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         # scipy specifies f and jac as f(t, y, *args) and jac(t, y)
         # while the present interface assumes
         # f(u, t, *f_args, **f_kwargs), jac(u, t, *jac_args, **jac_kwargs)
@@ -2635,7 +2642,7 @@ class Ode_scipy(Adaptive):
         self.integrator = self.integrator.set_integrator(
             self.__class__.__name__.lower(), **self.scipy_arguments)
         self.integrator = self.integrator.set_initial_value(self.U0, self.t[0])
-        Solver.set_internal_parameters(self)
+        Solver.initialize_for_solve(self)
 
     def advance(self):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -2664,10 +2671,10 @@ class Vode(Ode_scipy):
                       'with_jacobian', 'nsteps', 'first_step',
                       'min_step', 'max_step', 'order']
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         # internal argument to be transferred to scipy
         self.with_jacobian = getattr(self, 'jac', None) is not None
-        Ode_scipy.set_internal_parameters(self)
+        Ode_scipy.initialize_for_solve(self)
 
 class Dopri5(Ode_scipy):
     """

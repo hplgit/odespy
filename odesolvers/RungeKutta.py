@@ -6,17 +6,17 @@ class RungeKutta(Adaptive):
     Super class for explicit 1-level- Runge-Kutta methods:
     RungeKutta4, Rungekutta2,etc..
     or 2-levels adaptive Runge-Kutta methods:
-    Dormand & Prince , CashKarp or Fehlberg, etc..
+    Dormand & Prince, Cash-Karp or Fehlberg, etc.
 
     Available subclasses are:
-    MyRungeKutta(User-supplied RungeKutta methods),
     RungeKutta2, RungeKutta3, ForwardEuler, DormandPrince,
-    RungeKutta4, FehlBerg, CashKarp, BogackiShampine.
-
+    RungeKutta4, Fehlberg, CashKarp, BogackiShampine,
+    MyRungeKutta (user-supplied RungeKutta methods),
     """
     _method_order = None
     # An integer for unadaptive method,
     # or a pair of integers for 2 levels in adaptive methods.
+
     _butcher_tableau = None
     # (n, n) array for unadaptive methods,
     # or (n+1, n) array for adaptive ones.
@@ -26,8 +26,8 @@ class RungeKutta(Adaptive):
 
     def get_order(self):
         '''
-        Return the order of current method, both for unadaptive methods
-        and for adaptive ones.
+        Return the order of current method, both for non-adaptive
+        and adaptive methods.
         '''
         order = getattr(self, 'method_order', None)
         if order is None:       # User-supplied method in MyRungeKutta
@@ -70,6 +70,11 @@ class RungeKutta(Adaptive):
         return order
 
     def advance(self):
+        """
+        Advance the solution, either using one step or a
+        series of adaptive steps, from t[n] tp t[n+1].
+        """
+
         f, n, rtol, atol, neq = \
             self.f, self.n, self.rtol, self.atol, self.neq
         u_n, t_n, t_next = self.u[n], self.t[n], self.t[n+1]
@@ -101,13 +106,18 @@ class RungeKutta(Adaptive):
             # coefficients for local error between 2 levels
             factors_error = table[k_len+1, 1:] - factors_u_new
 
-            uwork, twork = [u_n,], [t_n,]                # work arrays
+            u_intermediate = [u_n,]
+            t_intermediate = [t_n,]
             u, t, h = u_n, t_n, first_step               # initial values
             k = np.zeros((k_len, self.neq), self.dtype)  # intern stages
+            if not hasattr(self, 'u_all'):
+                self.u_all = []  # store list of arrays for *all* steps
+            if not hasattr(self, 't_all'):
+                self.t_all = []  # store list of arrays for *all* steps
 
             # Loop until next time point is reached
             while (abs(t - t_n) < abs(t_next - t_n)):
-                u, t = uwork[-1], twork[-1]
+                u, t = u_intermediate[-1], t_intermediate[-1]
                 # internal steps
                 k[:, :] = 0.   # initialization for next step
                 for m in range(k_len):
@@ -126,7 +136,8 @@ class RungeKutta(Adaptive):
                 if (accurate or h <= min_step or h == max_step):
                     # Accurate enough,
                     # or the step size exceeds valid range.
-                    uwork.append(u_new); twork.append(t+h)
+                    u_intermediate.append(u_new)
+                    t_intermediate.append(t+h)
 
                 # prevent the error of dividing absolute zero
                 error = np.asarray([(1e-16 if x == 0. else x) \
@@ -149,14 +160,18 @@ class RungeKutta(Adaptive):
                 # step size should in range(min_step, max_step)
                 h = middle(h, y=min_step, z=max_step)
                 # in case for last intern step
-                h = min(h, t_next - twork[-1])
+                h = min(h, t_next - t_intermediate[-1])
 
-        else:      # Algorithm for explicit 1-level RungeKutta method
-            k = np.zeros((k_len,self.neq),float)  # intern stages
+            self.u_all.append(np.array(u_intermediate))
+            self.t_all.append(np.array(t_intermediate))
+
+        else:
+            # Run algorithm for explicit 1-level RungeKutta method
+            k = np.zeros((k_len, self.neq), float)  # intern stages
             for m in range(k_len):
-                k_factors = (np.dot(factors_u,k))[m]
-                k[m] = f(u_n + dt * k_factors,t_n + dt * factors_t[m])
-            u_new = u_n + dt * (np.dot(factors_u_new,k))
+                k_factors = (np.dot(factors_u, k))[m]
+                k[m] = f(u_n + dt*k_factors,t_n + dt*factors_t[m])
+            u_new = u_n + dt*(np.dot(factors_u_new, k))
         return u_new
 
 class RungeKutta2(RungeKutta):

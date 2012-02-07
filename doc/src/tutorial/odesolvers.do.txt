@@ -497,16 +497,45 @@ and initialized.
 
 ===== Solver Parameters =====
 
-The `ode` module contains a global dictionary `_parameters` holding
-all legal parameters. For each parameter the dictionary stores
-the parameter name, a default value, a description, the legal
-object type for the value of the parameter, and other quantities if
-needed. Each solver class defines a (static) class variable
+The `ODE` module defines a global dictionary `_parameters` holding
+all legal parameters. Other modules imports this `_parameters` dict
+and updates it with their own additional parameters.
+
+For each parameter the `_parameters` dict stores the parameter name, a
+default value, a description, the legal object type for the value of
+the parameter, and other quantities if needed. A typical example
+is
+!bc
+_parameters = dict(
+...
+
+f = dict(
+    help='Right-hand side f(u,t) defining the ODE',
+    type=callable),
+
+f_kwargs = dict(
+    help='Extra keyword arguments to f: f(u, t, *f_args, **f_kwargs)',
+    type=dict,
+    default={}),
+
+theta = dict(
+    help="""Weight in [0,1] used for
+"theta-rule" finite difference approx.""",
+    default=0.5,
+    type=(int,float),
+    range=[0, 1])
+
+...
+}
+!ec
+
+Each solver class defines a (static) class variable
 `_required_parameters` for holding the names of all required
 parameters (in a list). In addition, each solver class defines another
 class variable `_optional_parameters` holding the names of all the
 optional parameters. The doc strings of the solver classes are
-automatically equipped with tables of required and optional parameters.
+automatically equipped with tables of required and optional
+parameters.
 
 The optional parameters of a class consists of the optional parameters
 of the superclass and those specific to the class. The typical
@@ -519,6 +548,27 @@ class SomeMethod(ParentMethod):
 where `prm1`, `prm2`, etc. are names registered in the global
 `_parameters` dictionary.
 
+From a user's point of view, the parameters are set either at
+construction time or through the `set` function:
+!bc
+>>> from odesolvers import RK2
+>>> def f(u, t, a, b=0):
+...   return a*u + b
+...
+>>> method = RK2(f, f_kwargs=dict(b=1))
+>>> method.f_kwargs
+{'b': 1}
+>>> method.set(f_args=(3,))
+>>> method.f_args
+(3,)
+>>> # Get all registered parameters in the method instance
+>>> method.get()
+{'f_kwargs': {'b': 1}, 'f_args': (3,), 'complex_valued': False,
+ 'f': <function <lambda> at 0x2967500>}
+!ec
+===== Solver Classes =====
+
+[[[
 
 ======= Installation =======
 

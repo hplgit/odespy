@@ -35,7 +35,7 @@ class Pyds(Solver):
             terminate = lambda u, t, step_no: False
 
         self.t = np.asarray(time_points)
-        self.set_internal_parameters()
+        self.initialize_for_solve()
 
         N = self.t.size - 1  # no of intervals
         self.valid_data()
@@ -135,7 +135,7 @@ class Vode_pyds(Pyds):
     _params_pydstool = ['init-step','strictdt','stiff','use_special',\
                        'specialtimes']
 
-    def set_internal_parameters(self):
+    def initialize_for_solve(self):
         if not hasattr(self,'init_step'):
             self.init_step = self.t[1] - self.t[0]
         self.params_pydstool = dict(\

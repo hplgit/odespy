@@ -3,30 +3,31 @@
 
 
 # Done:
-_arg_dict _parameters
-_mandatory_arg_names _required_parameters
-_optional_arg_names _optional_parameters
-_legal_args _parameters
-get_all_solver_names_info   list_all_solvers
-set_parameter_properties adjust_parameters
-valid_data validate_data
-RungeKutta2 RK2
-RungeKutta3 RK3
-RungeKutta4 RK4
-RungeKuttaFehlberg RKFehlberg
-ForwardEuler Euler
-BogackiShampine_RK BogackiShampine
-CashKarp_RK CashKarp
-Fehlberg_RK Fehlberg
-ForwardEuler_RK ForwardEuler
-RungeKutta4_RK RungeKutta4
-DormandPrince_RK DormandPrince
-RungeKutta3_RK RungeKutta3
-RungeKutta2_RK RungeKutta2
+_arg_dict                           _parameters
+_mandatory_arg_names                _required_parameters
+_optional_arg_names                 _optional_parameters
+_legal_args                         _parameters
+set_internal_parameters             initialize_for_solve
+get_all_solver_names_info           list_all_solvers
+set_parameter_properties            adjust_parameters
+valid_data                          validate_data
+RungeKutta2                         RK2
+RungeKutta3                         RK3
+RungeKutta4                         RK4
+RungeKuttaFehlberg                  RKFehlberg
+BogackiShampine_RK                  BogackiShampine
+CashKarp_RK                         CashKarp
+Fehlberg_RK                         Fehlberg
+ForwardEuler_RK                     RungeKutta1
+RungeKutta2_RK                      RungeKutta2
+RungeKutta3_RK                      RungeKutta3
+RungeKutta4_RK                      RungeKutta4
+DormandPrince_RK                    DormandPrince
+
 
 
 
 # Plans:
-set_internal_parameters initialize_for_solve
+
 
 
