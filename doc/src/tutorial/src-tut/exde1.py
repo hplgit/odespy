@@ -31,5 +31,6 @@ print "Solve u'=%g*u, u(0)=%g, for t in [%g, %g] and u>%g" % \
 print 'Final u(t=%g)=%g after %d steps' % (t[-1], u[-1], len(u)-1)
 
 from matplotlib.pyplot import *
+print plot
 plot(t, u)
 show()
