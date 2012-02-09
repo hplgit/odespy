@@ -550,7 +550,7 @@ where `prm1`, `prm2`, etc. are names registered in the global
 
 From a user's point of view, the parameters are set either at
 construction time or through the `set` function:
-!bc
+!bc py
 >>> from odesolvers import RK2
 >>> def f(u, t, a, b=0):
 ...   return a*u + b
@@ -564,11 +564,123 @@ construction time or through the `set` function:
 >>> # Get all registered parameters in the method instance
 >>> method.get()
 {'f_kwargs': {'b': 1}, 'f_args': (3,), 'complex_valued': False,
- 'f': <function <lambda> at 0x2967500>}
+'name of f': 'f'}
 !ec
+The `set` method sets parameters through keyword arguments and can
+take an arbitrary collection of such arguments:
+!bc cod
+method.set(name1=value1, name2=value2, name3=value3, ...)
+!ec
+
+The `get` method returns the parameters and their values as a dictionary.
+(Note that the `'f'` key, which one might expect to appear in the
+returned dictionary of parameters, are omitted because it is always
+a lambda function wrapping the user's `f` function such that the
+returned value is guaranteed to be a `numpy` array. Instead,
+there is an entry `'name of f'` which reflects the name of the
+user-supplied function.)
+
+
 ===== Solver Classes =====
 
-[[[
+Each solver in this package is implemented as a class in a class hierarchy.
+Basic, common functionality is inherited from super classes, and the
+actual solver class implements what is specific for the method in question.
+
+Class `Solver` is the super class of the hierarchy. Its constructor
+requires one mandatory argument: the right-hand side of the ODE,
+$f(u,t)$, coded as a Python function `f(u, t)` or given as a string
+containing code in a compiled language (Fortran, for instance)
+implementing the right-hand side.  Additional keyword arguments can be
+provided to set parameters of the solver.
+
+The constructor performs a set of tasks that are common to all
+the subclass solvers:
+
+ o The set of optional and required parameters of a particular solver
+   is loaded into `self._parameters` such that this dictionary
+   can be used to look up all parameters of the solver.
+
+ o Representation of $f(u, t)$ (or the Jacobian) in a compiled language
+   is compiled into an extension module.
+
+ o The solver-specific method `adjust_parameters` is called to allow
+   the programmer of a solver to manipulate `self._parameters`.
+   For example, some existing or new parameters may be modified or set
+   according to the value of other parameters.
+
+ o All key-value pairs in `self._parameters` are mirrored by class
+   attributes. The computations and the `set` and `get` methods will
+   make use of the attributes rather than the `self._parameters` dict
+   to extract data.  For example, the value of
+   `self._parameters['myvar']` becomes available as `self.myvar` and
+   in the algorithms we use `self.myvar`, perhaps with a test
+   `hasattr(self, 'myvar')` test or a `try`-`except` clause (catching
+   an `AttributeError`).
+
+ o The `set` method is called with all keyword arguments to the
+   constructor, which then modifies the default values of the
+   parameters.
+
+ o The `f` function is wrapped in a lambda function such that
+   `f(u, t)` is guaranteed to return an array (in case the user
+   returns a list or scalar for convenience).
+
+ o The `initialize` method is called to finalize the tasks in
+   the constructor. The most common use of this method in subclasses
+   is to import extension modules that the solver depends on and
+   provide an error message if the extension modules are not available.
+   If they are, the modules are normally stored through an attribute
+   of the subclass.
+
+Let `method` some instance of a subclass in the hierarchy. The
+following calls are possible (through inheriting common convenience
+methods in the super class `Solver`):
+
+ * `repr(method)`: return the subclass name along with all
+   registered parameters and their values. This string provides
+   complete information on the state of a subclass.
+
+ * `str(method)`: return a short pretty print string reflecting
+   the name of the method and the value of parameters that
+   must be known to uniquely define the numerical method.
+   This string is what one would use as legends in a plot or
+   as method identifier in a table.
+
+ * `method.get_parameter_info`: return or print all registered
+   parameters for the current solver and all properties for
+   each parameter.
+
+After the constructor is called, `method.set_initial_condition` is
+called to set the initial condition, and then `solve` is called.
+The `solve` method features the following steps:
+
+ o Convert `time_points` to a `numpy` array.
+ o Call `initial_for_solve` (implemented in subclasses) to
+   precompute whatever is needed before the time loop.
+   The super class allocates storage for the solution and
+   loads the initial condition into that data structure.
+ o Run a loop over all time levels `n` and call `advance` (implemented
+   in subclasses) at each level to advance the solution from
+   time `t[n]` to `t[n+1]`. Also call `terminate` so that the
+   user code can analyze and work with the solution.
+
+Some subclasses will override the `solve` method and provide their own,
+but most subclasses just inherits the general one and implement
+the `advance` method.
+
+All classes have a set of attributes:
+
+ o `users_f` holding the user's function for $f(u, t)$
+   (implicit solvers will have a corresponding `users_jac` for
+   the user's Jacobian),
+ o one attribute for each parameter in the class,
+ o `u`: 1D `numpy` array holding the solution for a scalar ODE and
+   a 2D array in case of a system of ODEs. The first index
+   denotes the time level.
+ o `t`: the time levels corresponding to the first index in the `u` array.
+
+# Explain a subclass, show example
 
 ======= Installation =======
 

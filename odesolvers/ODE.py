@@ -884,15 +884,16 @@ class Solver:
 
     Attributes stored in this class:
 
-    ====  =============================================================
-    Name  Description
-    ====  =============================================================
-    u     array of point values of the solution function
-    t     array of time values: u[i] corresponds to t[i]
-    n     the most recently computed solution is u[n+1]
-    f     callable object implementing the right-hand side f(u, t)
-    ====  =============================================================
-
+    =========  ========================================================
+    Name       Description
+    =========  ========================================================
+    u          array of point values of the solution function
+    t          array of time values: u[i] corresponds to t[i]
+    n          the most recently computed solution is u[n+1]
+    f          the object wrapping the user's right-hand side f(u, t)
+    users_f    the user's original function implementing f(u, t)
+    PRM        an attribute for each optional and required parameter
+    =========  ========================================================
 
     """
 
@@ -1146,10 +1147,12 @@ class Solver:
                                          (name, value, str(ranges)))
         return True
 
-    def check_extra(self,**kwargs):
+    def check_extra(self, **kwargs):
         """
-        Run extra check functions if property 'extra_check' is specified
-        for some parameters.
+        A parameter may have a keyword ``extra_check`` for user-given
+        functions that performs consistency checks on the parameter.
+        This method runs the user-given function(s) on the relevant
+        set of parameters.
         """
         p = self._parameters
         prm_type_list = [(name, p[name]['extra_check'], kwargs[name]) \
@@ -1184,8 +1187,13 @@ class Solver:
             all_args = dict([(name, getattr(self, name, None)) \
                                  for name in self._parameters \
                                  if hasattr(self, name)])
+            # Remove f and jac since these are wrappers of the
+            # user's functions. Instead, insert an entries that
+            # reflect the name of user-supplied functions
+            all_args.remove('f')
             all_args['name of f'] = self.users_f.func_name})
             if 'jac' in all_args:
+                all_args.remove('jac')
                 all_args['name of jac'] = self.users_jac.func_name})
 
             if print_info:
@@ -1203,8 +1211,12 @@ class Solver:
 
     def get_parameter_info(self,print_info=False):
         '''
-        Return a dictionary containing properties of legal parameters in
-        current subclass, e.g. self._parameters.
+        Return a dictionary containing all properties of all
+        legal parameters in current subclass (i.e., the parameters
+        in ``self._parameters``).
+
+        If *print_info* is *True*, the ``self._parameters`` dict
+        is pretty printed, otherwise it is returned.
         '''
         if print_info:
             print 'Legal parameters for class %s are:' % self.__class__.__name__
