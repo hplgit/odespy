@@ -725,6 +725,11 @@ the subclass solvers:
    If they are, the modules are normally stored through an attribute
    of the subclass.
 
+ o The `switch_to` method returns a new solver initialized with all
+   parameters of the current solver that are legal in the new solver.
+   The method is useful when trying out a range of solvers for a
+   problem.
+
 Let `method` some instance of a subclass in the hierarchy. The
 following calls are possible (through inheriting common convenience
 methods in the super class `Solver`):
@@ -783,6 +788,15 @@ Most classes will also define two additional static variables,
 `_required_parameters` and `_optional_parameters` as explained
 in Section ref{odes:parameters}.
 
+=== Other Superclasses ===
+
+There are superclasses `SolverImplicit` for implicit methods,
+`Adaptive` for adaptive methods, 'RungeKutta' for general
+Runge-Kutta methods, `Ode_scipy` for interfaces to ODE solvers
+in `scipy`, and `Odepack` for interfaces to the ODEPACK family
+of solvers.
+
+
 === A Very Simple Subclass ===
 
 To implement a simple explicit scheme for solving a scalar ODE or a system
@@ -822,6 +836,8 @@ Remarks:
 
 Almost equally simple schemes, like explicit Runge-Kutta methods and Heun's
 method are implemented in the same way (see `ODE.py`).
+
+=== A Subclass with More Code ===
 
 A 2nd-order Adams-Bashforth scheme is a bit more complicated since it
 involves three time levels and therefore needs a separate method for
@@ -895,6 +911,49 @@ details of the check.
 More advanced implementations of subclasses can be studied
 in the `ODE.py` and `RungeKutta.py` files.
 
+=== A Simple Example of an Implicit Method ===
+
+Class `SolverImplicit` acts as superclass for the implementation of
+implicit methods. This class provides some basic functionality for
+solving the system of nonlinear equations that normally arise in
+implicit methods by Picard or Newton iteration.
+The parameter `nonlinear_solver` can take the values `Picard` or
+`Newton`. The user must provide in case of Newton's method provide
+a `jac` parameter for a function evaluating the Jacobian of $f(u,t)$
+with respect to $u$: $J_{i,j} = \partial f_i/\partial u_j$.
+
+Instead of implementing an `advance` method in subclasses, one provides
+a method `Picard` and/or `Newton` to define key quantities in these
+methods. The superclass implements `advance`, which will run a Picard
+or Newton iteration. The `Picard` method returns all the terms
+on the right-hand side of the discrete equation when only `u[n+1]` is
+on the left-hand side. `Newton` returns the right-hand side and the
+Jacobian of the system to be solved in each Newton iteration.
+
+Here is an example showing how to implement the Backward Euler method.
+!bc
+class BackwardEuler(SolverImplicit):
+    """
+    Implicit Backward Euler method::
+
+       u[n+1] = u[n] + dt*f(t[n+1], u[n+1])
+
+    The nonlinear system is solved by Newton or Picard iteration.
+    """
+    quick_description = "Implicit 1st-order Backward Euler method"
+
+    def Picard_update(self, ukp1):
+        u, f, n, t = self.u, self.f, self.n, self.t
+        dt = t[n+1] - t[n]
+        return u[n] + dt*f(ukp1, t[n+1])
+
+    def Newton_system(self, ukp1):
+        u, f, n, t = self.u, self.f, self.n, self.t
+        dt = t[n+1] - t[n]
+        F = ukp1 - (u[n] + dt*f(ukp1, t[n+1]))
+        J = np.eye(self.neq) - dt*self.jac(ukp1, t[n+1])
+        return F, J
+!ec
 
 ======= Installation =======
 

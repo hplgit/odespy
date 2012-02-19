@@ -8,9 +8,7 @@ supported.  A wide range of numerical methods for ODEs are offered:
 
 # The tutorial text inserts ../doc/src/tutorial/odesolvers.rst
 
-__tutorial__ = r"""
-
-
+__tutorial__ = r'''
 Basic Usage
 ===========
 
@@ -296,7 +294,7 @@ each subdomain in sequence. The following program performs the steps.
             return c*u
 
         import odesolvers, numpy
-        from matplotlib.pyplot import plot, hold, show
+        from matplotlib.pyplot import *
 
         method = odesolvers.RK4(f)
 
@@ -314,7 +312,7 @@ each subdomain in sequence. The following program performs the steps.
             time_points = numpy.linspace(T[i], T[i+1], N+1)
 
             method.set_initial_condition(A)  # at time_points[0]
-            print 'Solving in [%s, %s] with %d points' % \
+            print 'Solving in [%s, %s] with %d intervals' % \
                   (T[i], T[i+1], N)
             ui, ti = method.solve(time_points)
             A = ui[-1]  # newest u is next initial condition
@@ -390,6 +388,7 @@ The complete program may take the form
         print 'Final u(t=%g)=%g after %d steps' % (t[-1], u[-1], len(u)-1)
 
         from matplotlib.pyplot import *
+        print plot
         plot(t, u)
         show()
 
@@ -509,7 +508,7 @@ whose period is :math:`2\pi/\sqrt{c}`.)
 
         freq = sqrt(c)      # frequency of oscillations when Theta is small
         period = 2*pi/freq  # the period of the oscillations
-        T = 8*period        # final time
+        T = 10*period        # final time
         N_per_period = 20   # resolution of one period
         N = N_per_period*period
         time_points = numpy.linspace(0, T, N+1)
@@ -533,7 +532,44 @@ components in individual arrays:
         theta_small = Theta*numpy.cos(sqrt(c)*t)
         plot(t, theta, 'r-', t, theta_small, 'y-')
         legend(['theta', 'small angle approximation'])
+        savefig('tmp.png')
         show()
+
+
+Looking at the plot reveals that the numerical solution has
+an alarming feature: the amplitude grows (indicating increasing
+energy in the system). Changing ``T`` to 28 periods instead of 10
+makes the numerical solution explode.
+
+
+.. figure:: figs-tut/exos1a.png
+   :width: 500
+
+   *Comparison of large-amplitude numerical solution with corresponding analytical solution (derived for small amplitudes)*
+
+
+Changing solution method is a matter of substituting ``Heun`` by ``RK4``,
+for instance:
+
+
+.. code-block:: python
+
+        method = odesolvers.RK4(f)
+
+
+The amplitude is now correct, but the numerical solution has a different
+frequency than the inaccurate analytical "solution".
+
+
+.. figure:: figs-tut/exos1b.png
+   :width: 500
+
+   *Switching to a 4-th order Runge-Kutta method improves the numerical solution*
+
+
+Changing :math:`\Theta` to a small value, say 0.05, makes the two curves
+coincide. The next section shows how easy it is to run a problem with a set
+of numerical methods.
 
 
 Example: Testing Several Methods
@@ -714,10 +750,10 @@ The loop over the chosen solvers may look like
 
 
 
-.. figure:: src-tut/exos2.png
+.. figure:: figs-tut/exos2.png
    :width: 500
 
-   Comparison of solutions
+   *Comparison of solutions*
 
 
 We can extend this program to compute the error in each numerical
@@ -820,7 +856,8 @@ order, while the filtered Leapfrog method has slow convergence and
 a fairly large error, which is also evident in the previous figure.
 
 Extending the time domain to 20 periods makes many of the
-simplest methods inaccurate:
+simplest methods inaccurate and the rates computed on coarse
+time meshes are irrelevnat:
 
 .. code-block:: python
 
@@ -831,6 +868,117 @@ simplest methods inaccurate:
         ThetaRule            r: 87.8, 0.2, 1.7, 2.0 E_min=5.3E-02
         Leapfrog             r: 95.9, 18.0, 1.0, 2.0 E_min=1.1E-01
         LeapfrogFiltered     r: -0.0, 121.2, 0.3, 0.1 E_min=5.2E-01
+
+
+Example: Solving a Stochastic Differential Equation
+---------------------------------------------------
+
+We consider an oscillator driven by stochastic white noise:
+
+.. math::
+         x''(t) + bx'(t) + cx(t) = N(t),\ x(0)=X,\ x'(0) =0,
+
+where :math:`N(t)` is the white noise computed discretely as
+
+.. math::
+         N(t_i) \approx \sigma\frac{\Delta W_i}{\sqrt{t_{i+1}-t_i}},
+
+where :math:`\Delta W_1,\Delta W_2,\ldots` are independent normally
+distributed random variables with mean zero and unit standard
+deviation, and :math:`\sigma` is the strength of the noise.
+The idea is that :math:`N(t)` provides an excitation containing "all" frequencies,
+but the oscillator is a strong filter: with low damping one of the
+frequencies in :math:`N(t)` will hit the resonance frequency
+:math:`\sqrt{c}/(2\pi)` which will
+then dominate the output signal :math:`x(t)`.
+
+The noise is additive in this stochastic differential equation so
+there is no difference between the Ito and Stratonovich interpretations
+of the equation.
+
+The challenge with this model problem is that stochastic differential
+equations do not fit with the user interface offered by ``odesolvers``,
+since the right-hand side function is assumed to be dependent only
+on the solution and the present time (``f(u,t)``), and additional
+user-defined parameters, but for the present problem the right-hand
+side function needs information about :math:`N(t)` and hence
+the size of the current time step. We can solve this issue by
+having a reference to the solver in the right-hand side function,
+precomputing :math:`N(t_i)` for all time intervals :math:`i`, and using the ``n``
+attribute in the solver for selecting the right force term (recall
+that some methods will call the right-hand side function many times
+during a time interval - all these calls must use the same value of
+the white noise).
+
+The right-hand side function must do many things so a class is
+appropriate:
+
+
+.. code-block:: python
+
+        class WhiteNoiseOscillator:
+            def __init__(self, b, c, sigma=1):
+                self.b, self.c, self.sigma = b, c, sigma
+
+            def connect_solver(self, solver):
+                """Solver is needed for time step number and size."""
+                self.solver = solver
+
+            def __call__(self, u, t):
+                if not hasattr(self, 'N'):
+                    # Compute N(t) for all time intervals
+                    import numpy
+                    numpy.random.seed(12)
+                    t = self.solver.t
+                    dW = numpy.random.normal(loc=0, scale=1, size=len(t)-1)
+                    dt = t[1:] - t[:-1]
+                    self.N = self.sigma*dW/numpy.sqrt(dt)
+
+                x, v = u
+                N = self.N[self.solver.n]
+                return [v, N -self.b*v -self.c*x]
+
+
+We can easily compare different methods:
+
+
+.. code-block:: python
+
+        f = WhiteNoiseOscillator(b=0.1, c=pi**2, sigma=1)
+        methods = [odesolvers.Heun(f), odesolvers.RK4(f),
+                   odesolvers.ForwardEuler(f)]
+        for method in methods:
+            f.connect_solver(method)
+            method.set_initial_condition([0,0])  # start from rest
+            T = 60   # with c=pi**2, the period is 1
+            u, t = method.solve(linspace(0, T, 10001))
+
+            x = u[:,0]
+            plot(t, x)
+            hold(True)
+
+        legend([str(m) for m in methods])
+
+
+
+.. figure:: figs-tut/exsos1.png
+   :width: 500
+
+   *Oscillator driven by white noise*
+
+
+The ``Heun`` and ``RK2`` methods give coinciding solutions while
+the ``ForwardEuler`` method gives too large amplitudes.
+The frequency is 0.5 (period 2) as expected.
+
+In this example the white noise force is computed only once since
+the ``f`` instance is reused in all methods. If a new ``f`` is created
+for each method, it is crucial that the same seed of the random
+generator is used for all methods, so that the time evolution of
+the force is always the same - otherwise the solutions will be
+different.
+
+
 
 
 
@@ -844,19 +992,53 @@ various parts of the solution process. Below we describe how the
 superclass and its subclasses work and how parameters are registered
 and initialized.
 
+.. _odes:parameters:
+
 Solver Parameters
 -----------------
 
-The ``ode`` module contains a global dictionary ``_parameters`` holding
-all legal parameters. For each parameter the dictionary stores
-the parameter name, a default value, a description, the legal
-object type for the value of the parameter, and other quantities if
-needed. Each solver class defines a (static) class variable
+The ``ODE`` module defines a global dictionary ``_parameters`` holding
+all legal parameters. Other modules imports this ``_parameters`` dict
+and updates it with their own additional parameters.
+
+For each parameter the ``_parameters`` dict stores the parameter name, a
+default value, a description, the legal object type for the value of
+the parameter, and other quantities if needed. A typical example
+is
+
+.. code-block:: py
+
+
+        _parameters = dict(
+        ...
+
+        f = dict(
+            help='Right-hand side f(u,t) defining the ODE',
+            type=callable),
+
+        f_kwargs = dict(
+            help='Extra keyword arguments to f: f(u, t, *f_args, **f_kwargs)',
+            type=dict,
+            default={}),
+
+        theta = dict(
+            help="""Weight in [0,1] used for
+        "theta-rule" finite difference approx.""",
+            default=0.5,
+            type=(int,float),
+            range=[0, 1])
+
+        ...
+        }
+
+
+Each solver class defines a (static) class variable
 ``_required_parameters`` for holding the names of all required
 parameters (in a list). In addition, each solver class defines another
 class variable ``_optional_parameters`` holding the names of all the
 optional parameters. The doc strings of the solver classes are
-automatically equipped with tables of required and optional parameters.
+automatically equipped with tables of required and optional
+parameters.
 
 The optional parameters of a class consists of the optional parameters
 of the superclass and those specific to the class. The typical
@@ -870,6 +1052,286 @@ initialization of ``_optional_parameters`` goes like this:
 
 where ``prm1``, ``prm2``, etc. are names registered in the global
 ``_parameters`` dictionary.
+
+From a user's point of view, the parameters are set either at
+construction time or through the ``set`` function:
+
+.. code-block:: py
+
+
+        >>> from odesolvers import RK2
+        >>> def f(u, t, a, b=0):
+        ...   return a*u + b
+        ...
+        >>> method = RK2(f, f_kwargs=dict(b=1))
+        >>> method.f_kwargs
+        {'b': 1}
+        >>> method.set(f_args=(3,))
+        >>> method.f_args
+        (3,)
+        >>> # Get all registered parameters in the method instance
+        >>> method.get()
+        {'f_kwargs': {'b': 1}, 'f_args': (3,), 'complex_valued': False,
+        'name of f': 'f'}
+
+The ``set`` method sets parameters through keyword arguments and can
+take an arbitrary collection of such arguments:
+
+.. code-block:: python
+
+        method.set(name1=value1, name2=value2, name3=value3, ...)
+
+
+The ``get`` method returns the parameters and their values as a dictionary.
+(Note that the ``'f'`` key, which one might expect to appear in the
+returned dictionary of parameters, are omitted because it is always
+a lambda function wrapping the user's ``f`` function such that the
+returned value is guaranteed to be a ``numpy`` array. Instead,
+there is an entry ``'name of f'`` which reflects the name of the
+user-supplied function.)
+
+
+Solver Classes
+--------------
+
+Each solver in this package is implemented as a class in a class hierarchy.
+Basic, common functionality is inherited from super classes, and the
+actual solver class implements what is specific for the method in question.
+
+The Super Class
+~~~~~~~~~~~~~~~
+
+Class ``Solver`` is the super class of the hierarchy. Its constructor
+requires one mandatory argument: the right-hand side of the ODE,
+:math:`f(u,t)`, coded as a Python function ``f(u, t)`` or given as a string
+containing code in a compiled language (Fortran, for instance)
+implementing the right-hand side.  Additional keyword arguments can be
+provided to set parameters of the solver.
+
+The constructor performs a set of tasks that are common to all
+the subclass solvers:
+
+1. The set of optional and required parameters of a particular solver
+   is loaded into ``self._parameters`` such that this dictionary
+   can be used to look up all parameters of the solver.
+
+2. Representation of :math:`f(u, t)` (or the Jacobian) in a compiled language
+   is compiled into an extension module.
+
+3. The solver-specific method ``adjust_parameters`` is called to allow
+   the programmer of a solver to manipulate ``self._parameters``.
+   For example, some existing or new parameters may be modified or set
+   according to the value of other parameters.
+
+4. All key-value pairs in ``self._parameters`` are mirrored by class
+   attributes. The computations and the ``set`` and ``get`` methods will
+   make use of the attributes rather than the ``self._parameters`` dict
+   to extract data.  For example, the value of
+   ``self._parameters['myvar']`` becomes available as ``self.myvar`` and
+   in the algorithms we use ``self.myvar``, perhaps with a test
+   ``hasattr(self, 'myvar')`` test or a `try`-`except` clause (catching
+   an ``AttributeError``).
+
+5. The ``set`` method is called with all keyword arguments to the
+   constructor, which then modifies the default values of the
+   parameters.
+
+6. The ``f`` function is wrapped in a lambda function such that
+   ``f(u, t)`` is guaranteed to return an array (in case the user
+   returns a list or scalar for convenience).
+
+7. The ``initialize`` method is called to finalize the tasks in
+   the constructor. The most common use of this method in subclasses
+   is to import extension modules that the solver depends on and
+   provide an error message if the extension modules are not available.
+   If they are, the modules are normally stored through an attribute
+   of the subclass.
+
+Let ``method`` some instance of a subclass in the hierarchy. The
+following calls are possible (through inheriting common convenience
+methods in the super class ``Solver``):
+
+ * ``repr(method)``: return the subclass name along with all
+   registered parameters and their values. This string provides
+   complete information on the state of a subclass.
+
+ * ``str(method)``: return a short pretty print string reflecting
+   the name of the method and the value of parameters that
+   must be known to uniquely define the numerical method.
+   This string is what one would use as legends in a plot or
+   as method identifier in a table.
+
+ * ``method.get_parameter_info``: return or print all registered
+   parameters for the current solver and all properties for
+   each parameter.
+
+After the constructor is called, ``method.set_initial_condition`` is
+called to set the initial condition, and then ``solve`` is called.
+The ``solve`` method features the following steps:
+
+1. Convert ``time_points`` to a ``numpy`` array.
+
+2. Call ``initialize_for_solve`` (implemented in subclasses) to
+   precompute whatever is needed before the time loop.
+   The super class allocates storage for the solution and
+   loads the initial condition into that data structure.
+   Any subclass implementation of ``initialize_for_solve`` must therefore
+   also call this method in its super class.
+
+3. Call ``validate_data`` to check if the data structures are consistent
+   before starting the computations. Subclass implementations of
+   this method must call the super class' version of the method.
+
+4. Run a loop over all time levels ``n`` and call ``advance`` (implemented
+   in subclasses) at each level to advance the solution from
+   time ``t[n]`` to ``t[n+1]``. Also call ``terminate`` so that the
+   user code can analyze and work with the solution.
+
+Some subclasses will override the ``solve`` method and provide their own,
+but most subclasses just inherits the general one and implement
+the ``advance`` method.
+
+All classes have a set of attributes:
+
+1. ``users_f`` holding the user's function for :math:`f(u, t)`
+   (implicit solvers will have a corresponding ``users_jac`` for
+   the user's Jacobian),
+
+2. one attribute for each parameter in the class,
+
+3. ``u``: 1D ``numpy`` array holding the solution for a scalar ODE and
+   a 2D array in case of a system of ODEs. The first index
+   denotes the time level.
+
+4. ``t``: the time levels corresponding to the first index in the ``u`` array.
+
+5. ``quick_description``: a short one-line description of the method (this
+   variable is static in the class, i.e., declared outside any method).
+
+Most classes will also define two additional static variables,
+``_required_parameters`` and ``_optional_parameters`` as explained
+in the section :ref:`odes:parameters`.
+
+A Very Simple Subclass
+~~~~~~~~~~~~~~~~~~~~~~
+
+To implement a simple explicit scheme for solving a scalar ODE or a system
+of ODEs, you only need to write a subclass of ``Solver`` with an
+``advance`` method containing the formula that updates the solution from
+one time level to the next. For example, the Forward Euler scheme
+reads
+
+.. math::
+         u_{n+1} = u_n + \Delta t f(u_n, t_n),
+
+where subscript :math:`n` denotes the time level, and :math:`\Delta t = t_{n+1}-t_n` is
+the current time step.
+The implementation goes like
+
+.. code-block:: python
+
+        class ForwardEuler(Solver):
+            """
+            Forward Euler scheme::
+
+                u[n+1] = u[n] + dt*f(u[n], t[n])
+            """
+            quick_description = 'The simple explicit (forward) Euler scheme'
+
+            def advance(self):
+                u, f, n, t = self.u, self.f, self.n, self.t
+                dt = t[n+1] - t[n]
+                unew = u[n] + dt*f(u[n], t[n])
+                return unew
+
+Remarks:
+
+1. The ``quick_description`` is necessary for the class to appear in the
+   automatically generated overview of implemented methods
+   (run ``pydoc odesolvers`` to see this table).
+
+2. Extracting class attributes in local variables (here ``u``, ``f``, etc.)
+   avoids the need for the ``self`` prefix so that the implemented formulas
+   are as close to the mathematical formulas as possible.
+
+Almost equally simple schemes, like explicit Runge-Kutta methods and Heun's
+method are implemented in the same way (see ``ODE.py``).
+
+A 2nd-order Adams-Bashforth scheme is a bit more complicated since it
+involves three time levels and therefore needs a separate method for
+the first step. We should also avoid unnecessary evaluations of :math:`f(u,t)`.
+The user can specify a parameter ``start_method`` for the name of the
+solver to be used for the first step. This solver is initialized
+by the ``switch_to`` method in class ``Solver``. Basically,
+
+.. code-block:: python
+
+        new_solver = solver.switch_to(solver_name)
+
+creates a new solver instance ``new_solver``, of the class implied by
+``solver_name``, where all relevant parameters from ``solver`` are coopied
+to ``new_solver``.
+
+An implementation of a subclass for the
+2nd-order Adams-Bashforth scheme can then look as follows.
+
+.. code-block:: python
+
+        class AdamsBashforth2(Solver):
+            """
+            Second-order Adams-Bashforth method::
+
+                u[n+1] = u[n] + dt/2.*(3*f(u[n], t[n]) - f(u[n-1], t[n-1]))
+
+            for constant time step dt.
+
+            RK2 is used as default solver in first step.
+            """
+            quick_description = "Explicit 2nd-order Adams-Bashforth method"
+
+            _optional_parameters = Solver._optional_parameters + ['start_method',]
+
+            def initialize_for_solve(self):
+                # New solver instance for first step
+                self.starter = self.switch_to(self.start_method)
+                Solver.initialize_for_solve(self)
+
+            def validate_data(self):
+                if not self.constant_time_step():
+                    print '%s must have constant time step' % self.__name__
+                    return False
+                else:
+                    return True
+
+            def advance(self):
+                u, f, n, t = self.u, self.f, self.n, self.t
+
+                if n >= 1:
+                    dt = t[n+1] - t[n]  # must be constant
+                    self.f_n = f(u[n], t[n])
+                    unew = u[n] + dt/2.*(3*self.f_n - self.f_n_1)
+                    self.f_n_1 = self.f_n
+                else:
+                    # User-specified method for the first step
+                    self.starter.set_initial_condition(u[n])
+                    time_points = [t[n], t[n+1]]
+                    u_starter, t_starter = self.starter.solve(time_points)
+                    unew = u_starter[-1]
+                    self.f_n_1 = f(u[0], t[0])
+
+                return unew
+
+Three features are worth comments: 1) we extend the set of optional
+parameters; 2) we must initialize a separate solver for the first
+step, and this is done in the ``initialize_for_solve`` method that will
+be called as part of ``solve`` (before the time stepping); and 3) we
+extend ``validate_data`` to check that the time spacing given by the
+``time_points`` argument to ``solve`` is constant. The utility method
+``constant_time_step`` provided in super class ``Solver`` carries out the
+details of the check.
+
+More advanced implementations of subclasses can be studied
+in the ``ODE.py`` and ``RungeKutta.py`` files.
 
 
 Installation
@@ -906,55 +1368,7 @@ line installs all that ``odesolvers`` may need:
 
         sudo apt-get install python-scipy python-nose python-sympy
 
-
-TODO
-====
-
- * Start tutorial with solving a real problem with vode and RK2 say;
-   preferably some system where it is unclear if a sophisticated or
-   standard method will work.
-
- * new parameter: casename, put in Solver, always have, but can be None
-
- * Incorporate odelab
-
- * Interface sundials
-
- * Show phase space plot
-
- * call scipy.optimize.fsolve for Newton?
-
- * Show how to store different simulations in file (shelve, Gael's
-   work, NumPyDB), name each case, could have solve(..., storage='file')
-   and then return u as some file-like object that accepts u[i] etc and
-   for ui in u etc. Could be easy in class Solver. Requires param filename.
-
- * Design overview with superclasses
-
- * Storage (and philosophy)
-
- * SIR examples
-
- * Physics examples where class Problem has kinetic energy(u),
-   potential energy(u), position, momentum, velocity, friction force,
-   spring force, etc. Given u, get the physical quantity.
-   Could be a general base class for Oscillators,
-   odesolvers.Problem.Oscillator.
-
- * Complete physics example with class Problem, Solver and Viz a la INF1100.
-   Adaptive error controlled solution.
-
- * Solvers for 2nd order eqs where f must be an object and also have a
-   method d2ut2(u, dudt, t) for returning u''="f"?
-
- * PDE examples: conservation laws, diffusion
-
- * SODEs, need f as f + noise(u, t)? Problem: need dt, otherwise we
-   could do this without any support. Solution: provide dt to
-   f constructor :-)
-
- * Explain and show the code of the hierarchy.
-"""
+'''
 
 from ODE import *
 from RungeKutta import *

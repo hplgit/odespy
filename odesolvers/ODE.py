@@ -1,175 +1,15 @@
 # Author: Liwei Wang, Hans Petter Langtangen
 
-# This doc string is to be replaced by something from odesolvers.do.txt
-# filtered to sphinx.
-
 """
-This module contains tools for solving ordinary differential
-equations (ODEs). Both scalar ODEs and systems of ODEs are supported.
-A wide range of numerical methods for ODEs are offered.
-
-The typical use of the tools goes as follows. Given some ordinary
-differential equations written on the generic form u' = f(u, t),
-the user carries out three steps.
-
-##############################################################
-#                  Part 1    Introduction                    #
-##############################################################
-
-All ODE problems in a general form of the initial value problem:
-(1)  u'(t) = f(u,t)
-  where u can be defined either as a scalar, or as a vector.
-  f is a given function which specify the right side of equations.
-(2)  U(0) = u0
-  where u0 is the initial value to start with.
-(3 ) time_points = [t0,t1,t2,...]
-  which is the desired time points for the numerical iteration
-
-The module provides an unified interface to solving ODEs. Some classes
-in this module implement algorithms in Python, while others are
-wrappers of Python wrappers of compiled ODE solvers (from scipy, for
-instance).
-
-Including following subclasses:
-
-  1. Euler             : Forward Euler
-  2. MidpointIter      : Iterated Midpoint strategy
-  3. RK2               : 2nd-order Runge-Kutta
-  4. RK3               : 3rd-order Runge-Kutta method
-  5. RK4               : 4th-order Runge-Kutta method
-  6. Heun              : Heun's method
-  7. Leapfrog          : Plain Leapfrog method
-  8. LeapfrogFiltered  : Filtered Leapfrog method
-  9. AdamsBashforth2   : 2nd-order Adams-Bashforth method
- 10. AdamsBashforth3   : 3rd-order Adams-Bashforth method
- 11. AdamsBashforth4   : 4th-order Adams-Bashforth method
- 12. AdamsBashMoulton2 : 2-step Adams-Bash-Moulton method
- 13. AdamsBashMoulton3 : 3-step Adams-Bash-Moulton method
- 14. MySolver          : User-defined method
- 15. Vode_PyDS         : Wrapper for VODE_ODESystem in package PyDSTool.
- 16. Sympy_odefun      : Wrapper for sympy.mpmath.odefun, which uses a
-                         high-order Taylor series method.
-SolverImplicit:
-Implicit ODE solvers within either Newton or Picard nonlinear iteration.
- 17. BackwardEuler     : Backward Euler method
- 18. ThetaRule         : Theta rule method
- 19. Backward2step     : Three-level backward scheme
- 20. MidpointImplicit  : Implicit Midpoint method.
-
-Adaptive:
- 21. RKFehlberg        : 4-5-th order Runge-Kutta-Fehlberg
- 22. AdaptiveResidual  : Accept a specified solver, calculate residual
-                         as the error-check criteria.
- 23. Rkc               : Wrapper for rkc.f.
- 24. Rkf45             : Wrapper for Rkf45.f.
-
-ODEPACK:  Collection for solvers in ODEPACK.
- 25. Lsode             : Basic solver dlsode().
- 26. Lsodes            : dlsodes() for ODE problems with Jacobian matrix
-                         in general sparse form.
- 27. Lsoda             : dlsoda(), which automatically selects between
-                         nonstiff (Adams) and stiff (BDF) methods.
- 28. Lsodar            : dlsodar(), dlsoda with a rootfinding capability
-                         added.
- 29. Lsodi             : dlsodi(), which solves linearly implicit systems.
- 30. Lsoibt            : dlsoibt(), which solves linearly implicit systems
-                         in which the matrices involved are assumed to be
-                         block-tridiagonal.
- 31. Lsodis            : dlsodis(), which solves linearly implicit systems
-                         in which the matrices involved are assumed to be
-                         sparse.
-
-RungeKutta: Collection for explicit Rungekutta methods.
- 32. RungeKutta2       : Standard RungeKutta2
- 33. RungeKutta3       : Standard RungeKutta3
- 34. RungeKutta4       : Standard RungeKutta4
- 35. ForwardEuler      : Forward Euler
- 36. DormandPrince     : Dormand & Prince method
- 37. Fehlberg          : RungeKutta Fehlberg method
- 38. CashKarp          : Case Karp method
- 39. BogackiShampine   : Bogacki Shampine method
- 40. MyRungeKutta      : Specially for user-defined methods.
-
-Ode_scipy:   Wrapper for scipy.integrate.ode
- 41. Vode              : vode.f
- 42. Dopri             : Dormand&Prince order 5
- 43. Dop853            : Dormand&Prince order 8(5,3).
+This module contains the base class ``Solver`` in the ``odesolvers``
+package, as well as implementations of many subclasses.
 
 
-############################################################
-#                    Part 2   Usage                        #
-############################################################
+How to implement a new solver
+=============================
 
-Corresponding to the three components for an ODE problem ,
-(u' = f(u,t), U(0) = u0, time_points = [...]), we have 3 corresponding key
-methods to define the problem in this interface:
-
-1. Solver definition: u' = f(u,t)
-  ODE users can call the constructor __init__(f,**keyword-arguments)
-  for desired solver class to define equation u' = f(u,t), where f
-  is a user-defined Python function. Legal arguments can be attached
-  as keyword-arguments in the argument list.
-2. Initial value: u(0) = u0
-  Users can set up the initial value U(0) = u0 with method
-  set_initial_condition(u0).
-3. Solve the problem in desired range: time_points = [...]
-  Finally users can get the solution with method solve(time_list,...).
-
-Associate Methods for users:
-
-4. switch_to(self, solver_target, printInfo=False,**kwargs):
-  Switch to a new subclass with same settings of all useful attributes in
-  current solver. This function is intended to switch easily between subclasses
-  without restart from initialization in new subclass with same or almost same
-  values.
-  A new solver instance in the new subclass that is specified by the first
-  argument 'solver_target', will be returned. Optional parameters can be reset
-  or supplemented in variable-length argument list 'kwargs'.
-
-5. set(self, strict=False, **kwargs)
-  Reset or supplement the values of optional parameters.
-
-6. get(self, parameter_name=None, printInfo=False)
-  Return value of a specified input parameter.
-  If there is no input for 'parameter_name', a dictionary including values of
-  all the specified input parameters will be returned.
-
-7. get_parameter_info(self, printInfo=False)   :
-  Return a dictionary containing information (name, type, range, etc..) for
-  all the legal input parameters in current solver.
-
-8. odesolvers.list_all_solvers() :
- Return string list for all solvers in this module.
-
-9. odesolvers.list_available_solvers() :
- Return string list for available solvers.
-
-#############################################################
-#            Part 3  For Future Developers                  #
-#############################################################
-
-As an unified interface, common attributes and methods are defined in the
-superclass Solver,  and hence hold a unified form and features in the whole
-hierarchy. In this way, we can avoid duplicated attributes with different names
-(like 'atol','abstol','tol') in different solvers. With unified names in all
-subclasses, attributes can be recognized when switched to another solver. .
-
-Class attributes:
-1.  t            : array to hold time values
-2.  u            : array to hold solution values corresponding to points in t
-3.  f            : callable function to implement the right side of
-                   equations, i.e. f(u,t) = u'(t).
-4.  n            : time step number for current step
-5. _optional_parameters : list to hold names of all the optional parameters.
-6. _required_parameters : list to hold names of all the mandatory parameters.
-7. f_args        : extra arguments for user-defined function f if desired
-8. f_kwargs      : extra arguments with keyword for user-defined f if desired
-9. complex_valued: flag for complex data type
-
-General routine for future developers to integrate a new solver into this
-interface:
-
-1. Dependency preparation.
+Dependency preparation
+----------------------
 
 This step is involved only when developers intend to wrap an existing
 package into odesolvers.
@@ -186,7 +26,8 @@ By an attempt to import these necessary modules (often set in method
 initialize()), we can check whether the necessary dependencies are
 installed properly.
 
-2. Definition of legal parameters and their properties
+Definition of legal parameters and their properties
+---------------------------------------------------
 
 Each solver has a set of specific parameters depending on its
 underlying method. For example, adaptive solvers will be more
@@ -208,24 +49,29 @@ Furthermore, if a parameter in new solver has some properties
 different from general settings in _parameters, developers can reset(or
 supplement) these properties in function adjust_parameters().
 
-3. Special check in validate_data()
+Special check in validate_data()
+--------------------------------
 
 For some complicated solvers with many relevant input parameters,
 there are possibly special relationship requirements inbetween some
 specific input parameters.
 
 For example, in class odesolvers.Lsodes, there are special require-
-ments for the values of two input integer arrays ia and ja:
- I.   ia and ja must be input simultaneously.
- II.  len(ia) == neq + 1
- III. ia[neq] = len(ja)
+ments for the values of two input integer arrays ``ia`` and ``ja``:
+
+  * ``ia`` and ``ja`` must be input simultaneously.
+
+  * ``len(ia) == neq + 1``
+
+  * ``ia[neq] = len(ja)``
 
 Most of the automatic checking are taken in initialization step. We
 need to take extra check for the above requirements after all the
 inputs are initialized. Thus a new function check_iaja() is defined
 in odesolvers.Lsodes, and injected into function validate_data().
 
-4. Internal settings in initialize_for_solve()
+Internal settings in initialize_for_solve()
+-------------------------------------------
 
 When I tried to wrap some complicated ODE software, some param-
 eters are found to be dependent on values of other parameters,
@@ -241,7 +87,8 @@ as internal parameters.
 Function initialize_for_solve() is used to initialize this kind of
 parameters before they are passed to the underlying software.
 
-5. Step forward in advance()
+Step forward in advance()
+-------------------------
 
 In function advance(), solution value for next time point should be
 returned. This is the only mandatory step to implement a new solver.
@@ -258,104 +105,6 @@ solving procedure is started directly with the whole sequence of time
 points, but not step by step. Then developers should turn to start
 iteration directly in function solve().
 
-##############################################################
-#                 Part 4    Examples                         #
-##############################################################
-
->>> # Example 1:  Scalar ODE problem : Exponential
->>> # u'=-u, --> u = exp(-t)
->>> import odesolvers
->>> name = odesolvers.RK4  # example solver
->>> def f(u, t):
-...     return -u   # right-hand side of ODE
->>> method = name(f)
->>> method.set_initial_condition(1.)
->>> import numpy as np
->>> time_points = np.linspace(0, 3, 11)
->>> u, t = method.solve(time_points)
->>> u
-array([ 1.        ,  0.7408375 ,  0.5488402 ,  0.4066014 ,  0.30122557,
-        0.2231592 ,  0.1653247 ,  0.12247874,  0.09073684,  0.06722126,
-        0.04980003])
->>> t
-array([ 0. ,  0.3,  0.6,  0.9,  1.2,  1.5,  1.8,  2.1,  2.4,  2.7,  3. ])
->>> max_error = max(abs(np.exp(-t) - u))
->>> max_error
-3.1742968703674102e-05
-
->>> # Example 2: ODE systems with 2 equations: Sine
->>> # u'' = -u    -->   u = sin(t)
->>> name = odesolvers.RK4  # example
->>> def f(u, t):
-...     return [u[1], -u[0]]
->>> method = name(f)
->>> method.set_initial_condition([0., 1.])
->>> import numpy as np
->>> time_points = np.linspace(0, 2*np.pi, 11)
->>> u, t = method.solve(time_points)
->>> u
-array([[ 0.        ,  1.        ],
-       [ 0.58697683,  0.80910185],
-       [ 0.94984808,  0.31010401],
-       [ 0.95054771, -0.30663308],
-       [ 0.58910339, -0.80604687],
-       [ 0.00351381, -0.99796406],
-       [-0.58293875, -0.80951709],
-       [-0.9468246 , -0.31281024],
-       [-0.9496899 ,  0.30266876],
-       [-0.59073631,  0.80233581],
-       [-0.00701331,  0.99591992]])
->>> t
-array([ 0.        ,  0.62831853,  1.25663706,  1.88495559,  2.51327412,
-        3.14159265,  3.76991118,  4.39822972,  5.02654825,  5.65486678,
-        6.28318531])
->>> max_err = max(abs(u[:,0] - np.sin(t)))
->>> max_err
-0.0070133088801554774
-
->>> # Example 3: A loop to make a comparison among solvers
->>> # u'' = -u    -->    u = sin(t)
->>> def f(u, t):
-...     return [u[1], -u[0]]
->>> time_points = np.linspace(0, 2*np.pi, 11)
->>> exact_u = np.sin(time_points)
->>> from odesolvers import Vode, RKFehlberg, RK4
->>> for solver in [Vode, RKFehlberg, RK4]:
-...     method = solver(f)
-...     method.set_initial_condition([0.,1.])
-...     u,t = method.solve(time_points)
-...     max_err = max(u[:,0] - exact_u)
-...     print 'Maximum error for %s is %g.' % (solver.__name__, max_error)
-Maximum error for Vode is 3.1743e-05.
-Maximum error for RKFehlberg is 3.1743e-05.
-Maximum error for RK4 is 3.1743e-05.
-
->>> # Example 4: Extra parameter for function f(u,t,a)
->>> # u' = -a*u   -->   u = exp(-a*t)
->>> name = odesolvers.RK4  # example solver
->>> def f_with_a(u, t, a):    # extra parameter 'a'
-...     return -a*u   # right-hand side of ODE
->>> method = name(f_with_a, f_args=(2.,))      # set 'a' as 2.0
->>> method.set_initial_condition(1.)
->>> time_points = np.linspace(0, 3, 11)
->>> u, t = method.solve(time_points)
->>> u
-array([ 1.        ,  0.5494    ,  0.30184036,  0.16583109,  0.0911076 ,
-        0.05005452,  0.02749995,  0.01510847,  0.0083006 ,  0.00456035,
-        0.00250545])
-
->>> # Example 5: Stop events for logistic population model
->>> # u' = 1.2*u*(1-u) , stop when u exceed 0.9
->>> name = odesolvers.RK4
->>> def termin(u,t,step_no):    # return a boolean value for stop event
-...     return u[step_no]>0.9
->>> def f_logistic(u,t):
-...     return 1.2*u*(1 - u)
->>> method = name(f_logistic)
->>> method.set_initial_condition(.5)
->>> time_points = np.linspace(0, 2, 201)
->>> u, t = method.solve(time_points,terminate=termin)
-RK4 terminated at t=1.84
 """
 
 import pprint, sys, os, inspect
@@ -365,16 +114,16 @@ import numpy as np
 _parameters = dict(
 
     f = dict(
-        help='Right-hand side f(u,t) defining the ODE',
+        help='Right-hand side ``f(u,t)`` defining the ODE',
         type=callable),
 
     f_args = dict(
-        help='Extra positional arguments to f: f(u, t, *f_args, **f_kwargs)',
+        help='Extra positional arguments to f: ``f(u, t, *f_args, **f_kwargs)``',
         type=(tuple, list, np.ndarray),
         default=()),
 
     f_kwargs = dict(
-        help='Extra keyword arguments to f: f(u, t, *f_args, **f_kwargs)',
+        help='Extra keyword arguments to f: ``f(u, t, *f_args, **f_kwargs)``',
         type=dict,
         default={}),
 
@@ -389,14 +138,14 @@ _parameters = dict(
         type=callable),
 
     jac_args = dict(
-        help='Extra positional arguments to jac: jac(u, t, *jac_args,'\
-             '**jac_kwargs)',
+        help='Extra positional arguments to jac: ``jac(u, t, *jac_args,'\
+             '**jac_kwargs)``',
         type=(tuple,list),
         default=()),
 
     jac_kwargs = dict(
-        help='Extra keyword arguments to jac: jac(u, t, *jac_args,'\
-             '**jac_kwargs)',
+        help='Extra keyword arguments to jac: ``jac(u, t, *jac_args,'\
+             '**jac_kwargs)``',
         type=dict,
         default={}),
 
@@ -576,7 +325,7 @@ _parameters = dict(
     # parameters for linearly implicit ODE solvers: Lsodi, Lsoibt, Lsodis
     res = dict(
         help='User-supplied function to calculate the residual vector,'\
-             'defined by   r = g(t,y) - A(t,y) * s.'\
+             'defined by ``r = g(t,y) - A(t,y) * s``.'\
              'Used in Lsodi, Lsoibt, Lsodis',
         type=callable),
 
@@ -820,7 +569,8 @@ def _format_parameters_table(parameter_names, fixed_width=None):
                 # Spilt text with fixed width
                 text = [text[i*49:(i+1)*49] for i in range(line_no)]
             else:
-                text = textwrap.wrap(text, c2)    # list of wrapped lines
+                # List of wrapped lines
+                text = textwrap.wrap(text, c2, break_long_words=False)
             for i in range(1, len(text)):   # add initial space for line 2, ...
                 text[i] = ' '*(c1+1) + text[i]
             text = '\n'.join(text)
@@ -1427,15 +1177,14 @@ class Solver:
         Create a new solver instance which switch to another subclass with
         same values of common attributes.
 
-        Input:
-            solver_target:   Either as a string(for class name) or
-                             as a class, e.g. RK4 or 'RK4'
-            kwargs       :   Optional inputs to reset/supplement values of
-                             valid input argmenters in new solver.
-        Output:
-            A new instance in target solver class.
+        `solver_target` is either as a string (class name) or
+        a class, i.e., ``RK4`` or ``'RK4'``.
+        The `kwargs` arguments are optional parameters to
+        reset/supplement values of argmenters in the solver we switch to.
+        The instance of the target solver is returned.
 
         Example:
+
         >>> import odesolvers
         >>> f = lambda u,t: -u
         >>> time_points = np.linspace(0.,2.,11)
@@ -1449,7 +1198,6 @@ class Solver:
         >>> u2, t = m2.solve(time_points)
         >>> print 'Normarized error with RKFehlberg is %g' % np.linalg.norm(u2 - exact_u)
         Normarized error with RKFehlberg is 8.55517e-08
-
         """
         # Extract name list of all the subclasses in this module
         solver_list = list_all_solvers()
@@ -1664,24 +1412,25 @@ class MySolver(Solver):
     """
     Users can define a solver with supplying a function
     myadvance(), and make use of all possible parameters
-    in this module.
+    in this module::
 
-    myadvance(MySolver_instance)  -->  return unew
+        myadvance(MySolver_instance)  -->  return unew
 
-    Example:
-    def myadvance_(ms):
-        f, u, t, n, atol = ms.f, ms.u, ms.t, ms.n, ms.atol
-        # All class attributes can be obtained
-        unew = ...
-        return unew
+    Example::
 
-    def f(u,t):
-        udot = ...
-        return udot
+        def myadvance_(ms):
+            f, u, t, n, atol = ms.f, ms.u, ms.t, ms.n, ms.atol
+            # All class attributes can be obtained
+            unew = ...
+            return unew
 
-    method = MySolver(f, myadvance=myadvance_)
-    method.set_initial_condition(u0)
-    u,t = method.solve(time_points)
+        def f(u,t):
+            udot = ...
+            return udot
+
+        method = MySolver(f, myadvance=myadvance_)
+        method.set_initial_condition(u0)
+        u,t = method.solve(time_points)
     """
     _required_parameters = ['f', 'myadvance']
     _optional_parameters = _parameters.keys()
@@ -1889,6 +1638,7 @@ class AdamsBashforth2(Solver):
         Solver.initialize_for_solve(self)
 
     def validate_data(self):
+        """Check that the time steps are constant."""
         if not self.constant_time_step():
             print '%s must have constant time step' % self.__name__
             return False
@@ -1918,7 +1668,7 @@ class AdamsBashforth3(Solver):
     """
     Third-order Adams-Bashforth method::
 
-        u[n+1] = u[n] + dt/12.*(23*f(u[n], t[n]) - 16*f(u[n-1], t[n-1]) \
+        u[n+1] = u[n] + dt/12.*(23*f(u[n], t[n]) - 16*f(u[n-1], t[n-1])
                                 + 5*f(u[n-2], t[n-2]))
 
     for constant time step dt.
@@ -2384,8 +2134,8 @@ class ThetaRule(SolverImplicit):
 
 class MidpointImplicit(SolverImplicit):
     '''
-    Midpoint Implicit method.
-    Scheme:
+    Midpoint Implicit method::
+
        u[n+1] = u[n] + dt*f((u[n+1] + u[n])/2., t[n] + dt/2.)
 
     The nonlinear system is solved by Picard or Newton iteration.

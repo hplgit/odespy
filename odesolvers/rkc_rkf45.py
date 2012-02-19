@@ -5,16 +5,16 @@ import inspect, sys
 _parameters_RKC = dict(
 
     spcrad_f77 = dict(
-        help='Intend to supply a Fortran subroutine as spcrad. '\
-             'This subroutine should be defined in form:       '\
-             '      double precision function spcrad_f77(neq,t,'\
-             '     1       u)                                  '\
-             'Cf2py intent(hide)  neq                          '\
-             '      integer       neq                          '\
-             '      double precision t,u(neq)                  '\
-             '      spcrad_f77 =                               '\
-             '      return                                     '\
-             '      end                                        ',
+        help='Intend to supply a Fortran subroutine as spcrad.    '\
+             'This subroutine should be defined in form:          '\
+             '        double precision function spcrad_f77(       '\
+             '       1                                neq,t,u)    '\
+             '  Cf2py intent(hide)  neq                           '\
+             '        integer       neq                           '\
+             '        double precision t,u(neq)                   '\
+             '        spcrad_f77 =                                '\
+             '        return                                      '\
+             '        end                                         ',
         type=callable),
     )
 

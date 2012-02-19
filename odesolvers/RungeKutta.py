@@ -3,15 +3,19 @@ import numpy as np
 
 class RungeKutta(Adaptive):
     """
-    Super class for explicit 1-level- Runge-Kutta methods:
-    RungeKutta4, Rungekutta2,etc..
+    Superclass for explicit 1-level- Runge-Kutta methods:
+    RungeKutta4, Rungekutta2,etc.
     or 2-levels adaptive Runge-Kutta methods:
     Dormand & Prince, Cash-Karp or Fehlberg, etc.
 
     Available subclasses are:
-    RungeKutta2, RungeKutta3, ForwardEuler, DormandPrince,
-    RungeKutta4, Fehlberg, CashKarp, BogackiShampine,
+    RungeKutta2, RungeKutta3, RugeKutta1 (Forward Euler), RungeKutta4.
+    DormandPrince, Fehlberg, CashKarp, BogackiShampine,
     MyRungeKutta (user-supplied RungeKutta methods),
+
+    NOTE: This class should be superclass for level-1 methods.
+    A subclass AdaptiveRungeKutta can act as superclass for
+    the level-2 methods. get_order can be in RungeKutta.
     """
     _method_order = None
     # An integer for unadaptive method,
@@ -22,7 +26,7 @@ class RungeKutta(Adaptive):
     # or (n+1, n) array for adaptive ones.
 
     _optional_parameters = Adaptive._optional_parameters + \
-        ['min_step','max_step','first_step']
+        ['min_step', 'max_step', 'first_step']
 
     def get_order(self):
         '''
@@ -53,7 +57,7 @@ class RungeKutta(Adaptive):
         Calculate order of 1-level RungeKutta method
         with help of the known solution u = -e**t.
 
-        "Coefficients" is a square 2d-array(butcher tableau).
+        `Coefficients` is a square 2d-array (Butcher tableau).
         '''
         test = MyRungeKutta(lambda u,t:-u,\
                             butcher_tableau = coefficients)
@@ -174,6 +178,7 @@ class RungeKutta(Adaptive):
             u_new = u_n + dt*(np.dot(factors_u_new, k))
         return u_new
 
+
 class RungeKutta2(RungeKutta):
     """
     Standard Runge-Kutta method of order 2.
@@ -213,6 +218,21 @@ class RungeKutta1(RungeKutta):
          [0., 1.]])
     _method_order = 1
 
+class RungeKutta4(RungeKutta):
+    """
+    Standard Runge-Kutta method of order 4.
+    Implementation in the general RungeKutta Python framework.
+    """
+    quick_description = "Explicit 4th-order Runge-Kutta method"
+
+    _butcher_tableau = np.array(\
+        [[0., 0., 0., 0., 0.],
+         [.5, .5, 0., 0., 0.],
+         [.5, 0., .5, 0., 0.],
+         [1., 0., 0., 1., 0.],
+         [0., .16666667, .33333333, .33333333, .16666667]])
+    _method_order = 4
+
 class DormandPrince(RungeKutta):
     """
     Dormand&Prince Runge-Kutta method of order (5, 4).
@@ -232,20 +252,6 @@ class DormandPrince(RungeKutta):
          [0.,.08991319, 0.,.45348907,.6140625,-.27151238,.08904762,.025]])
     _method_order = (5,4)
 
-class RungeKutta4(RungeKutta):
-    """
-    Standard Runge-Kutta method of order 4.
-    Implementation in the general RungeKutta Python framework.
-    """
-    quick_description = "Explicit 4th-order Runge-Kutta method"
-
-    _butcher_tableau = np.array(\
-        [[0., 0., 0., 0., 0.],
-         [.5, .5, 0., 0., 0.],
-         [.5, 0., .5, 0., 0.],
-         [1., 0., 0., 1., 0.],
-         [0., .16666667, .33333333, .33333333, .16666667]])
-    _method_order = 4
 
 class Fehlberg(RungeKutta):
     """

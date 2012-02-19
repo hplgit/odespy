@@ -10,21 +10,22 @@ import glob, sys, os, re, shutil, commands
 # modules in the (sub)package. An empty keyword means that
 # there is no package, just a set of modules.
 
-source_file_dirs = [os.path.join(os.pardir, os.pardir, os.pardir, '*.py')]
+source_file_dirs = [os.path.join(os.pardir, os.pardir, os.pardir, 'odesolvers')]
 # Here we take all modules in source_file_dirs
 modules = glob.glob(os.path.join(source_file_dirs[0], '*.py'))
 packages = {'odesolvers': modules}
+
 # Exclude certain types of files
 exclude_files = ['__init__.py', 'PyDSTool.py', 'setup.py']
 remove = []
 for package in packages:
-    for i, module in enumerate(packages[package]):
+    for module in packages[package]:
         for name in exclude_files:
             if name in module:
-                remove.append((package, i))
+                remove.append((package, module))
 print packages
-for package, i in remove:
-    del packages[package][i]
+for package, module in remove:
+    packages[package].remove(module)
 
 source_file_dirs = [os.curdir]  # abs path or relative path to this dir
 docdir = 'API'  # name of subdir to contain generated documentation
@@ -48,18 +49,21 @@ def write_txtfile(module_name, prefix=''):
     module_names.append(module_name)
     txtfile = module_name + '.txt'
     txtfiles.append(txtfile)
-    heading_underline = '='*(7 + len(module_name))
+    if prefix:
+        full_name = prefix + '.' + module_name
+    else:
+        full_name = module_name
+    heading_underline = '='*(7 + len(full_name))
     f = open(txtfile, 'w')
 
     f.write("""
-:mod:`%(module_name)s`
+:mod:`%(full_name)s`
 %(heading_underline)s
 
-.. automodule:: %(module_name)s
+.. automodule:: %(full_name)s
    :members:
    :undoc-members:
    :special-members:
-   :inherited-members:
    :show-inheritance:
 """ % vars())
     f.close()
@@ -110,7 +114,10 @@ for txtfile in txtfiles:
     shutil.move(txtfile, docdir)
 
 # Copy figs-tut dir from the tutorial
-shutil.copytree(os.path.join(os.pardir, 'tutorial', 'figs-tut'), docdir)
+dest = os.path.join(docdir, 'figs-tut')
+if os.path.isdir(dest):
+    shutil.rmtree(dest)
+shutil.copytree(os.path.join(os.pardir, 'tutorial', 'figs-tut'), dest)
 
 os.chdir(docdir)
 
@@ -124,7 +131,7 @@ for line in lines:
     if 'Welcome to' in line:
         # Remove the Welcome to ... 's documentation
         words = line.split()
-        line = line[2:-1][:-2]
+        line = ' '.join(words[2:-1])[:-2] + '\n'
     f.write(line)
     if ':maxdepth:' in line:
         f.write("""

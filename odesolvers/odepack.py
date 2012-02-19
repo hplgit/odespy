@@ -9,7 +9,8 @@ _parameters_Odepack = dict(
 
     f_f77 = dict(
         help='Intend to supply a Fortran subroutine as f.      '\
-             'This subroutine should be defined in form:       '\
+             'This subroutine should be defined in form::      '\
+             '                                                 '\
              '        subroutine f_f77(neq,t,u,udot)           '\
              '  Cf2py intent(hide)   neq                       '\
              '  Cf2py intent(out)    udot                      '\
@@ -22,7 +23,8 @@ _parameters_Odepack = dict(
 
     jac_f77 = dict(
         help='Intend to supply a Fortran subroutine as jac.    '\
-             'This subroutine should be defined in form:       '\
+             'This subroutine should be defined in form::      '\
+             '                                                 '\
              '       subroutine jac_f77(neq,t,u,ml,mu,pd,      '\
              '      1      nrowpd)                             '\
              ' Cf2py intent(hide) neq,ml,mu,nrowpd             '\
@@ -39,7 +41,7 @@ _parameters_Odepack = dict(
         help='A callable object to define the banded Jacobian  '\
              'matrix(df/du) of right-hand side function f.     '\
              'Used in Lsode, Lsoda, Lsodar.                    '\
-             ' jac_banded(u,t,ml,mu)  -->   df/du              '\
+             ' jac_banded(u,t,ml,mu) returns df/du             '\
              ' vector * float * int * int -->   2d-array       ',
         paralist_old='u,t,ml,mu',
         paralist_new='t,u,ml,mu',
@@ -48,19 +50,20 @@ _parameters_Odepack = dict(
         type=callable),
 
     jac_banded_f77 = dict(
-        help='Intend to supply a Fortran subroutine as jac_band'\
-             'jac_banded.                                      '\
-             'This subroutine should be defined in form:       '\
-             '      subroutine jac_banded_f77(neq,t,u,ml,mu,pd,'\
-             '     1       nrowpd)                             '\
-             'Cf2py intent(hide) neq,ml,mu,nrowpd              '\
-             'Cf2py intent(out) pd                             '\
-             '      integer neq,ml,mu,nrowpd                   '\
-             '      double precision t,u,pd                    '\
-             '      dimension u(neq),pd(nrowpd,neq)            '\
-             '      pd = ...                                   '\
-             '      return                                     '\
-             '      end                                        ',
+        help='Intend to supply a Fortran subroutine as jac_band  '\
+             'jac_banded.                                        '\
+             'This subroutine should be defined in form::        '\
+             '                                                   '\
+             '        subroutine jac_banded_f77(neq,t,u,ml,      '\
+             '       1                          mu,pd,nrowpd)    '\
+             '  Cf2py intent(hide) neq,ml,mu,nrowpd              '\
+             '  Cf2py intent(out) pd                             '\
+             '        integer neq,ml,mu,nrowpd                   '\
+             '        double precision t,u,pd                    '\
+             '        dimension u(neq),pd(nrowpd,neq)            '\
+             '        pd = ...                                   '\
+             '        return                                     '\
+             '        end                                        ',
         type=callable),
 
     g = dict(
@@ -75,7 +78,8 @@ _parameters_Odepack = dict(
 
     g_f77 = dict(
         help='Intend to supply a Fortran subroutine as g.      '\
-             'This subroutine should be defined in form:       '\
+             'This subroutine should be defined in form::       '\
+             '                                                 '\
              '        subroutine g_f77(neq, t, u, ng, groot)   '\
              '  Cf2py intent(hide) neq                         '\
              '  Cf2py optional, intent(hide) ng                '\
@@ -103,7 +107,8 @@ _parameters_Odepack = dict(
     jac_column_f77 = dict(
         help='Intend to supply a Fortran subroutine as         '\
              'jac_column.                                      '\
-             'This subroutine should be defined in form:       '\
+             'This subroutine should be defined in form::      '\
+             '                                                 '\
              '        subroutine jac_column_f77(neq, t, u, j,  '\
              '       1       ia, ja, pd)                       '\
              '  Cf2py intent(hide) neq, ia, ja                 '\
@@ -142,7 +147,8 @@ _parameters_Odepack = dict(
 
     res_f77 = dict(
         help='Intend to supply a Fortran subroutine as res.    '\
-             'This subroutine should be defined in form:       '\
+             'This subroutine should be defined in form::      '\
+             '                                                 '\
              '      subroutine res_f77(neq, t, u, s, r, ires)  '\
              ' Cf2py intent(hide) neq                          '\
              ' Cf2py intent(out) r                             '\
@@ -167,7 +173,8 @@ _parameters_Odepack = dict(
 
     jac_lsodi_f77 = dict(
         help='Intend to supply Fortran subroutine as jac_lsodi.'\
-             'This subroutine should be defined in form:       '\
+             'This subroutine should be defined in form::      '\
+             '                                                 '\
              '       subroutine jac_lsodi_f77(neq, t, u, s, ml,'\
              '      1           mu, pd, nrowpd)                '\
              ' Cf2py intent(in, hide) neq, ml, mu, nrowpd      '\
@@ -195,7 +202,8 @@ _parameters_Odepack = dict(
     jac_banded_lsodi_f77 = dict(
         help='Intend to supply a Fortran subroutine as         '\
              'jac_banded_lsodi.                                '\
-             'This subroutine should be defined in form:       '\
+             'This subroutine should be defined in form::      '\
+             '                                                 '\
              '       subroutine jac_banded_lsodi_f77(neq, t, u,'\
              '      1      s, ml, mu, pd, nrowpd)              '\
              ' Cf2py intent(in, hide) neq, ml, mu, nrowpd      '\
@@ -222,7 +230,8 @@ _parameters_Odepack = dict(
     adda_lsodi_f77 = dict(
         help='Intend to supply a Fortran subroutine as         '\
              'adda_lsodi.                                      '\
-             'This subroutine should be defined in form:       '\
+             'This subroutine should be defined in form::      '\
+             '                                                 '\
              '        subroutine adda_lsodi_f77(neq, t, u, ml, '\
              '       1       mu, pd, nrowpd)                   '\
              '  Cf2py intent(in, hide) neq, ml, mu             '\
@@ -251,7 +260,8 @@ _parameters_Odepack = dict(
     adda_banded_lsodi_f77 = dict(
         help='Intend to supply a Fortran subroutine as         '\
              'adda_banded.                                     '\
-             'This subroutine should be defined in form:       '\
+             'This subroutine should be defined in form::      '\
+             '                                                 '\
              '       subroutine adda_banded_lsodi_f77(neq, t,  '\
              '      1         u, ml, mu, pd, nrowpd)           '\
              ' Cf2py intent(in, hide) neq, ml, mu              '\
@@ -417,15 +427,18 @@ class Odepack(Solver):
     This is a wrapper for seven solvers in Fortran package ODEPACK, which is
     available at netlib repository, www.netlib.org/odepack.
 
-    Super class for the following solvers:
+    Super class for the following set of solvers.
 
-      A. Solvers for explicitly given systems.
-         For each of the following solvers, it is assumed that the ODEs are
-         given explicitly, so that the system can be written in the form
-         du/dt = f(u,t), where u is a vector of dependent variables, and t
-         is a scalar.
+    *Solvers for explicitly given systems.*
+    For each of the following solvers, it is assumed that the ODEs are
+    given explicitly, so that the system can be written in the form
+    du/dt = f(u,t), where u is a vector of dependent variables, and t
+    is a scalar.
 
-       1.Lsode   --  A wrapper to dlsode, the basic solver in ODEPACK for
+    ===============  ==========================================================
+    Name             Description
+    ===============  ==========================================================
+       Lsode         A wrapper to dlsode, the basic solver in ODEPACK for
                      stiff and nonstiff systems of the form du/dt = f.
 
                      In the stiff case, it treats the Jacobian matrix df/du as
@@ -439,7 +452,7 @@ class Odepack(Solver):
                      systems that arise are solved by direct methods (LU
                      factor/solve).
 
-       2.Lsodes  --  solves systems du/dt = f, and in the stiff case
+       Lsodes        solves systems du/dt = f, and in the stiff case
                      treats Jacobian matrix in general sparse form. It can
                      determine the sparsity structure on its own, or optionally
                      accepts this information from the user.
@@ -447,47 +460,55 @@ class Odepack(Solver):
                      to solve the linear systems that arise, by a sparse
                      (direct) LU factorization/ backsolve method.
 
-       3.Lsoda  --  solves systems du/dt = f, with a dense or banded
-                    Jacobian when the problem is stiff, but it automatically
-                    selects between nonstiff (Adams) and stiff (BDF) methods. It
-                    uses the nonstiff method initially, and dynamically monitors
-                    data in order to decide which method to use.
+       Lsoda         solves systems du/dt = f, with a dense or banded
+                     Jacobian when the problem is stiff, but it automatically
+                     selects between nonstiff (Adams) and stiff (BDF)
+                     methods. It uses the nonstiff method initially, and
+                     dynamically monitors data in order to decide which
+                     method to use.
 
-       4.Lsodar   --  a variant of Lsoda with a rootfinding capability added.
-                    Thus it solves problems du/dt = f with dense or banded
-                    Jacobian and automatic method selection, and at the same
-                    time, it finds the roots of any of a set of given functions
-                    of the form g(u,t).  This is often useful for finding stop
-                    conditions, or for finding points at which a switch
-                    is to be made in the function f.
+       Lsodar        a variant of Lsoda with a rootfinding capability added.
+                     Thus it solves problems du/dt = f with dense or banded
+                     Jacobian and automatic method selection, and at the same
+                     time, it finds the roots of any of a set of given functions
+                     of the form g(u,t).  This is often useful for finding stop
+                     conditions, or for finding points at which a switch
+                     is to be made in the function f.
+    ===============  ==========================================================
 
-      B. Solvers for linearly implicit systems.
-      The following solvers treat systems in the linearly implicit form
+     *Solvers for linearly implicit systems.*
+     The following solvers treat systems in the linearly implicit form::
+
             A(u,t) du/dt = g(u,t),
-         A = a square matrix, i.e. with the derivative du/dt implicit, but
-             linearly so.
-       These solvers allow A to be singular, in which case the system is a
-       differential-algebraic equation (DAE) system.
-       In that case, the user must be very careful to supply a well-posed
-       problem with consistent initial conditions.
 
-       5. Lsodi   --  solves linearly implicit systems in which the
-                   matrices involved (A, dg/du, and d(A du/dt)/du) are all
-                   assumed to be either dense or banded.
+     where A is a square matrix, i.e., with the derivative
+     du/dt implicit, but linearly so.
+     These solvers allow A to be singular, in which case the system is a
+     differential-algebraic equation (DAE) system.
+     In that case, the user must be very careful to supply a well-posed
+     problem with consistent initial conditions.
 
-       6. Lsodibt --  solves linearly implicit systems in which the matrices
-                   involved are all assumed to be block-tridiagonal.  Linear
-                   systems are solved by the LU method.
+    ===============  ==========================================================
+    Name             Description
+    ===============  ==========================================================
+       Lsodi         solves linearly implicit systems in which the
+                     matrices involved (A, dg/du, and d(A du/dt)/du) are all
+                     assumed to be either dense or banded.
 
-       7. Lsodis   --  solves linearly implicit systems in which the
-                    matrices involved are all assumed to be sparse.
-                    Either determines the sparsity structure or accepts it from
-                    the user, and uses parts of the Yale Sparse Matrix Package
-                    to solve the linear systems that arise, by a direct method.
+       Lsodibt       solves linearly implicit systems in which the matrices
+                     involved are all assumed to be block-tridiagonal.  Linear
+                     systems are solved by the LU method.
 
-    Note:  It is encouraged that users provide a F2PY-compiled Fortran
-           subroutine or a multi-line string in Fortran code to define
-           user-supplied function. This would help to improve efficiency.
+       Lsodis        solves linearly implicit systems in which the
+                     matrices involved are all assumed to be sparse.
+                     Either determines the sparsity structure or accepts it from
+                     the user, and uses parts of the Yale Sparse Matrix Package
+                     to solve the linear systems that arise, by a direct method.
+    ===============  ==========================================================
+
+    *Note*: It is encouraged that users provide a F2PY-compiled Fortran
+    subroutine or a multi-line string in Fortran code to define
+    user-supplied function. This would help to improve efficiency.
     """
 
     # Default parameter-list for all solvers in OdePack
@@ -1056,9 +1077,13 @@ class Lsode(Odepack):
     '''
     Basic Solver in ODEPACK package.
     Solves the initial-value problem for stiff or nonstiff systems
-    of first-order ODE,
-    du/dt = f(u,t),   or, in component form,
-    du(i)/dt = f(u,t)[i] for i in 1,...,neq
+    of first-order ODE::
+
+        du/dt = f(u,t)
+
+    or, in component form::
+
+        du(i)/dt = f(u,t)[i] for i in 1,...,neq
     '''
     quick_description = "LSODE solver for a stiff or nonstiff system"
 
@@ -1160,9 +1185,13 @@ class Lsoda(Odepack):
     is stiff or not, and the solver will automatically choose the appropriate
     method.  It always starts with the nonstiff method.
     Solves the initial-value problem for stiff or nonstiff systems of
-    first-order ODE,
-    du/dt = f(u,t),   or, in component form,
-    du(i)/dt = f(u,t)[i] for i in 1,...,neq
+    first-order ODE::
+
+        du/dt = f(u,t)
+
+    or, in component form::
+
+        du(i)/dt = f(u,t)[i] for i in 1,...,neq
     '''
     quick_description = "LSODA solver with stiff-nonstiff auto shift"
 
@@ -1256,23 +1285,30 @@ class Lsoda(Odepack):
 class Lsodar(Odepack):
     '''
     A variant version of the DLSODE package.
-    It differs from DLSODE in two ways:
-	 (a) It switches automatically between stiff and nonstiff methods.
-	     This means that the user does not have to determine whether the
-             problem is stiff or not, and the solver will automatically choose
-             the appropriate method.  It always starts with the nonstiff method.
-	 (b) It finds the root of at least one of a set of constraint functions
-             g(i) of the independent and dependent variables.
-             It finds only those roots for which some g(i), as a function of t,
-             changes sign in the interval of integration.
-	     It then returns the solution at the root, if that occurs sooner
-             than the specified stop condition, and otherwise returns the
-             solution according to the specified stop condition.
+    It differs from DLSODE in two ways.
+
+    It switches automatically between stiff and nonstiff methods.
+    This means that the user does not have to determine whether the
+    problem is stiff or not, and the solver will automatically choose
+    the appropriate method.  It always starts with the nonstiff method.
+    It finds the root of at least one of a set of constraint functions
+    g(i) of the independent and dependent variables.
+    It finds only those roots for which some g(i), as a function of t,
+    changes sign in the interval of integration.
+    It then returns the solution at the root, if that occurs sooner
+    than the specified stop condition, and otherwise returns the
+    solution according to the specified stop condition.
     Solves the initial-value problem for stiff or nonstiff systems of
-    first-order ODE,
-       du/dt = f(u,t),   or, in component form,
+    first-order ODE::
+
+       du/dt = f(u,t),
+
+    or, in component form::
+
        du(i)/dt = f(u,t)[i] for i in 1,...,neq
-    At the same time, it locates the roots of any of a set of functions
+
+    At the same time, it locates the roots of any of a set of functions::
+
        g(i) = g(i,t,u(1),...,u(NEQ))  (i = 1,...,ng).
     '''
     quick_description = "LSODAR method with stiff-nonstiff auto shift"
@@ -1389,11 +1425,15 @@ class Lsodar(Odepack):
 
 class Lsodes(Odepack):
     """
-     A variant of the DLSODE package, and is intended for initial problems
-     in which the Jacobian matrix df/du has an arbitrary sparse structure
-     (when the problem is stiff).
-     du/dt = f(u,t),   or, in component form,
-     du(i)/dt = f(u,t)[i] for i in 1,...,neq
+    A variant of the DLSODE package, and is intended for initial problems
+    in which the Jacobian matrix df/du has an arbitrary sparse structure
+    (when the problem is stiff)::
+
+        du/dt = f(u,t),
+
+    or, in component form::
+
+        du(i)/dt = f(u,t)[i] for i in 1,...,neq
     """
     quick_description = "LSODES solver for sparse Jacobians"
 
@@ -1509,13 +1549,18 @@ class Lsodi(Odepack):
     '''
     A variant version of the DLSODE package.
     Solves the initial value problem for linearly implicit systems of first
-    order ODEs,
-       A(u,t) * du/dt = g(t,u) ,  where A(u,t) is a square matrix,
-    or, in component form,
-     ( a   * ( du / dt ))  + ... +  ( a     * ( du   / dt ))  =
-        i,1      1                     i,NEQ      NEQ
-      =   g ( t, u , u ,..., u    )   ( i = 1,...,NEQ )
-           i      1   2       NEQ
+    order ODEs::
+
+       A(u,t) * du/dt = g(t,u) ,
+
+    where A(u,t) is a square matrix.
+    Or, in component form::
+
+       ( a   * ( du / dt ))  + ... +  ( a     * ( du   / dt ))  =
+          i,1      1                     i,NEQ      NEQ
+        =   g ( t, u , u ,..., u    )   ( i = 1,...,NEQ )
+             i      1   2       NEQ
+
     If A is singular, this is a differential-algebraic system.
     Either res or res_f77 need to be supplied.
 
@@ -1673,13 +1718,18 @@ class Lsodis(Odepack):
     in which the matrix A and the Jacobian matrix d(g - A*s)/du have
     arbitrary sparse structures.
     Solves the initial value problem for linearly implicit systems
-    of first order ODEs,
-       A(u,t) * du/dt = g(u,t) ,  where A(u,t) is a square matrix,
-    or, in component form,
-     ( a   * ( du / dt ))  + ... +  ( a     * ( du   / dt ))  =
-        i,1      1                     i,NEQ      NEQ
-      =   g ( t, u , u ,..., u    )   ( i = 1,...,NEQ )
-           i      1   2       NEQ
+    of first order ODEs::
+
+       A(u,t) * du/dt = g(u,t),
+
+    where A(u,t) is a square matrix.
+    Or, in component form::
+
+      ( a   * ( du / dt ))  + ... +  ( a     * ( du   / dt ))  =
+         i,1      1                     i,NEQ      NEQ
+       =   g ( t, u , u ,..., u    )   ( i = 1,...,NEQ )
+            i      1   2       NEQ
+
     If A is singular, this is a differential-algebraic system.
     '''
     quick_description = "LSODIS solver for linearly implicit sparse systems"
@@ -1820,13 +1870,18 @@ class Lsoibt(Odepack):
     A variant version of Lsodi_ODEPACK, for the case where the matrices
     A, dg/du, and d(A*s)/du are all block-tridiagonal.
     Solves the initial value problem for linearly implicit systems of first
-    order ODEs,
-       A(u,t) * du/dt = g(u,t) ,  where A(u,t) is a square matrix,
-    or, in component form,
-     ( a   * ( du / dt ))  + ... +  ( a     * ( du   / dt ))  =
-        i,1      1                     i,NEQ      NEQ
-      =   g ( t, u , u ,..., u    )   ( i = 1,...,NEQ )
-           i      1   2       NEQ
+    order ODEs::
+
+       A(u,t) * du/dt = g(u,t),
+
+    where A(u,t) is a square matrix.
+    Or, in component form::
+
+      ( a   * ( du / dt ))  + ... +  ( a     * ( du   / dt ))  =
+         i,1      1                     i,NEQ      NEQ
+       =   g ( t, u , u ,..., u    )   ( i = 1,...,NEQ )
+            i      1   2       NEQ
+
     If A is singular, this is a differential-algebraic system.
     '''
     quick_description = "LSOIBIT solver for linearly implicit block tridiag systems"
