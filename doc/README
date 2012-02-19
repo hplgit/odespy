@@ -1,0 +1,7 @@
+Directory for documentation.
+
+src: source code for documentation.
+
+All other directories are automatically generated from the corresponding
+directories under src/ and contain the official versions of the
+documentation.

@@ -1,0 +1,6 @@
+TITLE: A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations
+AUTHOR: Hans Petter Langtangen at Center for Biomedical Computing, Simula Research Laboratory and Department of Informatics, University of Oslo
+AUTHOR: Liwei Wang at Department of Informatics, University of Oslo
+DATE: today
+
+# #include "odesolvers.do.txt"
