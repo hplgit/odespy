@@ -458,9 +458,9 @@ $r$ values:
 With 4 periods we get
 !bc dat
 ThetaRule(theta=0)   r: 2.9, 1.9, 1.4, 1.2 E_min=1.1E-01
-RK2          r: 2.1, 2.0, 2.0, 2.0 E_min=8.4E-04
+RK2                  r: 2.1, 2.0, 2.0, 2.0 E_min=8.4E-04
 ThetaRule(theta=1)   r: 0.3, 0.5, 0.7, 0.8 E_min=9.0E-02
-RK4          r: 4.0, 4.0, 4.0, 4.0 E_min=2.6E-08
+RK4                  r: 4.0, 4.0, 4.0, 4.0 E_min=2.6E-08
 ThetaRule            r: 2.0, 2.0, 2.0, 2.0 E_min=4.2E-04
 Leapfrog             r: 2.1, 2.0, 2.0, 2.0 E_min=8.5E-04
 LeapfrogFiltered     r: 0.2, 0.4, 0.6, 0.8 E_min=1.3E-01
@@ -474,16 +474,22 @@ order, while the filtered Leapfrog method has slow convergence and
 a fairly large error, which is also evident in the previous figure.
 
 Extending the time domain to 20 periods makes many of the
-simplest methods inaccurate:
+simplest methods inaccurate and the rates computed on coarse
+time meshes are irrelevnat:
 !bc dat
 ThetaRule(theta=0)   r: 10.4, 22.0, 18.2, 10.4 E_min=3.3E+02
-RK2          r: 51.4, 16.1, 2.3, 2.1 E_min=1.1E-01
+RK2                  r: 51.4, 16.1, 2.3, 2.1 E_min=1.1E-01
 ThetaRule(theta=1)   r: 11.2, 0.0, 0.1 E_min=5.0E-01
-RK4          r: 1.0, 3.6, 4.0, 4.0 E_min=8.2E-05
+RK4                  r: 1.0, 3.6, 4.0, 4.0 E_min=8.2E-05
 ThetaRule            r: 87.8, 0.2, 1.7, 2.0 E_min=5.3E-02
 Leapfrog             r: 95.9, 18.0, 1.0, 2.0 E_min=1.1E-01
 LeapfrogFiltered     r: -0.0, 121.2, 0.3, 0.1 E_min=5.2E-01
 !ec
+
+===== Example: Solving a Partial Differential Equation =====
+
+===== Example: Solving a Stochastic Differential Equation =====
+
 
 
 ======= Inner Workings of the Package =======
@@ -496,6 +502,7 @@ superclass and its subclasses work and how parameters are registered
 and initialized.
 
 ===== Solver Parameters =====
+label{odes:parameters}
 
 The `ODE` module defines a global dictionary `_parameters` holding
 all legal parameters. Other modules imports this `_parameters` dict
@@ -587,6 +594,8 @@ Each solver in this package is implemented as a class in a class hierarchy.
 Basic, common functionality is inherited from super classes, and the
 actual solver class implements what is specific for the method in question.
 
+=== The Super Class ===
+
 Class `Solver` is the super class of the hierarchy. Its constructor
 requires one mandatory argument: the right-hand side of the ODE,
 $f(u,t)$, coded as a Python function `f(u, t)` or given as a string
@@ -656,10 +665,15 @@ called to set the initial condition, and then `solve` is called.
 The `solve` method features the following steps:
 
  o Convert `time_points` to a `numpy` array.
- o Call `initial_for_solve` (implemented in subclasses) to
+ o Call `initialize_for_solve` (implemented in subclasses) to
    precompute whatever is needed before the time loop.
    The super class allocates storage for the solution and
    loads the initial condition into that data structure.
+   Any subclass implementation of `initialize_for_solve` must therefore
+   also call this method in its super class.
+ o Call `validate_data` to check if the data structures are consistent
+   before starting the computations. Subclass implementations of
+   this method must call the super class' version of the method.
  o Run a loop over all time levels `n` and call `advance` (implemented
    in subclasses) at each level to advance the solution from
    time `t[n]` to `t[n+1]`. Also call `terminate` so that the
@@ -679,8 +693,124 @@ All classes have a set of attributes:
    a 2D array in case of a system of ODEs. The first index
    denotes the time level.
  o `t`: the time levels corresponding to the first index in the `u` array.
+ o `quick_description`: a short one-line description of the method (this
+   variable is static in the class, i.e., declared outside any method).
 
-# Explain a subclass, show example
+Most classes will also define two additional static variables,
+`_required_parameters` and `_optional_parameters` as explained
+in Section ref{odes:parameters}.
+
+=== A Very Simple Subclass ===
+
+To implement a simple explicit scheme for solving a scalar ODE or a system
+of ODEs, you only need to write a subclass of `Solver` with an
+`advance` method containing the formula that updates the solution from
+one time level to the next. For example, the Forward Euler scheme
+reads
+!bt
+\[ u_{n+1} = u_n + \Delta t f(u_n, t_n),\]
+!et
+where subscript $n$ denotes the time level, and $Delta t = t_{n+1}-t_n$ is
+the current time step.
+The implementation goes like
+!bc cod
+class ForwardEuler(Solver):
+    """
+    Forward Euler scheme::
+
+        u[n+1] = u[n] + dt*f(u[n], t[n])
+    """
+    quick_description = 'The simple explicit (forward) Euler scheme'
+
+    def advance(self):
+        u, f, n, t = self.u, self.f, self.n, self.t
+        dt = t[n+1] - t[n]
+        unew = u[n] + dt*f(u[n], t[n])
+        return unew
+!ec
+Remarks:
+
+ o The `quick_description` is necessary for the class to appear in the
+   automatically generated overview of implemented methods.
+ o Extracting class attributes in local variables (here `u`, `f`, etc.)
+   avoids the need for the `self` prefix so that the implemented formulas
+   are as close to the mathematical formulas as possible.
+
+Almost equally simple schemes, like explicit Runge-Kutta methods and Heun's
+method are implemented in the same way (see `ODE.py`).
+
+A 2nd-order Adams-Bashforth scheme is a bit more complicated since it
+involves three time levels and therefore needs a separate method for
+the first step. We should also avoid unnecessary evaluations of $f(u,t)$.
+The user can specify a parameter `start_method` for the name of the
+solver to be used for the first step. This solver is initialized
+by the `switch_to` method in class `Solver`. Basically,
+!bc cod
+new_solver = solver.switch_to(solver_name)
+!ec
+creates a new solver instance `new_solver`, of the class implied by
+`solver_name`, where all relevant parameters from `solver` are coopied
+to `new_solver`.
+
+An implementation of a subclass for the
+2nd-order Adams-Bashforth scheme can then look as follows.
+!bc cod
+class AdamsBashforth2(Solver):
+    """
+    Second-order Adams-Bashforth method::
+
+        u[n+1] = u[n] + dt/2.*(3*f(u[n], t[n]) - f(u[n-1], t[n-1]))
+
+    for constant time step dt.
+
+    RK2 is used as default solver in first step.
+    """
+    quick_description = "Explicit 2nd-order Adams-Bashforth method"
+
+    _optional_parameters = Solver._optional_parameters + ['start_method',]
+
+    def initialize_for_solve(self):
+        # New solver instance for first step
+        self.starter = self.switch_to(self.start_method)
+        Solver.initialize_for_solve(self)
+
+    def validate_data(self):
+        if not self.constant_time_step():
+            print '%s must have constant time step' % self.__name__
+            return False
+        else:
+            return True
+
+    def advance(self):
+        u, f, n, t = self.u, self.f, self.n, self.t
+
+        if n >= 1:
+            dt = t[n+1] - t[n]  # must be constant
+            self.f_n = f(u[n], t[n])
+            unew = u[n] + dt/2.*(3*self.f_n - self.f_n_1)
+            self.f_n_1 = self.f_n
+        else:
+            # User-specified method for the first step
+            self.starter.set_initial_condition(u[n])
+            time_points = [t[n], t[n+1]]
+            u_starter, t_starter = self.starter.solve(time_points)
+            unew = u_starter[-1]
+            self.f_n_1 = f(u[0], t[0])
+
+        return unew
+!ec
+Three features are worth comments: 1) we extend the set of optional
+parameters; 2) we must initialize a separate solver for the first
+step, and this is done in the `initialize_for_solve` method that will
+be called as part of `solve` (before the time stepping); and 3) we
+extend `validate_data` to check that the time spacing given by the
+`time_points` argument to `solve` is constant. The utility method
+`constant_time_step` provided in super class `Solver` carries out the
+details of the check.
+
+More advanced implementations of subclasses can be studied
+in the `ODE.py` and `RungeKutta.py` files.
+
 
 ======= Installation =======
 

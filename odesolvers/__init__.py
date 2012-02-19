@@ -972,7 +972,7 @@ for classname in classnames:
     doc_str = getattr(class_, '__doc__')
     fixed_width = None if class_.__module__ in ('ODE', 'RungeKutta') \
         else (21,49)
-    setattr(class_, '__doc__', 
+    setattr(class_, '__doc__',
             doc_str + table_of_parameters(class_, fixed_width=fixed_width))
     if hasattr(class_, 'quick_description'):
         toc.append((classname, getattr(class_, 'quick_description')))
@@ -988,7 +988,7 @@ del class_, doc_str, classname, classnames, toc, typeset_toc, \
 if __name__ == '__main__':
     from os.path import join
     from numpy.testing import rundocs, run_module_suite
-    import odesolvers 
+    import odesolvers
     path = odesolvers.__path__[0]
 
     # Doctests

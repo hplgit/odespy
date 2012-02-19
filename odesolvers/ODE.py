@@ -868,7 +868,7 @@ def typeset_toc(toc):
     def line(name, descr):
         return '%%-%ds %%s' % (column1_width+1) % (name, descr)
     lines = [hrule, line('Classname', 'Short description'), hrule] + \
-            [line(name, descr) for name, descr in toc]
+            [line(name, descr) for name, descr in toc] + [hrule]
     return '\n'.join(lines)
 
 
@@ -890,7 +890,8 @@ class Solver:
     u          array of point values of the solution function
     t          array of time values: u[i] corresponds to t[i]
     n          the most recently computed solution is u[n+1]
-    f          the object wrapping the user's right-hand side f(u, t)
+    f          function wrapping the user's right-hand side f(u, t),
+               used in all algorithms
     users_f    the user's original function implementing f(u, t)
     PRM        an attribute for each optional and required parameter
     =========  ========================================================
@@ -1191,10 +1192,10 @@ class Solver:
             # user's functions. Instead, insert an entries that
             # reflect the name of user-supplied functions
             all_args.remove('f')
-            all_args['name of f'] = self.users_f.func_name})
+            all_args['name of f'] = self.users_f.func_name
             if 'jac' in all_args:
                 all_args.remove('jac')
-                all_args['name of jac'] = self.users_jac.func_name})
+                all_args['name of jac'] = self.users_jac.func_name
 
             if print_info:
                 print pprint.pformat(all_args)
@@ -1882,7 +1883,7 @@ class AdamsBashforth2(Solver):
     def initialize_for_solve(self):
         # New solver instance for first steps
         self.starter = self.switch_to(self.start_method)
-        # Create variables for f at previous time levels
+        # Create variables for holding f at previous time levels
         self.f_n_1 = None
         Solver.initialize_for_solve(self)
 
@@ -1901,9 +1902,8 @@ class AdamsBashforth2(Solver):
             self.f_n = f(u[n], t[n])
             unew = u[n] + dt/2.*(3*self.f_n - self.f_n_1)
             self.f_n_1 = self.f_n
-
         else:
-            # Start method
+            # User-specified method for the first step
             self.starter.set_initial_condition(u[n])
             time_points = [t[n], t[n+1]]
             u_starter, t_starter = self.starter.solve(time_points)
@@ -2154,8 +2154,10 @@ class MidpointIter(Solver):
     def advance(self):
         if not hasattr(self, 'v'):  # v is a help array needed in the method
             if self.neq == 1:
+                # Scalar ODE: v can be one-dim array
                 self.v = np.zeros(self.max_iter+1, self.u.dtype)
             else:
+                # System of ODEs: v must be two-dim array
                 self.v = np.zeros((self.max_iter+1, self.neq), self.u.dtype)
 
         u, f, n, t, v = \

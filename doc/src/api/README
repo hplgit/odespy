@@ -1,0 +1,14 @@
+Run
+
+  python make.py
+
+to generate new documentation. If it is ok, copy it to the destination
+by
+
+  sh cpapi.sh
+
+clean.sh cleans up the files in this directory.
+
+Note: The doc string in __init__.py must be copied from the tutorial
+when the tutorial is updated.
+

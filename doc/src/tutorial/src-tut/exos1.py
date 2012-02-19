@@ -28,5 +28,6 @@ from matplotlib.pyplot import *
 theta_small = Theta*numpy.cos(sqrt(c)*t)
 plot(t, theta, 'r-', t, theta_small, 'y-')
 legend(['theta', 'small angle approximation'])
+savefig('tmp.png')
 show()
 

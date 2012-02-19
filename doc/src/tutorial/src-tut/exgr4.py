@@ -6,7 +6,7 @@ def f(u, t):
     return c*u
 
 import odesolvers, numpy
-from matplotlib.pyplot import plot, hold, show
+from matplotlib.pyplot import *
 
 method = odesolvers.RK4(f)
 
