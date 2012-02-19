@@ -1,0 +1,493 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>odesolvers.RungeKutta &mdash; odesolver API 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="odesolver API 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">odesolver API 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for odesolvers.RungeKutta</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">ODE</span> <span class="kn">import</span> <span class="n">Solver</span><span class="p">,</span> <span class="n">Adaptive</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="RungeKutta"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.RungeKutta">[docs]</a><span class="k">class</span> <span class="nc">RungeKutta</span><span class="p">(</span><span class="n">Adaptive</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Superclass for explicit 1-level- Runge-Kutta methods:</span>
+<span class="sd">    RungeKutta4, Rungekutta2,etc.</span>
+<span class="sd">    or 2-levels adaptive Runge-Kutta methods:</span>
+<span class="sd">    Dormand &amp; Prince, Cash-Karp or Fehlberg, etc.</span>
+
+<span class="sd">    Available subclasses are:</span>
+<span class="sd">    RungeKutta2, RungeKutta3, RugeKutta1 (Forward Euler), RungeKutta4.</span>
+<span class="sd">    DormandPrince, Fehlberg, CashKarp, BogackiShampine,</span>
+<span class="sd">    MyRungeKutta (user-supplied RungeKutta methods),</span>
+
+<span class="sd">    NOTE: This class should be superclass for level-1 methods.</span>
+<span class="sd">    A subclass AdaptiveRungeKutta can act as superclass for</span>
+<span class="sd">    the level-2 methods. get_order can be in RungeKutta.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_method_order</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="c"># An integer for unadaptive method,</span>
+    <span class="c"># or a pair of integers for 2 levels in adaptive methods.</span>
+
+    <span class="n">_butcher_tableau</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="c"># (n, n) array for unadaptive methods,</span>
+    <span class="c"># or (n+1, n) array for adaptive ones.</span>
+
+    <span class="n">_optional_parameters</span> <span class="o">=</span> <span class="n">Adaptive</span><span class="o">.</span><span class="n">_optional_parameters</span> <span class="o">+</span> \
+        <span class="p">[</span><span class="s">&#39;min_step&#39;</span><span class="p">,</span> <span class="s">&#39;max_step&#39;</span><span class="p">,</span> <span class="s">&#39;first_step&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="RungeKutta.get_order"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.RungeKutta.get_order">[docs]</a>    <span class="k">def</span> <span class="nf">get_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return the order of current method, both for non-adaptive</span>
+<span class="sd">        and adaptive methods.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;method_order&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>       <span class="c"># User-supplied method in MyRungeKutta</span>
+            <span class="n">coefficients</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">butcher_tableau</span>
+            <span class="k">if</span> <span class="n">coefficients</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">coefficients</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="c"># Butcher_table is a square array</span>
+                <span class="n">order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_order_1_level</span><span class="p">(</span><span class="n">coefficients</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># 2-level method</span>
+                <span class="c"># Seperate &amp; extract coefficients for two levels</span>
+                <span class="n">table_1</span><span class="p">,</span> <span class="n">table_2</span> <span class="o">=</span> <span class="n">coefficients</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,],</span> \
+                    <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">coefficients</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,],</span><span class="n">coefficients</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,]))</span>
+                <span class="c"># Calculate order seperately</span>
+                <span class="n">order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_order_1_level</span><span class="p">(</span><span class="n">table_1</span><span class="p">),</span>\
+                        <span class="bp">self</span><span class="o">.</span><span class="n">calculate_order_1_level</span><span class="p">(</span><span class="n">table_2</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&#39;&#39;&#39;</span>
+<span class="s">        The order of user-defined method is not provided.</span>
+<span class="s">        The value of calculated order is </span><span class="si">%s</span><span class="s">&#39;&#39;&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">order</span>
+</div>
+<div class="viewcode-block" id="RungeKutta.calculate_order_1_level"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.RungeKutta.calculate_order_1_level">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_order_1_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">coefficients</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Calculate order of 1-level RungeKutta method</span>
+<span class="sd">        with help of the known solution u = -e**t.</span>
+
+<span class="sd">        `Coefficients` is a square 2d-array (Butcher tableau).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">test</span> <span class="o">=</span> <span class="n">MyRungeKutta</span><span class="p">(</span><span class="k">lambda</span> <span class="n">u</span><span class="p">,</span><span class="n">t</span><span class="p">:</span><span class="o">-</span><span class="n">u</span><span class="p">,</span>\
+                            <span class="n">butcher_tableau</span> <span class="o">=</span> <span class="n">coefficients</span><span class="p">)</span>
+        <span class="n">test</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+        <span class="n">u</span><span class="p">,</span><span class="n">t</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">solve</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span><span class="mf">1.1</span><span class="p">])</span>
+
+        <span class="c"># Calculate errors with 2 time step size (dt1,dt2).</span>
+        <span class="c"># where error1 = O(dt1**order), error2 = O(dt2**order)</span>
+        <span class="c"># Then error1/error2 = O(dt1**order)/O(dt2**order)</span>
+        <span class="c"># Take logarithms of both side, order can be estimated.</span>
+        <span class="n">error1</span><span class="p">,</span> <span class="n">error2</span> <span class="o">=</span> \
+            <span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">error1</span><span class="o">/</span><span class="n">error2</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">order</span>
+</div>
+<div class="viewcode-block" id="RungeKutta.advance"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.RungeKutta.advance">[docs]</a>    <span class="k">def</span> <span class="nf">advance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Advance the solution, either using one step or a</span>
+<span class="sd">        series of adaptive steps, from t[n] tp t[n+1].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">rtol</span><span class="p">,</span> <span class="n">atol</span><span class="p">,</span> <span class="n">neq</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rtol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">neq</span>
+        <span class="n">u_n</span><span class="p">,</span> <span class="n">t_n</span><span class="p">,</span> <span class="n">t_next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">t_next</span> <span class="o">-</span> <span class="n">t_n</span>
+
+        <span class="c"># default setting of step size</span>
+        <span class="n">min_step</span><span class="p">,</span> <span class="n">max_step</span><span class="p">,</span> <span class="n">first_step</span> <span class="o">=</span> \
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;min_step&#39;</span><span class="p">,</span> <span class="n">dt</span><span class="o">/</span><span class="mf">1000.</span><span class="p">),</span> \
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;max_step&#39;</span><span class="p">,</span> <span class="n">dt</span><span class="p">),</span> \
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;first_step&#39;</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span><span class="n">z</span><span class="o">=</span><span class="mf">4.</span><span class="p">):</span>    <span class="c"># Auxilary function</span>
+            <span class="k">return</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c"># Extract coefficients from Butcher-tableau</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_butcher_tableau</span>
+        <span class="n">k_len</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>   <span class="c"># number of internal stages</span>
+
+        <span class="c"># coefficients for internal stages</span>
+        <span class="n">factors_u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">table</span><span class="p">[:</span><span class="n">k_len</span><span class="p">,</span> <span class="mi">1</span><span class="p">:])</span>
+        <span class="c"># coefficients for t</span>
+        <span class="n">factors_t</span> <span class="o">=</span> <span class="n">table</span><span class="p">[:</span><span class="n">k_len</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="c"># coefficients for u_new</span>
+        <span class="n">factors_u_new</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">k_len</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="o">==</span> <span class="n">k_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c"># (k+2, k+1) array --&gt;  2-levels Adaptive methods</span>
+
+            <span class="c"># coefficients for local error between 2 levels</span>
+            <span class="n">factors_error</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">k_len</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">factors_u_new</span>
+
+            <span class="n">u_intermediate</span> <span class="o">=</span> <span class="p">[</span><span class="n">u_n</span><span class="p">,]</span>
+            <span class="n">t_intermediate</span> <span class="o">=</span> <span class="p">[</span><span class="n">t_n</span><span class="p">,]</span>
+            <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">u_n</span><span class="p">,</span> <span class="n">t_n</span><span class="p">,</span> <span class="n">first_step</span>               <span class="c"># initial values</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">k_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">neq</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>  <span class="c"># intern stages</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;u_all&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">u_all</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c"># store list of arrays for *all* steps</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;t_all&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">t_all</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c"># store list of arrays for *all* steps</span>
+
+            <span class="c"># Loop until next time point is reached</span>
+            <span class="k">while</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">t_n</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">t_next</span> <span class="o">-</span> <span class="n">t_n</span><span class="p">)):</span>
+                <span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">u_intermediate</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">t_intermediate</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="c"># internal steps</span>
+                <span class="n">k</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">0.</span>   <span class="c"># initialization for next step</span>
+                <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k_len</span><span class="p">):</span>
+                    <span class="n">k_factors</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">factors_u</span><span class="p">,</span> <span class="n">k</span><span class="p">))[</span><span class="n">m</span><span class="p">]</span>
+                    <span class="c">#print u, u+h*k_factors, f(u+h*k_factor, 0.5), self.dtype</span>
+                    <span class="n">k</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">u</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="n">k_factors</span><span class="p">,</span> <span class="n">t</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="n">factors_t</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+                <span class="n">u_new</span> <span class="o">=</span> <span class="n">u</span> <span class="o">+</span> <span class="n">h</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">factors_u_new</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+
+                <span class="c"># local error between 2 levels</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="n">h</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">factors_error</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+                <span class="c"># Acceptable error tolerance</span>
+                <span class="n">tol</span> <span class="o">=</span> <span class="n">rtol</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">u_new</span><span class="p">)</span> <span class="o">+</span> <span class="n">atol</span>
+
+                <span class="n">accurate</span> <span class="o">=</span> <span class="p">(</span><span class="n">error</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="n">accurate</span> <span class="ow">or</span> <span class="n">h</span> <span class="o">&lt;=</span> <span class="n">min_step</span> <span class="ow">or</span> <span class="n">h</span> <span class="o">==</span> <span class="n">max_step</span><span class="p">):</span>
+                    <span class="c"># Accurate enough,</span>
+                    <span class="c"># or the step size exceeds valid range.</span>
+                    <span class="n">u_intermediate</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">u_new</span><span class="p">)</span>
+                    <span class="n">t_intermediate</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="o">+</span><span class="n">h</span><span class="p">)</span>
+
+                <span class="c"># prevent the error of dividing absolute zero</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([(</span><span class="mf">1e-16</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mf">0.</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span> \
+                                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">error</span><span class="p">])</span>
+
+                <span class="c"># Normarized error rate</span>
+                <span class="n">rms</span> <span class="o">=</span> <span class="n">error</span><span class="o">/</span><span class="n">tol</span>
+                <span class="n">rms_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rms</span><span class="o">*</span><span class="n">rms</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">neq</span><span class="p">)</span>
+
+                <span class="n">order</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_method_order</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="c"># factor to adjust the size of next step</span>
+                <span class="c"># Formula is from &lt;Numerical Methods for Engineers,</span>
+                <span class="c">#  Chappra &amp; Cannle&gt;</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="o">.</span><span class="mi">8</span> <span class="o">*</span><span class="p">((</span><span class="mf">1.</span><span class="o">/</span><span class="n">rms_norm</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">order</span><span class="p">))</span>
+                <span class="c"># scalar should in range(0.1, 4.)</span>
+                <span class="c"># for better accuracy and smoothness</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">middle</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                <span class="n">h</span> <span class="o">*=</span> <span class="n">s</span>
+
+                <span class="c"># step size should in range(min_step, max_step)</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="n">middle</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">min_step</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">max_step</span><span class="p">)</span>
+                <span class="c"># in case for last intern step</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">t_next</span> <span class="o">-</span> <span class="n">t_intermediate</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">u_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">u_intermediate</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">t_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t_intermediate</span><span class="p">))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Run algorithm for explicit 1-level RungeKutta method</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">k_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">neq</span><span class="p">),</span> <span class="nb">float</span><span class="p">)</span>  <span class="c"># intern stages</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k_len</span><span class="p">):</span>
+                <span class="n">k_factors</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">factors_u</span><span class="p">,</span> <span class="n">k</span><span class="p">))[</span><span class="n">m</span><span class="p">]</span>
+                <span class="n">k</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">u_n</span> <span class="o">+</span> <span class="n">dt</span><span class="o">*</span><span class="n">k_factors</span><span class="p">,</span><span class="n">t_n</span> <span class="o">+</span> <span class="n">dt</span><span class="o">*</span><span class="n">factors_t</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+            <span class="n">u_new</span> <span class="o">=</span> <span class="n">u_n</span> <span class="o">+</span> <span class="n">dt</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">factors_u_new</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">u_new</span>
+
+</div></div>
+<div class="viewcode-block" id="RungeKutta2"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.RungeKutta2">[docs]</a><span class="k">class</span> <span class="nc">RungeKutta2</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Standard Runge-Kutta method of order 2.</span>
+<span class="sd">    Implementation in the general RungeKutta Python framework.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quick_description</span> <span class="o">=</span> <span class="s">&quot;Explicit 2nd-order Runge-Kutta method&quot;</span>
+
+    <span class="n">_butcher_tableau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>\
+        <span class="p">[[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]])</span>
+    <span class="n">_method_order</span> <span class="o">=</span> <span class="mi">2</span>
+</div>
+<div class="viewcode-block" id="RungeKutta3"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.RungeKutta3">[docs]</a><span class="k">class</span> <span class="nc">RungeKutta3</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Standard Runge-Kutta method of order 3.</span>
+<span class="sd">    Implementation in the general RungeKutta Python framework.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quick_description</span> <span class="o">=</span> <span class="s">&quot;Explicit 3rd-order Runge-Kutta method&quot;</span>
+
+    <span class="n">_butcher_tableau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>\
+        <span class="p">[[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">16666667</span><span class="p">,</span> <span class="o">.</span><span class="mi">66666667</span><span class="p">,</span> <span class="o">.</span><span class="mi">16666667</span><span class="p">]])</span>
+    <span class="n">_method_order</span> <span class="o">=</span> <span class="mi">3</span>
+</div>
+<div class="viewcode-block" id="RungeKutta1"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.RungeKutta1">[docs]</a><span class="k">class</span> <span class="nc">RungeKutta1</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Explicit Forward Euler method implemented</span>
+<span class="sd">    in the general RungeKutta Python framework.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quick_description</span> <span class="o">=</span> <span class="s">&quot;Explicit 1st-order Runge-Kutta method&quot;</span>
+
+    <span class="n">_butcher_tableau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>\
+        <span class="p">[[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]])</span>
+    <span class="n">_method_order</span> <span class="o">=</span> <span class="mi">1</span>
+</div>
+<div class="viewcode-block" id="RungeKutta4"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.RungeKutta4">[docs]</a><span class="k">class</span> <span class="nc">RungeKutta4</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Standard Runge-Kutta method of order 4.</span>
+<span class="sd">    Implementation in the general RungeKutta Python framework.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quick_description</span> <span class="o">=</span> <span class="s">&quot;Explicit 4th-order Runge-Kutta method&quot;</span>
+
+    <span class="n">_butcher_tableau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>\
+        <span class="p">[[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">16666667</span><span class="p">,</span> <span class="o">.</span><span class="mi">33333333</span><span class="p">,</span> <span class="o">.</span><span class="mi">33333333</span><span class="p">,</span> <span class="o">.</span><span class="mi">16666667</span><span class="p">]])</span>
+    <span class="n">_method_order</span> <span class="o">=</span> <span class="mi">4</span>
+</div>
+<div class="viewcode-block" id="DormandPrince"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.DormandPrince">[docs]</a><span class="k">class</span> <span class="nc">DormandPrince</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dormand&amp;Prince Runge-Kutta method of order (5, 4).</span>
+<span class="sd">    Implementation in the general RungeKutta Python framework.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quick_description</span> <span class="o">=</span> <span class="s">&quot;Dormand &amp; Prince RK method of order (5, 4)&quot;</span>
+
+    <span class="n">_butcher_tableau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>\
+        <span class="p">[[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mo">075</span><span class="p">,</span> <span class="o">.</span><span class="mi">225</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">97777778</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.73333333</span><span class="p">,</span> <span class="mf">3.55555556</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">88888889</span><span class="p">,</span><span class="mf">2.95259869</span><span class="p">,</span><span class="o">-</span><span class="mf">11.59579332</span><span class="p">,</span><span class="mf">9.82289285</span><span class="p">,</span><span class="o">-.</span><span class="mi">29080933</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">2.84627525</span><span class="p">,</span><span class="o">-</span><span class="mf">10.75757576</span><span class="p">,</span><span class="mf">8.90642272</span><span class="p">,</span><span class="o">.</span><span class="mi">27840909</span><span class="p">,</span><span class="o">-.</span><span class="mi">2735313</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">1.</span><span class="p">,</span><span class="o">.</span><span class="mi">09114583</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span><span class="o">.</span><span class="mi">4492363</span><span class="p">,</span><span class="o">.</span><span class="mi">65104167</span><span class="p">,</span><span class="o">-.</span><span class="mi">32237618</span><span class="p">,</span><span class="o">.</span><span class="mi">13095238</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="o">.</span><span class="mi">09114583</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span><span class="o">.</span><span class="mi">4492363</span><span class="p">,</span><span class="o">.</span><span class="mi">65104167</span><span class="p">,</span><span class="o">-.</span><span class="mi">32237618</span><span class="p">,</span><span class="o">.</span><span class="mi">13095238</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="o">.</span><span class="mi">08991319</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span><span class="o">.</span><span class="mi">45348907</span><span class="p">,</span><span class="o">.</span><span class="mi">6140625</span><span class="p">,</span><span class="o">-.</span><span class="mi">27151238</span><span class="p">,</span><span class="o">.</span><span class="mi">08904762</span><span class="p">,</span><span class="o">.</span><span class="mo">025</span><span class="p">]])</span>
+    <span class="n">_method_order</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Fehlberg"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.Fehlberg">[docs]</a><span class="k">class</span> <span class="nc">Fehlberg</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adaptive Runge-Kutta-Fehlberg method of order (4, 5).</span>
+<span class="sd">    Implementation in the general RungeKutta Python framework.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quick_description</span> <span class="o">=</span> <span class="s">&quot;Adaptive Runge-Kutta-Fehlberg (4,5) method&quot;</span>
+
+    <span class="n">_butcher_tableau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>\
+        <span class="p">[[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">25</span><span class="p">,</span> <span class="o">.</span><span class="mi">25</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">375</span><span class="p">,</span> <span class="o">.</span><span class="mi">09375</span><span class="p">,</span> <span class="o">.</span><span class="mi">28125</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">92307692</span><span class="p">,</span> <span class="o">.</span><span class="mi">87938097</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.27719618</span><span class="p">,</span> <span class="mf">3.32089213</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.03240741</span><span class="p">,</span><span class="o">-</span><span class="mf">8.</span><span class="p">,</span> <span class="mf">7.17348928</span><span class="p">,</span><span class="o">-.</span><span class="mi">20589669</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">-.</span><span class="mi">2962963</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.38167641</span><span class="p">,</span> <span class="o">.</span><span class="mi">45297271</span><span class="p">,</span> <span class="o">-.</span><span class="mi">275</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">11574074</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">54892788</span><span class="p">,</span> <span class="o">.</span><span class="mi">53533138</span><span class="p">,</span> <span class="o">-.</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">11851852</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">51898635</span><span class="p">,</span> <span class="o">.</span><span class="mi">50613149</span><span class="p">,</span> <span class="o">-.</span><span class="mi">18</span><span class="p">,</span> <span class="o">.</span><span class="mo">03636364</span><span class="p">]])</span>
+    <span class="n">_method_order</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CashKarp"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.CashKarp">[docs]</a><span class="k">class</span> <span class="nc">CashKarp</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adaptive Cash-Karp Runge-Kutta method of order (5, 4).</span>
+<span class="sd">    Implementation in the general RungeKutta Python framework.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quick_description</span> <span class="o">=</span> <span class="s">&quot;Adaptive Cash-Karp RK method of order (5, 4)&quot;</span>
+
+    <span class="n">_butcher_tableau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mo">075</span><span class="p">,</span> <span class="o">.</span><span class="mi">225</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">6</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="o">-.</span><span class="mi">9</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-.</span><span class="mi">2037037</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.59259259</span><span class="p">,</span> <span class="mf">1.2962963</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">875</span><span class="p">,</span> <span class="o">.</span><span class="mo">02</span><span class="mi">94958</span><span class="p">,</span> <span class="o">.</span><span class="mi">34179688</span><span class="p">,</span> <span class="o">.</span><span class="mo">0415</span><span class="mi">9433</span><span class="p">,</span> <span class="o">.</span><span class="mi">40034541</span><span class="p">,</span> <span class="o">.</span><span class="mo">0617675</span><span class="mi">8</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">0978836</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">40257649</span><span class="p">,</span> <span class="o">.</span><span class="mi">21043771</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">2891022</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">10217737</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">3839079</span><span class="p">,</span> <span class="o">.</span><span class="mi">24459274</span><span class="p">,</span> <span class="o">.</span><span class="mo">01</span><span class="mi">932199</span><span class="p">,</span> <span class="o">.</span><span class="mi">25</span><span class="p">]])</span>
+    <span class="n">_method_order</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BogackiShampine"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.BogackiShampine">[docs]</a><span class="k">class</span> <span class="nc">BogackiShampine</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adaptive Bogacki-Shampine Runge-Kutta method of order (3, 2).</span>
+<span class="sd">    Implementation in the general RungeKutta Python framework.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quick_description</span> <span class="o">=</span> <span class="s">&quot;Adaptive Bogacki-Shampine RK method of order (3, 2)&quot;</span>
+
+    <span class="n">_butcher_tableau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="o">.</span><span class="mi">75</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">75</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="o">.</span><span class="mi">22222222</span><span class="p">,</span> <span class="o">.</span><span class="mi">33333333</span><span class="p">,</span> <span class="o">.</span><span class="mi">44444444</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">22222222</span><span class="p">,</span> <span class="o">.</span><span class="mi">33333333</span><span class="p">,</span> <span class="o">.</span><span class="mi">44444444</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+         <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">29166667</span><span class="p">,</span> <span class="o">.</span><span class="mi">25</span><span class="p">,</span> <span class="o">.</span><span class="mi">33333333</span><span class="p">,</span> <span class="o">.</span><span class="mi">125</span><span class="p">]])</span>
+    <span class="n">_method_order</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="MyRungeKutta"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.MyRungeKutta">[docs]</a><span class="k">class</span> <span class="nc">MyRungeKutta</span><span class="p">(</span><span class="n">RungeKutta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    User-supplied RungeKutta method, which is defined by providing</span>
+<span class="sd">    butcher-table in an 2d-array.</span>
+<span class="sd">    Method order should be provided if it is known. If not, the order</span>
+<span class="sd">    would be estimated automatically with function get_order().</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_butcher_tableau</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">_method_order</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">_required_parameters</span> <span class="o">=</span> <span class="n">RungeKutta</span><span class="o">.</span><span class="n">_required_parameters</span> <span class="o">+</span> \
+                           <span class="p">[</span><span class="s">&#39;butcher_tableau&#39;</span><span class="p">,]</span>
+
+    <span class="n">_optional_parameters</span> <span class="o">=</span>  <span class="n">RungeKutta</span><span class="o">.</span><span class="n">_optional_parameters</span> <span class="o">+</span> \
+                           <span class="p">[</span><span class="s">&#39;method_order&#39;</span><span class="p">,]</span>
+
+<div class="viewcode-block" id="MyRungeKutta.validate_data"><a class="viewcode-back" href="../../RungeKutta.html#odesolvers.RungeKutta.MyRungeKutta.validate_data">[docs]</a>    <span class="k">def</span> <span class="nf">validate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">RungeKutta</span><span class="o">.</span><span class="n">validate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="c"># Check for dimension of user-defined butcher table.</span>
+        <span class="n">array_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">butcher_tableau</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">array_shape</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">,</span><span class="s">&#39;&#39;&#39;</span>
+<span class="s">        Illegal input! Your input butcher_tableau should be a 2d-array!&#39;&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">m</span><span class="p">,</span><span class="n">n</span> <span class="o">=</span> <span class="n">array_shape</span>
+            <span class="k">if</span> <span class="n">m</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="s">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s">        The dimension of 2d-array &lt;method_yours_array&gt; should be:</span>
+<span class="s">        1. Either (n, n), --&gt; For 1-level RungeKutta methods</span>
+<span class="s">        2. Or (n+1, n),   --&gt; For 2-levels RungeKutta methods</span>
+<span class="s">        The shape of your input array is (</span><span class="si">%d</span><span class="s">, </span><span class="si">%d</span><span class="s">).&#39;&#39;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_butcher_tableau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">butcher_tableau</span>
+
+        <span class="c"># Check for user-defined order,</span>
+        <span class="c"># which should be an integer or a pair of adjacent integers</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;method_order&#39;</span><span class="p">):</span>
+            <span class="n">error_1level</span> <span class="o">=</span> <span class="s">&#39;&#39;&#39;</span>
+<span class="s">        method_order should be a single integer, with a square butcher</span>
+<span class="s">        table, which implies a single-level RungeKutta method.</span>
+<span class="s">        Your input is </span><span class="si">%s</span><span class="s"> .&#39;&#39;&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method_order</span><span class="p">)</span>
+            <span class="n">error_2level</span> <span class="o">=</span> <span class="s">&#39;&#39;&#39;</span>
+<span class="s">        method order should be a pair of adjacent positive integers,</span>
+<span class="s">        with a supplied non-square butch table, which implies a</span>
+<span class="s">        2-level method. Your input is </span><span class="si">%s</span><span class="s">.&#39;&#39;&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method_order</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">array_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">array_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c"># 2-level RungeKutta methods</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method_order</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="n">error_2level</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">order1</span><span class="p">,</span> <span class="n">order2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">method_order</span>
+                    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">order1</span><span class="o">-</span><span class="n">order2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> \
+                            <span class="n">order1</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">order2</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="n">error_2level</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">,</span><span class="n">error_2level</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># 1-level RungeKutta methods</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method_order</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">int</span> <span class="ow">or</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">method_order</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">,</span><span class="n">error_1level</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_method_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">method_order</span>
+
+        <span class="k">else</span><span class="p">:</span>   <span class="c"># method_order is not specified</span>
+            <span class="k">if</span> <span class="n">array_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">array_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c"># Calculate order for 2-level-methods</span>
+                <span class="c"># Method_order is required for computation</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_method_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_order</span><span class="p">()</span>
+
+        <span class="c"># check for consistency requirement of Butcher Tableau</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">array_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">butcher_tableau</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>\
+                               <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">butcher_tableau</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">:])):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="s">&#39;&#39;&#39;</span>
+<span class="s">        Inconsistent data in Butcher_Tableau!</span>
+<span class="s">        In each lines of stage-coefficients, first number should be</span>
+<span class="s">        equal to the sum of other numbers.</span>
+<span class="s">        That is, for a butcher_table with K columns,</span>
+<span class="s">            a[i][0] == a[i][1] + a[i][2] + ... + a[i][K - 1]</span>
+<span class="s">            where 1 &lt;= i &lt;= K - 1</span>
+<span class="s">        Your input for line </span><span class="si">%d</span><span class="s"> is :</span><span class="si">%s</span><span class="s"></span>
+<span class="s">        &#39;&#39;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">butcher_tableau</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+        <span class="k">return</span> <span class="bp">True</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">odesolver API 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Liwei Wang and Hans Petter Langtangen.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

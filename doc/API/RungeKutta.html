@@ -1,0 +1,1694 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>odesolvers.RungeKutta &mdash; odesolver API 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="odesolver API 0.1 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">odesolver API 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-odesolvers.RungeKutta">
+<span id="odesolvers-rungekutta"></span><h1><a class="reference internal" href="#module-odesolvers.RungeKutta" title="odesolvers.RungeKutta"><tt class="xref py py-mod docutils literal"><span class="pre">odesolvers.RungeKutta</span></tt></a><a class="headerlink" href="#module-odesolvers.RungeKutta" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="odesolvers.RungeKutta.BogackiShampine">
+<em class="property">class </em><tt class="descclassname">odesolvers.RungeKutta.</tt><tt class="descname">BogackiShampine</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#BogackiShampine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.BogackiShampine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odesolvers.RungeKutta.RungeKutta" title="odesolvers.RungeKutta.RungeKutta"><tt class="xref py py-class docutils literal"><span class="pre">odesolvers.RungeKutta.RungeKutta</span></tt></a></p>
+<p>Adaptive Bogacki-Shampine Runge-Kutta method of order (3, 2).
+Implementation in the general RungeKutta Python framework.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_arg</span>
+<span class="pre">s,</span> <span class="pre">**f_kwargs)</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt> (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued (default: False)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>relative tolerance for solution (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>absolute tolerance for solution (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt>()</td>
+<td>This method allows subclasses to adjust (modify or add) entries in the self._parameters dictionary.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>Advance the solution, either using one step or a</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">calculate_order_1_level</span></tt>(coefficients)</td>
+<td>Calculate order of 1-level RungeKutta method</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_order</span></tt>()</td>
+<td>Return the order of current method, both for non-adaptive</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Subclass-specific initialization.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>Compute discrete solution u of the ODE problem at time points</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>This function is used for extra check after all the attributes, (including inputs and internal parameters), have been initialized, e.g.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.BogackiShampine.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odesolvers.RungeKutta'</em><a class="headerlink" href="#odesolvers.RungeKutta.BogackiShampine.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.BogackiShampine.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'Adaptive Bogacki-Shampine RK method of order (3, 2)'</em><a class="headerlink" href="#odesolvers.RungeKutta.BogackiShampine.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odesolvers.RungeKutta.CashKarp">
+<em class="property">class </em><tt class="descclassname">odesolvers.RungeKutta.</tt><tt class="descname">CashKarp</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#CashKarp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.CashKarp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odesolvers.RungeKutta.RungeKutta" title="odesolvers.RungeKutta.RungeKutta"><tt class="xref py py-class docutils literal"><span class="pre">odesolvers.RungeKutta.RungeKutta</span></tt></a></p>
+<p>Adaptive Cash-Karp Runge-Kutta method of order (5, 4).
+Implementation in the general RungeKutta Python framework.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_arg</span>
+<span class="pre">s,</span> <span class="pre">**f_kwargs)</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt> (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued (default: False)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>relative tolerance for solution (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>absolute tolerance for solution (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt>()</td>
+<td>This method allows subclasses to adjust (modify or add) entries in the self._parameters dictionary.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>Advance the solution, either using one step or a</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">calculate_order_1_level</span></tt>(coefficients)</td>
+<td>Calculate order of 1-level RungeKutta method</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_order</span></tt>()</td>
+<td>Return the order of current method, both for non-adaptive</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Subclass-specific initialization.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>Compute discrete solution u of the ODE problem at time points</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>This function is used for extra check after all the attributes, (including inputs and internal parameters), have been initialized, e.g.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.CashKarp.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odesolvers.RungeKutta'</em><a class="headerlink" href="#odesolvers.RungeKutta.CashKarp.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.CashKarp.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'Adaptive Cash-Karp RK method of order (5, 4)'</em><a class="headerlink" href="#odesolvers.RungeKutta.CashKarp.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odesolvers.RungeKutta.DormandPrince">
+<em class="property">class </em><tt class="descclassname">odesolvers.RungeKutta.</tt><tt class="descname">DormandPrince</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#DormandPrince"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.DormandPrince" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odesolvers.RungeKutta.RungeKutta" title="odesolvers.RungeKutta.RungeKutta"><tt class="xref py py-class docutils literal"><span class="pre">odesolvers.RungeKutta.RungeKutta</span></tt></a></p>
+<p>Dormand&amp;Prince Runge-Kutta method of order (5, 4).
+Implementation in the general RungeKutta Python framework.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_arg</span>
+<span class="pre">s,</span> <span class="pre">**f_kwargs)</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt> (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued (default: False)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>relative tolerance for solution (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>absolute tolerance for solution (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt>()</td>
+<td>This method allows subclasses to adjust (modify or add) entries in the self._parameters dictionary.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>Advance the solution, either using one step or a</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">calculate_order_1_level</span></tt>(coefficients)</td>
+<td>Calculate order of 1-level RungeKutta method</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_order</span></tt>()</td>
+<td>Return the order of current method, both for non-adaptive</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Subclass-specific initialization.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>Compute discrete solution u of the ODE problem at time points</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>This function is used for extra check after all the attributes, (including inputs and internal parameters), have been initialized, e.g.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.DormandPrince.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odesolvers.RungeKutta'</em><a class="headerlink" href="#odesolvers.RungeKutta.DormandPrince.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.DormandPrince.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'Dormand &amp; Prince RK method of order (5, 4)'</em><a class="headerlink" href="#odesolvers.RungeKutta.DormandPrince.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odesolvers.RungeKutta.Fehlberg">
+<em class="property">class </em><tt class="descclassname">odesolvers.RungeKutta.</tt><tt class="descname">Fehlberg</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#Fehlberg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.Fehlberg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odesolvers.RungeKutta.RungeKutta" title="odesolvers.RungeKutta.RungeKutta"><tt class="xref py py-class docutils literal"><span class="pre">odesolvers.RungeKutta.RungeKutta</span></tt></a></p>
+<p>Adaptive Runge-Kutta-Fehlberg method of order (4, 5).
+Implementation in the general RungeKutta Python framework.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_arg</span>
+<span class="pre">s,</span> <span class="pre">**f_kwargs)</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt> (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued (default: False)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>relative tolerance for solution (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>absolute tolerance for solution (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt>()</td>
+<td>This method allows subclasses to adjust (modify or add) entries in the self._parameters dictionary.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>Advance the solution, either using one step or a</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">calculate_order_1_level</span></tt>(coefficients)</td>
+<td>Calculate order of 1-level RungeKutta method</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_order</span></tt>()</td>
+<td>Return the order of current method, both for non-adaptive</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Subclass-specific initialization.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>Compute discrete solution u of the ODE problem at time points</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>This function is used for extra check after all the attributes, (including inputs and internal parameters), have been initialized, e.g.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.Fehlberg.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odesolvers.RungeKutta'</em><a class="headerlink" href="#odesolvers.RungeKutta.Fehlberg.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.Fehlberg.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'Adaptive Runge-Kutta-Fehlberg (4,5) method'</em><a class="headerlink" href="#odesolvers.RungeKutta.Fehlberg.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odesolvers.RungeKutta.MyRungeKutta">
+<em class="property">class </em><tt class="descclassname">odesolvers.RungeKutta.</tt><tt class="descname">MyRungeKutta</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#MyRungeKutta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.MyRungeKutta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odesolvers.RungeKutta.RungeKutta" title="odesolvers.RungeKutta.RungeKutta"><tt class="xref py py-class docutils literal"><span class="pre">odesolvers.RungeKutta.RungeKutta</span></tt></a></p>
+<p>User-supplied RungeKutta method, which is defined by providing
+butcher-table in an 2d-array.
+Method order should be provided if it is known. If not, the order
+would be estimated automatically with function get_order().</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE</td>
+</tr>
+<tr class="row-odd"><td>butcher_tableau</td>
+<td>2d-array which contains the butcher table for use
+r-supplied Runge-Kutta method. (n,n) array for 1-
+level Runge-Kutta methods.(n+1,n) array for 2-lev
+el Runge-Kutta methods.</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_arg</span>
+<span class="pre">s,</span> <span class="pre">**f_kwargs)</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt> (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued (default: False)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>relative tolerance for solution (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>absolute tolerance for solution (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+<tr class="row-odd"><td>method_order</td>
+<td>Method order for user-defined method if known.A i
+nteger for 1-level methods, or a pair of   intege
+r for 2-levels methods.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt>()</td>
+<td>This method allows subclasses to adjust (modify or add) entries in the self._parameters dictionary.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>Advance the solution, either using one step or a</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">calculate_order_1_level</span></tt>(coefficients)</td>
+<td>Calculate order of 1-level RungeKutta method</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_order</span></tt>()</td>
+<td>Return the order of current method, both for non-adaptive</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Subclass-specific initialization.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>Compute discrete solution u of the ODE problem at time points</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odesolvers.RungeKutta.MyRungeKutta.validate_data" title="odesolvers.RungeKutta.MyRungeKutta.validate_data"><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt></a>()</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.MyRungeKutta.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odesolvers.RungeKutta'</em><a class="headerlink" href="#odesolvers.RungeKutta.MyRungeKutta.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odesolvers.RungeKutta.MyRungeKutta.validate_data">
+<tt class="descname">validate_data</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#MyRungeKutta.validate_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.MyRungeKutta.validate_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odesolvers.RungeKutta.RungeKutta">
+<em class="property">class </em><tt class="descclassname">odesolvers.RungeKutta.</tt><tt class="descname">RungeKutta</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#RungeKutta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ODE.html#odesolvers.ODE.Adaptive" title="odesolvers.ODE.Adaptive"><tt class="xref py py-class docutils literal"><span class="pre">odesolvers.ODE.Adaptive</span></tt></a></p>
+<p>Superclass for explicit 1-level- Runge-Kutta methods:
+RungeKutta4, Rungekutta2,etc.
+or 2-levels adaptive Runge-Kutta methods:
+Dormand &amp; Prince, Cash-Karp or Fehlberg, etc.</p>
+<p>Available subclasses are:
+RungeKutta2, RungeKutta3, RugeKutta1 (Forward Euler), RungeKutta4.
+DormandPrince, Fehlberg, CashKarp, BogackiShampine,
+MyRungeKutta (user-supplied RungeKutta methods),</p>
+<p>NOTE: This class should be superclass for level-1 methods.
+A subclass AdaptiveRungeKutta can act as superclass for
+the level-2 methods. get_order can be in RungeKutta.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_arg</span>
+<span class="pre">s,</span> <span class="pre">**f_kwargs)</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt> (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued (default: False)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>relative tolerance for solution (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>absolute tolerance for solution (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt>()</td>
+<td>This method allows subclasses to adjust (modify or add) entries in the self._parameters dictionary.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odesolvers.RungeKutta.RungeKutta.advance" title="odesolvers.RungeKutta.RungeKutta.advance"><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt></a>()</td>
+<td>Advance the solution, either using one step or a</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odesolvers.RungeKutta.RungeKutta.calculate_order_1_level" title="odesolvers.RungeKutta.RungeKutta.calculate_order_1_level"><tt class="xref py py-obj docutils literal"><span class="pre">calculate_order_1_level</span></tt></a>(coefficients)</td>
+<td>Calculate order of 1-level RungeKutta method</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odesolvers.RungeKutta.RungeKutta.get_order" title="odesolvers.RungeKutta.RungeKutta.get_order"><tt class="xref py py-obj docutils literal"><span class="pre">get_order</span></tt></a>()</td>
+<td>Return the order of current method, both for non-adaptive</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Subclass-specific initialization.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>Compute discrete solution u of the ODE problem at time points</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>This function is used for extra check after all the attributes, (including inputs and internal parameters), have been initialized, e.g.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.RungeKutta.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odesolvers.RungeKutta'</em><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odesolvers.RungeKutta.RungeKutta.advance">
+<tt class="descname">advance</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#RungeKutta.advance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta.advance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Advance the solution, either using one step or a
+series of adaptive steps, from t[n] tp t[n+1].</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odesolvers.RungeKutta.RungeKutta.calculate_order_1_level">
+<tt class="descname">calculate_order_1_level</tt><big>(</big><em>coefficients</em><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#RungeKutta.calculate_order_1_level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta.calculate_order_1_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate order of 1-level RungeKutta method
+with help of the known solution u = -e**t.</p>
+<p><cite>Coefficients</cite> is a square 2d-array (Butcher tableau).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odesolvers.RungeKutta.RungeKutta.get_order">
+<tt class="descname">get_order</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#RungeKutta.get_order"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta.get_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the order of current method, both for non-adaptive
+and adaptive methods.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odesolvers.RungeKutta.RungeKutta1">
+<em class="property">class </em><tt class="descclassname">odesolvers.RungeKutta.</tt><tt class="descname">RungeKutta1</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#RungeKutta1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odesolvers.RungeKutta.RungeKutta" title="odesolvers.RungeKutta.RungeKutta"><tt class="xref py py-class docutils literal"><span class="pre">odesolvers.RungeKutta.RungeKutta</span></tt></a></p>
+<p>Explicit Forward Euler method implemented
+in the general RungeKutta Python framework.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_arg</span>
+<span class="pre">s,</span> <span class="pre">**f_kwargs)</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt> (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued (default: False)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>relative tolerance for solution (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>absolute tolerance for solution (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt>()</td>
+<td>This method allows subclasses to adjust (modify or add) entries in the self._parameters dictionary.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>Advance the solution, either using one step or a</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">calculate_order_1_level</span></tt>(coefficients)</td>
+<td>Calculate order of 1-level RungeKutta method</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_order</span></tt>()</td>
+<td>Return the order of current method, both for non-adaptive</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Subclass-specific initialization.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>Compute discrete solution u of the ODE problem at time points</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>This function is used for extra check after all the attributes, (including inputs and internal parameters), have been initialized, e.g.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.RungeKutta1.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odesolvers.RungeKutta'</em><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta1.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.RungeKutta1.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'Explicit 1st-order Runge-Kutta method'</em><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta1.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odesolvers.RungeKutta.RungeKutta2">
+<em class="property">class </em><tt class="descclassname">odesolvers.RungeKutta.</tt><tt class="descname">RungeKutta2</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#RungeKutta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odesolvers.RungeKutta.RungeKutta" title="odesolvers.RungeKutta.RungeKutta"><tt class="xref py py-class docutils literal"><span class="pre">odesolvers.RungeKutta.RungeKutta</span></tt></a></p>
+<p>Standard Runge-Kutta method of order 2.
+Implementation in the general RungeKutta Python framework.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_arg</span>
+<span class="pre">s,</span> <span class="pre">**f_kwargs)</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt> (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued (default: False)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>relative tolerance for solution (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>absolute tolerance for solution (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt>()</td>
+<td>This method allows subclasses to adjust (modify or add) entries in the self._parameters dictionary.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>Advance the solution, either using one step or a</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">calculate_order_1_level</span></tt>(coefficients)</td>
+<td>Calculate order of 1-level RungeKutta method</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_order</span></tt>()</td>
+<td>Return the order of current method, both for non-adaptive</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Subclass-specific initialization.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>Compute discrete solution u of the ODE problem at time points</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>This function is used for extra check after all the attributes, (including inputs and internal parameters), have been initialized, e.g.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.RungeKutta2.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odesolvers.RungeKutta'</em><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta2.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.RungeKutta2.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'Explicit 2nd-order Runge-Kutta method'</em><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta2.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odesolvers.RungeKutta.RungeKutta3">
+<em class="property">class </em><tt class="descclassname">odesolvers.RungeKutta.</tt><tt class="descname">RungeKutta3</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#RungeKutta3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odesolvers.RungeKutta.RungeKutta" title="odesolvers.RungeKutta.RungeKutta"><tt class="xref py py-class docutils literal"><span class="pre">odesolvers.RungeKutta.RungeKutta</span></tt></a></p>
+<p>Standard Runge-Kutta method of order 3.
+Implementation in the general RungeKutta Python framework.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_arg</span>
+<span class="pre">s,</span> <span class="pre">**f_kwargs)</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt> (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued (default: False)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>relative tolerance for solution (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>absolute tolerance for solution (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt>()</td>
+<td>This method allows subclasses to adjust (modify or add) entries in the self._parameters dictionary.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>Advance the solution, either using one step or a</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">calculate_order_1_level</span></tt>(coefficients)</td>
+<td>Calculate order of 1-level RungeKutta method</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_order</span></tt>()</td>
+<td>Return the order of current method, both for non-adaptive</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Subclass-specific initialization.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>Compute discrete solution u of the ODE problem at time points</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>This function is used for extra check after all the attributes, (including inputs and internal parameters), have been initialized, e.g.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.RungeKutta3.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odesolvers.RungeKutta'</em><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta3.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.RungeKutta3.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'Explicit 3rd-order Runge-Kutta method'</em><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta3.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odesolvers.RungeKutta.RungeKutta4">
+<em class="property">class </em><tt class="descclassname">odesolvers.RungeKutta.</tt><tt class="descname">RungeKutta4</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odesolvers/RungeKutta.html#RungeKutta4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odesolvers.RungeKutta.RungeKutta" title="odesolvers.RungeKutta.RungeKutta"><tt class="xref py py-class docutils literal"><span class="pre">odesolvers.RungeKutta.RungeKutta</span></tt></a></p>
+<p>Standard Runge-Kutta method of order 4.
+Implementation in the general RungeKutta Python framework.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_arg</span>
+<span class="pre">s,</span> <span class="pre">**f_kwargs)</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt> (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued (default: False)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>relative tolerance for solution (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>absolute tolerance for solution (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm</td>
+</tr>
+<tr class="row-even"><td>first_step</td>
+<td>Suggested first time step size for an adaptive al
+gorithm</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt>()</td>
+<td>This method allows subclasses to adjust (modify or add) entries in the self._parameters dictionary.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>Advance the solution, either using one step or a</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">calculate_order_1_level</span></tt>(coefficients)</td>
+<td>Calculate order of 1-level RungeKutta method</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_order</span></tt>()</td>
+<td>Return the order of current method, both for non-adaptive</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Subclass-specific initialization.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>Compute discrete solution u of the ODE problem at time points</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>This function is used for extra check after all the attributes, (including inputs and internal parameters), have been initialized, e.g.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.RungeKutta4.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odesolvers.RungeKutta'</em><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta4.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odesolvers.RungeKutta.RungeKutta4.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'Explicit 4th-order Runge-Kutta method'</em><a class="headerlink" href="#odesolvers.RungeKutta.RungeKutta4.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/RungeKutta.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">odesolver API 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Liwei Wang and Hans Petter Langtangen.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

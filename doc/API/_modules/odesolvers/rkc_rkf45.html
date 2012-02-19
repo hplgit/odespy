@@ -1,0 +1,311 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>odesolvers.rkc_rkf45 &mdash; odesolver API 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="odesolver API 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">odesolver API 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for odesolvers.rkc_rkf45</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">ODE</span> <span class="kn">import</span> <span class="n">Solver</span><span class="p">,</span> <span class="n">Adaptive</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">inspect</span><span class="o">,</span> <span class="nn">sys</span>
+
+<span class="n">_parameters_RKC</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+
+    <span class="n">spcrad_f77</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">help</span><span class="o">=</span><span class="s">&#39;Intend to supply a Fortran subroutine as spcrad.    &#39;</span>\
+             <span class="s">&#39;This subroutine should be defined in form:          &#39;</span>\
+             <span class="s">&#39;        double precision function spcrad_f77(       &#39;</span>\
+             <span class="s">&#39;       1                                neq,t,u)    &#39;</span>\
+             <span class="s">&#39;  Cf2py intent(hide)  neq                           &#39;</span>\
+             <span class="s">&#39;        integer       neq                           &#39;</span>\
+             <span class="s">&#39;        double precision t,u(neq)                   &#39;</span>\
+             <span class="s">&#39;        spcrad_f77 =                                &#39;</span>\
+             <span class="s">&#39;        return                                      &#39;</span>\
+             <span class="s">&#39;        end                                         &#39;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">callable</span><span class="p">),</span>
+    <span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">ODE</span>
+<span class="n">ODE</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_parameters_RKC</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RKC"><a class="viewcode-back" href="../../rkc_rkf45.html#odesolvers.rkc_rkf45.RKC">[docs]</a><span class="k">class</span> <span class="nc">RKC</span><span class="p">(</span><span class="n">Adaptive</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Wrapper for rkc.f integrates initial value problems for systems of</span>
+<span class="sd">    first order ordinary differential equations. It is based on a</span>
+<span class="sd">    family of explicit Runge-Kutta-Chebyshev formulas of order two.</span>
+
+<span class="sd">    The source code for rkc.f can be obtained from netlib and contains</span>
+<span class="sd">    more details.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">quick_description</span> <span class="o">=</span> <span class="s">&quot;Explicit 2nd-order Runge-Kutta-Chebyshev method (rkc.f)&quot;</span>
+    <span class="n">_optional_parameters</span> <span class="o">=</span> <span class="n">Adaptive</span><span class="o">.</span><span class="n">_optional_parameters</span> <span class="o">+</span> \
+        <span class="p">[</span><span class="s">&#39;f_f77&#39;</span><span class="p">,</span> <span class="s">&#39;spcrad&#39;</span><span class="p">,</span> <span class="s">&#39;spcrad_f77&#39;</span><span class="p">,</span> <span class="s">&#39;jac_constant&#39;</span><span class="p">]</span>
+    <span class="c"># The following step parameters are illegal for rkc.f</span>
+    <span class="n">_optional_parameters</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">&#39;first_step&#39;</span><span class="p">)</span>
+    <span class="n">_optional_parameters</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">&#39;min_step&#39;</span><span class="p">)</span>
+    <span class="n">_optional_parameters</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">&#39;max_step&#39;</span><span class="p">)</span>
+
+    <span class="n">_istate_messages</span> <span class="o">=</span> <span class="p">{</span>\
+    <span class="mi">3</span><span class="p">:</span> <span class="s">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s">    Repeated improper error control: For some j, ATOL(j) = 0 and Y(j) = 0.&#39;&#39;&#39;</span><span class="p">,</span>
+    <span class="mi">4</span><span class="p">:</span> <span class="s">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s">    Unable to achieve the desired accuracy with the precision available.</span>
+<span class="s">    A severe lack of smoothness in the solution y(t) or the function</span>
+<span class="s">    f(t,y) is likely. &#39;&#39;&#39;</span><span class="p">,</span>
+    <span class="mi">6</span><span class="p">:</span> <span class="s">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s">    The method used by RKC to estimate the spectral radius of the Jacobian</span>
+<span class="s">    failed to converge.&#39;&#39;&#39;</span><span class="p">,</span>
+    <span class="mi">0</span><span class="p">:</span><span class="s">&#39;&#39;&#39;Iteration stops when function TERMINATE return with True.&#39;&#39;&#39;</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">:</span><span class="s">&#39;&#39;&#39;Iteration succeed.&#39;&#39;&#39;</span><span class="p">}</span>
+
+<div class="viewcode-block" id="RKC.adjust_parameters"><a class="viewcode-back" href="../../rkc_rkf45.html#odesolvers.rkc_rkf45.RKC.adjust_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">adjust_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s">&#39;rtol&#39;</span><span class="p">][</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s">&#39;rtol&#39;</span><span class="p">][</span><span class="s">&#39;range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.22e-15</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RKC.check_atol"><a class="viewcode-back" href="../../rkc_rkf45.html#odesolvers.rkc_rkf45.RKC.check_atol">[docs]</a>    <span class="k">def</span> <span class="nf">check_atol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; ATOL need to be supplied as scalar or vector of length NEQ. &#39;&#39;&#39;</span>
+        <span class="n">atol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atol</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atol</span><span class="p">,</span><span class="nb">float</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">atol</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">neq</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">,</span>  <span class="s">&#39;&#39;&#39;</span>
+<span class="s">ATOL =</span><span class="si">%s</span><span class="s"> should be either a scalar or a vector of length NEQ=</span><span class="si">%d</span><span class="s">.</span>
+<span class="s">           &#39;&#39;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">atol</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">neq</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RKC.validate_data"><a class="viewcode-back" href="../../rkc_rkf45.html#odesolvers.rkc_rkf45.RKC.validate_data">[docs]</a>    <span class="k">def</span> <span class="nf">validate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_atol</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Adaptive</span><span class="o">.</span><span class="n">validate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RKC.initialize_for_solve"><a class="viewcode-back" href="../../rkc_rkf45.html#odesolvers.rkc_rkf45.RKC.initialize_for_solve">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_for_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># INFO(4) is an integer array to specify how the problem</span>
+        <span class="c"># is to be solved</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>      <span class="c"># Compute solution at each time point</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;spcrad_f77&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;spcrad&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c"># SPCRAD routine is supplied</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spcrad</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="mf">0.0</span>  <span class="c"># dummy function</span>
+        <span class="c"># Is the Jacobian constant?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jac_constant</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">iterable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">neq</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>   <span class="c"># ATOL is a sequence of length NEQ</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">):</span>
+            <span class="c"># If f is input in form of a Python function f(u,t),</span>
+            <span class="c"># let self.f_f77 wrap f and have arguments t, u.</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f_f77</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">,</span><span class="n">u</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">t</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;f_f77&#39;</span><span class="p">):</span>
+            <span class="c"># The right-hand side &quot;f&quot; is input as a Fortran function</span>
+            <span class="c"># taking the arguments t,u.</span>
+            <span class="c"># Set self.f to be f_f77 wrapped to the general form f(u,t)</span>
+            <span class="c"># for switch_to().</span>
+            <span class="n">f_f77</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_f77</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span><span class="n">t</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">f_f77</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">u</span><span class="p">))</span>
+        <span class="c"># If spcrad is input in form of spcrad(u,t),</span>
+        <span class="c"># wrap spcrad to spcrad_f77 for Fortran code.</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;spcrad&#39;</span><span class="p">):</span>
+            <span class="c"># If spcrad is in form of spcrad(u,t), wrap for Fortran code.</span>
+            <span class="n">spcrad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spcrad</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spcrad_f77</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">,</span><span class="n">u</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">spcrad</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">t</span><span class="p">))</span>
+        <span class="n">Solver</span><span class="o">.</span><span class="n">initialize_for_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>   <span class="c"># Common settings</span>
+</div>
+<div class="viewcode-block" id="RKC.initialize"><a class="viewcode-back" href="../../rkc_rkf45.html#odesolvers.rkc_rkf45.RKC.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Import extension module _rkc and check that it exists.&#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">_rkc</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rkc</span> <span class="o">=</span> <span class="n">_rkc</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;Cannot find the extension module _rkc.</span><span class="se">\n</span><span class="s">Run setup.py again and investigate why _rkc.so was not successfully built.&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="RKC.solve"><a class="viewcode-back" href="../../rkc_rkf45.html#odesolvers.rkc_rkf45.RKC.solve">[docs]</a>    <span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">terminate</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c"># flag to indicate dummy function</span>
+        <span class="n">itermin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">terminate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="c"># Logical value cannot be transferred with f2py.</span>
+        <span class="k">if</span> <span class="n">terminate</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>    <span class="c"># Dummy function</span>
+            <span class="n">terminate_int</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">step_no</span><span class="p">,</span> <span class="n">nt</span><span class="p">,</span> <span class="n">neq</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">terminate_int</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">step_no</span><span class="p">,</span> <span class="n">nt</span><span class="p">,</span> <span class="n">neq</span><span class="p">:</span> \
+                                   <span class="nb">int</span><span class="p">(</span><span class="n">terminate</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">step_no</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">time_points</span><span class="p">)</span>
+
+        <span class="c"># Setting for internal parameters, (like self.u)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialize_for_solve</span><span class="p">()</span>
+
+        <span class="c"># Validity-check for values of class attributes</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_data</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Invalid data in &quot;</span><span class="si">%s</span><span class="s">&quot;:</span><span class="se">\n</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> \
+                             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                              <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)))</span>
+
+        <span class="c"># Call extension module</span>
+        <span class="n">solve</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rkc</span><span class="o">.</span><span class="n">solve</span>
+        <span class="c"># Fortran or Python function</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_f77</span><span class="p">,</span> <span class="s">&#39;_cpointer&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_f77</span><span class="p">)</span>
+        <span class="n">spcrad</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spcrad_f77</span><span class="p">,</span> <span class="s">&#39;_cpointer&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spcrad_f77</span><span class="p">)</span>
+
+        <span class="c"># Start iteration</span>
+        <span class="n">uout</span><span class="p">,</span> <span class="n">istate</span><span class="p">,</span> <span class="n">nstop</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">spcrad</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rtol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">,</span>
+                                    <span class="n">terminate_int</span><span class="p">,</span> <span class="n">itermin</span><span class="p">)</span>
+        <span class="c"># Print corresponding message</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">_istate_messages</span><span class="p">[</span><span class="n">istate</span><span class="p">]</span>
+        <span class="k">print</span> <span class="s">&#39;Iteration stops at T=</span><span class="si">%g</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">nstop</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c"># Error occurs.</span>
+        <span class="k">if</span> <span class="n">istate</span>  <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>   <span class="c"># Abnormal status</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>   <span class="c"># Interrupt</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">uout</span><span class="p">[:</span><span class="n">nstop</span><span class="p">,:])</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span>
+
+
+</div></div>
+<div class="viewcode-block" id="RKF45"><a class="viewcode-back" href="../../rkc_rkf45.html#odesolvers.rkc_rkf45.RKF45">[docs]</a><span class="k">class</span> <span class="nc">RKF45</span><span class="p">(</span><span class="n">Adaptive</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper for rkf45.f, a FORTRAN solver designed to solve non-stiff and</span>
+<span class="sd">    mildly stiff differential equations by the well-known</span>
+<span class="sd">    Runge-Kutta-Fehlberg (4,5) method.</span>
+
+<span class="sd">    The FORTRAN source rkf45.f can be obtained from Netlib.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quick_description</span> <span class="o">=</span> <span class="s">&quot;Adaptive Runge-Kutta-Fehlberg (4,5) method (rkf45.f)&quot;</span>
+
+    <span class="n">_optional_parameters</span> <span class="o">=</span> <span class="n">Adaptive</span><span class="o">.</span><span class="n">_optional_parameters</span> <span class="o">+</span> <span class="p">[</span><span class="s">&#39;f_f77&#39;</span><span class="p">]</span>
+    <span class="c"># The following step parameters are illegal for rkf45.f</span>
+    <span class="c"># and therefore removed (class Adaptive adds them in the above statement)</span>
+    <span class="n">_optional_parameters</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">&#39;first_step&#39;</span><span class="p">)</span>
+    <span class="n">_optional_parameters</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">&#39;min_step&#39;</span><span class="p">)</span>
+    <span class="n">_optional_parameters</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">&#39;max_step&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RKF45.initialize"><a class="viewcode-back" href="../../rkc_rkf45.html#odesolvers.rkc_rkf45.RKF45.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Import extension module _rkf45 and check that it exists.&#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">_rkf45</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rkf45</span> <span class="o">=</span> <span class="n">_rkf45</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;Cannot find the extension module _rkf45.</span><span class="se">\n</span><span class="s">Run setup.py again and investigate why _rkf45.so was not successfully built.&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RKF45.adjust_parameters"><a class="viewcode-back" href="../../rkc_rkf45.html#odesolvers.rkc_rkf45.RKF45.adjust_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">adjust_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s">&#39;rtol&#39;</span><span class="p">][</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s">&#39;rtol&#39;</span><span class="p">][</span><span class="s">&#39;extra_check&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s">&#39;atol&#39;</span><span class="p">][</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">[</span><span class="s">&#39;atol&#39;</span><span class="p">][</span><span class="s">&#39;extra_check&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mf">0.0</span>
+</div>
+<div class="viewcode-block" id="RKF45.initialize_for_solve"><a class="viewcode-back" href="../../rkc_rkf45.html#odesolvers.rkc_rkf45.RKF45.initialize_for_solve">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_for_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;f&#39;</span><span class="p">):</span>
+            <span class="c"># If f is input in form of f(u,t), wrap f to f_f77 for Fortran code.</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f_f77</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">,</span><span class="n">u</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">t</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;f_f77&#39;</span><span class="p">):</span>
+            <span class="c"># If f is input in form of f(t,u) (usually in Fortran),</span>
+            <span class="c"># wrap f_f77 to the general form f(u,t) for switch_to()</span>
+            <span class="n">f_f77</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_f77</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span><span class="n">t</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">f_f77</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">u</span><span class="p">))</span>
+        <span class="n">Solver</span><span class="o">.</span><span class="n">initialize_for_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RKF45.advance"><a class="viewcode-back" href="../../rkc_rkf45.html#odesolvers.rkc_rkf45.RKF45.advance">[docs]</a>    <span class="k">def</span> <span class="nf">advance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">rtol</span><span class="p">,</span> <span class="n">atol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rtol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atol</span>
+
+        <span class="n">advance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rkf45</span><span class="o">.</span><span class="n">advance</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f_f77</span><span class="p">,</span> <span class="s">&#39;_cpointer&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_f77</span><span class="p">)</span>
+        <span class="n">unew</span><span class="p">,</span> <span class="n">istate</span> <span class="o">=</span> <span class="n">advance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">rtol</span><span class="p">,</span> <span class="n">atol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">istate</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">unew</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">odesolver API 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Liwei Wang and Hans Petter Langtangen.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

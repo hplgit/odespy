@@ -1,0 +1,1334 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations &mdash; A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pyramid.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations 1.0 documentation" href="index.html" />
+    <link rel="prev" title="A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations" href="index.html" />
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+
+  </head>
+  <body>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="index.html" title="A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="a-tutorial-for-the-odesolvers-package-for-solving-ordinary-differentialequations">
+<h1>A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations<a class="headerlink" href="#a-tutorial-for-the-odesolvers-package-for-solving-ordinary-differentialequations" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Hans Petter Langtangen, Liwei Wang</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Feb 19, 2012</td>
+</tr>
+</tbody>
+</table>
+<p>The <tt class="docutils literal"><span class="pre">odesolvers</span></tt> package contains tools for solving ordinary
+differential equations (ODEs). The user specifies the problem through
+high-level Python code. Both scalar ODEs and systems of ODEs are
+supported.  A wide range of numerical methods for ODEs are offered.</p>
+</div>
+<div class="section" id="basic-usage">
+<h1>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The typical usage of the tools consists of six steps. These are
+outlined in generic form below.</p>
+<div class="section" id="step-1">
+<h3>Step 1<a class="headerlink" href="#step-1" title="Permalink to this headline">¶</a></h3>
+<p>Write the ODE problem on the generic form <span class="math">\(u' = f(u, t)\)</span>,
+where <span class="math">\(u(t)\)</span> is the unknown function to be solved for, or a vector
+of unknown functions of time in case of a system of ODEs.</p>
+</div>
+<div class="section" id="step-2">
+<h3>Step 2<a class="headerlink" href="#step-2" title="Permalink to this headline">¶</a></h3>
+<p>Implement the right-hand side function <span class="math">\(f(u, t)\)</span>, which
+defines the ODEs to be solved, as a Python function <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t)</span></tt>.  The
+argument <tt class="docutils literal"><span class="pre">u</span></tt> is either a <tt class="docutils literal"><span class="pre">float</span></tt> object (in case of a scalar ODE) or a
+<tt class="docutils literal"><span class="pre">numpy</span></tt> array object (in case of a system of ODEs).  Alternatively, a
+class with a <tt class="docutils literal"><span class="pre">__call__</span></tt> method can be used instead of a plain
+function.  Some tools in this package also allow implementation of <span class="math">\(f\)</span>
+in Fortran or C for increased efficiency.</p>
+</div>
+<div class="section" id="step-3">
+<h3>Step 3<a class="headerlink" href="#step-3" title="Permalink to this headline">¶</a></h3>
+<p>Create a method object</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">method</span> <span class="o">=</span> <span class="n">classname</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <tt class="docutils literal"><span class="pre">classname</span></tt> is the name of a class in this package implementing
+the desired numerical method.</p>
+<p>Many solver classes has a range of parameters that the user can set to
+control various parts of the solution process. The parameters are
+documented in the doc string of the class (<tt class="docutils literal"><span class="pre">pydoc</span> <span class="pre">classname</span></tt> will list
+the documentation in a terminal window). One can either specify parameters
+at construction time, via extra keyword arguments to the constructor,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">method</span> <span class="o">=</span> <span class="n">classname</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">prm1</span><span class="o">=</span><span class="n">value1</span><span class="p">,</span> <span class="n">prm2</span><span class="o">=</span><span class="n">value2</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or at any time using the <tt class="docutils literal"><span class="pre">set</span></tt> method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">method</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">prm1</span><span class="o">=</span><span class="n">value1</span><span class="p">,</span> <span class="n">prm2</span><span class="o">=</span><span class="n">value2</span><span class="p">,</span> <span class="n">prm3</span><span class="o">=</span><span class="n">value3</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">method</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">prm4</span><span class="o">=</span><span class="n">value4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="step-4">
+<h3>Step 4<a class="headerlink" href="#step-4" title="Permalink to this headline">¶</a></h3>
+<p>Set the initial condition, <span class="math">\(u(0)=U_0\)</span>,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">method</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="n">U0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <tt class="docutils literal"><span class="pre">U0</span></tt> is either a number, for a scalar ODE, or a sequence (list, tuple,
+<tt class="docutils literal"><span class="pre">numpy</span></tt> array), for a system of ODEs.</p>
+</div>
+<div class="section" id="step-5">
+<h3>Step 5<a class="headerlink" href="#step-5" title="Permalink to this headline">¶</a></h3>
+<p>Solve the ODE problem, which means to compute <span class="math">\(u(t)\)</span> at
+some discrete user-specified time points <span class="math">\(t_i\)</span>, for
+<span class="math">\(i=0,1,\ldots,n\)</span>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">T</span> <span class="o">=</span> <span class="o">...</span>  <span class="c"># end time</span>
+<span class="n">time_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">time_points</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In case of a scalar ODE, the returned solution <tt class="docutils literal"><span class="pre">u</span></tt> is a one-dimensional
+<tt class="docutils literal"><span class="pre">numpy</span></tt> array where <tt class="docutils literal"><span class="pre">u[i]</span></tt> holds the solution at time point <tt class="docutils literal"><span class="pre">t[i]</span></tt>.
+For a system of ODEs, the returned <tt class="docutils literal"><span class="pre">u</span></tt> is a two-dimensional <tt class="docutils literal"><span class="pre">numpy</span></tt>
+array where <tt class="docutils literal"><span class="pre">u[i,j]</span></tt> holds the solution of the $j$-th unknown
+function at the $i$-th time point <tt class="docutils literal"><span class="pre">t[i]</span></tt> (<span class="math">\(u_j(t_i)\)</span> in mathematics
+notation).</p>
+<p>The <tt class="docutils literal"><span class="pre">time_points</span></tt> array specifies the time points where we want the
+solution to be computed. The returned array <tt class="docutils literal"><span class="pre">t</span></tt> is the same as
+<tt class="docutils literal"><span class="pre">time_points</span></tt>.  The simplest numerical methods in the <tt class="docutils literal"><span class="pre">odesolvers</span></tt>
+package apply the <tt class="docutils literal"><span class="pre">time_points</span></tt> array directly in the solution. That
+is, the time steps used are given by <tt class="docutils literal"><span class="pre">time_points[i]</span> <span class="pre">-</span>
+<span class="pre">time_points[i-1]</span></tt>, for <tt class="docutils literal"><span class="pre">i=0,1,...,len(time_points)-1</span></tt>.  Some more
+advanced adaptive methods compute the time steps internally. Then the
+<tt class="docutils literal"><span class="pre">time_points</span></tt> array is just a specification of the time points where
+we want to know the solution.</p>
+<p>(<strong>hpl</strong>: Need to document how the tp array is used.)</p>
+<p>(<strong>hpl</strong>: Need to comment on storage.)</p>
+<p>The <tt class="docutils literal"><span class="pre">solve</span></tt> method in solver classes also allows a second argument,
+<tt class="docutils literal"><span class="pre">terminate</span></tt>, which is a user-implemented Python function specifying
+when the solution process is to be terminated. For example,
+terminating when the solution reaches an asymptotic (known) value
+<tt class="docutils literal"><span class="pre">a</span></tt> can be done by</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">step_no</span><span class="p">):</span>
+    <span class="c"># u and t are arrays. Most recent solution is u[step_no].</span>
+    <span class="n">tolerance</span> <span class="o">=</span> <span class="mf">1E-6</span>
+    <span class="k">return</span> <span class="bp">True</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">step_no</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span> <span class="k">else</span> <span class="bp">False</span>
+
+<span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">time_points</span><span class="p">,</span> <span class="n">terminate</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The arguments transferred to the <tt class="docutils literal"><span class="pre">terminate</span></tt> function are the
+solution array <tt class="docutils literal"><span class="pre">u</span></tt>, the corresponding time points <tt class="docutils literal"><span class="pre">t</span></tt>, and
+an integer <tt class="docutils literal"><span class="pre">step_no</span></tt> reflecting the most recently computed <tt class="docutils literal"><span class="pre">u</span></tt>
+value. That is, <tt class="docutils literal"><span class="pre">u[step_no]</span></tt> is most recently computed value of <span class="math">\(u\)</span>.
+(The array data <tt class="docutils literal"><span class="pre">u[step_no+1:]</span></tt> will typically be zero as these
+are uncomputed future values.)</p>
+</div>
+<div class="section" id="step-6">
+<h3>Step 6<a class="headerlink" href="#step-6" title="Permalink to this headline">¶</a></h3>
+<p>Extract solution components for plotting and further analysis.
+Since the <tt class="docutils literal"><span class="pre">u</span></tt> array returned from <tt class="docutils literal"><span class="pre">method.solve</span></tt> stores all unknown
+functions at all discrete time levels, one usually wants to extract
+individual unknowns as one-dimensional arrays. Here is an example
+where unknown <span class="math">\(0\)</span> and <span class="math">\(k\)</span> are extracted in individual arrays and plotted:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">u_0</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">u_k</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="n">plot</span><span class="p">,</span> <span class="n">show</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u_0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_k</span><span class="p">)</span>
+<span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="example-exponential-growth">
+<span id="ode-sec-exgr"></span><h2>Example: Exponential Growth<a class="headerlink" href="#example-exponential-growth" title="Permalink to this headline">¶</a></h2>
+<p>Our first example concerns the simple scalar ODE problem <span class="math">\(u'=cu\)</span>,
+<span class="math">\(u(0)=A\)</span>, where <span class="math">\(A&gt;0\)</span> and <span class="math">\(c&gt;0\)</span> are known constants. Using a standard
+Runge-Kutta method of order four, the code for solving the problem in
+the time interval <span class="math">\([0,10]\)</span>, with <span class="math">\(N=30\)</span> time steps, looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">A</span> <span class="o">=</span> <span class="mf">1.5</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">c</span><span class="o">*</span><span class="n">u</span>
+
+<span class="kn">import</span> <span class="nn">odesolvers</span>
+<span class="n">method</span> <span class="o">=</span> <span class="n">odesolvers</span><span class="o">.</span><span class="n">RK4</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="n">method</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">30</span>  <span class="c"># no of time steps</span>
+<span class="n">time_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">time_points</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+<span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>With the <tt class="docutils literal"><span class="pre">RK4</span></tt> method and other non-adaptive methods
+the time steps are dictated by the <tt class="docutils literal"><span class="pre">time_points</span></tt> array.
+A constant time step of size <tt class="docutils literal"><span class="pre">time_points[1]</span> <span class="pre">-</span> <span class="pre">time_points[0]</span> <span class="pre">=</span> <span class="pre">1/3</span></tt>
+is implied in the present example.</p>
+<div class="section" id="parameters-in-the-right-hand-side-function">
+<span id="ode-sec-exgr-farg"></span><h3>Parameters in the Right-Hand Side Function<a class="headerlink" href="#parameters-in-the-right-hand-side-function" title="Permalink to this headline">¶</a></h3>
+<p>The right-hand side function and all physical parameters are often
+lumped together in a class, for instance,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ExponentialGrowth</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span> <span class="n">A</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">*</span><span class="n">u</span>
+
+<span class="n">f</span> <span class="o">=</span> <span class="n">ExponentialGrowth</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">odesolvers</span>
+<span class="n">method</span> <span class="o">=</span> <span class="n">odesolvers</span><span class="o">.</span><span class="n">RK4</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="n">method</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We may also compare the numerical and exact solution:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">u_exact</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">A</span><span class="o">*</span><span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">c</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+<span class="n">error</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">u_exact</span> <span class="o">-</span> <span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&#39;Max deviation of numerical solution:&#39;</span><span class="p">,</span> <span class="n">error</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="s">&#39;r-&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_exact</span><span class="p">,</span> <span class="s">&#39;bo&#39;</span><span class="p">)</span>
+<span class="n">legend</span><span class="p">([</span><span class="s">&#39;RK4, N=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">N</span><span class="p">,</span> <span class="s">&#39;exact&#39;</span><span class="p">])</span>
+<span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Instead of having the <tt class="docutils literal"><span class="pre">c</span></tt> variable as a global variable or
+in a class, we may include it as an extra argument to <tt class="docutils literal"><span class="pre">f</span></tt>, either
+as a positional argument or as a keyword argument. Positional arguments
+can be sent to <tt class="docutils literal"><span class="pre">f</span></tt> via the constructor argument <tt class="docutils literal"><span class="pre">f_args</span></tt> (a list/tuple of
+variables), while a dictionary <tt class="docutils literal"><span class="pre">f_kwargs</span></tt> is used to transfer
+keyword arguments to <tt class="docutils literal"><span class="pre">f</span></tt> via the constructor:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># f has extra positional argument</span>
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">c</span><span class="o">*</span><span class="n">u</span>
+
+<span class="n">method</span> <span class="o">=</span> <span class="n">odesolvers</span><span class="o">.</span><span class="n">RK4</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">f_args</span><span class="o">=</span><span class="p">[</span><span class="n">c</span><span class="p">])</span>
+
+<span class="c"># Alternative: f has extra keyword argument</span>
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">c</span><span class="o">*</span><span class="n">u</span>
+
+<span class="n">method</span> <span class="o">=</span> <span class="n">odesolvers</span><span class="o">.</span><span class="n">RK4</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">f_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;c&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>The right-hand side function <tt class="docutils literal"><span class="pre">f</span></tt> may feature both extra positional
+arguments and extra keyword arguments,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">kwarg1</span><span class="o">=</span><span class="n">val1</span><span class="p">,</span> <span class="n">kwarg2</span><span class="o">=</span><span class="n">val2</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+    <span class="o">...</span>
+
+<span class="n">method</span> <span class="o">=</span> <span class="n">odesolvers</span><span class="o">.</span><span class="n">classname</span><span class="p">(</span><span class="n">f</span><span class="p">,</span>
+                    <span class="n">f_args</span><span class="o">=</span><span class="p">[</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+                    <span class="n">f_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">kwarg1</span><span class="o">=</span><span class="n">val1</span><span class="p">,</span> <span class="n">kwarg2</span><span class="o">=</span><span class="n">val2</span><span class="p">,</span> <span class="o">...</span><span class="p">))</span>
+
+<span class="c"># Alternative setting of f_args and f_kwargs</span>
+<span class="n">method</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">f_args</span><span class="o">=</span><span class="p">[</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+           <span class="n">f_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">kwarg1</span><span class="o">=</span><span class="n">val1</span><span class="p">,</span> <span class="n">kwarg2</span><span class="o">=</span><span class="n">val2</span><span class="p">,</span> <span class="o">...</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Solvers will call <tt class="docutils literal"><span class="pre">f</span></tt> as <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span> <span class="pre">**f_kwargs)</span></tt>.</p>
+</div>
+<div class="section" id="continuing-a-previous-simulation">
+<h3>Continuing a Previous Simulation<a class="headerlink" href="#continuing-a-previous-simulation" title="Permalink to this headline">¶</a></h3>
+<p>It is easy to simulate for some time interval <span class="math">\([0, T_1]\)</span>,
+the continue with <span class="math">\(u(T_1)\)</span> as new initial condition and simulate for
+<span class="math">\(t\)</span> in <span class="math">\([T_1, T_2]\)</span> and so on. Let us divide the time
+domain <span class="math">\([0,10]\)</span> into subdomains and compute the solution for
+each subdomain in sequence. The following program performs the steps.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">A</span> <span class="o">=</span> <span class="mf">1.5</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">c</span><span class="o">*</span><span class="n">u</span>
+
+<span class="kn">import</span> <span class="nn">odesolvers</span><span class="o">,</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">method</span> <span class="o">=</span> <span class="n">odesolvers</span><span class="o">.</span><span class="n">RK4</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="c"># Split time domain into subdomains and</span>
+<span class="c"># integrate the ODE in each subdomain</span>
+<span class="n">T</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">]</span>
+
+<span class="n">N_tot</span> <span class="o">=</span> <span class="mi">30</span>               <span class="c"># no of time intervals in total</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">T</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="n">N_tot</span>  <span class="c"># time step, kept fixed</span>
+<span class="n">u</span> <span class="o">=</span> <span class="p">[];</span> <span class="n">t</span> <span class="o">=</span> <span class="p">[]</span>           <span class="c"># collectors for u and t</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">T_interval</span> <span class="o">=</span> <span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">T_interval</span><span class="o">/</span><span class="n">dt</span><span class="p">))</span>
+    <span class="n">time_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">method</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>  <span class="c"># at time_points[0]</span>
+    <span class="k">print</span> <span class="s">&#39;Solving in [</span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">] with </span><span class="si">%d</span><span class="s"> intervals&#39;</span> <span class="o">%</span> \
+          <span class="p">(</span><span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">N</span><span class="p">)</span>
+    <span class="n">ui</span><span class="p">,</span> <span class="n">ti</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">time_points</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">ui</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c"># newest u is next initial condition</span>
+
+    <span class="n">plot</span><span class="p">(</span><span class="n">ti</span><span class="p">,</span> <span class="n">ui</span><span class="p">)</span>
+    <span class="n">hold</span><span class="p">(</span><span class="s">&#39;on&#39;</span><span class="p">)</span>
+
+    <span class="n">u</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ui</span><span class="p">);</span>  <span class="n">t</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ti</span><span class="p">)</span>
+
+<span class="c"># Can concatenate all the elements of u and t, if desired</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">u</span><span class="p">);</span>  <span class="n">t</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="c">#plot(t, u, &#39;bo&#39;)  # same curve</span>
+<span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="example-decay-equation">
+<h2>Example: Decay Equation<a class="headerlink" href="#example-decay-equation" title="Permalink to this headline">¶</a></h2>
+<p>The second example also concerns the ODE <span class="math">\(u'=cu\)</span>, but this time with
+<span class="math">\(c&lt;0\)</span>. We want to integrate until the asymptotic value <span class="math">\(u=0\)</span> is
+reached with an accuracy of <span class="math">\(0.001\)</span>. For this purpose we need a
+<tt class="docutils literal"><span class="pre">terminate</span></tt> function, which returns <tt class="docutils literal"><span class="pre">True</span></tt> when the termination
+criterion is met:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">tol</span> <span class="o">=</span> <span class="mf">0.001</span>  <span class="c"># tolerance for terminating the simulation</span>
+
+<span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">step_no</span><span class="p">):</span>
+    <span class="c"># Most recent solution is in u[step_no] at time t[step_no]</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">step_no</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</pre></div>
+</div>
+<p>The complete program may take the form</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.1</span>
+<span class="n">A</span> <span class="o">=</span> <span class="mf">1.5</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">c</span><span class="o">*</span><span class="n">u</span>
+
+<span class="kn">import</span> <span class="nn">odesolvers</span>
+<span class="n">method</span> <span class="o">=</span> <span class="n">odesolvers</span><span class="o">.</span><span class="n">RK4</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="n">method</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="c"># Make sure integration interval [0, T] is large enough</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">T</span> <span class="o">=</span> <span class="mi">150</span>
+<span class="n">time_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">tol</span> <span class="o">=</span> <span class="mf">0.001</span>  <span class="c"># tolerance for terminating the simulation</span>
+
+<span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">step_no</span><span class="p">):</span>
+    <span class="c"># Most recent solution is in u[step_no] at time t[step_no]</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">step_no</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+<span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">time_points</span><span class="p">,</span> <span class="n">terminate</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="s">&quot;Solve u&#39;=</span><span class="si">%g</span><span class="s">*u, u(0)=</span><span class="si">%g</span><span class="s">, for t in [</span><span class="si">%g</span><span class="s">, </span><span class="si">%g</span><span class="s">] and u&gt;</span><span class="si">%g</span><span class="s">&quot;</span> <span class="o">%</span> \
+      <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">time_points</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">tol</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Final u(t=</span><span class="si">%g</span><span class="s">)=</span><span class="si">%g</span><span class="s"> after </span><span class="si">%d</span><span class="s"> steps&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="k">print</span> <span class="n">plot</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+<span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Note that the size of the returned arrays <tt class="docutils literal"><span class="pre">u</span></tt> and <tt class="docutils literal"><span class="pre">t</span></tt> fits
+the time interval up to the point of termination by <tt class="docutils literal"><span class="pre">terminate</span></tt>.</p>
+</div>
+<div class="section" id="example-decay-equation-with-other-symbols">
+<h2>Example: Decay Equation with Other Symbols<a class="headerlink" href="#example-decay-equation-with-other-symbols" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">odesolvers</span></tt> package applies <tt class="docutils literal"><span class="pre">u</span></tt> for the unknown function or
+vector of unknown functions and <tt class="docutils literal"><span class="pre">t</span></tt> as the name of the independent
+variable. Many problems involve other symbols for functions and
+independent variables. These symbols should be reflected in the code.
+For example, here is a coding example involving the differential
+equation <span class="math">\(y'(x)=-y(x)\)</span>, <span class="math">\(y(0)=1\)</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">myrhs</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">y</span>
+
+<span class="kn">import</span> <span class="nn">odesolvers</span>
+<span class="n">method</span> <span class="o">=</span> <span class="n">odesolvers</span><span class="o">.</span><span class="n">RK4</span><span class="p">(</span><span class="n">myrhs</span><span class="p">)</span>
+<span class="n">method</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="c"># Make sure integration interval [0, L] is large enough</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">x_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">stepnumber</span><span class="p">):</span>
+    <span class="n">tol</span> <span class="o">=</span> <span class="mf">0.001</span>
+    <span class="k">return</span> <span class="bp">True</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">stepnumber</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">tol</span> <span class="k">else</span> <span class="bp">False</span>
+
+<span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">x_points</span><span class="p">,</span> <span class="n">terminate</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="s">&#39;Final y(x=</span><span class="si">%g</span><span class="s">)=</span><span class="si">%g</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>As shown, we use <tt class="docutils literal"><span class="pre">y</span></tt> for <tt class="docutils literal"><span class="pre">u</span></tt>, <tt class="docutils literal"><span class="pre">x</span></tt> for <tt class="docutils literal"><span class="pre">t</span></tt>, and <tt class="docutils literal"><span class="pre">x_points</span></tt> instead
+of <tt class="docutils literal"><span class="pre">time_points</span></tt>.</p>
+</div>
+<div class="section" id="example-the-pendulum-equation">
+<h2>Example: The Pendulum Equation<a class="headerlink" href="#example-the-pendulum-equation" title="Permalink to this headline">¶</a></h2>
+<p>The angle <span class="math">\(\theta\)</span> of a pendulum with mass <span class="math">\(m\)</span> and length <span class="math">\(L\)</span>
+is governed by the equation
+(neglecting air resistance for simplicity)</p>
+<div class="math">
+\[mL\ddot\theta + mg\sin\theta = 0,\quad \theta (0)=\Theta,\
+\dot\theta (0)=0 .\]</div>
+<p>A dot over <span class="math">\(\theta\)</span> implies differentiation with respect to time.
+The ODE can be written as <span class="math">\(\ddot\theta + c\sin\theta=0\)</span> by
+introducing <span class="math">\(c = g/L\)</span>.
+This problem must be expressed as a first-order ODE system if it is
+going to be solved by the tools in the <tt class="docutils literal"><span class="pre">odesolvers</span></tt> package.
+Introducing <span class="math">\(\omega = \dot\theta\)</span> (the angular velocity) as auxiliary
+unknown, we get the system</p>
+<div class="math">
+\[\begin{split}\dot\theta &amp;= \omega,\\
+\dot\omega &amp;= -c\sin\theta,\end{split}\]</div>
+<p>with <span class="math">\(\theta(0)=\Theta\)</span> and <span class="math">\(\omega(0)=0\)</span>.</p>
+<p>Now the <tt class="docutils literal"><span class="pre">f</span></tt> function must return a list or array with the two
+right-hand side functions:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="n">theta</span><span class="p">,</span> <span class="n">omega</span> <span class="o">=</span> <span class="n">u</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">omega</span><span class="p">,</span> <span class="o">-</span><span class="n">c</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Note that when we have a system of ODEs with <tt class="docutils literal"><span class="pre">n</span></tt> components, the <tt class="docutils literal"><span class="pre">u</span></tt>
+object sent to the <tt class="docutils literal"><span class="pre">f</span></tt> function is an array of length <tt class="docutils literal"><span class="pre">n</span></tt>,
+representing the value of all components in the ODE system at time <tt class="docutils literal"><span class="pre">t</span></tt>.
+Here we extract the two components of <tt class="docutils literal"><span class="pre">u</span></tt> in separate local variables
+with names equal to what is used in the mathematical description of
+the current problem.</p>
+<p>The initial conditions must be specified as a list:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">method</span> <span class="o">=</span> <span class="n">odesolvers</span><span class="o">.</span><span class="n">Heun</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="n">method</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">([</span><span class="n">Theta</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>To specify the time points we here first decide on a number of periods
+(oscillations back and forth) to simulate and then on the time resolution
+of each period. (When <span class="math">\(\Theta\)</span> is small we can replace
+<span class="math">\(\sin\theta\)</span> by <span class="math">\(\theta\)</span> and find an analytical
+solution
+<span class="math">\(\theta (t)=\Theta\cos\left(\sqrt{c}t\right)\)</span>
+whose period is <span class="math">\(2\pi/\sqrt{c}\)</span>.)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">freq</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>      <span class="c"># frequency of oscillations when Theta is small</span>
+<span class="n">period</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="n">freq</span>  <span class="c"># the period of the oscillations</span>
+<span class="n">T</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="n">period</span>        <span class="c"># final time</span>
+<span class="n">N_per_period</span> <span class="o">=</span> <span class="mi">20</span>   <span class="c"># resolution of one period</span>
+<span class="n">N</span> <span class="o">=</span> <span class="n">N_per_period</span><span class="o">*</span><span class="n">period</span>
+<span class="n">time_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">time_points</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">u</span></tt> returned from <tt class="docutils literal"><span class="pre">method.solve</span></tt> is a two-dimensional array, where the
+columns hold the various solution functions of the ODE system. That is,
+the first column holds <span class="math">\(\theta\)</span> and the second column holds
+<span class="math">\(\omega\)</span>. For convenience we extract the individual solution
+components in individual arrays:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">theta</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">omega</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">theta_small</span> <span class="o">=</span> <span class="n">Theta</span><span class="o">*</span><span class="n">numpy</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="s">&#39;r-&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">theta_small</span><span class="p">,</span> <span class="s">&#39;y-&#39;</span><span class="p">)</span>
+<span class="n">legend</span><span class="p">([</span><span class="s">&#39;theta&#39;</span><span class="p">,</span> <span class="s">&#39;small angle approximation&#39;</span><span class="p">])</span>
+<span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.png&#39;</span><span class="p">)</span>
+<span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Looking at the plot reveals that the numerical solution has
+an alarming feature: the amplitude grows (indicating increasing
+energy in the system). Changing <tt class="docutils literal"><span class="pre">T</span></tt> to 28 periods instead of 10
+makes the numerical solution explode.</p>
+<div class="figure">
+<img alt="_images/exos1a.png" src="_images/exos1a.png" style="width: 500px;" />
+<p class="caption"><em>Comparison of large-amplitude numerical solution with corresponding analytical solution (derived for small amplitudes)</em></p>
+</div>
+<p>Changing solution method is a matter of substituting <tt class="docutils literal"><span class="pre">Heun</span></tt> by <tt class="docutils literal"><span class="pre">RK4</span></tt>,
+for instance:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">method</span> <span class="o">=</span> <span class="n">odesolvers</span><span class="o">.</span><span class="n">RK4</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The amplitude is now correct, but the numerical solution has a different
+frequency than the inaccurate analytical &#8220;solution&#8221;.</p>
+<div class="figure">
+<img alt="_images/exos1b.png" src="_images/exos1b.png" style="width: 500px;" />
+<p class="caption"><em>Switching to a 4-th order Runge-Kutta method improves the numerical solution</em></p>
+</div>
+<p>Changing <span class="math">\(\Theta\)</span> to a small value, say 0.05, makes the two curves
+coincide. The next section shows how easy it is to run a problem with a set
+of numerical methods.</p>
+</div>
+<div class="section" id="example-testing-several-methods">
+<h2>Example: Testing Several Methods<a class="headerlink" href="#example-testing-several-methods" title="Permalink to this headline">¶</a></h2>
+<p>We shall now make a more advanced solver by
+extending the previous example. More specifically, we shall</p>
+<blockquote>
+<div><ul class="simple">
+<li>represent the right-hand side function as class,</li>
+<li>compare several different solvers,</li>
+<li>compute error of numerical solutions.</li>
+</ul>
+</div></blockquote>
+<p>Since we want to compare numerical errors in the various
+solvers we need a test problem where the exact solution is known.
+Approximating <span class="math">\(\sin(\theta)\)</span> by <span class="math">\(\theta\)</span>
+(valid for small <span class="math">\(\theta\)</span>), gives the ODE system</p>
+<div class="math">
+\[\begin{split}\dot\theta &amp;= \omega,\\
+\dot\omega &amp;= -c\theta,\end{split}\]</div>
+<p>with <span class="math">\(\theta(0)=\Theta\)</span> and <span class="math">\(\omega(0)=0\)</span>.</p>
+<p>Right-hand side functions with parameters can be handled by
+including extra arguments via the <tt class="docutils literal"><span class="pre">f_args</span></tt> and <tt class="docutils literal"><span class="pre">f_kwargs</span></tt> functionality,
+or by using a class where the parameters are attributes and
+a <tt class="docutils literal"><span class="pre">__call__</span></tt> method makes the class instance callable as a function. The section <a class="reference internal" href="#ode-sec-exgr-farg"><em>Parameters in the Right-Hand Side Function</em></a> exemplifies the details.
+A minimal class representation of the right-hand side
+function in the present case looks like this:</p>
+<div class="highlight-py"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Problem</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">Theta</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Theta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">Theta</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">theta</span><span class="p">,</span> <span class="n">omega</span> <span class="o">=</span> <span class="n">u</span><span class="p">;</span>  <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">omega</span><span class="p">,</span> <span class="o">-</span><span class="n">c</span><span class="o">*</span><span class="n">theta</span><span class="p">]</span>
+
+<span class="n">problem</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">Theta</span><span class="o">=</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It would be convenient to add an attribute <tt class="docutils literal"><span class="pre">period</span></tt> which holds
+an estimate of the period of oscillations as we need this for
+deciding on the complete time interval for solving the differential
+equations. An appropriate extension of class <tt class="docutils literal"><span class="pre">Problem</span></tt> is therefore</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Problem</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">Theta</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Theta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">Theta</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">freq</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">freq</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">theta</span><span class="p">,</span> <span class="n">omega</span> <span class="o">=</span> <span class="n">u</span><span class="p">;</span>  <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">omega</span><span class="p">,</span> <span class="o">-</span><span class="n">c</span><span class="o">*</span><span class="n">theta</span><span class="p">]</span>
+
+<span class="n">problem</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">Theta</span><span class="o">=</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The second extension is to loop over many solvers. All
+solvers can be listed by</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">odesolvers</span><span class="o">,</span> <span class="nn">pprint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">solvers</span> <span class="o">=</span> <span class="n">list_all_solvers</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">solver</span> <span class="ow">in</span> <span class="n">solvers</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="k">print</span> <span class="n">solver</span>
+<span class="gp">...</span>
+<span class="go">AdamsBashMoulton2</span>
+<span class="go">AdamsBashMoulton3</span>
+<span class="go">AdamsBashforth2</span>
+<span class="go">AdamsBashforth3</span>
+<span class="go">AdamsBashforth4</span>
+<span class="go">AdaptiveResidual</span>
+<span class="go">Backward2Step</span>
+<span class="go">BackwardEuler</span>
+<span class="go">BogackiShampine</span>
+<span class="go">CashKarp</span>
+<span class="go">Dop853</span>
+<span class="go">Dopri5</span>
+<span class="go">DormandPrince</span>
+<span class="go">Fehlberg</span>
+<span class="go">Euler</span>
+<span class="go">ForwardEuler</span>
+<span class="go">Heun</span>
+<span class="go">Leapfrog</span>
+<span class="go">LeapfrogFiltered</span>
+<span class="go">Lsoda</span>
+<span class="go">Lsodar</span>
+<span class="go">Lsode</span>
+<span class="go">Lsodes</span>
+<span class="go">Lsodi</span>
+<span class="go">Lsodis</span>
+<span class="go">Lsoibt</span>
+<span class="go">MidpointImplicit</span>
+<span class="go">MidpointIter</span>
+<span class="go">MyRungeKutta</span>
+<span class="go">MySolver</span>
+<span class="go">RKC</span>
+<span class="go">RKF45</span>
+<span class="go">RK2</span>
+<span class="go">RungeKutta2</span>
+<span class="go">RK3</span>
+<span class="go">RungeKutta3</span>
+<span class="go">RK4</span>
+<span class="go">RungeKutta4</span>
+<span class="go">RKFehlberg</span>
+<span class="go">SymPy_odefun</span>
+<span class="go">ThetaRule</span>
+<span class="go">Trapezoidal</span>
+<span class="go">Vode</span>
+</pre></div>
+</div>
+<p>A similar function, <tt class="docutils literal"><span class="pre">list_available_solvers</span></tt>, returns a list of the
+names of the solvers that are available in the current installation
+(e.g., the <tt class="docutils literal"><span class="pre">Vode</span></tt> solver is only available if the comprehensive
+<tt class="docutils literal"><span class="pre">scipy</span></tt> package is installed).
+This is the list that is usually most relevant.</p>
+<p>For now we explicitly choose a subset of the commonly available solvers:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">odesolvers</span>
+<span class="n">solvers</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">odesolvers</span><span class="o">.</span><span class="n">ThetaRule</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>   <span class="c"># Forward Euler</span>
+    <span class="n">odesolvers</span><span class="o">.</span><span class="n">ThetaRule</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span> <span class="c"># Midpoint</span>
+    <span class="n">odesolvers</span><span class="o">.</span><span class="n">ThetaRule</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>   <span class="c"># Backward Euler</span>
+    <span class="n">odesolvers</span><span class="o">.</span><span class="n">RK4</span><span class="p">(</span><span class="n">problem</span><span class="p">),</span>
+    <span class="n">odesolvers</span><span class="o">.</span><span class="n">MidpointIter</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">eps_iter</span><span class="o">=</span><span class="mf">0.01</span><span class="p">),</span>
+    <span class="n">odesolvers</span><span class="o">.</span><span class="n">LeapfrogFiltered</span><span class="p">(</span><span class="n">problem</span><span class="p">),</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+<p>It will be evident that the <tt class="docutils literal"><span class="pre">ThetaRule</span></tt> solver with <tt class="docutils literal"><span class="pre">theta=0</span></tt> and
+<tt class="docutils literal"><span class="pre">theta=1</span></tt> (Forward and Backward Euler methods) gives growing and
+decaying amplitudes, respectively, while the other solvers are
+capable of reproducing the constant amplitude of the oscillations of
+in the current mathematical model.</p>
+<p>The loop over the chosen solvers may look like</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">N_per_period</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">T</span> <span class="o">=</span> <span class="mi">3</span><span class="o">*</span><span class="n">problem</span><span class="o">.</span><span class="n">period</span>   <span class="c"># final time</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">mpl</span>
+<span class="n">legends</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">solvers</span><span class="p">:</span>
+    <span class="n">method_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">method_name</span>
+
+    <span class="n">method</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">([</span><span class="n">problem</span><span class="o">.</span><span class="n">Theta</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">N_per_period</span><span class="o">*</span><span class="n">problem</span><span class="o">.</span><span class="n">period</span>
+    <span class="n">time_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">time_points</span><span class="p">)</span>
+
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">legends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">method_name</span><span class="p">)</span>
+    <span class="n">mpl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+    <span class="n">mpl</span><span class="o">.</span><span class="n">hold</span><span class="p">(</span><span class="s">&#39;on&#39;</span><span class="p">)</span>
+<span class="n">mpl</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legends</span><span class="p">)</span>
+<span class="n">mpl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">__file__</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;.png&#39;</span><span class="p">)</span>
+<span class="n">mpl</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="figure">
+<img alt="_images/exos2.png" src="_images/exos2.png" style="width: 500px;" />
+<p class="caption"><em>Comparison of solutions</em></p>
+</div>
+<p>We can extend this program to compute the error in each numerical
+solution for different time step sizes.
+Let <tt class="docutils literal"><span class="pre">results</span></tt> be a dictionary with the method name as
+key, containing two sub dictionaries <tt class="docutils literal"><span class="pre">dt</span></tt> and <tt class="docutils literal"><span class="pre">error</span></tt>, which hold
+a sequence of time steps and a sequence of corresponding
+errors, respectively. The errors are computed by subtracting
+the numerical solution from the exact solution,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">theta_exact</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">problem</span><span class="o">.</span><span class="n">Theta</span><span class="o">*</span><span class="n">numpy</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">c</span><span class="p">)</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+<span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">time_points</span><span class="p">)</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">error</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">theta_exact</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The so-called L2 norm of the <tt class="docutils literal"><span class="pre">error</span></tt> array is a suitable
+scalar error measure (square root of total error squared and integrated,
+here numerically):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">error_L2</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">error</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">dt</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <tt class="docutils literal"><span class="pre">dt</span></tt> is the time step size.</p>
+<p>Typical loops over solvers and resolutions look as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">T</span> <span class="o">=</span> <span class="n">num_periods</span><span class="o">*</span><span class="n">problem</span><span class="o">.</span><span class="n">period</span>       <span class="c"># final time</span>
+<span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">resolutions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">160</span><span class="p">]</span>  <span class="c"># intervals per period</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">solvers</span><span class="p">:</span>
+    <span class="n">method_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="n">method_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;dt&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+
+    <span class="n">method</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">([</span><span class="n">problem</span><span class="o">.</span><span class="n">Theta</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">N_per_period</span> <span class="ow">in</span> <span class="n">resolutions</span><span class="p">:</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">N_per_period</span><span class="o">*</span><span class="n">problem</span><span class="o">.</span><span class="n">period</span>
+        <span class="n">time_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">time_points</span><span class="p">)</span>
+
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">theta_exact</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span>
+        <span class="n">error_L2</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">error</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">N</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">error_L2</span><span class="p">):</span>  <span class="c"># drop nan</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">method_name</span><span class="p">][</span><span class="s">&#39;dt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">method_name</span><span class="p">][</span><span class="s">&#39;error&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_L2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Assuming the error to be of the form <span class="math">\(C\Delta t^r\)</span>, we can estimate
+<span class="math">\(C\)</span> and <span class="math">\(r\)</span> from two consequtive experiments to obtain a sequence
+of <span class="math">\(r\)</span> values which (hopefully) convergences to a value that we can
+view as the empirical convergence rate of a method.
+Given the sequence of time steps and errors, a function in
+the <tt class="docutils literal"><span class="pre">scitools</span></tt> package automatically computes the sequence of
+<span class="math">\(r\)</span> values:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Analyze convergence</span>
+<span class="kn">from</span> <span class="nn">scitools.convergencerate</span> <span class="kn">import</span> <span class="n">OneDiscretizationPrm</span>
+<span class="n">pairwise_rates</span> <span class="o">=</span> <span class="n">OneDiscretizationPrm</span><span class="o">.</span><span class="n">pairwise_rates</span>  <span class="c"># short form</span>
+
+<span class="k">print</span> <span class="s">&#39;</span><span class="se">\n\n</span><span class="s">Convergence results for </span><span class="si">%d</span><span class="s"> periods&#39;</span> <span class="o">%</span> <span class="n">num_periods</span>
+<span class="k">for</span> <span class="n">method_name</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="n">rates</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">pairwise_rates</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">method_name</span><span class="p">][</span><span class="s">&#39;dt&#39;</span><span class="p">],</span>
+                              <span class="n">results</span><span class="p">[</span><span class="n">method_name</span><span class="p">][</span><span class="s">&#39;error&#39;</span><span class="p">])</span>
+    <span class="n">rates</span> <span class="o">=</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;</span><span class="si">%.1f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">rate</span> <span class="k">for</span> <span class="n">rate</span> <span class="ow">in</span> <span class="n">rates</span><span class="p">])</span>
+    <span class="k">print</span> <span class="s">&#39;</span><span class="si">%-20s</span><span class="s"> r: </span><span class="si">%s</span><span class="s"> E_min=</span><span class="si">%.1E</span><span class="s">&#39;</span> <span class="o">%</span> \
+          <span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="n">rates</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">method_name</span><span class="p">][</span><span class="s">&#39;error&#39;</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>With 4 periods we get</p>
+<div class="highlight-python"><pre>ThetaRule(theta=0)   r: 2.9, 1.9, 1.4, 1.2 E_min=1.1E-01
+RK2                  r: 2.1, 2.0, 2.0, 2.0 E_min=8.4E-04
+ThetaRule(theta=1)   r: 0.3, 0.5, 0.7, 0.8 E_min=9.0E-02
+RK4                  r: 4.0, 4.0, 4.0, 4.0 E_min=2.6E-08
+ThetaRule            r: 2.0, 2.0, 2.0, 2.0 E_min=4.2E-04
+Leapfrog             r: 2.1, 2.0, 2.0, 2.0 E_min=8.5E-04
+LeapfrogFiltered     r: 0.2, 0.4, 0.6, 0.8 E_min=1.3E-01</pre>
+</div>
+<p>The rates of the Forward and Backward Euler methods (1st and 3rd line) have
+not yet converged to unity, as expected, while the 2nd-order
+Runge-Kutta method, Leapfrog, and the $theta$|$theta$-rule with <span class="math">\(\theta =0.5\)</span>
+(<tt class="docutils literal"><span class="pre">ThetaRule</span></tt> with default value of <tt class="docutils literal"><span class="pre">theta</span></tt>) shows the expected
+<span class="math">\(r=2\)</span> value. The 4th-order Runge-Kutta holds the promise of being of 4th
+order, while the filtered Leapfrog method has slow convergence and
+a fairly large error, which is also evident in the previous figure.</p>
+<p>Extending the time domain to 20 periods makes many of the
+simplest methods inaccurate and the rates computed on coarse
+time meshes are irrelevnat:</p>
+<div class="highlight-python"><pre>ThetaRule(theta=0)   r: 10.4, 22.0, 18.2, 10.4 E_min=3.3E+02
+RK2                  r: 51.4, 16.1, 2.3, 2.1 E_min=1.1E-01
+ThetaRule(theta=1)   r: 11.2, 0.0, 0.1 E_min=5.0E-01
+RK4                  r: 1.0, 3.6, 4.0, 4.0 E_min=8.2E-05
+ThetaRule            r: 87.8, 0.2, 1.7, 2.0 E_min=5.3E-02
+Leapfrog             r: 95.9, 18.0, 1.0, 2.0 E_min=1.1E-01
+LeapfrogFiltered     r: -0.0, 121.2, 0.3, 0.1 E_min=5.2E-01</pre>
+</div>
+</div>
+<div class="section" id="example-solving-a-stochastic-differential-equation">
+<h2>Example: Solving a Stochastic Differential Equation<a class="headerlink" href="#example-solving-a-stochastic-differential-equation" title="Permalink to this headline">¶</a></h2>
+<p>We consider an oscillator driven by stochastic white noise:</p>
+<div class="math">
+\[x''(t) + bx'(t) + cx(t) = N(t),\ x(0)=X,\ x'(0) =0,\]</div>
+<p>where <span class="math">\(N(t)\)</span> is the white noise computed discretely as</p>
+<div class="math">
+\[N(t_i) \approx \sigma\frac{\Delta W_i}{\sqrt{t_{i+1}-t_i}},\]</div>
+<p>where <span class="math">\(\Delta W_1,\Delta W_2,\ldots\)</span> are independent normally
+distributed random variables with mean zero and unit standard
+deviation, and <span class="math">\(\sigma\)</span> is the strength of the noise.
+The idea is that <span class="math">\(N(t)\)</span> provides an excitation containing &#8220;all&#8221; frequencies,
+but the oscillator is a strong filter: with low damping one of the
+frequencies in <span class="math">\(N(t)\)</span> will hit the resonance frequency
+<span class="math">\(\sqrt{c}/(2\pi)\)</span> which will
+then dominate the output signal <span class="math">\(x(t)\)</span>.</p>
+<p>The noise is additive in this stochastic differential equation so
+there is no difference between the Ito and Stratonovich interpretations
+of the equation.</p>
+<p>The challenge with this model problem is that stochastic differential
+equations do not fit with the user interface offered by <tt class="docutils literal"><span class="pre">odesolvers</span></tt>,
+since the right-hand side function is assumed to be dependent only
+on the solution and the present time (<tt class="docutils literal"><span class="pre">f(u,t)</span></tt>), and additional
+user-defined parameters, but for the present problem the right-hand
+side function needs information about <span class="math">\(N(t)\)</span> and hence
+the size of the current time step. We can solve this issue by
+having a reference to the solver in the right-hand side function,
+precomputing <span class="math">\(N(t_i)\)</span> for all time intervals <span class="math">\(i\)</span>, and using the <tt class="docutils literal"><span class="pre">n</span></tt>
+attribute in the solver for selecting the right force term (recall
+that some methods will call the right-hand side function many times
+during a time interval - all these calls must use the same value of
+the white noise).</p>
+<p>The right-hand side function must do many things so a class is
+appropriate:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">WhiteNoiseOscillator</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">sigma</span>
+
+    <span class="k">def</span> <span class="nf">connect_solver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solver</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Solver is needed for time step number and size.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="n">solver</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;N&#39;</span><span class="p">):</span>
+            <span class="c"># Compute N(t) for all time intervals</span>
+            <span class="kn">import</span> <span class="nn">numpy</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">t</span>
+            <span class="n">dW</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="o">*</span><span class="n">dW</span><span class="o">/</span><span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+
+        <span class="n">x</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">u</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">n</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">,</span> <span class="n">N</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">*</span><span class="n">v</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">*</span><span class="n">x</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>We can easily compare different methods:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">f</span> <span class="o">=</span> <span class="n">WhiteNoiseOscillator</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="n">odesolvers</span><span class="o">.</span><span class="n">Heun</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">odesolvers</span><span class="o">.</span><span class="n">RK4</span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
+           <span class="n">odesolvers</span><span class="o">.</span><span class="n">ForwardEuler</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span>
+<span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">connect_solver</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="n">method</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>  <span class="c"># start from rest</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="mi">60</span>   <span class="c"># with c=pi**2, the period is 1</span>
+    <span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="mi">10001</span><span class="p">))</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">hold</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">legend</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="figure">
+<img alt="_images/exsos1.png" src="_images/exsos1.png" style="width: 500px;" />
+<p class="caption"><em>Oscillator driven by white noise</em></p>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">Heun</span></tt> and <tt class="docutils literal"><span class="pre">RK2</span></tt> methods give coinciding solutions while
+the <tt class="docutils literal"><span class="pre">ForwardEuler</span></tt> method gives too large amplitudes.
+The frequency is 0.5 (period 2) as expected.</p>
+<p>In this example the white noise force is computed only once since
+the <tt class="docutils literal"><span class="pre">f</span></tt> instance is reused in all methods. If a new <tt class="docutils literal"><span class="pre">f</span></tt> is created
+for each method, it is crucial that the same seed of the random
+generator is used for all methods, so that the time evolution of
+the force is always the same - otherwise the solutions will be
+different.</p>
+</div>
+</div>
+<div class="section" id="inner-workings-of-the-package">
+<h1>Inner Workings of the Package<a class="headerlink" href="#inner-workings-of-the-package" title="Permalink to this headline">¶</a></h1>
+<p>The solvers are organized as classes in a class hierarchy with class
+<tt class="docutils literal"><span class="pre">Solver</span></tt> as superclass. Each class is initialized by the right-hand
+side function (<tt class="docutils literal"><span class="pre">f</span></tt>) and an optional set of parameters for controlling
+various parts of the solution process. Below we describe how the
+superclass and its subclasses work and how parameters are registered
+and initialized.</p>
+<div class="section" id="solver-parameters">
+<span id="odes-parameters"></span><h2>Solver Parameters<a class="headerlink" href="#solver-parameters" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">ODE</span></tt> module defines a global dictionary <tt class="docutils literal"><span class="pre">_parameters</span></tt> holding
+all legal parameters. Other modules imports this <tt class="docutils literal"><span class="pre">_parameters</span></tt> dict
+and updates it with their own additional parameters.</p>
+<p>For each parameter the <tt class="docutils literal"><span class="pre">_parameters</span></tt> dict stores the parameter name, a
+default value, a description, the legal object type for the value of
+the parameter, and other quantities if needed. A typical example
+is</p>
+<div class="highlight-py"><pre>_parameters = dict(
+...
+
+f = dict(
+    help='Right-hand side f(u,t) defining the ODE',
+    type=callable),
+
+f_kwargs = dict(
+    help='Extra keyword arguments to f: f(u, t, *f_args, **f_kwargs)',
+    type=dict,
+    default={}),
+
+theta = dict(
+    help="""Weight in [0,1] used for
+"theta-rule" finite difference approx.""",
+    default=0.5,
+    type=(int,float),
+    range=[0, 1])
+
+...
+}</pre>
+</div>
+<p>Each solver class defines a (static) class variable
+<tt class="docutils literal"><span class="pre">_required_parameters</span></tt> for holding the names of all required
+parameters (in a list). In addition, each solver class defines another
+class variable <tt class="docutils literal"><span class="pre">_optional_parameters</span></tt> holding the names of all the
+optional parameters. The doc strings of the solver classes are
+automatically equipped with tables of required and optional
+parameters.</p>
+<p>The optional parameters of a class consists of the optional parameters
+of the superclass and those specific to the class. The typical
+initialization of <tt class="docutils literal"><span class="pre">_optional_parameters</span></tt> goes like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">SomeMethod</span><span class="p">(</span><span class="n">ParentMethod</span><span class="p">):</span>
+    <span class="n">_optional_parameters</span> <span class="o">=</span> <span class="n">ParentMethod</span><span class="o">.</span><span class="n">_optional_parameters</span> <span class="o">+</span> \
+                           <span class="p">[</span><span class="s">&#39;prm1&#39;</span><span class="p">,</span> <span class="s">&#39;prm2&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>where <tt class="docutils literal"><span class="pre">prm1</span></tt>, <tt class="docutils literal"><span class="pre">prm2</span></tt>, etc. are names registered in the global
+<tt class="docutils literal"><span class="pre">_parameters</span></tt> dictionary.</p>
+<p>From a user&#8217;s point of view, the parameters are set either at
+construction time or through the <tt class="docutils literal"><span class="pre">set</span></tt> function:</p>
+<div class="highlight-py"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">odesolvers</span> <span class="kn">import</span> <span class="n">RK2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="k">return</span> <span class="n">a</span><span class="o">*</span><span class="n">u</span> <span class="o">+</span> <span class="n">b</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">method</span> <span class="o">=</span> <span class="n">RK2</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">f_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">method</span><span class="o">.</span><span class="n">f_kwargs</span>
+<span class="go">{&#39;b&#39;: 1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">method</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">f_args</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">method</span><span class="o">.</span><span class="n">f_args</span>
+<span class="go">(3,)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Get all registered parameters in the method instance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">method</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="go">{&#39;f_kwargs&#39;: {&#39;b&#39;: 1}, &#39;f_args&#39;: (3,), &#39;complex_valued&#39;: False,</span>
+<span class="go">&#39;name of f&#39;: &#39;f&#39;}</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">set</span></tt> method sets parameters through keyword arguments and can
+take an arbitrary collection of such arguments:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">method</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">name1</span><span class="o">=</span><span class="n">value1</span><span class="p">,</span> <span class="n">name2</span><span class="o">=</span><span class="n">value2</span><span class="p">,</span> <span class="n">name3</span><span class="o">=</span><span class="n">value3</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">get</span></tt> method returns the parameters and their values as a dictionary.
+(Note that the <tt class="docutils literal"><span class="pre">'f'</span></tt> key, which one might expect to appear in the
+returned dictionary of parameters, are omitted because it is always
+a lambda function wrapping the user&#8217;s <tt class="docutils literal"><span class="pre">f</span></tt> function such that the
+returned value is guaranteed to be a <tt class="docutils literal"><span class="pre">numpy</span></tt> array. Instead,
+there is an entry <tt class="docutils literal"><span class="pre">'name</span> <span class="pre">of</span> <span class="pre">f'</span></tt> which reflects the name of the
+user-supplied function.)</p>
+</div>
+<div class="section" id="solver-classes">
+<h2>Solver Classes<a class="headerlink" href="#solver-classes" title="Permalink to this headline">¶</a></h2>
+<p>Each solver in this package is implemented as a class in a class hierarchy.
+Basic, common functionality is inherited from super classes, and the
+actual solver class implements what is specific for the method in question.</p>
+<div class="section" id="the-super-class">
+<h3>The Super Class<a class="headerlink" href="#the-super-class" title="Permalink to this headline">¶</a></h3>
+<p>Class <tt class="docutils literal"><span class="pre">Solver</span></tt> is the super class of the hierarchy. Its constructor
+requires one mandatory argument: the right-hand side of the ODE,
+<span class="math">\(f(u,t)\)</span>, coded as a Python function <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t)</span></tt> or given as a string
+containing code in a compiled language (Fortran, for instance)
+implementing the right-hand side.  Additional keyword arguments can be
+provided to set parameters of the solver.</p>
+<p>The constructor performs a set of tasks that are common to all
+the subclass solvers:</p>
+<ol class="arabic simple">
+<li>The set of optional and required parameters of a particular solver
+is loaded into <tt class="docutils literal"><span class="pre">self._parameters</span></tt> such that this dictionary
+can be used to look up all parameters of the solver.</li>
+<li>Representation of <span class="math">\(f(u, t)\)</span> (or the Jacobian) in a compiled language
+is compiled into an extension module.</li>
+<li>The solver-specific method <tt class="docutils literal"><span class="pre">adjust_parameters</span></tt> is called to allow
+the programmer of a solver to manipulate <tt class="docutils literal"><span class="pre">self._parameters</span></tt>.
+For example, some existing or new parameters may be modified or set
+according to the value of other parameters.</li>
+<li>All key-value pairs in <tt class="docutils literal"><span class="pre">self._parameters</span></tt> are mirrored by class
+attributes. The computations and the <tt class="docutils literal"><span class="pre">set</span></tt> and <tt class="docutils literal"><span class="pre">get</span></tt> methods will
+make use of the attributes rather than the <tt class="docutils literal"><span class="pre">self._parameters</span></tt> dict
+to extract data.  For example, the value of
+<tt class="docutils literal"><span class="pre">self._parameters['myvar']</span></tt> becomes available as <tt class="docutils literal"><span class="pre">self.myvar</span></tt> and
+in the algorithms we use <tt class="docutils literal"><span class="pre">self.myvar</span></tt>, perhaps with a test
+<tt class="docutils literal"><span class="pre">hasattr(self,</span> <span class="pre">'myvar')</span></tt> test or a <cite>try</cite>-<cite>except</cite> clause (catching
+an <tt class="docutils literal"><span class="pre">AttributeError</span></tt>).</li>
+<li>The <tt class="docutils literal"><span class="pre">set</span></tt> method is called with all keyword arguments to the
+constructor, which then modifies the default values of the
+parameters.</li>
+<li>The <tt class="docutils literal"><span class="pre">f</span></tt> function is wrapped in a lambda function such that
+<tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t)</span></tt> is guaranteed to return an array (in case the user
+returns a list or scalar for convenience).</li>
+<li>The <tt class="docutils literal"><span class="pre">initialize</span></tt> method is called to finalize the tasks in
+the constructor. The most common use of this method in subclasses
+is to import extension modules that the solver depends on and
+provide an error message if the extension modules are not available.
+If they are, the modules are normally stored through an attribute
+of the subclass.</li>
+<li>The <tt class="docutils literal"><span class="pre">switch_to</span></tt> method returns a new solver initialized with all
+parameters of the current solver that are legal in the new solver.
+The method is useful when trying out a range of solvers for a
+problem.</li>
+</ol>
+<p>Let <tt class="docutils literal"><span class="pre">method</span></tt> some instance of a subclass in the hierarchy. The
+following calls are possible (through inheriting common convenience
+methods in the super class <tt class="docutils literal"><span class="pre">Solver</span></tt>):</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">repr(method)</span></tt>: return the subclass name along with all
+registered parameters and their values. This string provides
+complete information on the state of a subclass.</li>
+<li><tt class="docutils literal"><span class="pre">str(method)</span></tt>: return a short pretty print string reflecting
+the name of the method and the value of parameters that
+must be known to uniquely define the numerical method.
+This string is what one would use as legends in a plot or
+as method identifier in a table.</li>
+<li><tt class="docutils literal"><span class="pre">method.get_parameter_info</span></tt>: return or print all registered
+parameters for the current solver and all properties for
+each parameter.</li>
+</ul>
+</div></blockquote>
+<p>After the constructor is called, <tt class="docutils literal"><span class="pre">method.set_initial_condition</span></tt> is
+called to set the initial condition, and then <tt class="docutils literal"><span class="pre">solve</span></tt> is called.
+The <tt class="docutils literal"><span class="pre">solve</span></tt> method features the following steps:</p>
+<ol class="arabic simple">
+<li>Convert <tt class="docutils literal"><span class="pre">time_points</span></tt> to a <tt class="docutils literal"><span class="pre">numpy</span></tt> array.</li>
+<li>Call <tt class="docutils literal"><span class="pre">initialize_for_solve</span></tt> (implemented in subclasses) to
+precompute whatever is needed before the time loop.
+The super class allocates storage for the solution and
+loads the initial condition into that data structure.
+Any subclass implementation of <tt class="docutils literal"><span class="pre">initialize_for_solve</span></tt> must therefore
+also call this method in its super class.</li>
+<li>Call <tt class="docutils literal"><span class="pre">validate_data</span></tt> to check if the data structures are consistent
+before starting the computations. Subclass implementations of
+this method must call the super class&#8217; version of the method.</li>
+<li>Run a loop over all time levels <tt class="docutils literal"><span class="pre">n</span></tt> and call <tt class="docutils literal"><span class="pre">advance</span></tt> (implemented
+in subclasses) at each level to advance the solution from
+time <tt class="docutils literal"><span class="pre">t[n]</span></tt> to <tt class="docutils literal"><span class="pre">t[n+1]</span></tt>. Also call <tt class="docutils literal"><span class="pre">terminate</span></tt> so that the
+user code can analyze and work with the solution.</li>
+</ol>
+<p>Some subclasses will override the <tt class="docutils literal"><span class="pre">solve</span></tt> method and provide their own,
+but most subclasses just inherits the general one and implement
+the <tt class="docutils literal"><span class="pre">advance</span></tt> method.</p>
+<p>All classes have a set of attributes:</p>
+<ol class="arabic simple">
+<li><tt class="docutils literal"><span class="pre">users_f</span></tt> holding the user&#8217;s function for <span class="math">\(f(u, t)\)</span>
+(implicit solvers will have a corresponding <tt class="docutils literal"><span class="pre">users_jac</span></tt> for
+the user&#8217;s Jacobian),</li>
+<li>one attribute for each parameter in the class,</li>
+<li><tt class="docutils literal"><span class="pre">u</span></tt>: 1D <tt class="docutils literal"><span class="pre">numpy</span></tt> array holding the solution for a scalar ODE and
+a 2D array in case of a system of ODEs. The first index
+denotes the time level.</li>
+<li><tt class="docutils literal"><span class="pre">t</span></tt>: the time levels corresponding to the first index in the <tt class="docutils literal"><span class="pre">u</span></tt> array.</li>
+<li><tt class="docutils literal"><span class="pre">quick_description</span></tt>: a short one-line description of the method (this
+variable is static in the class, i.e., declared outside any method).</li>
+</ol>
+<p>Most classes will also define two additional static variables,
+<tt class="docutils literal"><span class="pre">_required_parameters</span></tt> and <tt class="docutils literal"><span class="pre">_optional_parameters</span></tt> as explained
+in the section <a class="reference internal" href="#odes-parameters"><em>Solver Parameters</em></a>.</p>
+</div>
+<div class="section" id="other-superclasses">
+<h3>Other Superclasses<a class="headerlink" href="#other-superclasses" title="Permalink to this headline">¶</a></h3>
+<p>There are superclasses <tt class="docutils literal"><span class="pre">SolverImplicit</span></tt> for implicit methods,
+<tt class="docutils literal"><span class="pre">Adaptive</span></tt> for adaptive methods, &#8216;RungeKutta&#8217; for general
+Runge-Kutta methods, <tt class="docutils literal"><span class="pre">Ode_scipy</span></tt> for interfaces to ODE solvers
+in <tt class="docutils literal"><span class="pre">scipy</span></tt>, and <tt class="docutils literal"><span class="pre">Odepack</span></tt> for interfaces to the ODEPACK family
+of solvers.</p>
+</div>
+<div class="section" id="a-very-simple-subclass">
+<h3>A Very Simple Subclass<a class="headerlink" href="#a-very-simple-subclass" title="Permalink to this headline">¶</a></h3>
+<p>To implement a simple explicit scheme for solving a scalar ODE or a system
+of ODEs, you only need to write a subclass of <tt class="docutils literal"><span class="pre">Solver</span></tt> with an
+<tt class="docutils literal"><span class="pre">advance</span></tt> method containing the formula that updates the solution from
+one time level to the next. For example, the Forward Euler scheme
+reads</p>
+<div class="math">
+\[u_{n+1} = u_n + \Delta t f(u_n, t_n),\]</div>
+<p>where subscript <span class="math">\(n\)</span> denotes the time level, and <span class="math">\(\Delta t = t_{n+1}-t_n\)</span> is
+the current time step.
+The implementation goes like</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ForwardEuler</span><span class="p">(</span><span class="n">Solver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Forward Euler scheme::</span>
+
+<span class="sd">        u[n+1] = u[n] + dt*f(u[n], t[n])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quick_description</span> <span class="o">=</span> <span class="s">&#39;The simple explicit (forward) Euler scheme&#39;</span>
+
+    <span class="k">def</span> <span class="nf">advance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">u</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+        <span class="n">unew</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span><span class="o">*</span><span class="n">f</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">unew</span>
+</pre></div>
+</div>
+<p>Remarks:</p>
+<ol class="arabic simple">
+<li>The <tt class="docutils literal"><span class="pre">quick_description</span></tt> is necessary for the class to appear in the
+automatically generated overview of implemented methods
+(run <tt class="docutils literal"><span class="pre">pydoc</span> <span class="pre">odesolvers</span></tt> to see this table).</li>
+<li>Extracting class attributes in local variables (here <tt class="docutils literal"><span class="pre">u</span></tt>, <tt class="docutils literal"><span class="pre">f</span></tt>, etc.)
+avoids the need for the <tt class="docutils literal"><span class="pre">self</span></tt> prefix so that the implemented formulas
+are as close to the mathematical formulas as possible.</li>
+</ol>
+<p>Almost equally simple schemes, like explicit Runge-Kutta methods and Heun&#8217;s
+method are implemented in the same way (see <tt class="docutils literal"><span class="pre">ODE.py</span></tt>).</p>
+</div>
+<div class="section" id="a-subclass-with-more-code">
+<h3>A Subclass with More Code<a class="headerlink" href="#a-subclass-with-more-code" title="Permalink to this headline">¶</a></h3>
+<p>A 2nd-order Adams-Bashforth scheme is a bit more complicated since it
+involves three time levels and therefore needs a separate method for
+the first step. We should also avoid unnecessary evaluations of <span class="math">\(f(u,t)\)</span>.
+The user can specify a parameter <tt class="docutils literal"><span class="pre">start_method</span></tt> for the name of the
+solver to be used for the first step. This solver is initialized
+by the <tt class="docutils literal"><span class="pre">switch_to</span></tt> method in class <tt class="docutils literal"><span class="pre">Solver</span></tt>. Basically,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">new_solver</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">switch_to</span><span class="p">(</span><span class="n">solver_name</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>creates a new solver instance <tt class="docutils literal"><span class="pre">new_solver</span></tt>, of the class implied by
+<tt class="docutils literal"><span class="pre">solver_name</span></tt>, where all relevant parameters from <tt class="docutils literal"><span class="pre">solver</span></tt> are coopied
+to <tt class="docutils literal"><span class="pre">new_solver</span></tt>.</p>
+<p>An implementation of a subclass for the
+2nd-order Adams-Bashforth scheme can then look as follows.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">AdamsBashforth2</span><span class="p">(</span><span class="n">Solver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Second-order Adams-Bashforth method::</span>
+
+<span class="sd">        u[n+1] = u[n] + dt/2.*(3*f(u[n], t[n]) - f(u[n-1], t[n-1]))</span>
+
+<span class="sd">    for constant time step dt.</span>
+
+<span class="sd">    RK2 is used as default solver in first step.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quick_description</span> <span class="o">=</span> <span class="s">&quot;Explicit 2nd-order Adams-Bashforth method&quot;</span>
+
+    <span class="n">_optional_parameters</span> <span class="o">=</span> <span class="n">Solver</span><span class="o">.</span><span class="n">_optional_parameters</span> <span class="o">+</span> <span class="p">[</span><span class="s">&#39;start_method&#39;</span><span class="p">,]</span>
+
+    <span class="k">def</span> <span class="nf">initialize_for_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># New solver instance for first step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">starter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">switch_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_method</span><span class="p">)</span>
+        <span class="n">Solver</span><span class="o">.</span><span class="n">initialize_for_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">validate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant_time_step</span><span class="p">():</span>
+            <span class="k">print</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> must have constant time step&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name__</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">advance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">u</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>  <span class="c"># must be constant</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f_n</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+            <span class="n">unew</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span><span class="o">/</span><span class="mf">2.</span><span class="o">*</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">f_n</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_n_1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f_n_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_n</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># User-specified method for the first step</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">starter</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+            <span class="n">time_points</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">u_starter</span><span class="p">,</span> <span class="n">t_starter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">starter</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">time_points</span><span class="p">)</span>
+            <span class="n">unew</span> <span class="o">=</span> <span class="n">u_starter</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f_n_1</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">unew</span>
+</pre></div>
+</div>
+<p>Three features are worth comments: 1) we extend the set of optional
+parameters; 2) we must initialize a separate solver for the first
+step, and this is done in the <tt class="docutils literal"><span class="pre">initialize_for_solve</span></tt> method that will
+be called as part of <tt class="docutils literal"><span class="pre">solve</span></tt> (before the time stepping); and 3) we
+extend <tt class="docutils literal"><span class="pre">validate_data</span></tt> to check that the time spacing given by the
+<tt class="docutils literal"><span class="pre">time_points</span></tt> argument to <tt class="docutils literal"><span class="pre">solve</span></tt> is constant. The utility method
+<tt class="docutils literal"><span class="pre">constant_time_step</span></tt> provided in super class <tt class="docutils literal"><span class="pre">Solver</span></tt> carries out the
+details of the check.</p>
+<p>More advanced implementations of subclasses can be studied
+in the <tt class="docutils literal"><span class="pre">ODE.py</span></tt> and <tt class="docutils literal"><span class="pre">RungeKutta.py</span></tt> files.</p>
+</div>
+<div class="section" id="a-simple-example-of-an-implicit-method">
+<h3>A Simple Example of an Implicit Method<a class="headerlink" href="#a-simple-example-of-an-implicit-method" title="Permalink to this headline">¶</a></h3>
+<p>Class <tt class="docutils literal"><span class="pre">SolverImplicit</span></tt> acts as superclass for the implementation of
+implicit methods. This class provides some basic functionality for
+solving the system of nonlinear equations that normally arise in
+implicit methods by Picard or Newton iteration.
+The parameter <tt class="docutils literal"><span class="pre">nonlinear_solver</span></tt> can take the values <tt class="docutils literal"><span class="pre">Picard</span></tt> or
+<tt class="docutils literal"><span class="pre">Newton</span></tt>. The user must provide in case of Newton&#8217;s method provide
+a <tt class="docutils literal"><span class="pre">jac</span></tt> parameter for a function evaluating the Jacobian of <span class="math">\(f(u,t)\)</span>
+with respect to <span class="math">\(u\)</span>: <span class="math">\(J_{i,j} = \partial f_i/\partial u_j\)</span>.</p>
+<p>Instead of implementing an <tt class="docutils literal"><span class="pre">advance</span></tt> method in subclasses, one provides
+a method <tt class="docutils literal"><span class="pre">Picard</span></tt> and/or <tt class="docutils literal"><span class="pre">Newton</span></tt> to define key quantities in these
+methods. The superclass implements <tt class="docutils literal"><span class="pre">advance</span></tt>, which will run a Picard
+or Newton iteration. The <tt class="docutils literal"><span class="pre">Picard</span></tt> method returns all the terms
+on the right-hand side of the discrete equation when only <tt class="docutils literal"><span class="pre">u[n+1]</span></tt> is
+on the left-hand side. <tt class="docutils literal"><span class="pre">Newton</span></tt> returns the right-hand side and the
+Jacobian of the system to be solved in each Newton iteration.</p>
+<p>Here is an example showing how to implement the Backward Euler method.</p>
+<div class="highlight-py"><div class="highlight"><pre><span class="k">class</span> <span class="nc">BackwardEuler</span><span class="p">(</span><span class="n">SolverImplicit</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implicit Backward Euler method::</span>
+
+<span class="sd">       u[n+1] = u[n] + dt*f(t[n+1], u[n+1])</span>
+
+<span class="sd">    The nonlinear system is solved by Newton or Picard iteration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quick_description</span> <span class="o">=</span> <span class="s">&quot;Implicit 1st-order Backward Euler method&quot;</span>
+
+    <span class="k">def</span> <span class="nf">Picard_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ukp1</span><span class="p">):</span>
+        <span class="n">u</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span><span class="o">*</span><span class="n">f</span><span class="p">(</span><span class="n">ukp1</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">Newton_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ukp1</span><span class="p">):</span>
+        <span class="n">u</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">ukp1</span> <span class="o">-</span> <span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span><span class="o">*</span><span class="n">f</span><span class="p">(</span><span class="n">ukp1</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">neq</span><span class="p">)</span> <span class="o">-</span> <span class="n">dt</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">jac</span><span class="p">(</span><span class="n">ukp1</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">F</span><span class="p">,</span> <span class="n">J</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">odesolvers</span></tt> package is most easily installed by checkout out
+the latest version of the source code:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">git clone git@github.com:hplgit/odesolvers.git</span>
+<span class="go">cd odesolvers</span>
+</pre></div>
+</div>
+<p>The installation follows the expected standard procedure,</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">sudo python setup.py install</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">odesolvers</span></tt> package depends on several other packages:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">scipy</span></tt> for running the <tt class="docutils literal"><span class="pre">Vode</span></tt> Adams/BDF solver and the
+Dormand-Prince adaptive methods <tt class="docutils literal"><span class="pre">Dop853</span></tt>, and <tt class="docutils literal"><span class="pre">Dopri5</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">sympy</span></tt> for running the extremely accurate <tt class="docutils literal"><span class="pre">SymPy_odefun</span></tt> solver.</li>
+</ul>
+</div></blockquote>
+<p>These packages are readily downloaded and installed by the
+standard <tt class="docutils literal"><span class="pre">setup.py</span></tt> script as shown above.
+On Ubuntu and other Debian-based Linux systems the following
+line installs all that <tt class="docutils literal"><span class="pre">odesolvers</span></tt> may need:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">sudo apt-get install python-scipy python-nose python-sympy</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations</a></li>
+<li><a class="reference internal" href="#basic-usage">Basic Usage</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a><ul>
+<li><a class="reference internal" href="#step-1">Step 1</a></li>
+<li><a class="reference internal" href="#step-2">Step 2</a></li>
+<li><a class="reference internal" href="#step-3">Step 3</a></li>
+<li><a class="reference internal" href="#step-4">Step 4</a></li>
+<li><a class="reference internal" href="#step-5">Step 5</a></li>
+<li><a class="reference internal" href="#step-6">Step 6</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example-exponential-growth">Example: Exponential Growth</a><ul>
+<li><a class="reference internal" href="#parameters-in-the-right-hand-side-function">Parameters in the Right-Hand Side Function</a></li>
+<li><a class="reference internal" href="#continuing-a-previous-simulation">Continuing a Previous Simulation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example-decay-equation">Example: Decay Equation</a></li>
+<li><a class="reference internal" href="#example-decay-equation-with-other-symbols">Example: Decay Equation with Other Symbols</a></li>
+<li><a class="reference internal" href="#example-the-pendulum-equation">Example: The Pendulum Equation</a></li>
+<li><a class="reference internal" href="#example-testing-several-methods">Example: Testing Several Methods</a></li>
+<li><a class="reference internal" href="#example-solving-a-stochastic-differential-equation">Example: Solving a Stochastic Differential Equation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#inner-workings-of-the-package">Inner Workings of the Package</a><ul>
+<li><a class="reference internal" href="#solver-parameters">Solver Parameters</a></li>
+<li><a class="reference internal" href="#solver-classes">Solver Classes</a><ul>
+<li><a class="reference internal" href="#the-super-class">The Super Class</a></li>
+<li><a class="reference internal" href="#other-superclasses">Other Superclasses</a></li>
+<li><a class="reference internal" href="#a-very-simple-subclass">A Very Simple Subclass</a></li>
+<li><a class="reference internal" href="#a-subclass-with-more-code">A Subclass with More Code</a></li>
+<li><a class="reference internal" href="#a-simple-example-of-an-implicit-method">A Simple Example of an Implicit Method</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="index.html" title="A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations"
+             >previous</a> |</li>
+        <li><a href="index.html">A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Hans Petter Langtangen and Liwei Wang.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>
