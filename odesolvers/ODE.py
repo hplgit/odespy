@@ -1324,6 +1324,7 @@ class Solver:
             terminate = lambda u, t, step_no: False
 
         self.t = np.asarray(time_points)
+        self.n = 0  # time step counter
         self.initialize_for_solve()
         self.validate_data()
 

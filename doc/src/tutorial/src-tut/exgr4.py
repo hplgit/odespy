@@ -24,7 +24,7 @@ for i in range(len(T)-1):
     time_points = numpy.linspace(T[i], T[i+1], N+1)
 
     method.set_initial_condition(A)  # at time_points[0]
-    print 'Solving in [%s, %s] with %d points' % \
+    print 'Solving in [%s, %s] with %d intervals' % \
           (T[i], T[i+1], N)
     ui, ti = method.solve(time_points)
     A = ui[-1]  # newest u is next initial condition

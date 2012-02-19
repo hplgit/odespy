@@ -14,7 +14,7 @@ method = odesolvers.Heun(f)
 method.set_initial_condition([Theta, 0])
 freq = sqrt(c)      # frequency of oscillations when Theta is small
 period = 2*pi/freq  # the period of the oscillations
-T = 8*period        # final time
+T = 10*period        # final time
 N_per_period = 20   # resolution of one period
 N = N_per_period*period
 time_points = numpy.linspace(0, T, N+1)

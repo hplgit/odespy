@@ -264,7 +264,7 @@ The initial conditions are _theta(0) = Theta_ and _omega'(0) = 0_.
 Now the `f` function must return a list or array with the two
 right-hand side functions:
 
-@@@CODE src-tut/exos1.py  fromto: def f@method =
+@@@CODE src-tut/exos1a.py  fromto: def f@method =
 
 Note that when we have a system of ODEs with `n` components, the `u`
 object sent to the `f` function is an array of length `n`,
@@ -275,7 +275,7 @@ the current problem.
 
 The initial conditions must be specified as a list:
 
-@@@CODE src-tut/exos1.py  fromto: method =@freq =
+@@@CODE src-tut/exos1a.py  fromto: method =@freq =
 
 To specify the time points we here first decide on a number of periods
 (oscillations back and forth) to simulate and then on the time resolution
@@ -285,7 +285,7 @@ solution
 $\theta (t)=\Theta\cos\left(\sqrt{c}t\right)$|$theta(t) = Theta*cos(sqrt(c)*t)$
 whose period is $2\pi/\sqrt{c}$|$2*pi/sqrt(c)$.)
 
-@@@CODE src-tut/exos1.py  fromto: freq =@theta =
+@@@CODE src-tut/exos1a.py  fromto: freq =@theta =
 
 The `u` returned from `method.solve` is a two-dimensional array, where the
 columns hold the various solution functions of the ODE system. That is,
@@ -293,7 +293,29 @@ the first column holds $\theta$|$theta$ and the second column holds
 $\omega$|$omega$. For convenience we extract the individual solution
 components in individual arrays:
 
-@@@CODE src-tut/exos1.py  fromto: theta =@import matplotlib
+@@@CODE src-tut/exos1a.py  fromto: theta =@import matplotlib
+
+Looking at the plot reveals that the numerical solution has
+an alarming feature: the amplitude grows (indicating increasing
+energy in the system). Changing `T` to 28 periods instead of 10
+makes the numerical solution explode.
+
+FIGURE: [figs-tut/exos1a.png, width=500] Comparison of large-amplitude numerical solution with corresponding analytical solution (derived for small amplitudes).
+
+Changing solution method is a matter of substituting `Heun` by `RK4`,
+for instance:
+
+@@@CODE src-tut/exos1b.py  fromto: method =@method\.set_initial
+
+The amplitude is now correct, but the numerical solution has a different
+frequency than the inaccurate analytical "solution".
+
+FIGURE: [figs-tut/exos1b.png, width=500] Switching to a 4-th order Runge-Kutta method improves the numerical solution.
+
+Changing $\Theta$|$Theta$ to a small value, say 0.05, makes the two curves
+coincide. The next section shows how easy it is to run a problem with a set
+of numerical methods.
+
 
 ===== Example: Testing Several Methods =====
 
@@ -418,7 +440,7 @@ The loop over the chosen solvers may look like
 
 @@@CODE src-tut/exos2.py  fromto: N_per_period =@
 
-FIGURE: [src-tut/exos2.png, width=500] Comparison of solutions.
+FIGURE: [figs-tut/exos2.png, width=500] Comparison of solutions.
 
 We can extend this program to compute the error in each numerical
 solution for different time step sizes.
@@ -486,9 +508,70 @@ Leapfrog             r: 95.9, 18.0, 1.0, 2.0 E_min=1.1E-01
 LeapfrogFiltered     r: -0.0, 121.2, 0.3, 0.1 E_min=5.2E-01
 !ec
 
+===== Example: Solving a Stochastic Differential Equation =====
+
+We consider an oscillator driven by stochastic white noise:
+!bt
+\[ x''(t) + bx'(t) + cx(t) = N(t),\ x(0)=X,\ x'(0) =0,\]
+!et
+where $N(t)$ is the white noise computed discretely as
+!bt
+\[ N(t_i) \approx \sigma\frac{\Delta W_i}{\sqrt{t_{i+1}-t_i}},\]
+!et
+where $\Delta W_1,\Delta W_2,\ldots$ are independent normally
+distributed random variables with mean zero and unit standard
+deviation, and $\sigma$ is the strength of the noise.
+The idea is that $N(t)$ provides an excitation containing "all" frequencies,
+but the oscillator is a strong filter: with low damping one of the
+frequencies in $N(t)$ will hit the resonance frequency
+$\sqrt{c}/(2\pi)$ which will
+then dominate the output signal $x(t)$.
+
+The noise is additive in this stochastic differential equation so
+there is no difference between the Ito and Stratonovich interpretations
+of the equation.
+
+The challenge with this model problem is that stochastic differential
+equations do not fit with the user interface offered by `odesolvers`,
+since the right-hand side function is assumed to be dependent only
+on the solution and the present time (`f(u,t)`), and additional
+user-defined parameters, but for the present problem the right-hand
+side function needs information about $N(t)$ and hence
+the size of the current time step. We can solve this issue by
+having a reference to the solver in the right-hand side function,
+precomputing $N(t_i)$ for all time intervals $i$, and using the `n`
+attribute in the solver for selecting the right force term (recall
+that some methods will call the right-hand side function many times
+during a time interval - all these calls must use the same value of
+the white noise).
+
+The right-hand side function must do many things so a class is
+appropriate:
+
+@@@CODE src-tut/exsos1.py class WhiteNoise@from numpy
+
+We can easily compare different methods:
+
+@@@CODE src-tut/exsos1.py f = White@savefig
+
+FIGURE: [figs-tut/exsos1.png, width=500] Oscillator driven by white noise.
+
+The `Heun` and `RK2` methods give coinciding solutions while
+the `ForwardEuler` method gives too large amplitudes.
+The frequency is 0.5 (period 2) as expected.
+
+In this example the white noise force is computed only once since
+the `f` instance is reused in all methods. If a new `f` is created
+for each method, it is crucial that the same seed of the random
+generator is used for all methods, so that the time evolution of
+the force is always the same - otherwise the solutions will be
+different.
+
+
+# #ifdef EXTRA
 ===== Example: Solving a Partial Differential Equation =====
 
-===== Example: Solving a Stochastic Differential Equation =====
+# #endif
 
 
 
@@ -710,7 +793,7 @@ reads
 !bt
 \[ u_{n+1} = u_n + \Delta t f(u_n, t_n),\]
 !et
-where subscript $n$ denotes the time level, and $Delta t = t_{n+1}-t_n$ is
+where subscript $n$ denotes the time level, and $\Delta t = t_{n+1}-t_n$ is
 the current time step.
 The implementation goes like
 !bc cod
@@ -731,7 +814,8 @@ class ForwardEuler(Solver):
 Remarks:
 
  o The `quick_description` is necessary for the class to appear in the
-   automatically generated overview of implemented methods.
+   automatically generated overview of implemented methods
+   (run `pydoc odesolvers` to see this table).
  o Extracting class attributes in local variables (here `u`, `f`, etc.)
    avoids the need for the `self` prefix so that the implemented formulas
    are as close to the mathematical formulas as possible.
@@ -839,6 +923,7 @@ line installs all that `odesolvers` may need:
 sudo apt-get install python-scipy python-nose python-sympy
 !ec
 
+# #ifdef EXTRA
 ======= TODO =======
 
  * Start tutorial with solving a real problem with vode and RK2 say;
@@ -870,3 +955,5 @@ sudo apt-get install python-scipy python-nose python-sympy
    could do this without any support. Solution: provide dt to
    f constructor :-)
  * Explain and show the code of the hierarchy.
+
+# #endif
