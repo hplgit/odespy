@@ -1,7 +1,6 @@
 #!/bin/sh
 dest=../../tutorial
 cp -r sphinx-rootdir/_build/html $dest
-touch $dest/.nojekyll   # very important for visible _static
 
 cat > $dest/README <<EOF
 This directory contains the tutorial for the package.
