@@ -1370,10 +1370,11 @@ line installs all that ``odesolvers`` may need:
 
 '''
 
-from ODE import *
+from solvers import *
 from RungeKutta import *
+from rkc import *
+from rkf45 import *
 from odepack import *
-from rkc_rkf45 import *
 
 # Update doc strings with common info
 class_, doc_str, classname = None, None, None

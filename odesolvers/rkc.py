@@ -1,6 +1,7 @@
+"""Module for wrapping rkc.f."""
+
 from ODE import Solver, Adaptive
 import numpy as np
-import inspect, sys
 
 _parameters_RKC = dict(
 
@@ -148,63 +149,10 @@ ATOL =%s should be either a scalar or a vector of length NEQ=%d.
         print 'Iteration stops at T=%g' % self.t[nstop-1]
 
         # Error occurs.
-        if istate  > 1:   # Abnormal status
-            sys.exit(1)   # Interrupt
+        if istate > 1:   # Abnormal status
+            raise Exception('istate=%d > 1: abort' % istate)
 
         self.u = np.asarray(uout[:nstop,:]).copy()
         return self.u, self.t
 
 
-
-class RKF45(Adaptive):
-    """
-    Wrapper for rkf45.f, a FORTRAN solver designed to solve non-stiff and
-    mildly stiff differential equations by the well-known
-    Runge-Kutta-Fehlberg (4,5) method.
-
-    The FORTRAN source rkf45.f can be obtained from Netlib.
-    """
-    quick_description = "Adaptive Runge-Kutta-Fehlberg (4,5) method (rkf45.f)"
-
-    _optional_parameters = Adaptive._optional_parameters + ['f_f77']
-    # The following step parameters are illegal for rkf45.f
-    # and therefore removed (class Adaptive adds them in the above statement)
-    _optional_parameters.remove('first_step')
-    _optional_parameters.remove('min_step')
-    _optional_parameters.remove('max_step')
-
-    def initialize(self):
-        '''Import extension module _rkf45 and check that it exists.'''
-        try:
-            import _rkf45
-            self._rkf45 = _rkf45
-        except ImportError:
-            raise ImportError('Cannot find the extension module _rkf45.\nRun setup.py again and investigate why _rkf45.so was not successfully built.')
-
-    def adjust_parameters(self):
-        self._parameters['rtol']['type'] = float
-        self._parameters['rtol']['extra_check'] = lambda x: x >= 0.0
-        self._parameters['atol']['type'] = float
-        self._parameters['atol']['extra_check'] = lambda x: x >= 0.0
-
-    def initialize_for_solve(self):
-        if hasattr(self, 'f'):
-            # If f is input in form of f(u,t), wrap f to f_f77 for Fortran code.
-            f = self.f
-            self.f_f77 = lambda t,u: np.asarray(f(u,t))
-        elif hasattr(self, 'f_f77'):
-            # If f is input in form of f(t,u) (usually in Fortran),
-            # wrap f_f77 to the general form f(u,t) for switch_to()
-            f_f77 = self.f_f77
-            self.f = lambda u,t: np.asarray(f_f77(t,u))
-        Solver.initialize_for_solve(self)
-
-    def advance(self):
-        u, t, n, rtol, atol = self.u, self.t, self.n, self.rtol, self.atol
-
-        advance = self._rkf45.advance
-        f = getattr(self.f_f77, '_cpointer', self.f_f77)
-        unew, istate = advance(f, u[n], t[n], t[n+1], rtol, atol)
-        if istate > 2:
-            sys.exit(1)
-        return unew
