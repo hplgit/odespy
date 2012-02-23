@@ -21,7 +21,7 @@ class RKF45(Adaptive):
     _optional_parameters.remove('min_step')
     _optional_parameters.remove('max_step')
 
-    _iflag_states = {
+    _iflag_messages = {
         2:
         'integration reached tout. indicates successful retur '
         'and is the normal mode for continuing integration.',
@@ -95,5 +95,5 @@ class RKF45(Adaptive):
         unew, iflag = advance(f, u[n], t[n], t[n+1], rtol, atol)
         if iflag > 2:
             raise Exception('rkf45.f: iflag=%d > 2 (abort)' % iflag)
-        self.iflag = 'iflag=%d\n%s' % (iflag, RKF45._iflag_states[iflag])
+        self.iflag = 'iflag=%d\n%s' % (iflag, RKF45._iflag_messages[iflag])
         return unew

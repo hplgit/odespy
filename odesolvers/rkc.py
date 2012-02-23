@@ -39,18 +39,21 @@ class RKC(Adaptive):
     _optional_parameters.remove('min_step')
     _optional_parameters.remove('max_step')
 
-    _istate_messages = {\
-    3: '''\
-    Repeated improper error control: For some j, ATOL(j) = 0 and Y(j) = 0.''',
-    4: '''\
-    Unable to achieve the desired accuracy with the precision available.
-    A severe lack of smoothness in the solution y(t) or the function
-    f(t,y) is likely. ''',
-    6: '''\
-    The method used by RKC to estimate the spectral radius of the Jacobian
-    failed to converge.''',
-    0:'''Iteration stops when function TERMINATE return with True.''',
-    1:'''Iteration succeed.'''}
+    _did_messages = {
+        3:
+        'Repeated improper error control: For some j, '
+        'ATOL(j) = 0 and Y(j) = 0.',
+        4:
+        'Unable to achieve the desired accuracy with the precision available. '
+        'A severe lack of smoothness in the solution y(t) or the function '
+        'f(t,y) is likely.',
+        6:
+        'The method used by RKC to estimate the spectral radius of the '
+        'Jacobian failed to converge.',
+        0:
+        'Iteration stops when function TERMINATE return with True.',
+        1:'Iteration succeed.'
+        }
 
     def adjust_parameters(self):
         self._parameters['rtol']['type'] = float
@@ -141,16 +144,33 @@ ATOL =%s should be either a scalar or a vector of length NEQ=%d.
         spcrad = getattr(self.spcrad_f77, '_cpointer', self.spcrad_f77)
 
         # Start iteration
-        uout, istate, nstop = solve(spcrad, f, self.u[0].copy(),
-                                    self.t, self.rtol, self.atol, self.info,
-                                    terminate_int, itermin)
+        uout, idid, nstop = solve(spcrad, f, self.u[0].copy(),
+                                  self.t, self.rtol, self.atol, self.info,
+                                  terminate_int, itermin)
         # Print corresponding message
         print self._istate_messages[istate]
         print 'Iteration stops at T=%g' % self.t[nstop-1]
 
-        # Error occurs.
-        if istate > 1:   # Abnormal status
-            raise Exception('istate=%d > 1: abort' % istate)
+        if idid > 1:   # abnormal status?
+            raise Exception('idid=%d > 1 (abort)' % idid)
+        self.idid = 'idid=%d\n%s' % (idid, RKC._idid_messages[idid])
+
+        # Store statistics from common block
+        self.statistics = {
+            'nfe': (self._rkc.rkcdid.nfe,
+                    'number of evaluations of f used to integrate '
+                    'the initial value problem'),
+            'nsteps': (self._rkc.rkcdid.nsteps,
+                       'no of integration steps'),
+            'naccpt': (self._rkc.rkcdid.naccpt,
+                       'no of accepted steps'),
+            'nrejct': (self._rkc.rkcdid.nrejct,
+                       'no of rejected steps'),
+            'nfesig': (self._rkc.rkcdid.nfesig,
+                       'no of evaluations of f used to estimate '
+                       'spectral radius'),
+            'maxm': (self._rkc.rkcdid.maxm,
+                     'max no of stages used')}
 
         self.u = np.asarray(uout[:nstop,:]).copy()
         return self.u, self.t
