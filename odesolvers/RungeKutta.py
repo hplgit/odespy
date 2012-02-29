@@ -1,4 +1,4 @@
-from ODE import Solver, Adaptive
+from solvers import Solver, Adaptive
 import numpy as np
 
 class RungeKutta(Adaptive):

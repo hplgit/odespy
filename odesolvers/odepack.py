@@ -1,4 +1,4 @@
-from ODE import Solver
+from solvers import Solver
 import numpy as np
 import sys, inspect
 
@@ -50,20 +50,20 @@ _parameters_Odepack = dict(
         type=callable),
 
     jac_banded_f77 = dict(
-        help='Intend to supply a Fortran subroutine as jac_band  '\
-             'jac_banded.                                        '\
-             'This subroutine should be defined in form::        '\
-             '                                                   '\
-             '        subroutine jac_banded_f77(neq,t,u,ml,      '\
-             '       1                          mu,pd,nrowpd)    '\
-             '  Cf2py intent(hide) neq,ml,mu,nrowpd              '\
-             '  Cf2py intent(out) pd                             '\
-             '        integer neq,ml,mu,nrowpd                   '\
-             '        double precision t,u,pd                    '\
-             '        dimension u(neq),pd(nrowpd,neq)            '\
-             '        pd = ...                                   '\
-             '        return                                     '\
-             '        end                                        ',
+        help='Intend to supply a Fortran subroutine as jac_band'\
+             'jac_banded.                                      '\
+             'This subroutine should be defined in form::      '\
+             '                                                 '\
+             '        subroutine jac_banded_f77(neq,t,u,ml,    '\
+             '       1                          mu,pd,nrowpd)  '\
+             '  Cf2py intent(hide) neq,ml,mu,nrowpd            '\
+             '  Cf2py intent(out) pd                           '\
+             '        integer neq,ml,mu,nrowpd                 '\
+             '        double precision t,u,pd                  '\
+             '        dimension u(neq),pd(nrowpd,neq)          '\
+             '        pd = ...                                 '\
+             '        return                                   '\
+             '        end                                      ',
         type=callable),
 
     g = dict(
@@ -418,8 +418,8 @@ _parameters_Odepack = dict(
 
     )
 
-import ODE
-ODE._parameters.update(_parameters_Odepack)
+import solvers
+solvers._parameters.update(_parameters_Odepack)
 
 
 class Odepack(Solver):

@@ -1385,7 +1385,7 @@ toc = []
 for classname in classnames:
     class_ = eval(classname)
     doc_str = getattr(class_, '__doc__')
-    fixed_width = None if class_.__module__ in ('ODE', 'RungeKutta') \
+    fixed_width = None if class_.__module__ in ('solvers', 'RungeKutta') \
         else (21,49)
     setattr(class_, '__doc__',
             doc_str + table_of_parameters(class_, fixed_width=fixed_width))

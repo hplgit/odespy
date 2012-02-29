@@ -21,7 +21,7 @@ time_points = np.linspace(t0, tn, n_points)
 for solver in ('RKFehlberg', 'RungeKutta2'):
     m = AdaptiveResidual(f, solver=solver, atol=atol, rtol=rtol)
     m.set_initial_condition(u0)
-    u,t = m.solve(time_points, printInfo=True)
+    u,t = m.solve(time_points, print_info=True)
     st.plot(t, u, '-', legend=solver, hold='on')
 
 st.plot(time_points, np.exp(-time_points),'*', 

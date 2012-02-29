@@ -1,7 +1,7 @@
 # Author: Liwei Wang
 """
 """
-from ODE import *
+from solvers import *
 import numpy as np
 
 class Pyds(Solver):
@@ -38,7 +38,7 @@ class Pyds(Solver):
         self.initialize_for_solve()
 
         N = self.t.size - 1  # no of intervals
-        self.valid_data()
+        self.validate_data()
 
         # As a main designing priciple of PyDSTool, most of data structures in
         # PyDSTool are index-free. That is, the numerical data are stored mainly

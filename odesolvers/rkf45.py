@@ -1,6 +1,6 @@
 """Module for wrapping rkf45.py."""
 
-from ODE import Solver, Adaptive
+from solvers import Solver, Adaptive
 import numpy as np
 
 
@@ -25,7 +25,7 @@ class RKF45(Adaptive):
         2:
         'integration reached tout. indicates successful retur '
         'and is the normal mode for continuing integration.',
-        -2
+        -2:
         'a single successful step in the direction of tout '
         'has been taken. normal mode for continuing '
         'integration one step at a time.',

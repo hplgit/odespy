@@ -1,26 +1,26 @@
 """Module for wrapping rkc.f."""
 
-from ODE import Solver, Adaptive
+from solvers import Solver, Adaptive
 import numpy as np
 
 _parameters_RKC = dict(
 
     spcrad_f77 = dict(
-        help='Intend to supply a Fortran subroutine as spcrad.    '\
-             'This subroutine should be defined in form:          '\
-             '        double precision function spcrad_f77(       '\
-             '       1                                neq,t,u)    '\
-             '  Cf2py intent(hide)  neq                           '\
-             '        integer       neq                           '\
-             '        double precision t,u(neq)                   '\
-             '        spcrad_f77 =                                '\
-             '        return                                      '\
-             '        end                                         ',
+        help='Intend to supply a Fortran subroutine as spcrad. '\
+             'This subroutine should be defined in form:       '\
+             '        double precision function spcrad_f77(    '\
+             '       1      neq,t,u)                           '\
+             '  Cf2py intent(hide)  neq                        '\
+             '        integer       neq                        '\
+             '        double precision t,u(neq)                '\
+             '        spcrad_f77 =                             '\
+             '        return                                   '\
+             '        end                                      ',
         type=callable),
     )
 
-import ODE
-ODE._parameters.update(_parameters_RKC)
+import solvers
+solvers._parameters.update(_parameters_RKC)
 
 class RKC(Adaptive):
     '''
@@ -31,7 +31,8 @@ class RKC(Adaptive):
     The source code for rkc.f can be obtained from netlib and contains
     more details.
     '''
-    quick_description = "Explicit 2nd-order Runge-Kutta-Chebyshev method (rkc.f)"
+    quick_description = \
+        "Explicit 2nd-order Runge-Kutta-Chebyshev method (rkc.f)"
     _optional_parameters = Adaptive._optional_parameters + \
         ['f_f77', 'spcrad', 'spcrad_f77', 'jac_constant']
     # The following step parameters are illegal for rkc.f
@@ -39,7 +40,7 @@ class RKC(Adaptive):
     _optional_parameters.remove('min_step')
     _optional_parameters.remove('max_step')
 
-    _did_messages = {
+    _idid_messages = {
         3:
         'Repeated improper error control: For some j, '
         'ATOL(j) = 0 and Y(j) = 0.',
@@ -147,9 +148,6 @@ ATOL =%s should be either a scalar or a vector of length NEQ=%d.
         uout, idid, nstop = solve(spcrad, f, self.u[0].copy(),
                                   self.t, self.rtol, self.atol, self.info,
                                   terminate_int, itermin)
-        # Print corresponding message
-        print self._istate_messages[istate]
-        print 'Iteration stops at T=%g' % self.t[nstop-1]
 
         if idid > 1:   # abnormal status?
             raise Exception('idid=%d > 1 (abort)' % idid)
