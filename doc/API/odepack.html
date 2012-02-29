@@ -152,41 +152,17 @@ vector * float * int * int &#8211;&gt;   2d-array</div></blockquote>
 </td>
 </tr>
 <tr class="row-even"><td>jac_banded_f77</td>
-<td><dl class="first docutils">
-<dt>Intend to supply a Fortran subroutine as jac_band</dt>
-<dd><dl class="first last docutils">
-<dt>jac_banded.</dt>
-<dd><p class="first">This subroutine should be defined in form:</p>
-<div class="last highlight-python"><pre>subroutine jac_banded_f77(neq,t,u</pre>
+<td><p class="first">Intend to supply a Fortran subroutine as jac_banded. This subroutine should be defined in form:</p>
+<div class="last highlight-python"><pre> subroutine jac_banded_f77(neq,t,u,ml
+     1 ,mu,pd,nrowpd)
+Cf2py intent(out) pd
+      integer neq,ml,mu,nrowpd
+      double precision t,u,pd
+      dimension u(neq),pd(nrowpd,neq)
+      pd = ...
+      return
+      end</pre>
 </div>
-</dd>
-</dl>
-</dd>
-</dl>
-<p>,ml,             1                          mu,pd
-,nrowpd)      Cf2py intent(hide) neq,ml,mu,nrowpd</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>Cf2py intent(out) pd</dt>
-<dd><dl class="first last docutils">
-<dt>integer neq,ml,mu,nrowpd</dt>
-<dd><dl class="first last docutils">
-<dt>double precision t,u,pd</dt>
-<dd>dimension u(neq),pd(n</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-</div></blockquote>
-<dl class="last docutils">
-<dt>rowpd,neq)                    pd = ...</dt>
-<dd><dl class="first last docutils">
-<dt>return</dt>
-<dd>end</dd>
-</dl>
-</dd>
-</dl>
 </td>
 </tr>
 <tr class="row-odd"><td>ml</td>
@@ -516,41 +492,17 @@ vector * float * int * int &#8211;&gt;   2d-array</div></blockquote>
 </td>
 </tr>
 <tr class="row-even"><td>jac_banded_f77</td>
-<td><dl class="first docutils">
-<dt>Intend to supply a Fortran subroutine as jac_band</dt>
-<dd><dl class="first last docutils">
-<dt>jac_banded.</dt>
-<dd><p class="first">This subroutine should be defined in form:</p>
-<div class="last highlight-python"><pre>subroutine jac_banded_f77(neq,t,u</pre>
+<td><p class="first">Intend to supply a Fortran subroutine as jac_banded. This subroutine should be defined in form:</p>
+<div class="last highlight-python"><pre> subroutine jac_banded_f77(neq,t,u,ml
+     1 ,mu,pd,nrowpd)
+Cf2py intent(out) pd
+      integer neq,ml,mu,nrowpd
+      double precision t,u,pd
+      dimension u(neq),pd(nrowpd,neq)
+      pd = ...
+      return
+      end</pre>
 </div>
-</dd>
-</dl>
-</dd>
-</dl>
-<p>,ml,             1                          mu,pd
-,nrowpd)      Cf2py intent(hide) neq,ml,mu,nrowpd</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>Cf2py intent(out) pd</dt>
-<dd><dl class="first last docutils">
-<dt>integer neq,ml,mu,nrowpd</dt>
-<dd><dl class="first last docutils">
-<dt>double precision t,u,pd</dt>
-<dd>dimension u(neq),pd(n</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-</div></blockquote>
-<dl class="last docutils">
-<dt>rowpd,neq)                    pd = ...</dt>
-<dd><dl class="first last docutils">
-<dt>return</dt>
-<dd>end</dd>
-</dl>
-</dd>
-</dl>
 </td>
 </tr>
 <tr class="row-odd"><td>ml</td>
@@ -898,41 +850,17 @@ vector * float * int * int &#8211;&gt;   2d-array</div></blockquote>
 </td>
 </tr>
 <tr class="row-even"><td>jac_banded_f77</td>
-<td><dl class="first docutils">
-<dt>Intend to supply a Fortran subroutine as jac_band</dt>
-<dd><dl class="first last docutils">
-<dt>jac_banded.</dt>
-<dd><p class="first">This subroutine should be defined in form:</p>
-<div class="last highlight-python"><pre>subroutine jac_banded_f77(neq,t,u</pre>
+<td><p class="first">Intend to supply a Fortran subroutine as jac_banded. This subroutine should be defined in form:</p>
+<div class="last highlight-python"><pre> subroutine jac_banded_f77(neq,t,u,ml
+     1 ,mu,pd,nrowpd)
+Cf2py intent(out) pd
+      integer neq,ml,mu,nrowpd
+      double precision t,u,pd
+      dimension u(neq),pd(nrowpd,neq)
+      pd = ...
+      return
+      end</pre>
 </div>
-</dd>
-</dl>
-</dd>
-</dl>
-<p>,ml,             1                          mu,pd
-,nrowpd)      Cf2py intent(hide) neq,ml,mu,nrowpd</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>Cf2py intent(out) pd</dt>
-<dd><dl class="first last docutils">
-<dt>integer neq,ml,mu,nrowpd</dt>
-<dd><dl class="first last docutils">
-<dt>double precision t,u,pd</dt>
-<dd>dimension u(neq),pd(n</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
-</div></blockquote>
-<dl class="last docutils">
-<dt>rowpd,neq)                    pd = ...</dt>
-<dd><dl class="first last docutils">
-<dt>return</dt>
-<dd>end</dd>
-</dl>
-</dd>
-</dl>
 </td>
 </tr>
 <tr class="row-odd"><td>ml</td>
