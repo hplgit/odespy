@@ -1037,7 +1037,7 @@ class Odepack(Solver):
 
         tried = 0
         while tried < 5:       # prevent endless loop
-            unew, t, istate, iwork = apply(\
+            u_new, t, istate, iwork = apply(\
                 eval('self._odepack.d%s' % solver_name),\
                 (res, adda, jac, neq, u[n].copy(), self.ydoti, t, t_next,
                  self.itol, self.rtol, self.atol, itask, istate, self.iopt,
@@ -1065,11 +1065,11 @@ class Odepack(Solver):
                         sys.exit(1)   # Interrupt
                 elif istate == -6:
                     # divide-zero-error when error(i) became 0 for some i
-                    self.adjust_atol(unew)
+                    self.adjust_atol(u_new)
                 else:   # Unavoidable interrupts
                     sys.exit(1)  #  Interrupt
                 istate = 1
-	return unew
+	return u_new
 
 ### end of class Odepack ###
 

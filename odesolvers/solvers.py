@@ -1420,15 +1420,15 @@ class MySolver(Solver):
     myadvance(), and make use of all possible parameters
     in this module::
 
-        myadvance(MySolver_instance)  -->  return unew
+        myadvance(MySolver_instance)  -->  return u_new
 
     Example::
 
         def myadvance_(ms):
             f, u, t, n, atol = ms.f, ms.u, ms.t, ms.n, ms.atol
             # All class attributes can be obtained
-            unew = ...
-            return unew
+            u_new = ...
+            return u_new
 
         def f(u,t):
             udot = ...
@@ -1458,8 +1458,8 @@ class ForwardEuler(Solver):
     def advance(self):
         u, f, n, t = self.u, self.f, self.n, self.t
         dt = t[n+1] - t[n]
-        unew = u[n] + dt*f(u[n], t[n])
-        return unew
+        u_new = u[n] + dt*f(u[n], t[n])
+        return u_new
 
 Euler = ForwardEuler   # synonym
 
@@ -1483,11 +1483,11 @@ class Leapfrog(Solver):
 
         if n >= 1:
             dt2 = t[n+1] - t[n-1]
-            unew = u[n-1] + dt2*f(u[n], t[n])
+            u_new = u[n-1] + dt2*f(u[n], t[n])
         else:
             dt = t[n+1] - t[n]
-            unew = u[n] + dt*f(u[n], t[n])
-        return unew
+            u_new = u[n] + dt*f(u[n], t[n])
+        return u_new
 
 
 
@@ -1517,12 +1517,12 @@ class LeapfrogFiltered(Solver):
 
         if n >= 1:
             dt2 = t[n+1] - t[n-1]
-            unew = u[n-1] + dt2*f(u[n], t[n])
-            u[n] = u[n] + gamma*(u[n-1] - 2*u[n] + unew)
+            u_new = u[n-1] + dt2*f(u[n], t[n])
+            u[n] = u[n] + gamma*(u[n-1] - 2*u[n] + u_new)
         else:
             dt = t[n+1] - t[n]
-            unew = u[n] + dt*f(u[n], t[n])
-        return unew
+            u_new = u[n] + dt*f(u[n], t[n])
+        return u_new
 
 
 
@@ -1543,8 +1543,8 @@ class Heun(Solver):
         u, f, n, t = self.u, self.f, self.n, self.t
         dt = t[n+1] - t[n]
         u_star = u[n] + dt*f(u[n], t[n])  # Forward Euler step
-        unew = u[n] + 0.5*dt*(f(u[n], t[n]) + f(u_star, t[n+1]))
-        return unew
+        u_new = u[n] + 0.5*dt*(f(u[n], t[n]) + f(u_star, t[n+1]))
+        return u_new
 
 
 
@@ -1564,8 +1564,8 @@ class RK2(Solver):
         dt = t[n+1] - t[n]
         K1 = dt*f(u[n], t[n])
         K2 = dt*f(u[n] + 0.5*K1, t[n] + 0.5*dt)
-	unew = u[n] + K2
-        return unew
+	u_new = u[n] + K2
+        return u_new
 
 
 class RK4(Solver):
@@ -1591,8 +1591,8 @@ class RK4(Solver):
         K2 = dt*f(u[n] + 0.5*K1, t[n] + dt2)
         K3 = dt*f(u[n] + 0.5*K2, t[n] + dt2)
         K4 = dt*f(u[n] + K3, t[n] + dt)
-        unew = u[n] + (1/6.0)*(K1 + 2*K2 + 2*K3 + K4)
-        return unew
+        u_new = u[n] + (1/6.0)*(K1 + 2*K2 + 2*K3 + K4)
+        return u_new
 
 
 class RK3(Solver):
@@ -1616,8 +1616,8 @@ class RK3(Solver):
         K1 = dt*f(u[n], t[n])
         K2 = dt*f(u[n] + 0.5*K1, t[n] + dt2)
         K3 = dt*f(u[n] - K1 + 2*K2, t[n] + dt)
-        unew = u[n] + (1/6.0)*(K1 + 4*K2 + K3)
-        return unew
+        u_new = u[n] + (1/6.0)*(K1 + 4*K2 + K3)
+        return u_new
 
 
 class AdamsBashforth2(Solver):
@@ -1655,17 +1655,17 @@ class AdamsBashforth2(Solver):
         if n >= 1:
             dt = t[n+1] - t[n]  # must be constant
             self.f_n = f(u[n], t[n])
-            unew = u[n] + dt/2.*(3*self.f_n - self.f_n_1)
+            u_new = u[n] + dt/2.*(3*self.f_n - self.f_n_1)
             self.f_n_1 = self.f_n
         else:
             # User-specified method for the first step
             self.starter.set_initial_condition(u[n])
             time_points = [t[n], t[n+1]]
             u_starter, t_starter = self.starter.solve(time_points)
-            unew = u_starter[-1]
+            u_new = u_starter[-1]
             self.f_n_1 = f(u[0], t[0])
 
-        return unew
+        return u_new
 
 
 class AdamsBashforth3(Solver):
@@ -1704,7 +1704,7 @@ class AdamsBashforth3(Solver):
         if n >= 2:
             dt = t[n+1] - t[n]  # must be constant
             self.f_n = f(u[n], t[n])
-            unew = u[n] + dt/12.*(23*self.f_n - 16*self.f_n_1 + 5*self.f_n_2)
+            u_new = u[n] + dt/12.*(23*self.f_n - 16*self.f_n_1 + 5*self.f_n_2)
             self.f_n_1, self.f_n_2, self.f_n = self.f_n, self.f_n_1, self.f_n_2
 
         else:
@@ -1712,12 +1712,12 @@ class AdamsBashforth3(Solver):
             self.starter.set_initial_condition(u[n])
             time_points = [t[n], t[n+1]]
             u_starter, t_starter = self.starter.solve(time_points)
-            unew = u_starter[-1]
+            u_new = u_starter[-1]
             if n == 0:
                 self.f_n_2 = f(u[0], t[0])
             elif n == 1:
                 self.f_n_1 = f(u[1], t[1])
-        return unew
+        return u_new
 
 
 class AdamsBashMoulton2(Solver):
@@ -1759,7 +1759,7 @@ class AdamsBashMoulton2(Solver):
             self.f_n = f(u[n], t[n])
             predictor = u[n] + dt/12.*(23.*self.f_n - 16*self.f_n_1 + \
                                   5*self.f_n_2)
-            unew = u[n] + dt/12.*(8*self.f_n - self.f_n_1 + \
+            u_new = u[n] + dt/12.*(8*self.f_n - self.f_n_1 + \
                                   5*f(predictor, t[n + 1]))
             self.f_n_1, self.f_n_2 = self.f_n, self.f_n_1
         else:
@@ -1767,13 +1767,13 @@ class AdamsBashMoulton2(Solver):
             self.starter.set_initial_condition(u[n])
             time_points = [t[n], t[n+1]]
             u_starter, t_starter = self.starter.solve(time_points)
-            unew = u_starter[-1]
+            u_new = u_starter[-1]
             if n == 0:
                 self.f_n_2 = f(u[0], t[0])
             elif n == 1:
                 self.f_n_1 = f(u[1], t[1])
 
-        return unew
+        return u_new
 
 
 class AdamsBashforth4(Solver):
@@ -1811,7 +1811,7 @@ class AdamsBashforth4(Solver):
         if n >= 3:
             dt = t[n+1] - t[n]  # must be constant
             self.f_n = f(u[n], t[n])
-            unew = u[n] + dt/24.*(55.*self.f_n - 59*self.f_n_1 + \
+            u_new = u[n] + dt/24.*(55.*self.f_n - 59*self.f_n_1 + \
                                   37*self.f_n_2 - 9*self.f_n_3)
             self.f_n_1, self.f_n_2, self.f_n_3 = \
                 self.f_n, self.f_n_1, self.f_n_2
@@ -1820,7 +1820,7 @@ class AdamsBashforth4(Solver):
             self.starter.set_initial_condition(u[n])
             time_points = [t[n], t[n+1]]
             u_starter, t_starter = self.starter.solve(time_points)
-            unew = u_starter[-1]
+            u_new = u_starter[-1]
             if n == 0:
                 self.f_n_3 = f(u[0], t[0])
             elif n == 1:
@@ -1828,7 +1828,7 @@ class AdamsBashforth4(Solver):
             elif n == 2:
                 self.f_n_1 = f(u[2], t[2])
 
-        return unew
+        return u_new
 
 
 class AdamsBashMoulton3(Solver):
@@ -1870,7 +1870,7 @@ class AdamsBashMoulton3(Solver):
             self.f_n = f(u[n], t[n])
             predictor = u[n] + dt/24.*(55.*self.f_n - 59*self.f_n_1 + \
                                   37*self.f_n_2 - 9*self.f_n_3)
-            unew = u[n] + dt/24.*(self.f_n_2 - 5*self.f_n_1 + 19*self.f_n + \
+            u_new = u[n] + dt/24.*(self.f_n_2 - 5*self.f_n_1 + 19*self.f_n + \
                                   9*f(predictor, t[n + 1]))
             self.f_n_1, self.f_n_2, self.f_n_3 = \
                 self.f_n, self.f_n_1, self.f_n_2
@@ -1879,7 +1879,7 @@ class AdamsBashMoulton3(Solver):
             self.starter.set_initial_condition(u[n])
             time_points = [t[n], t[n+1]]
             u_starter, t_starter = self.starter.solve(time_points)
-            unew = u_starter[-1]
+            u_new = u_starter[-1]
             if n == 0:
                 self.f_n_3 = f(u[0], t[0])
             elif n == 1:
@@ -1887,7 +1887,7 @@ class AdamsBashMoulton3(Solver):
             elif n == 2:
                 self.f_n_1 = f(u[2], t[2])
 
-        return unew
+        return u_new
 
 
 
@@ -1929,8 +1929,8 @@ class MidpointIter(Solver):
                 v_finished = True
                 self.num_iterations = q
 
-        unew = v[q]
-        return unew
+        u_new = v[q]
+        return u_new
 
 
 def approximate_Jacobian(f, u0, t0, h):
@@ -2005,6 +2005,8 @@ class odelab(Adaptive):
     _optional_parameters = Adaptive._optional_parameters + \
         ['jac', 'jac_args', 'jac_kwargs', ]
 
+    solvers = 'ExplicitEuler ImplicitEuler RungeKutta4 ExplicitTrapezoidal RungeKutta34 SymplecticEuler Heun Kutta AdamsBashforth Butcher LDIRK343 LobattoIIIA LobattoIIIB LobattoIIIC LobattoIIICs LobattoIIID RadauIIA'.split()
+
     def initialize(self):
         try:
             import odelab
@@ -2018,8 +2020,36 @@ class odelab(Adaptive):
         self.f4odelab = lambda t, u: self.f(u, t, *self.f_args, **self.f_kwargs)
         Solver.initialize_for_solve(self)
 
+        if self.odelab_solver not in odelab.solvers:
+            raise ValueError('requested solver %s not in %s' % \
+                             (self.odelab_solver, str(odelab.solvers)))
+
         self.system = self.odelab.System(self.f4odelab)
-        [[[
+
+        h = self.t[1] - self.t[0]
+        # odelab solvers are in different modules...
+        for module in [self.odelab.scheme.classic,
+                       self.odelab.scheme.geometric,
+                       self.odelab.scheme.rungekutta,
+                       ]:
+            if self.odelab_solver in dir(module):
+                self.scheme = getattr(module, self.odelab_solver)(h)
+                break
+        self.solver = self.odelab.Solver(scheme=self.scheme,
+                                         system=self.system)
+
+        # Set initial condition
+        self.solver.initialize(self.U0)
+        # Solve problem in odelab
+        self.solver.run(self.t[-1])
+        # Retrive solution
+        with self.solver.open_store() as events:
+            for i in range(self.neq):
+                self.u[:, i] = events[i]
+        # PROBLEM: will the events correspond to self.t? Probably
+        # not for adaptive methods...
+        return self.u, self.t
+
 
     def solve(self, time_points, terminate=None):
         """
@@ -2031,7 +2061,7 @@ class odelab(Adaptive):
         self.t = np.asarray(time_points)
         self.initialize_for_solve()
 
-
+        scheme = self.odelab.scheme.classic.ExplicitEuler
         self.sympy.mpmath.mp.dps = 15  # accuracy
         self.ufunc = self.sympy.mpmath.odefun(
             self.f4odefun, time_points[0], self.U0)
@@ -2087,16 +2117,16 @@ class SolverImplicit(Solver):
         # control by number of intern steps and error tolerance
         while i <= self.max_iter and error > self.eps_iter:
             if self.nonlinear_solver == 'Picard':
-                unew = self.Picard_update(u_new)
+                u_new = self.Picard_update(u_new)
             elif self.nonlinear_solver == 'Newton':
                 F, Jac = self.Newton_system(u_new)
                 du = F/Jac if self.neq == 1 else np.linalg.solve(Jac, F)
-                unew = u_new - du
+                u_new = u_new - du
             elif self.nonlinear_solver == 'FixedPoint':
-                unew = un + dt*f(u_new,tn)
-            error = np.abs(unew - u_new).max()
+                u_new = un + dt*f(u_new,tn)
+            error = np.abs(u_new - u_new).max()
             r = self.relaxation    # Relax factor
-            u_new = r*unew + (1-r)*un
+            u_new = r*u_new + (1-r)*un
             i += 1
         return u_new
 
@@ -2289,64 +2319,75 @@ class AdaptiveResidual(Adaptive):
                     break
 
                 self.solver.set_initial_condition(self.u[-1])
-                unew, tnew = self.solver.solve(time_points, terminate)
-                R = self.residual(unew[-2], unew[-1], tnew[-2], tnew[-1])
+                u_new, tnew = self.solver.solve(time_points, terminate)
+                R = self.residual(u_new[-2], u_new[-1], tnew[-2], tnew[-1])
                 if print_info:
                     print '\n%d time points in (t[%d], t[%d]) = (%.3g, %.3g)' \
                         % (ntpoints, k-1, k, t[k-1], t[k])
                     print 'Residual = %g, Tolerance = %g, calling %s' % \
                         (R, self.atol, self.solver.__class__.__name__)
                 # reintegrate with time_step = dt/2
-            self.u.extend(unew[1:])
+            self.u.extend(u_new[1:])
             self.t.extend(tnew[1:])
         return self.u, self.t
 
 
 class RK34(Adaptive):
     """
-    Adaptive 4th-rder Runge-Kutta method.
-    solve returns u, t at the adaptively computed time levels.
+    Adaptive 4th-order Runge-Kutta method.
+    For each time level t[n], the method takes many
+    adaptively chosen (small) time steps to hit the
+    next target level t[n+1].
+    All computed u and t values are available as
+    self.u_adaptive and self.t_adaptive, if desired.
     """
     quick_description = "Adaptive 4th-order Runge-Kutta method"
 
     def initialize_for_solve(self):
         Adaptive.initialize_for_solve(self)
-        self.dt = self.first_step      # current time step
         self.order = 4
         self.t_adaptive = [self.t[0]]  # computed time levels
+        self.u_adaptive = [self.u[0]]  # corresponding u values
 
-    def solve(self, time_points, terminate=None):
-        u, t = Adaptive.solve(self, time_points, terminate)
-        # Note u does not correspond to t - the actual
-        # time levels are in self.t_adaptive
-        if len(self.t_adaptive) != len(u):
-            raise ValueError('Bug: self.t_adaptive has different length from u')
-        t = np.array(self.t_adaptive)
-        return u, t
+    def intermediate_step(self, u, t, dt):
+        """Parmeters: u at time t, dt is time step."""
 
-    def advance(self):
-        u, f, n, t, dt = self.u, self.f, self.n, self.t, dt
+        f = self.f
+        K1 = f(u,                   t)
+        K2 = f(u + dt*K1/2.,        t + dt/2.)
+        K3 = f(u + dt*K2/2,         t + dt/2)
+        Z3 = f(u - dt*K1 + 2*dt*K2, t + dt)
+        K4 = f(u + dt*K3,           t + dt)
 
-        K1 = f(u[n],                   t)
-        K2 = f(u[n] + dt*K1/2.,        t + dt/2.)
-        K3 = f(u[n] + dt*K2/2,         t + dt/2)
-        Z3 = f(u[n] - dt*K1 + 2*dt*K2, t + dt)
-        K4 = f(u[n] + dt*K3,           t + dt)
-
-        unew = dt/6.*(K1 + 2*K2 + 2*K3 + K4)
+        u_new = dt/6.*(K1 + 2*K2 + 2*K3 + K4)
         self.t_adaptive.append(t+dt)
+        self.u_adaptive.append(u_new)
 
         # Adjust dt
         error = dt/6.*(2*K2 + Z3 - 2*Y3 - Y4)
-        abs_error = np.linalg.norm(error)
+        error = np.linalg.norm(error)  # scalar measure
+        tol = self.rtol*np.linalg.norm(u_new) + self.atol
         if abs_error > 1E-14:
-            dt_new *= (self.atol/abs_error)**(1./self.order)
-            if dt_new <= self.max_step and self.dt_new >= self.min_step:
-                self.dt = dt_new
+            dt_new *= (tol/error)**(1./self.order)
+            if self.min_step <= dt_new <= self.max_step:
+                dt = dt_new
 
-        return unew
+        return u_new, dt
 
+    def advance(self):
+        """Advance from t[n] to t[n+1] in (small) adaptive steps."""
+        n = self.n
+        u = self.u[n]
+        t = t_n = self.t[n]
+        t_np1 = self.t[n+1]
+        dt = self.t[n+1] - self.t[n]  # initial dt
 
+        while t <= t_np1:
+            u, dt = self.intermediate_step(u, t, dt)
+            if t+dt > t_np1:  # fit last step so we hit t_np1
+                dt = t_np1 - t
+            t += dt
+        return u
 
 
 class RKFehlberg(Adaptive):
@@ -2365,9 +2406,9 @@ class RKFehlberg(Adaptive):
            return sorted([x, y, z])[1]
 
         f, n, rtol, atol = self.f, self.n, self.rtol, self.atol
-        u_n, t_n, t_next = self.u[n], self.t[n], self.t[n+1]
+        u_n, t_n, t_np1 = self.u[n], self.t[n], self.t[n+1]
 
-        dt = t_next - t_n
+        dt = t_np1 - t_n
 
         # default setting of step size
         min_step, max_step, h = \
@@ -2404,11 +2445,11 @@ class RKFehlberg(Adaptive):
              2197/4104.,
              -1/5.)
 
-        uwork = [u_n,]; twork = [t_n,]
-        u, t = u_n, t_n
+        # u_i and t_i are intermediate steps between t_n and t_np1
+        u_i = [u_n]; t_i = [t_n]
 
-        while abs(t - t_n) < abs(t_next - t_n):
-            u, t = uwork[-1], twork[-1]
+        while abs(t - t_n) < abs(t_np1 - t_n):
+            u, t = u_i[-1], t_i[-1]
 
             # internal steps
             k1 = h*f(u, t)
@@ -2430,7 +2471,8 @@ class RKFehlberg(Adaptive):
 
             # Close enough or step size can not be reduced any more
             if rms_norm <= 1. or h <= min_step:
-                uwork.append(u_new); twork.append(t+h)
+                u_i.append(u_new)
+                t_i.append(t+h)
 
             # prevent the error of dividing absolute zero
             error = np.asarray([(1e-16 if x == 0. else x) for x in error]) \
@@ -2438,14 +2480,14 @@ class RKFehlberg(Adaptive):
 
             # Factor to adjust next step size
             s = (tol/(2*error))**0.25
-            # factor should be in a reasonable range[0.1,4.0]
+            # Factor should be in a reasonable range[0.1,4.0]
             s = min(map(middle, s)) if self.neq > 1 else middle(s)
 
-            # step size should be in reasonable range [min_step, max_step]
+            # Step size should be in range [min_step, max_step]
             h = middle(h*s, y=min_step, z=max_step)
 
-            # h should be set to 't_next-twork[-1]' at the last intern step.
-            h = min(h, t_next-twork[-1])
+            # h should be set to 't_np1-t_i[-1]' at the last intern step.
+            h = min(h, t_np1-t_i[-1])
 
         return u_new
 
@@ -2510,13 +2552,13 @@ class Ode_scipy(Adaptive):
 
     def advance(self):
         u, f, n, t = self.u, self.f, self.n, self.t
-        unew = self.integrator.integrate(t[n+1])
+        u_new = self.integrator.integrate(t[n+1])
         if not self.integrator.successful():
             print 'Warning: %s call to scipy.integrate.ode.method.integrate was not successful' % self.__class__.__name__
-        if len(unew) == 1:
-            return unew[0]
+        if len(u_new) == 1:
+            return u_new[0]
         else:
-            return unew
+            return u_new
 
 class Vode(Ode_scipy):
     '''

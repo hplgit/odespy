@@ -577,17 +577,37 @@ different.
 
 ======= Inner Workings of the Package =======
 
-The solvers are organized as classes in a class hierarchy with class
-`Solver` as superclass. Each class is initialized by the right-hand
+There are three basic entities when solving ODEs numerically: the
+definition of the *ODE system*, the *time-stepping method*, and
+the *solver* that runs the "time loop" and stores results.
+
+The information about the ODE system is made very simple: the user
+provides 1) an object that can be called as a Python function `f(u,
+t)`, and 2) an array or list with the initial values.  Some users will
+wrap this information in their own data structures, e.g., a class.
+
+The time-stepping method and the algorthm for calling the time-stepping
+are collected in a solver class. All the solver classes are
+related in a class hierarchy. Each solver class initialized by the right-hand
 side function (`f`) and an optional set of parameters for controlling
-various parts of the solution process. Below we describe how the
-superclass and its subclasses work and how parameters are registered
-and initialized.
+various parts of the solution process. The solver object is also
+used to set the initial condition (`set_initial_condition`) and
+to run the solution process (`solve`). The time-stepping scheme
+is isolated in a method `advance` in the solver classes, but
+for some schemes or external software packages the separation of
+doing one step and doing the whole time integration is less feasible.
+
+The package does not interact with visualization tools - the array
+containing the solution is returned to the user and must be further
+processed and visualized in the user's code.
+
+Below we describe how the classes in the solver hierarchy work and how
+parameters are registered and initialized.
 
 ===== Solver Parameters =====
 label{odes:parameters}
 
-The `ODE` module defines a global dictionary `_parameters` holding
+The `solver` module defines a global dictionary `_parameters` holding
 all legal parameters. Other modules imports this `_parameters` dict
 and updates it with their own additional parameters.
 
@@ -676,6 +696,7 @@ user-supplied function.)
 Each solver in this package is implemented as a class in a class hierarchy.
 Basic, common functionality is inherited from super classes, and the
 actual solver class implements what is specific for the method in question.
+
 
 === The Super Class ===
 
