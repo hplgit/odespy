@@ -270,6 +270,12 @@ _parameters = dict(
         default=0.9,
         type=float),
 
+    # odelab parameters
+    odelab_solver = dict(
+        help='Name of Solver class in odelab',
+        default='RungeKutta34',
+        type=str),
+
     # Vode_PyDS parameters
     init_step = dict(
         help='Fixed step size for time mesh.',
@@ -1562,7 +1568,6 @@ class RK2(Solver):
         return unew
 
 
-
 class RK4(Solver):
     """
     Standard RK4 method::
@@ -1588,7 +1593,6 @@ class RK4(Solver):
         K4 = dt*f(u[n] + K3, t[n] + dt)
         unew = u[n] + (1/6.0)*(K1 + 2*K2 + 2*K3 + K4)
         return unew
-
 
 
 class RK3(Solver):
@@ -1990,6 +1994,54 @@ class SymPy_odefun(Solver):
         return self.u, self.t
 
 
+class odelab(Adaptive):
+    """
+    Wrapper for the odelab package.
+    """
+    quick_description = "interface to all solvers in odelab"
+
+    _required_parameters = Adaptive._required_parameters + \
+        ['odelab_solver']
+    _optional_parameters = Adaptive._optional_parameters + \
+        ['jac', 'jac_args', 'jac_kwargs', ]
+
+    def initialize(self):
+        try:
+            import odelab
+            self.odelab = odelab
+        except ImportError:
+            raise ImportError,'odelab is not installed - needed for sympy_odefun'
+
+    def initialize_for_solve(self):
+        # odelab requires f(t, u), not f(u, t, *args, **kwargs)
+        # self.f4odelab(t, u) is what we pass on to odelab
+        self.f4odelab = lambda t, u: self.f(u, t, *self.f_args, **self.f_kwargs)
+        Solver.initialize_for_solve(self)
+
+        self.system = self.odelab.System(self.f4odelab)
+        [[[
+
+    def solve(self, time_points, terminate=None):
+        """
+        The complete solve method must be overridded in this class
+        since odelab. is such a solve method.
+        """
+        if terminate is not None:
+            print 'Warning: odelab.solve ignores the terminate function!'
+        self.t = np.asarray(time_points)
+        self.initialize_for_solve()
+
+
+        self.sympy.mpmath.mp.dps = 15  # accuracy
+        self.ufunc = self.sympy.mpmath.odefun(
+            self.f4odefun, time_points[0], self.U0)
+
+        # u and t to be returned are now computed by sampling self.ufunc
+        # at the specified time points
+        self.u = np.array([self.ufunc(t) for t in time_points])
+        self.t = np.asarray(time_points)
+        return self.u, self.t
+
 
 class SolverImplicit(Solver):
     """
@@ -2250,6 +2302,53 @@ class AdaptiveResidual(Adaptive):
         return self.u, self.t
 
 
+class RK34(Adaptive):
+    """
+    Adaptive 4th-rder Runge-Kutta method.
+    solve returns u, t at the adaptively computed time levels.
+    """
+    quick_description = "Adaptive 4th-order Runge-Kutta method"
+
+    def initialize_for_solve(self):
+        Adaptive.initialize_for_solve(self)
+        self.dt = self.first_step      # current time step
+        self.order = 4
+        self.t_adaptive = [self.t[0]]  # computed time levels
+
+    def solve(self, time_points, terminate=None):
+        u, t = Adaptive.solve(self, time_points, terminate)
+        # Note u does not correspond to t - the actual
+        # time levels are in self.t_adaptive
+        if len(self.t_adaptive) != len(u):
+            raise ValueError('Bug: self.t_adaptive has different length from u')
+        t = np.array(self.t_adaptive)
+        return u, t
+
+    def advance(self):
+        u, f, n, t, dt = self.u, self.f, self.n, self.t, dt
+
+        K1 = f(u[n],                   t)
+        K2 = f(u[n] + dt*K1/2.,        t + dt/2.)
+        K3 = f(u[n] + dt*K2/2,         t + dt/2)
+        Z3 = f(u[n] - dt*K1 + 2*dt*K2, t + dt)
+        K4 = f(u[n] + dt*K3,           t + dt)
+
+        unew = dt/6.*(K1 + 2*K2 + 2*K3 + K4)
+        self.t_adaptive.append(t+dt)
+
+        # Adjust dt
+        error = dt/6.*(2*K2 + Z3 - 2*Y3 - Y4)
+        abs_error = np.linalg.norm(error)
+        if abs_error > 1E-14:
+            dt_new *= (self.atol/abs_error)**(1./self.order)
+            if dt_new <= self.max_step and self.dt_new >= self.min_step:
+                self.dt = dt_new
+
+        return unew
+
+
+
+
 class RKFehlberg(Adaptive):
     """The classical adaptive Runge-Kutta-Fehlberg method of order 4-5."""
     quick_description = "Adaptive Runge-Kutta-Fehlberg (4,5) method"
@@ -2258,7 +2357,7 @@ class RKFehlberg(Adaptive):
 
 
     def initialize_for_solve(self):
-        Solver.initialize_for_solve(self)
+        Adaptive.initialize_for_solve(self)
 
     def advance(self):
         # auxilatory function to pick up the middle number from 3 floats
@@ -2444,9 +2543,11 @@ class Vode(Ode_scipy):
 class Dopri5(Ode_scipy):
     """
     Wrapper for scipy.integrate.ode.dopri5, which applies the
-    Dormand&Prince method of order 5.
+    Dormand&Prince method of order 5(4), based on the Fortran
+    implementation by Hairer and Wanner.
+    See http://www.unige.ch/~hairer/software.html.
     """
-    quick_description = "Dormand & Prince method of order 5 (SciPy)"
+    quick_description = "Dormand & Prince method of order 5(4) (scipy)"
 
     _optional_parameters = Ode_scipy._optional_parameters + \
         ['ifactor', 'dfactor', 'beta', 'safety']
@@ -2458,9 +2559,11 @@ class Dopri5(Ode_scipy):
 class Dop853(Ode_scipy):
     """
     Wrapper for scipy.integrate.ode.dop853, which applies the
-    Dormand&Prince method of order 8(5,3).
+    Dormand&Prince method of order 8(5,3), based on the Fortran
+    implementation by Hairer and Wanner.
+    See http://www.unige.ch/~hairer/software.html.
     """
-    quick_description = "Adaptive Dormand & Prince method of order 8(5,3) (SciPy)"
+    quick_description = "Adaptive Dormand & Prince method of order 8(5,3) (scipy)"
 
     _optional_parameters = Ode_scipy._optional_parameters + \
         ['ifactor', 'dfactor', 'beta', 'safety']
