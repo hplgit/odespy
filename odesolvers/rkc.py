@@ -106,6 +106,7 @@ ATOL =%s should be either a scalar or a vector of length NEQ=%d.
             # If spcrad is in form of spcrad(u,t), wrap for Fortran code.
             spcrad = self.spcrad
             self.spcrad_f77 = lambda t,u: np.asarray(spcrad(u,t))
+        # XXX WHY NOT CALL Adaptive.initialize?
         Solver.initialize_for_solve(self)   # Common settings
 
     def initialize(self):

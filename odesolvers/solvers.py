@@ -1,111 +1,136 @@
 # Author: Liwei Wang, Hans Petter Langtangen
 
-"""
-This module contains the base class ``Solver`` in the ``odesolvers``
-package, as well as implementations of many subclasses.
+'''
+This module contains the base class ``Solver``
+package and the implementations of many subclasses.
 
 
 How to implement a new solver
 =============================
 
-Dependency preparation
+Simple explicit solver
 ----------------------
 
-This step is involved only when developers intend to wrap an existing
-package into odesolvers.
+A new non-adaptive time-stepping scheme can often be implemented by
+just subclassing ``Solver`` and writing the ``advance`` method
+to define the time-stepping scheme. Here is how the 4th-order
+Runge-Kutta is implemented::
+
+    class RK4(Solver):
+        quick_description = "Explicit 4th-order Runge-Kutta method"
+
+        def advance(self):
+            u, f, n, t = self.u, self.f, self.n, self.t
+            dt = t[n+1] - t[n]
+            dt2 = dt/2.0
+            K1 = dt*f(u[n], t[n])
+            K2 = dt*f(u[n] + 0.5*K1, t[n] + dt2)
+            K3 = dt*f(u[n] + 0.5*K2, t[n] + dt2)
+            K4 = dt*f(u[n] + K3, t[n] + dt)
+            u_new = u[n] + (1/6.0)*(K1 + 2*K2 + 2*K3 + K4)
+            return u_new
+
+The ``quick_description`` string is needed for the class to appear
+in the package's table of contents.
+
+Implicit solver
+---------------
+
+See examples in the ``solver.py`` file, class ``BackwardEuler``,
+for instance.
+
+Adaptive solver
+---------------
+
+See examples in the ``solver.py`` file, class ``RK43``,
+for instance.
+
+Wrapping other packages
+-----------------------
+
+This section is for developers who intend to wrap an existing
+package and integrate with the present one..
 
 If the original package is not written in Python language, developers
-need to apply some specific tools (like F2PY or SWIG) to create an
-extension module to make the package accessible from our Python
+need to apply some specific tools (like F2PY, Cython, or SWIG) to create an
+extension module to make the package accessible from Python
 code.
 
-Otherwise, if the original package is also a Python software, developers
- need to install and import the desired package as a Python module.
+On the other hand, if the original package is also a Python software,
+developers need to install and import (in ``initialize``) the desired
+package as a Python module and just write a class in the ``Solver``
+hierarchy that calls the proper functions in the package. See the
+classes ``SymPy_odefun`` and ``Ode_scipy`` (and its subclasses).
 
 By an attempt to import these necessary modules (often set in method
 initialize()), we can check whether the necessary dependencies are
 installed properly.
 
-Definition of legal parameters and their properties
----------------------------------------------------
+Definition of parameters and their properties
+---------------------------------------------
 
 Each solver has a set of specific parameters depending on its
 underlying method. For example, adaptive solvers will be more
-likely to apply attributes for step control, like first_step, min_step,
-max_step. And a collection of methods probably need to provide a
-parameter for users to make method choice, like ode_method.
+likely to apply (many) attributes for step-size control.
+When integrating a new method, first search in the ``_parameters``
+dictionary in ``solver.py`` if some parameters can be reused
+for the new solver. New parameters are added to the ``_parameters``
+dictionary, either in the ``solver.py`` or by importing ``solver``
+and updating ``solver._parameters``, see ``rkc.py`` for an example.
 
-Developers should try to search in dictionary _parameters for suitable
- items to represent the desired parameters. If there is no
-suitable items found in this dictionary, developer need to supplement
- new items in it.
+Each solver class lists the required and optional parameters
+it needs in the class variables ``_optional_parameters`` and
+``_required_parameters``. Very often these lists are inherited,
+or just a few new parameters are added to the list already
+defined in the superclass.
 
-There is no need to define input parameters one by one. With the help
-of variable _optional_parameters and _required_parameters,
-all parameters with names in these two name lists would be consid-
-ered as legal in new solver.
+Sometimes values of parameters (or other properties) need to be
+changed in a solver, e.g., because there are certain relations between
+various parameters. Appropriate adjustments and checks are done in the
+method ``initialize_for_solve``, which is called in the beginning of
+the "solve" process (before any computations take place).  Many
+classes provide examples on this, e.g., class ``RKC`` in ``rkc.py``.
+This particular class shows how to generate input parameters
+to the Fortran code that are not given by the user, but automatically
+derived in the Python code from other data.
 
-Furthermore, if a parameter in new solver has some properties
-different from general settings in _parameters, developers can reset(or
-supplement) these properties in function adjust_parameters().
+Another method that is called from ``solve`` is ``validate_data``. The
+solver class can use this method to check for consistency of data
+structures before starting the numerical computations.  As an example,
+the class ``Lsodes`` in the ``odepack.py`` file imposes relations
+between the input data: two input integer arrays ``ia`` and ``ja``
+must be input simultaneously, ``len(ia) == neq + 1``, and ``ia[neq] =
+len(ja)``. These checks are done in Python before calling the Fortran
+solver.
 
-Special check in validate_data()
---------------------------------
 
-For some complicated solvers with many relevant input parameters,
-there are possibly special relationship requirements inbetween some
-specific input parameters.
+The solve and advance methods
+-----------------------------
 
-For example, in class odesolvers.Lsodes, there are special require-
-ments for the values of two input integer arrays ``ia`` and ``ja``:
+Simple methods can just implement ``advance`` to bring the solution
+one step forward in time. The existing ``solve`` method derived from
+the superclass is general enough to administer the whole solution
+process.
 
-  * ``ia`` and ``ja`` must be input simultaneously.
+Adaptive solvers will typically think of ``advance`` as bringing the
+solution to the next user-desired time level, using an unknown set of
+smaller time steps whose sizes must be determined. Then there will
+hence be a time loop within ``advance``, while the outer time loop in
+``solve`` takes care of the stepping between the user-desired time
+levels. (The simplest methods just takes one step between the
+user-desired time levels.)
 
-  * ``len(ia) == neq + 1``
+When wrapping solvers in external software, it is occasionally not
+feasible to implement ``advance`` because one wants to rely on the
+software's ability to solve the whole ODE problem. Then it is more
+natural to write a new ``solve`` method (using ``Solver.solve`` as
+model) and call up the solve functionality in the external
+software. Class ``SymPy_odefun`` provides an example. On the other
+hand, the wrappers for the ``scipy`` solvers (``vode`` for instance)
+applies ``solve`` from the present package and the ``scipy`` functions
+for doing one (adaptive) time step, called in the ``advance`` method.
 
-  * ``ia[neq] = len(ja)``
-
-Most of the automatic checking are taken in initialization step. We
-need to take extra check for the above requirements after all the
-inputs are initialized. Thus a new function check_iaja() is defined
-in odesolvers.Lsodes, and injected into function validate_data().
-
-Internal settings in initialize_for_solve()
--------------------------------------------
-
-When I tried to wrap some complicated ODE software, some param-
-eters are found to be dependent on values of other parameters,
-although they are required as inputs for these underlying ODE
-software.
-
-For example, as an input parameter for rkc.f, info[1] is an integer
- flag to indicate whether function spcrad is supplied by users.
-This kind of parameters are required by underlying software, but
-unnecessary to be valued from user's input. This is why I called them
-as internal parameters.
-
-Function initialize_for_solve() is used to initialize this kind of
-parameters before they are passed to the underlying software.
-
-Step forward in advance()
--------------------------
-
-In function advance(), solution value for next time point should be
-returned. This is the only mandatory step to implement a new solver.
-
-For simple numerical methods (like ForwardEuler method), numerical
- scheme is implemented directly in this function. If the new solver
-is a wrapper to another module(either Python module, or extension
-module), iteration in underlying package will be ready to start if
-Python code pass all the necessary parameters to the underlying
-module according to its user interface.
-
-In the user interfaces of some ODE software, like sympy.mpamath.odeint,
-solving procedure is started directly with the whole sequence of time
-points, but not step by step. Then developers should turn to start
-iteration directly in function solve().
-
-"""
+'''
 
 import pprint, sys, os, inspect
 import numpy as np
