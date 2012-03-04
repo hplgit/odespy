@@ -28,7 +28,7 @@ for package, module in remove:
     packages[package].remove(module)
 
 source_file_dirs = [os.curdir]  # abs path or relative path to this dir
-docdir = 'API'  # name of subdir to contain generated documentation
+docdir = 'api'  # name of subdir to contain generated documentation
 project_name = 'odesolver API'
 author = 'Liwei Wang and Hans Petter Langtangen'
 version = '0.1'
@@ -224,7 +224,7 @@ if failure:
     sys.exit(1)
 
 
-print '\nrun google-chrome API/_build/html/index.html to see the documentation'
+print '\nrun google-chrome %s/_build/html/index.html to see the documentation' % docdir
 print '\nsee tmp.out for output from make html'
 
 
