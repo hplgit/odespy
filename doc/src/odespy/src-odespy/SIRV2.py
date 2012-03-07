@@ -7,13 +7,13 @@ def f(u, t, beta, nu, p):
             nu*I,
             p(t)*S]
 
-import odesolvers
+import odespy
 import numpy as np
 import sys, time
 import matplotlib.pyplot as mpl
 
 def simulate(beta, nu, p, S0, I0, frame_counter=0, mpl_lines=None):
-    solver = odesolvers.Euler(f, f_args=(beta, nu, p))
+    solver = odespy.Euler(f, f_args=(beta, nu, p))
     solver.set_initial_condition([S0, I0, 0, 0])
     dt = 0.5  # t counts days
     T = 60

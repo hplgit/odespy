@@ -12,8 +12,8 @@ class ExponentialGrowth:
 
 f = ExponentialGrowth(c=0.1, A=1.5)
 
-import odesolvers
-solver = odesolvers.RK4(f)
+import odespy
+solver = odespy.RK4(f)
 solver.set_initial_condition(f.A)
 
 import numpy

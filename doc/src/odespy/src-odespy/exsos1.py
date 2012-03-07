@@ -25,11 +25,11 @@ class WhiteNoiseOscillator:
 
 from numpy import pi, linspace
 from matplotlib.pyplot import *
-import odesolvers
+import odespy
 
 f = WhiteNoiseOscillator(b=0.1, c=pi**2, sigma=1)
-methods = [odesolvers.Heun(f), odesolvers.RK4(f),
-           odesolvers.ForwardEuler(f)]
+methods = [odespy.Heun(f), odespy.RK4(f),
+           odespy.ForwardEuler(f)]
 for method in methods:
     f.connect_solver(method)
     solver.set_initial_condition([0,0])  # start from rest

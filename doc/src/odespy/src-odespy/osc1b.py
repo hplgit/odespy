@@ -1,6 +1,6 @@
 """Oscillating pendulum."""
 
-import odesolvers, numpy
+import odespy, numpy
 from math import sin, pi, sqrt
 
 c = 1
@@ -10,7 +10,7 @@ def f(u, t):
     theta, omega = u
     return [omega, -c*sin(theta)]
 
-solver = odesolvers.RK4(f)
+solver = odespy.RK4(f)
 solver.set_initial_condition([Theta, 0])
 freq = sqrt(c)      # frequency of oscillations when Theta is small
 period = 2*pi/freq  # the period of the oscillations

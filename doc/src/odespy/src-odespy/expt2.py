@@ -13,8 +13,8 @@ class Gaussian(Problem):
     def __call__(self, u, t):
         return -2*(t-self.mu)/self.sigma**2*u
 
-import odesolvers
-solver = odesolvers.RK4(f)
+import odespy
+solver = odespy.RK4(f)
 solver.set_initial_condition(A)
 
 problem = Gaussian(mu=5, sigma=0.5)

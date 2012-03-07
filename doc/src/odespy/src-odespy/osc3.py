@@ -15,16 +15,16 @@ class Problem:
 
 problem = Problem(c=1, Theta=pi/4)
 
-import odesolvers
+import odespy
 solvers = [
-    odesolvers.ThetaRule(problem, theta=0),   # Forward Euler
-    odesolvers.ThetaRule(problem, theta=0.5), # Midpoint
-    odesolvers.ThetaRule(problem, theta=1),   # Backward Euler
-    odesolvers.RK4(problem),
-    odesolvers.RK2(problem),
-    odesolvers.MidpointIter(problem, max_iter=5, eps_iter=0.01),
-    odesolvers.Leapfrog(problem),
-    odesolvers.LeapfrogFiltered(problem),
+    odespy.ThetaRule(problem, theta=0),   # Forward Euler
+    odespy.ThetaRule(problem, theta=0.5), # Midpoint
+    odespy.ThetaRule(problem, theta=1),   # Backward Euler
+    odespy.RK4(problem),
+    odespy.RK2(problem),
+    odespy.MidpointIter(problem, max_iter=5, eps_iter=0.01),
+    odespy.Leapfrog(problem),
+    odespy.LeapfrogFiltered(problem),
     ]
 
 theta_exact = lambda t: problem.Theta*numpy.cos(sqrt(problem.c)*t)

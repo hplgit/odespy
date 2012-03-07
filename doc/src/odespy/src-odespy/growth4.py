@@ -5,10 +5,10 @@ A = 1.5
 def f(u, t):
     return c*u
 
-import odesolvers, numpy
+import odespy, numpy
 from matplotlib.pyplot import *
 
-solver = odesolvers.RK4(f)
+solver = odespy.RK4(f)
 
 # Split time domain into subdomains and
 # integrate the ODE in each subdomain

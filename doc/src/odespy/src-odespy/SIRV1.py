@@ -7,7 +7,7 @@ def f(u, t, beta, nu, p):
             nu*I,
             p(t)*S]
 
-import odesolvers
+import odespy
 import numpy as np
 import sys
 
@@ -18,7 +18,7 @@ nu = 0.1
 p = lambda t: 0.1 if t >= 6 and t <= 15 else 0
 #p = lambda t: 0.1
 
-solver = odesolvers.Euler(f, f_args=(beta, nu, p))
+solver = odespy.Euler(f, f_args=(beta, nu, p))
 solver.set_initial_condition([S0, I0, 0, 0])
 dt = 0.5  # t counts days
 T = 60

@@ -16,10 +16,10 @@ v0 = 0.1
 w0 = 0.0
 T = 50
 
-import odesolvers, numpy as np, scitools.std as st
+import odespy, numpy as np, scitools.std as st
 a = 0.12   # stable
 a = -0.12  # unstable
-solver = odesolvers.ForwardEuler(f, jac=jac, f_kwargs={'a': a})
+solver = odespy.ForwardEuler(f, jac=jac, f_kwargs={'a': a})
 solver.set_initial_condition([v0, w0])
 time_points = np.linspace(0, T, 401)
 #time_points = np.linspace(0, T, 21)

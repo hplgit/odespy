@@ -371,12 +371,12 @@ _parameters = dict(
     # of matrices
     ja = dict(
         help='Integer array containing the row indices of nonzero entries '
-              'in a sparse matrix (CRS storage scheme)'.
+              'in a sparse matrix (CRS storage scheme)',
         type=(list,tuple,np.ndarray)),
 
     ia = dict(
         help='Integer array containing info where the different rows '\
-              'of a sparse matrix start (CRS storage scheme)'.
+              'of a sparse matrix start (CRS storage scheme)',
         type=(list,tuple,np.ndarray)),
 
     # ml, mu describe banded Jacobian matrix.
@@ -1918,84 +1918,6 @@ class SymPy_odefun(Solver):
         return self.u, self.t
 
 
-class odelab(Adaptive):
-    """
-    Wrapper for the odelab package.
-    """
-    quick_description = "interface to all solvers in odelab"
-
-    _required_parameters = Adaptive._required_parameters + \
-        ['odelab_solver']
-    _optional_parameters = Adaptive._optional_parameters + \
-        ['jac', 'jac_args', 'jac_kwargs', ]
-
-    solvers = 'ExplicitEuler ImplicitEuler RungeKutta4 ExplicitTrapezoidal RungeKutta34 SymplecticEuler Heun Kutta AdamsBashforth Butcher LDIRK343 LobattoIIIA LobattoIIIB LobattoIIIC LobattoIIICs LobattoIIID RadauIIA'.split()
-
-    def initialize(self):
-        try:
-            import odelab
-            self.odelab = odelab
-        except ImportError:
-            raise ImportError,'odelab is not installed - needed for sympy_odefun'
-
-    def initialize_for_solve(self):
-        # odelab requires f(t, u), not f(u, t, *args, **kwargs)
-        # self.f4odelab(t, u) is what we pass on to odelab
-        self.f4odelab = lambda t, u: self.f(u, t, *self.f_args, **self.f_kwargs)
-        Solver.initialize_for_solve(self)
-
-        if self.odelab_solver not in odelab.solvers:
-            raise ValueError('requested solver %s not in %s' % \
-                             (self.odelab_solver, str(odelab.solvers)))
-
-        self.system = self.odelab.System(self.f4odelab)
-
-        h = self.t[1] - self.t[0]
-        # odelab solvers are in different modules...
-        for module in [self.odelab.scheme.classic,
-                       self.odelab.scheme.geometric,
-                       self.odelab.scheme.rungekutta,
-                       ]:
-            if self.odelab_solver in dir(module):
-                self.scheme = getattr(module, self.odelab_solver)(h)
-                break
-        self.solver = self.odelab.Solver(scheme=self.scheme,
-                                         system=self.system)
-
-        # Set initial condition
-        self.solver.initialize(self.U0)
-        # Solve problem in odelab
-        self.solver.run(self.t[-1])
-        # Retrive solution
-        with self.solver.open_store() as events:
-            for i in range(self.neq):
-                self.u[:, i] = events[i]
-        # PROBLEM: will the events correspond to self.t? Probably
-        # not for adaptive methods...
-        return self.u, self.t
-
-
-    def solve(self, time_points, terminate=None):
-        """
-        The complete solve method must be overridded in this class
-        since odelab. is such a solve method.
-        """
-        if terminate is not None:
-            print 'Warning: odelab.solve ignores the terminate function!'
-        self.t = np.asarray(time_points)
-        self.initialize_for_solve()
-
-        scheme = self.odelab.scheme.classic.ExplicitEuler
-        self.sympy.mpmath.mp.dps = 15  # accuracy
-        self.ufunc = self.sympy.mpmath.odefun(
-            self.f4odefun, time_points[0], self.U0)
-
-        # u and t to be returned are now computed by sampling self.ufunc
-        # at the specified time points
-        self.u = np.array([self.ufunc(t) for t in time_points])
-        self.t = np.asarray(time_points)
-        return self.u, self.t
-
 
 class SolverImplicit(Solver):
     """
@@ -2313,12 +2235,17 @@ class RK34(Adaptive):
         """
         Advance from t[n] to t[n+1] in (small) adaptive steps.
 
-        Adaptivity logic: start with dt=t[n+1]-t[n] (one big
-        step), repeat computing the solution and an error
-        estimate e until e < tol.
+        Adaptivity logic:
+        Define ``h`` as the local adaptive time step and ``dt = t[1]-t[0]``.
+        Start with ``h`` as ``first_step`` if ``first_step <= dt``,
+        otherwise ``h = dt``.
+        At each user-specified time level: step ``h`` forward, estimate
+        error, accept solution if error less than tolerance, adjust ``h``,
+        retry with new ``h`` until solution is less than error.
+        Then proceed with a new step. Continue until next user-specified
+        time level.
         """
         # u, t: solution u at time t in between self.t[n] and self.t[n+1]
-        # dt: adaptive time step in between self.t[n] and self.t[n+1]
         n = self.n
         u, t, t_np1 = self.u[n], self.t[n], self.t[n+1]
         dt = tnp1 -t
@@ -2600,6 +2527,88 @@ class Dop853(Ode_scipy):
     # argument list to be passed to scipy.ode for 'dop853' method
     _arglist_scipy = ('atol','rtol','safety','ifactor','dfactor','beta',
                       'nsteps','first_step','max_step')
+
+
+class odelab(Adaptive):
+    """
+    Wrapper for the odelab package.
+    """
+    quick_description = "interface to all solvers in odelab"
+
+    _required_parameters = Adaptive._required_parameters + \
+        ['odelab_solver']
+    _optional_parameters = Adaptive._optional_parameters + \
+        ['jac', 'jac_args', 'jac_kwargs', ]
+
+    solvers = 'ExplicitEuler ImplicitEuler RungeKutta4 ExplicitTrapezoidal RungeKutta34 SymplecticEuler Heun Kutta AdamsBashforth Butcher LDIRK343 LobattoIIIA LobattoIIIB LobattoIIIC LobattoIIICs LobattoIIID RadauIIA'.split()
+
+    def initialize(self):
+        try:
+            import odelab
+            self.odelab = odelab
+        except ImportError:
+            raise ImportError,'odelab is not installed - needed for sympy_odefun'
+
+    def initialize_for_solve(self):
+        # odelab requires f(t, u), not f(u, t, *args, **kwargs)
+        # self.f4odelab(t, u) is what we pass on to odelab
+        self.f4odelab = lambda t, u: self.f(u, t, *self.f_args, **self.f_kwargs)
+        Solver.initialize_for_solve(self)
+
+        if self.odelab_solver not in odelab.solvers:
+            raise ValueError('requested solver %s not in %s' % \
+                             (self.odelab_solver, str(odelab.solvers)))
+
+        self.system = self.odelab.System(self.f4odelab)
+
+        h = self.t[1] - self.t[0]
+        # odelab solvers are in different modules...
+        for module in [self.odelab.scheme.classic,
+                       self.odelab.scheme.geometric,
+                       self.odelab.scheme.rungekutta,
+                       ]:
+            if self.odelab_solver in dir(module):
+                self.scheme = getattr(module, self.odelab_solver)(h)
+                break
+        self.solver = self.odelab.Solver(scheme=self.scheme,
+                                         system=self.system)
+
+        # Set initial condition
+        self.solver.initialize(self.U0)
+        # Solve problem in odelab
+        self.solver.run(self.t[-1])
+        # Retrive solution
+        with self.solver.open_store() as events:
+            for i in range(self.neq):
+                self.u[:, i] = events[i]
+        # PROBLEM: will the events correspond to self.t? Probably
+        # not for adaptive methods...
+        return self.u, self.t
+
+
+    def solve(self, time_points, terminate=None):
+        """
+        The complete solve method must be overridded in this class
+        since odelab. is such a solve method.
+        """
+        if terminate is not None:
+            print 'Warning: odelab.solve ignores the terminate function!'
+        self.t = np.asarray(time_points)
+        self.initialize_for_solve()
+
+        scheme = self.odelab.scheme.classic.ExplicitEuler
+        self.sympy.mpmath.mp.dps = 15  # accuracy
+        self.ufunc = self.sympy.mpmath.odefun(
+            self.f4odefun, time_points[0], self.U0)
+
+        # u and t to be returned are now computed by sampling self.ufunc
+        # at the specified time points
+        self.u = np.array([self.ufunc(t) for t in time_points])
+        self.t = np.asarray(time_points)
+        return self.u, self.t
+
+
+#------------------------------------------------------------------------------
 
 def list_all_solvers():
     """Return all solver classes in this package, excluding superclasses."""

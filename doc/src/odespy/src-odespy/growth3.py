@@ -1,19 +1,19 @@
 """As exgr1.py, but c as argument in f."""
 c = 0.1
 A = 1.5
-import odesolvers
+import odespy
 
 # f has extra positional argument
 def f(u, t, c):
     return c*u
 
-solver = odesolvers.RK4(f, f_args=[c])
+solver = odespy.RK4(f, f_args=[c])
 
 # Alternative: f has extra keyword argument
 def f(u, t, c=1):
     return c*u
 
-solver = odesolvers.RK4(f, f_kwargs={'c': c})
+solver = odespy.RK4(f, f_kwargs={'c': c})
 solver.set_initial_condition(A)
 
 import numpy

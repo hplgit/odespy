@@ -5,8 +5,8 @@ A = 1
 def f(u, t):
     return c*u
 
-import odesolvers
-solver = odesolvers.AdaptiveResidual(f, solver='Euler', atol=1E-3)
+import odespy
+solver = odespy.AdaptiveResidual(f, solver='Euler', atol=1E-3)
 solver.set_initial_condition(A)
 
 import numpy

@@ -15,8 +15,8 @@ def f(x):
     return sqrt(x)
     #return 2*x
 
-import odesolvers
-solver = odesolvers.RungeKutta2(rhs, f_args=[f], f_kwargs={'h': 1E-3})
+import odespy
+solver = odespy.RungeKutta2(rhs, f_args=[f], f_kwargs={'h': 1E-3})
 solver.set_initial_condition(0)
 y_points = linspace(0, 4, 41)
 x, y = solver.solve(y_points)

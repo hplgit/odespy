@@ -15,14 +15,14 @@ class Problem:
 
 problem = Problem(c=1, Theta=pi/4)
 
-import odesolvers
+import odespy
 solvers = [
-    odesolvers.ThetaRule(problem, theta=0),   # Forward Euler
-    odesolvers.ThetaRule(problem, theta=0.5), # Midpoint
-    odesolvers.ThetaRule(problem, theta=1),   # Backward Euler
-    odesolvers.RK4(problem),
-    odesolvers.MidpointIter(problem, max_iter=2, eps_iter=0.01),
-    odesolvers.LeapfrogFiltered(problem),
+    odespy.ThetaRule(problem, theta=0),   # Forward Euler
+    odespy.ThetaRule(problem, theta=0.5), # Midpoint
+    odespy.ThetaRule(problem, theta=1),   # Backward Euler
+    odespy.RK4(problem),
+    odespy.MidpointIter(problem, max_iter=2, eps_iter=0.01),
+    odespy.LeapfrogFiltered(problem),
     ]
 
 N_per_period = 20

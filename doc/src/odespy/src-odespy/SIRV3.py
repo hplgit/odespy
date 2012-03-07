@@ -7,13 +7,13 @@ def f(u, t, beta, nu, p):
             nu*I,
             p(t)*S]
 
-import odesolvers
+import odespy
 import numpy as np
 import sys, time
 
 def simulate(beta, nu, p0, S0, I0, V_T):
     p = lambda t: p0 if 6 <= t <= 6+V_T else 0
-    solver = odesolvers.Euler(f, f_args=(beta, nu, p))
+    solver = odespy.Euler(f, f_args=(beta, nu, p))
     solver.set_initial_condition([S0, I0, 0, 0])
     dt = 0.5  # t counts days
     T = 60

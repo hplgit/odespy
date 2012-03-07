@@ -6,7 +6,7 @@ def f(u, t, beta, nu):
             beta(t)*S*I - nu*I,
             nu*I]
 
-import odesolvers
+import odespy
 import numpy as np
 import sys
 
@@ -17,7 +17,7 @@ nu = 0.1
 I0 = 1
 S0 = 1500.
 
-solver = odesolvers.Euler(f, f_args=(beta, nu))
+solver = odespy.Euler(f, f_args=(beta, nu))
 solver.set_initial_condition([S0, I0, 0])
 dt = 0.5  # t counts days
 T = 60

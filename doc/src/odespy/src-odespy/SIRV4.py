@@ -7,7 +7,7 @@ def f(u, t, beta, nu, p, mu, rho):
             nu*I - mu*R,
             p(t)*S - rho*V]
 
-import odesolvers
+import odespy
 import numpy as np
 import sys
 
@@ -21,7 +21,7 @@ rho = 1./150
 p = lambda t: 0.01*np.sin(np.pi/period*(t-50))**6
 p = lambda t: 0.0
 
-solver = odesolvers.Euler(f, f_args=(beta, nu, p, mu, rho))
+solver = odespy.Euler(f, f_args=(beta, nu, p, mu, rho))
 solver.set_initial_condition([S0, I0, 0, 0])
 dt = 0.5  # t counts days
 T = 1400

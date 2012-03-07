@@ -5,8 +5,8 @@ A = 1.5
 def f(u, t):
     return c*u
 
-import odesolvers
-method = odesolvers.RK4(f)
+import odespy
+method = odespy.RK4(f)
 method.set_initial_condition(A)
 
 import numpy

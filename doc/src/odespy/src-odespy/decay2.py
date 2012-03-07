@@ -3,8 +3,8 @@
 def myrhs(y, x):
     return -y
 
-import odesolvers
-solver = odesolvers.RK4(myrhs)
+import odespy
+solver = odespy.RK4(myrhs)
 solver.set_initial_condition(1)
 
 import numpy

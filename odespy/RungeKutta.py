@@ -97,7 +97,7 @@ class RungeKutta2level(Adaptive):
                         np.vstack((coefficients[:-2,],coefficients[-1,]))
             # Calculate order seperately
             order = [calculate_order_1_level(table_1),
-                     .calculate_order_1_level(table_2)]
+                     calculate_order_1_level(table_2)]
         return order
 
     def initialize_for_solve(self):
@@ -256,26 +256,25 @@ class RungeKutta2level(Adaptive):
                 error[error == 0] = 1E-15
                 #error = np.asarray([(1e-16 if x == 0. else x) \
                 #                    for x in error])
-[[[[rykk inn
-            # Normarized error rate
-            rms = error/tol
-            rms_norm = np.sqrt(np.sum(rms*rms)/self.neq)
 
-            order = float(self._method_order[0])
-            # factor to adjust the size of next step
-            # Formula is from <Numerical Methods for Engineers,
-            #  Chappra & Cannle>
-            s = .8 *((1./rms_norm)**(1/order))
-            # scalar should in range(0.1, 4.)
-            # for better accuracy and smoothness
-            s = middle(s, 0.1, 4.0)
-            h *= s
+                # Normarized error rate
+                rms = error/tol
+                rms_norm = np.sqrt(np.sum(rms*rms)/self.neq)
 
-            # step size should in range(min_step, max_step)
-            h = middle(h, y=min_step, z=max_step)
-            # in case for last intern step
-            h = min(h, t_np1 - t_intermediate[-1])
+                order = float(self._method_order[0])
+                # factor to adjust the size of next step
+                # Formula is from <Numerical Methods for Engineers,
+                #  Chappra & Cannle>
+                s = .8 *((1./rms_norm)**(1/order))
+                # scalar should in range(0.1, 4.)
+                # for better accuracy and smoothness
+                s = middle(s, 0.1, 4.0)
+                h *= s
 
+                # step size should in range(min_step, max_step)
+                h = middle(h, y=min_step, z=max_step)
+                # in case for last intern step
+                h = min(h, t_np1 - t_intermediate[-1])
         return u_new
 
 
@@ -415,10 +414,10 @@ class MyRungeKutta(RungeKutta2level):
     _butcher_tableau = None
     _method_order = None
 
-    _required_parameters = RungeKutta._required_parameters + \
+    _required_parameters = RungeKutta2level._required_parameters + \
                            ['butcher_tableau',]
 
-    _optional_parameters =  RungeKutta._optional_parameters + \
+    _optional_parameters =  RungeKutta2level._optional_parameters + \
                            ['method_order',]
 
     def validate_data(self):
