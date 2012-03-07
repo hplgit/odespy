@@ -1,0 +1,54 @@
+- INSTALL.txt: require Py 2.7, numpy, scipy, sympy,
+  python-scitools, explain this in tutorial too, together with git clone.
+  sundials, odelib
+
+- Refactor RKFehlberg a la RK43?
+
+- Link to all source code files in tutorial.
+
+- Tutorial examples: zombie, u = w*1j*u, pure_diffusion, reaction_diffusion
+
+- Unit tests.
+  Make a class Problem with f, jac, stiff, complex_, a la scipy.integrate,
+  but lett stiff etc be self.stiff such that parameters can vary and
+  determine if the problem is stiff.
+
+- Get description of rkf45.f and rkc.f into doc strings.
+
+- more methods: radau?
+
+setup.py:
+
+Think of an extension module as a set of .f files that are first
+compiled to a library. This is specified by add_library.
+Then an interface .c or .pyf is compiled
+and linked with the library to form an extension module. This is
+specified with add_extension. See scipy.integrate.
+
+#!/usr/bin/env python
+def configuration(parent_package='',top_path=None):
+    from numpy.distutils.misc_util import Configuration
+    config = Configuration('mymodule',parent_package,top_path)
+    config.add_extension('fastcalc', ['src/fastcalc.f90'])
+    return config
+
+if __name__ == "__main__":
+    from numpy.distutils.core import setup
+    setup(configuration=configuration)
+
+More examples are in
+
+  numpy/distutils/tests/
+
+
+setup.py numpy style is to only build extension modules while
+__init__.py imports all the python modules and makes then
+available, either from import or just import
+
+
+mixture of Cython, Python, C, F77: maybe these with separate setup.py
+in separate dirs? Can numpy distutils call up a Cython setup.py?
+Yes, one first runs manually Cython on the .pyx file and creates the
+.c file, then this file is simply added as extension, see
+scipy/io/matlab/setup.py. The setup.py script can run Cython, see
+if that's "official".
