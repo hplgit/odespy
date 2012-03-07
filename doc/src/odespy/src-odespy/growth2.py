@@ -18,7 +18,7 @@ solver.set_initial_condition(f.A)
 
 import numpy
 N = 30  # no of time steps
-time_points = numpy.linspace(0, 10, N+1)
+time_points = numpy.linspace(0, 40, N+1)
 u, t = solver.solve(time_points)
 
 u_exact = f.A*numpy.exp(f.c*t)

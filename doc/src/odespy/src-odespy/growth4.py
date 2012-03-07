@@ -12,7 +12,7 @@ solver = odespy.RK4(f)
 
 # Split time domain into subdomains and
 # integrate the ODE in each subdomain
-T = [0, 1, 3, 6, 10, 20]
+T = [0, 3, 6, 10, 20, 40]
 
 N_tot = 30               # no of time intervals in total
 dt = float(T[-1])/N_tot  # time step, kept fixed

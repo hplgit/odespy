@@ -6,20 +6,10 @@ import numpy as np
 _parameters_RKC = dict(
 
     spcrad = dict(
-        help='Python function returning the spectral radius '
-        'of the Jacobian.'
-
-
-             'This subroutine should be defined in form:       '\
-             '        double precision function spcrad_f77(    '\
-             '       1      neq,t,u)                           '\
-             '  Cf2py intent(hide)  neq                        '\
-             '        integer       neq                        '\
-             '        double precision t,u(neq)                '\
-             '        spcrad_f77 =                             '\
-             '        return                                   '\
-             '        end                                      ',
+        help='Python function of (u, t) returning the spectral radius '\
+             'of the Jacobian in the rkc.f solver.',
         type=callable),
+
     spcrad_f77 = dict(
         help='Fortran version of spcrad function.              '\
              'This subroutine should be defined in form:       '\

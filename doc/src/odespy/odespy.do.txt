@@ -193,14 +193,13 @@ label{ode:sec:exgr}
 Our first example concerns the simple scalar ODE problem $u'=cu$,
 $u(0)=A$, where $A>0$ and $c>0$ are known constants. Using a standard
 Runge-Kutta method of order four, the code for solving the problem in
-the time interval $[0,10]$, with $N=30$ time steps, looks like this:
+the time interval $[0,40]$, with $N=30$ time steps, looks like this:
 
 @@@CODE src-odespy/growth1.py  fromto: c = @
 
 With the `RK4` method and other non-adaptive methods
 the time steps are dictated by the `time_points` array.
-A constant time step of size `time_points[1] - time_points[0] = 1/3`
-is implied in the present example.
+A constant time step of size is implied in the present example.
 
 
 === Parameters in the Right-Hand Side Function ===
@@ -245,7 +244,7 @@ Solvers will call `f` as `f(u, t, *f_args, **f_kwargs)`.
 It is easy to simulate for some time interval $[0, T_1]$,
 the continue with $u(T_1)$ as new initial condition and simulate for
 $t$ in $[T_1, T_2]$ and so on. Let us divide the time
-domain $[0,10]$ into subdomains and compute the solution for
+domain $[0,40]$ into subdomains and compute the solution for
 each subdomain in sequence. The following program performs the steps.
 
 @@@CODE src-odespy/growth4.py  fromto:c = 0.1@

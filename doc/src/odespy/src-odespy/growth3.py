@@ -18,7 +18,7 @@ solver.set_initial_condition(A)
 
 import numpy
 N = 30
-time_points = numpy.linspace(0, 10, N+1)
+time_points = numpy.linspace(0, 40, N+1)
 u, t = solver.solve(time_points)
 
 from matplotlib.pyplot import *
