@@ -7,19 +7,19 @@ import odesolvers
 def f(u, t, c):
     return c*u
 
-method = odesolvers.RK4(f, f_args=[c])
+solver = odesolvers.RK4(f, f_args=[c])
 
 # Alternative: f has extra keyword argument
 def f(u, t, c=1):
     return c*u
 
-method = odesolvers.RK4(f, f_kwargs={'c': c})
-method.set_initial_condition(A)
+solver = odesolvers.RK4(f, f_kwargs={'c': c})
+solver.set_initial_condition(A)
 
 import numpy
 N = 30
 time_points = numpy.linspace(0, 10, N+1)
-u, t = method.solve(time_points)
+u, t = solver.solve(time_points)
 
 from matplotlib.pyplot import *
 plot(t, u)

@@ -35,11 +35,11 @@ for method in solvers:
     method_name = str(method)
     print method_name
 
-    method.set_initial_condition([problem.Theta, 0])
+    solver.set_initial_condition([problem.Theta, 0])
     N = N_per_period*problem.period
     time_points = numpy.linspace(0, T, N+1)
 
-    u, t = method.solve(time_points)
+    u, t = solver.solve(time_points)
 
     theta = u[:,0]
     legends.append(method_name)

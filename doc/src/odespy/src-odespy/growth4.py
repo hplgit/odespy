@@ -8,7 +8,7 @@ def f(u, t):
 import odesolvers, numpy
 from matplotlib.pyplot import *
 
-method = odesolvers.RK4(f)
+solver = odesolvers.RK4(f)
 
 # Split time domain into subdomains and
 # integrate the ODE in each subdomain
@@ -23,10 +23,10 @@ for i in range(len(T)-1):
     N = int(round(T_interval/dt))
     time_points = numpy.linspace(T[i], T[i+1], N+1)
 
-    method.set_initial_condition(A)  # at time_points[0]
+    solver.set_initial_condition(A)  # at time_points[0]
     print 'Solving in [%s, %s] with %d intervals' % \
           (T[i], T[i+1], N)
-    ui, ti = method.solve(time_points)
+    ui, ti = solver.solve(time_points)
     A = ui[-1]  # newest u is next initial condition
 
     plot(ti, ui)

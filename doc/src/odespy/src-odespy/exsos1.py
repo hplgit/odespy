@@ -32,9 +32,9 @@ methods = [odesolvers.Heun(f), odesolvers.RK4(f),
            odesolvers.ForwardEuler(f)]
 for method in methods:
     f.connect_solver(method)
-    method.set_initial_condition([0,0])  # start from rest
+    solver.set_initial_condition([0,0])  # start from rest
     T = 60   # with c=pi**2, the period is 1
-    u, t = method.solve(linspace(0, T, 10001))
+    u, t = solver.solve(linspace(0, T, 10001))
 
     x = u[:,0]
     plot(t, x)

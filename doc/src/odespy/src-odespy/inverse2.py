@@ -25,9 +25,9 @@ class Inverse:
     def discrete(self):
         """Solve dx/dxy = 1/f'(x), x(I[0])=x0."""
         self.y = np.linspace(self.I[0], self.I[1], self.resolution+1)
-        method = odesolvers.RungeKutta4(self._rhs)
-        method.set_initial_condition(self.x0)
-        self.x, self.y = method.solve(self.y)
+        solver = odesolvers.RungeKutta4(self._rhs)
+        solver.set_initial_condition(self.x0)
+        self.x, self.y = solver.solve(self.y)
         return self.x, self.y
 
     def continuous(self):

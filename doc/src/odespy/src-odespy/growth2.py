@@ -13,13 +13,13 @@ class ExponentialGrowth:
 f = ExponentialGrowth(c=0.1, A=1.5)
 
 import odesolvers
-method = odesolvers.RK4(f)
-method.set_initial_condition(f.A)
+solver = odesolvers.RK4(f)
+solver.set_initial_condition(f.A)
 
 import numpy
 N = 30  # no of time steps
 time_points = numpy.linspace(0, 10, N+1)
-u, t = method.solve(time_points)
+u, t = solver.solve(time_points)
 
 u_exact = f.A*numpy.exp(f.c*t)
 error = numpy.abs(u_exact - u).max()

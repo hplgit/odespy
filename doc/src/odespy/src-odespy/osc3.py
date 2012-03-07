@@ -44,13 +44,13 @@ for method in solvers:
     method_name = str(method)
     results[method_name] = {'dt': [], 'error': []}
 
-    method.set_initial_condition([problem.Theta, 0])
+    solver.set_initial_condition([problem.Theta, 0])
 
     for N_per_period in resolutions:
         N = N_per_period*problem.period
         time_points = numpy.linspace(0, T, N+1)
 
-        u, t = method.solve(time_points)
+        u, t = solver.solve(time_points)
 
         theta = u[:,0]
         error = numpy.abs(theta_exact(t) - theta)

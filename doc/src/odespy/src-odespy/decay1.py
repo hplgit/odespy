@@ -6,8 +6,8 @@ def f(u, t):
     return c*u
 
 import odesolvers
-method = odesolvers.RK4(f)
-method.set_initial_condition(A)
+solver = odesolvers.RK4(f)
+solver.set_initial_condition(A)
 
 import numpy
 # Make sure integration interval [0, T] is large enough
@@ -24,7 +24,7 @@ def terminate(u, t, step_no):
     else:
         return False
 
-u, t = method.solve(time_points, terminate)
+u, t = solver.solve(time_points, terminate)
 
 print "Solve u'=%g*u, u(0)=%g, for t in [%g, %g] and u>%g" % \
       (c, A, time_points[0], time_points[-1], tol)

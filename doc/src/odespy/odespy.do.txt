@@ -1,8 +1,67 @@
-The `odesolvers` package contains tools for solving ordinary
-differential equations (ODEs). The user specifies the problem through
-high-level Python code. Both scalar ODEs and systems of ODEs are
-supported.  A wide range of numerical methods for ODEs are offered.
+The `odespy` package makes it easy to specify an ODE problem in
+Python and get it solved by a wide variety of different numerical
+methods.
 
+======= Motivation =======
+
+The `odespy` package grew out of the desire to have a unified interface
+to lots of different methods and software for ODEs. Consider the
+ODE problem
+!bt
+\[ u'' = 3 (1 - u^2) u' + u,\quad u(0)=2,\ u'(0)=1
+!et
+known as the van der Pool oscillator.
+
+[0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+
+!bc fpro
+     program main
+     external f
+     integer i, iopt, iout, istate, itask, itol, iwork,
+    1   lrw, liw, mf, neq, nout
+     double precision atol, t, tout, rtol, rwork, u, urr
+     dimension u(2), rwork(52), iwork(20), urr(5,2)
+     neq = 2
+     mf = 10
+     itol = 1
+     rtol = 0.0d0
+     atol = 1.0d-6
+     lrw = 52
+     liw = 20
+     nout = 5
+     t = 0.0d0
+     tout = 0.2d0
+     u(1)= 2.0d0
+     u(2) = 0.0d0
+     itask = 1
+     istate = 1
+     do 100 iout = 1, nout
+       call dlsode(f,neq,u,t,tout,itol,rtol,atol,itask,
+    1     istate,iopt,rwork,lrw,iwork,liw,jac,mf)
+       urr(iout,1) = u(1)
+       urr(iout,2) = u(2)
+ 100   tout = tout + 2d-1
+     end
+
+     subroutine f(neq, t, u, udot)
+     integer neq
+     double precision t, u, udot
+     dimension u(2), udot(2)
+     udot(1) = u(2)
+     udot(2) = 3.0d0*(1.0d0 - u(1)*u(1))*u(2) - u(1)
+     return
+     end
+!ec
+
+`myode.m`:
+!bc mcod
+      function F = myode(t, u);
+      F(1,1) = u(2)
+      F(2,1) = 3*(1 - u(1)*u(1))*u(2) - u(1)
+!ec
+
+!bc ipy
+>> [tv, uv] = ode45('myode', [0, 1], [2; 0])
 
 ======= Basic Usage =======
 
@@ -79,7 +138,7 @@ notation).
 
 The `time_points` array specifies the time points where we want the
 solution to be computed. The returned array `t` is the same as
-`time_points`.  The simplest numerical methods in the `odesolvers`
+`time_points`.  The simplest numerical methods in the `odespy`
 package apply the `time_points` array directly in the solution. That
 is, the time steps used are given by `time_points[i] -
 time_points[i-1]`, for `i=0,1,...,len(time_points)-1`.  Some more
@@ -136,7 +195,7 @@ $u(0)=A$, where $A>0$ and $c>0$ are known constants. Using a standard
 Runge-Kutta method of order four, the code for solving the problem in
 the time interval $[0,10]$, with $N=30$ time steps, looks like this:
 
-@@@CODE src-tut/growth1.py  fromto: c = @
+@@@CODE src-odespy/growth1.py  fromto: c = @
 
 With the `RK4` method and other non-adaptive methods
 the time steps are dictated by the `time_points` array.
@@ -150,11 +209,11 @@ label{ode:sec:exgr:farg}
 The right-hand side function and all physical parameters are often
 lumped together in a class, for instance,
 
-@@@CODE src-tut/growth2.py  fromto: class Exponential@import numpy
+@@@CODE src-odespy/growth2.py  fromto: class Exponential@import numpy
 
 We may also compare the numerical and exact solution:
 
-@@@CODE src-tut/growth2.py  fromto: u_exact = @
+@@@CODE src-odespy/growth2.py  fromto: u_exact = @
 
 Instead of having the `c` variable as a global variable or
 in a class, we may include it as an extra argument to `f`, either
@@ -163,7 +222,7 @@ can be sent to `f` via the constructor argument `f_args` (a list/tuple of
 variables), while a dictionary `f_kwargs` is used to transfer
 keyword arguments to `f` via the constructor:
 
-@@@CODE src-tut/growth3.py  fromto: \# f has extra@method\.set_initial
+@@@CODE src-odespy/growth3.py  fromto: \# f has extra@method\.set_initial
 
 The right-hand side function `f` may feature both extra positional
 arguments and extra keyword arguments,
@@ -171,7 +230,7 @@ arguments and extra keyword arguments,
 def f(u, t, arg1, arg2, arg3, ..., kwarg1=val1, kwarg2=val2, ...):
     ...
 
-method = odesolvers.classname(f,
+method = odespy.classname(f,
                     f_args=[arg1, arg2, arg3, ...],
                     f_kwargs=dict(kwarg1=val1, kwarg2=val2, ...))
 
@@ -189,7 +248,7 @@ $t$ in $[T_1, T_2]$ and so on. Let us divide the time
 domain $[0,10]$ into subdomains and compute the solution for
 each subdomain in sequence. The following program performs the steps.
 
-@@@CODE src-tut/growth4.py  fromto:c = 0.1@
+@@@CODE src-odespy/growth4.py  fromto:c = 0.1@
 
 
 ===== Example: Decay Equation =====
@@ -200,11 +259,11 @@ reached with an accuracy of $0.001$. For this purpose we need a
 `terminate` function, which returns `True` when the termination
 criterion is met:
 
-@@@CODE src-tut/decay1.py  tol =@u, t =
+@@@CODE src-odespy/decay1.py  tol =@u, t =
 
 The complete program may take the form
 
-@@@CODE src-tut/decay1.py  fromto: c = -@
+@@@CODE src-odespy/decay1.py  fromto: c = -@
 
 Note that the size of the returned arrays `u` and `t` fits
 the time interval up to the point of termination by `terminate`.
@@ -212,14 +271,14 @@ the time interval up to the point of termination by `terminate`.
 
 ===== Example: Decay Equation with Other Symbols =====
 
-The `odesolvers` package applies `u` for the unknown function or
+The `odespy` package applies `u` for the unknown function or
 vector of unknown functions and `t` as the name of the independent
 variable. Many problems involve other symbols for functions and
 independent variables. These symbols should be reflected in the code.
 For example, here is a coding example involving the differential
 equation $y'(x)=-y(x)$, $y(0)=1$:
 
-@@@CODE src-tut/decay2.py  fromto: def myrhs@
+@@@CODE src-odespy/decay2.py  fromto: def myrhs@
 
 As shown, we use `y` for `u`, `x` for `t`, and `x_points` instead
 of `time_points`.
@@ -244,7 +303,7 @@ introducing $c = g/L$.
 _theta'' + c*sin(theta) = 0_, with _theta(0) = Theta_ and _theta'(0) = 0_.
 # #endif
 This problem must be expressed as a first-order ODE system if it is
-going to be solved by the tools in the `odesolvers` package.
+going to be solved by the tools in the `odespy` package.
 # #if FORMAT == "latex" or FORMAT == "sphinx"
 Introducing $\omega = \dot\theta$ (the angular velocity) as auxiliary
 unknown, we get the system
@@ -264,7 +323,7 @@ The initial conditions are _theta(0) = Theta_ and _omega'(0) = 0_.
 Now the `f` function must return a list or array with the two
 right-hand side functions:
 
-@@@CODE src-tut/osc1a.py  fromto: def f@method =
+@@@CODE src-odespy/osc1a.py  fromto: def f@method =
 
 Note that when we have a system of ODEs with `n` components, the `u`
 object sent to the `f` function is an array of length `n`,
@@ -275,7 +334,7 @@ the current problem.
 
 The initial conditions must be specified as a list:
 
-@@@CODE src-tut/osc1a.py  fromto: method =@freq =
+@@@CODE src-odespy/osc1a.py  fromto: method =@freq =
 
 To specify the time points we here first decide on a number of periods
 (oscillations back and forth) to simulate and then on the time resolution
@@ -285,7 +344,7 @@ solution
 $\theta (t)=\Theta\cos\left(\sqrt{c}t\right)$|$theta(t) = Theta*cos(sqrt(c)*t)$
 whose period is $2\pi/\sqrt{c}$|$2*pi/sqrt(c)$.)
 
-@@@CODE src-tut/osc1a.py  fromto: freq =@theta =
+@@@CODE src-odespy/osc1a.py  fromto: freq =@theta =
 
 The `u` returned from `method.solve` is a two-dimensional array, where the
 columns hold the various solution functions of the ODE system. That is,
@@ -293,7 +352,7 @@ the first column holds $\theta$|$theta$ and the second column holds
 $\omega$|$omega$. For convenience we extract the individual solution
 components in individual arrays:
 
-@@@CODE src-tut/osc1a.py  fromto: theta =@import matplotlib
+@@@CODE src-odespy/osc1a.py  fromto: theta =@import matplotlib
 
 Looking at the plot reveals that the numerical solution has
 an alarming feature: the amplitude grows (indicating increasing
@@ -305,7 +364,7 @@ FIGURE: [figs-tut/exos1a.png, width=500] Comparison of large-amplitude numerical
 Changing solution method is a matter of substituting `Heun` by `RK4`,
 for instance:
 
-@@@CODE src-tut/osc1b.py  fromto: method =@method\.set_initial
+@@@CODE src-odespy/osc1b.py  fromto: method =@method\.set_initial
 
 The amplitude is now correct, but the numerical solution has a different
 frequency than the inaccurate analytical "solution".
@@ -366,12 +425,12 @@ an estimate of the period of oscillations as we need this for
 deciding on the complete time interval for solving the differential
 equations. An appropriate extension of class `Problem` is therefore
 
-@@@CODE src-tut/osc2.py  fromto: class Problem@import odesolvers
+@@@CODE src-odespy/osc2.py  fromto: class Problem@import odespy
 
 The second extension is to loop over many solvers. All
 solvers can be listed by
 !bc ipy
->>> import odesolvers, pprint
+>>> import odespy, pprint
 >>> solvers = list_all_solvers()
 >>> for solver in solvers:
 ...   print solver
@@ -428,7 +487,7 @@ This is the list that is usually most relevant.
 
 For now we explicitly choose a subset of the commonly available solvers:
 
-@@@CODE src-tut/osc2.py  fromto: import odesolvers@N_per_period =
+@@@CODE src-odespy/osc2.py  fromto: import odespy@N_per_period =
 
 It will be evident that the `ThetaRule` solver with `theta=0` and
 `theta=1` (Forward and Backward Euler methods) gives growing and
@@ -438,7 +497,7 @@ in the current mathematical model.
 
 The loop over the chosen solvers may look like
 
-@@@CODE src-tut/osc2.py  fromto: N_per_period =@
+@@@CODE src-odespy/osc2.py  fromto: N_per_period =@
 
 FIGURE: [figs-tut/exos2.png, width=500] Comparison of solutions.
 
@@ -465,7 +524,7 @@ where `dt` is the time step size.
 
 Typical loops over solvers and resolutions look as follows:
 
-@@@CODE src-tut/osc3.py  fromto: T = num_periods@\# Print
+@@@CODE src-odespy/osc3.py  fromto: T = num_periods@\# Print
 
 Assuming the error to be of the form $C\Delta t^r$, we can estimate
 $C$ and $r$ from two consequtive experiments to obtain a sequence
@@ -475,7 +534,7 @@ Given the sequence of time steps and errors, a function in
 the `scitools` package automatically computes the sequence of
 $r$ values:
 
-@@@CODE src-tut/osc3.py  fromto: \# Analyze@
+@@@CODE src-odespy/osc3.py  fromto: \# Analyze@
 
 With 4 periods we get
 !bc dat
@@ -532,7 +591,7 @@ there is no difference between the Ito and Stratonovich interpretations
 of the equation.
 
 The challenge with this model problem is that stochastic differential
-equations do not fit with the user interface offered by `odesolvers`,
+equations do not fit with the user interface offered by `odespy`,
 since the right-hand side function is assumed to be dependent only
 on the solution and the present time (`f(u,t)`), and additional
 user-defined parameters, but for the present problem the right-hand
@@ -548,11 +607,11 @@ the white noise).
 The right-hand side function must do many things so a class is
 appropriate:
 
-@@@CODE src-tut/exsos1.py class WhiteNoise@from numpy
+@@@CODE src-odespy/exsos1.py class WhiteNoise@from numpy
 
 We can easily compare different methods:
 
-@@@CODE src-tut/exsos1.py f = White@savefig
+@@@CODE src-odespy/exsos1.py f = White@savefig
 
 FIGURE: [figs-tut/exsos1.png, width=500] Oscillator driven by white noise.
 
@@ -661,7 +720,7 @@ where `prm1`, `prm2`, etc. are names registered in the global
 From a user's point of view, the parameters are set either at
 construction time or through the `set` function:
 !bc py
->>> from odesolvers import RK2
+>>> from odespy import RK2
 >>> def f(u, t, a, b=0):
 ...   return a*u + b
 ...
@@ -850,7 +909,7 @@ Remarks:
 
  o The `quick_description` is necessary for the class to appear in the
    automatically generated overview of implemented methods
-   (run `pydoc odesolvers` to see this table).
+   (run `pydoc odespy` to see this table).
  o Extracting class attributes in local variables (here `u`, `f`, etc.)
    avoids the need for the `self` prefix so that the implemented formulas
    are as close to the mathematical formulas as possible.
@@ -978,18 +1037,18 @@ class BackwardEuler(SolverImplicit):
 
 ======= Installation =======
 
-The `odesolvers` package is most easily installed by checkout out
+The `odespy` package is most easily installed by checkout out
 the latest version of the source code:
 !bc sys
-git clone git@github.com:hplgit/odesolvers.git
-cd odesolvers
+git clone git@github.com:hplgit/odespy.git
+cd odespy
 !ec
 The installation follows the expected standard procedure,
 !bc sys
 sudo python setup.py install
 !ec
 
-The `odesolvers` package depends on several other packages:
+The `odespy` package depends on several other packages:
 
  * `scipy` for running the `Vode` Adams/BDF solver and the
    Dormand-Prince adaptive methods `Dop853`, and `Dopri5`.
@@ -998,7 +1057,7 @@ The `odesolvers` package depends on several other packages:
 These packages are readily downloaded and installed by the
 standard `setup.py` script as shown above.
 On Ubuntu and other Debian-based Linux systems the following
-line installs all that `odesolvers` may need:
+line installs all that `odespy` may need:
 !bc sys
 sudo apt-get install python-scipy python-nose python-sympy
 !ec
@@ -1025,7 +1084,7 @@ sudo apt-get install python-scipy python-nose python-sympy
    potential energy(u), position, momentum, velocity, friction force,
    spring force, etc. Given u, get the physical quantity.
    Could be a general base class for Oscillators,
-   odesolvers.Problem.Oscillator.
+   odespy.Problem.Oscillator.
  * Complete physics example with class Problem, Solver and Viz a la INF1100.
    Adaptive error controlled solution.
  * Solvers for 2nd order eqs where f must be an object and also have a

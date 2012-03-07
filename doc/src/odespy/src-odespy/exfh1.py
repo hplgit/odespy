@@ -19,11 +19,11 @@ T = 50
 import odesolvers, numpy as np, scitools.std as st
 a = 0.12   # stable
 a = -0.12  # unstable
-method = odesolvers.ForwardEuler(f, jac=jac, f_kwargs={'a': a})
-method.set_initial_condition([v0, w0])
+solver = odesolvers.ForwardEuler(f, jac=jac, f_kwargs={'a': a})
+solver.set_initial_condition([v0, w0])
 time_points = np.linspace(0, T, 401)
 #time_points = np.linspace(0, T, 21)
-u, t = method.solve(time_points)
+u, t = solver.solve(time_points)
 v = u[:,0]
 w = u[:,1]
 st.plot(t, v, 'r-',

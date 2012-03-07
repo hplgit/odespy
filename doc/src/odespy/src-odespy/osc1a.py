@@ -10,8 +10,8 @@ def f(u, t):
     theta, omega = u
     return [omega, -c*sin(theta)]
 
-method = odesolvers.Heun(f)
-method.set_initial_condition([Theta, 0])
+solver = odesolvers.Heun(f)
+solver.set_initial_condition([Theta, 0])
 freq = sqrt(c)      # frequency of oscillations when Theta is small
 period = 2*pi/freq  # the period of the oscillations
 T = 10*period        # final time
@@ -19,7 +19,7 @@ N_per_period = 20   # resolution of one period
 N = N_per_period*period
 time_points = numpy.linspace(0, T, N+1)
 
-u, t = method.solve(time_points)
+u, t = solver.solve(time_points)
 
 theta = u[:,0]
 omega = u[:,1]

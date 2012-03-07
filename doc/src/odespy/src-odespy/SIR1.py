@@ -17,13 +17,13 @@ nu   = float(sys.argv[2])
 I0   = float(sys.argv[3])
 S0 = 1500.
 
-method = odesolvers.Euler(f, f_args=(beta, nu))
-method.set_initial_condition([S0, I0, 0])
+solver = odesolvers.Euler(f, f_args=(beta, nu))
+solver.set_initial_condition([S0, I0, 0])
 dt = 0.5  # t counts days
 T = 60
 N = int(T/dt)
 t = np.linspace(0, T, N+1)
-u, t = method.solve(t)
+u, t = solver.solve(t)
 S, I, R = u[:,0], u[:,1], u[:,2]
 
 from matplotlib.pyplot import *

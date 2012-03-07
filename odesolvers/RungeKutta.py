@@ -1,29 +1,85 @@
 from solvers import Solver, Adaptive
 import numpy as np
 
-class RungeKutta(Adaptive):
+def calculate_order_1_level(coefficients):
     """
-    Superclass for explicit 1-level- Runge-Kutta methods:
-    RungeKutta4, Rungekutta2,etc.
-    or 2-levels adaptive Runge-Kutta methods:
-    Dormand & Prince, Cash-Karp or Fehlberg, etc.
+    Calculate order of 1-level RungeKutta method
+    with help of the known solution u = -e**t.
 
-    Available subclasses are:
-    RungeKutta2, RungeKutta3, RugeKutta1 (Forward Euler), RungeKutta4.
+    `coefficients` is a square two-dimensional (Butcher tableau).
+    """
+    test = MyRungeKutta(lambda u,t: -u,
+                        butcher_tableau=coefficients)
+    test.set_initial_condition(1.)
+    u,t = test.solve([0., .1, 1.1])
+
+    # Calculate errors with 2 time step size (dt1, dt2).
+    # where error1 = O(dt1**order), error2 = O(dt2**order)
+    # Then error1/error2 = O(dt1**order)/O(dt2**order)
+    # Taking logarithms of both side, order can be estimated.
+    error1, error2 = \
+            u[-1] - np.exp(-t[-1]), u[-2] - np.exp(-t[-2])
+    order = int(np.log(abs(error1/error2))/np.log(t[-1]/t[-2]))
+    return order
+
+class RungeKutta1level(Solver):
+    """
+    Superclass for explicit 1-level Runge-Kutta methods.  Subclasses
+    are RungeKutta4, Rungekutta2, RungeKutta3, RugeKutta1 (Forward
+    Euler).
+    """
+    _method_order = None
+    _butcher_tableau = None  # (n, n) array for nonadaptive methods
+
+    def get_order(self):
+        """Return the order of the current method."""
+        order = getattr(self, 'method_order', None)
+        if order is None:       # User-supplied method in MyRungeKutta
+            order = calculate_order_1_level(self.butcher_tableau)
+        return order
+
+    def advance(self):
+        """Advance the solution one time step: t[n] to t[n+1]."""
+
+        f, n, neq = self.f, self.n, self.neq
+        u_n, t_n, t_next = self.u[n], self.t[n], self.t[n+1]
+
+        dt = t_next - t_n
+
+        # Extract coefficients from Butcher-tableau
+        table = self._butcher_tableau
+        k_len = table.shape[1] - 1   # number of internal stages
+
+        # coefficients for internal stages
+        factors_u = np.asarray(table[:k_len, 1:])
+        # coefficients for t
+        factors_t = table[:k_len, 0]
+        # coefficients for u_new
+        factors_u_new = table[k_len, 1:]
+
+        # Run algorithm for explicit 1-level RungeKutta method
+        k = np.zeros((k_len, self.neq), float)  # intern stages
+        for m in range(k_len):
+            k_factors = (np.dot(factors_u, k))[m]
+            k[m] = f(u_n + dt*k_factors,t_n + dt*factors_t[m])
+        u_new = u_n + dt*(np.dot(factors_u_new, k))
+        return u_new
+
+
+class RungeKutta2level(Adaptive):
+    """
+    Superclass for 2-levels adaptive Runge-Kutta methods:
     DormandPrince, Fehlberg, CashKarp, BogackiShampine,
-    MyRungeKutta (user-supplied RungeKutta methods),
+    MyRungeKutta (user-supplied RungeKutta methods).
 
     NOTE: This class should be superclass for level-1 methods.
     A subclass AdaptiveRungeKutta can act as superclass for
     the level-2 methods. get_order can be in RungeKutta.
     """
     _method_order = None
-    # An integer for unadaptive method,
-    # or a pair of integers for 2 levels in adaptive methods.
+    # Pair of integers for 2 levels in adaptive methods.
 
-    _butcher_tableau = None
-    # (n, n) array for unadaptive methods,
-    # or (n+1, n) array for adaptive ones.
+    _butcher_tableau = None  # or (n+1, n) array for adaptive ones.
 
     _optional_parameters = Adaptive._optional_parameters + \
         ['min_step', 'max_step', 'first_step']
@@ -36,59 +92,31 @@ class RungeKutta(Adaptive):
         order = getattr(self, 'method_order', None)
         if order is None:       # User-supplied method in MyRungeKutta
             coefficients = self.butcher_tableau
-            if coefficients.shape[0] == coefficients.shape[1]:
-                # Butcher_table is a square array
-                order = self.calculate_order_1_level(coefficients)
-            else:
-                # 2-level method
-                # Seperate & extract coefficients for two levels
-                table_1, table_2 = coefficients[:-1,], \
-                    np.vstack((coefficients[:-2,],coefficients[-1,]))
-                # Calculate order seperately
-                order = self.calculate_order_1_level(table_1),\
-                        self.calculate_order_1_level(table_2)
-            print '''
-        The order of user-defined method is not provided.
-        The value of calculated order is %s''' % str(order)
+            # Seperate & extract coefficients for two levels
+            table_1, table_2 = coefficients[:-1,], \
+                        np.vstack((coefficients[:-2,],coefficients[-1,]))
+            # Calculate order seperately
+            order = [calculate_order_1_level(table_1),
+                     .calculate_order_1_level(table_2)]
         return order
 
-    def calculate_order_1_level(self,coefficients):
-        '''
-        Calculate order of 1-level RungeKutta method
-        with help of the known solution u = -e**t.
-
-        `Coefficients` is a square 2d-array (Butcher tableau).
-        '''
-        test = MyRungeKutta(lambda u,t:-u,\
-                            butcher_tableau = coefficients)
-        test.set_initial_condition(1.)
-        u,t = test.solve([0.,.1,1.1])
-
-        # Calculate errors with 2 time step size (dt1,dt2).
-        # where error1 = O(dt1**order), error2 = O(dt2**order)
-        # Then error1/error2 = O(dt1**order)/O(dt2**order)
-        # Take logarithms of both side, order can be estimated.
-        error1, error2 = \
-            u[-1] - np.exp(-t[-1]), u[-2] - np.exp(-t[-2])
-        order = int(np.log(abs(error1/error2))/np.log(t[-1]/t[-2]))
-        return order
+    def initialize_for_solve(self):
+        Adaptive.initialize_for_solve(self)
+        self.t_all = [self.t[0]]  # computed time levels
+        self.u_all = [self.u[0]]  # corresponding u values
 
     def advance(self):
-        """
-        Advance the solution, either using one step or a
-        series of adaptive steps, from t[n] tp t[n+1].
-        """
+        """Advance from t[n] to t[n+1] in (small) adaptive steps."""
 
         f, n, rtol, atol, neq = \
             self.f, self.n, self.rtol, self.atol, self.neq
         u_n, t_n, t_next = self.u[n], self.t[n], self.t[n+1]
         dt = t_next - t_n
 
-        # default setting of step size
-        min_step, max_step, first_step = \
-            getattr(self, 'min_step', dt/1000.), \
-            getattr(self, 'max_step', dt), \
-            getattr(self, 'first_step', dt)
+        min_step = getattr(self, 'min_step', dt/1000.)
+        max_step = getattr(self, 'max_step', dt)
+        first_step = getattr(self, 'first_step', dt)
+        first_step = min(first_step, dt)  # dt is max choice for first_step
 
         def middle(x,y=.1,z=4.):    # Auxilary function
             return sorted([x,y,z])[1]
@@ -104,82 +132,154 @@ class RungeKutta(Adaptive):
         # coefficients for u_new
         factors_u_new = table[k_len, 1:]
 
-        if len(table) == k_len + 2:
-            # (k+2, k+1) array -->  2-levels Adaptive methods
+        # coefficients for local error between 2 levels
+        factors_error = table[k_len+1, 1:] - factors_u_new
 
-            # coefficients for local error between 2 levels
-            factors_error = table[k_len+1, 1:] - factors_u_new
+        u_intermediate = [u_n,]
+        t_intermediate = [t_n,]
+        u, t, h = u_n, t_n, first_step               # initial values
+        k = np.zeros((k_len, self.neq), self.dtype)  # intern stages
 
-            u_intermediate = [u_n,]
-            t_intermediate = [t_n,]
-            u, t, h = u_n, t_n, first_step               # initial values
-            k = np.zeros((k_len, self.neq), self.dtype)  # intern stages
-            if not hasattr(self, 'u_all'):
-                self.u_all = []  # store list of arrays for *all* steps
-            if not hasattr(self, 't_all'):
-                self.t_all = []  # store list of arrays for *all* steps
+        # Loop until next time point is reached
+        while (abs(t - t_n) < abs(t_next - t_n)):
+            u, t = u_intermediate[-1], t_intermediate[-1]
+            # internal steps
+            k[:, :] = 0.   # initialization for next step
+            for m in range(k_len):
+                k_factors = (np.dot(factors_u, k))[m]
+                #print u, u+h*k_factors, f(u+h*k_factor, 0.5), self.dtype
+                k[m] = f(u+h*k_factors, t+h*factors_t[m])
+            u_new = u + h*(np.dot(factors_u_new, k))
 
-            # Loop until next time point is reached
-            while (abs(t - t_n) < abs(t_next - t_n)):
-                u, t = u_intermediate[-1], t_intermediate[-1]
+            # local error between 2 levels
+            error = h*np.abs(np.dot(factors_error, k))
+            # Acceptable error tolerance
+            tol = rtol*np.abs(u_new) + atol
+
+            accurate = (error <= tol).all()
+
+            if accurate or h <= min_step or h >= max_step:
+                # Accurate enough,
+                # or the step size exceeds valid range.
+                u_intermediate.append(u_new)
+                t_intermediate.append(t+h)
+                self.u_all.append(u_new)
+                self.t_all.append(t+h)
+
+
+           # prevent the error of dividing absolute zero
+            error = np.asarray([(1e-16 if x == 0. else x) \
+                                for x in error])
+
+            # Normarized error rate
+            rms = error/tol
+            rms_norm = np.sqrt(np.sum(rms*rms)/self.neq)
+
+            order = float(self._method_order[0])
+            # factor to adjust the size of next step
+            # Formula is from <Numerical Methods for Engineers,
+            #  Chappra & Cannle>
+            s = .8 *((1./rms_norm)**(1/order))
+            # scalar should in range(0.1, 4.)
+            # for better accuracy and smoothness
+            s = middle(s, 0.1, 4.0)
+            h *= s
+
+            # step size should in range(min_step, max_step)
+            h = middle(h, y=min_step, z=max_step)
+            # in case for last intern step
+            h = min(h, t_next - t_intermediate[-1])
+
+        return u_new
+
+    def advance(self):
+        """Advance from t[n] to t[n+1] in (small) adaptive steps."""
+
+        n = self.n
+        u, t, t_np1 = self.u[n], self.t[n], self.t[n+1]
+        dt = tnp1 -t
+
+        f = self.f
+
+        min_step = getattr(self, 'min_step', dt/1000.)
+        max_step = getattr(self, 'max_step', dt)
+        first_step = getattr(self, 'first_step', dt)
+        first_step = min(first_step, dt)  # dt is max choice for first_step
+        h = first_step
+
+        def middle(x,y=.1,z=4.):    # Auxilary function
+            return sorted([x,y,z])[1]
+
+        # Extract coefficients from Butcher-tableau
+        table = self._butcher_tableau
+        k_len = table.shape[1] - 1   # number of internal stages
+
+        # coefficients for internal stages
+        factors_u = np.asarray(table[:k_len, 1:])
+        # coefficients for t
+        factors_t = table[:k_len, 0]
+        # coefficients for u_new
+        factors_u_new = table[k_len, 1:]
+
+        # coefficients for local error between 2 levels
+        factors_error = table[k_len+1, 1:] - factors_u_new
+
+        k = np.zeros((k_len, self.neq), self.dtype)  # intern stages
+
+        # Loop until next time point is reached
+        while t <= t_np1:
+            sufficiently_accurate = False
+            while not sufficiently_accurate:
+
                 # internal steps
                 k[:, :] = 0.   # initialization for next step
                 for m in range(k_len):
                     k_factors = (np.dot(factors_u, k))[m]
-                    #print u, u+h*k_factors, f(u+h*k_factor, 0.5), self.dtype
                     k[m] = f(u+h*k_factors, t+h*factors_t[m])
                 u_new = u + h*(np.dot(factors_u_new, k))
 
-                # local error between 2 levels
+                # local error between 2 levels is the error estimate
                 error = h*np.abs(np.dot(factors_error, k))
-                # Acceptable error tolerance
-                tol = rtol*np.abs(u_new) + atol
 
+                # Is u_new sufficiently accurate?
+                tol = self.rtol*np.abs(u_new) + self.atol
                 accurate = (error <= tol).all()
 
-                if (accurate or h <= min_step or h == max_step):
-                    # Accurate enough,
-                    # or the step size exceeds valid range.
-                    u_intermediate.append(u_new)
-                    t_intermediate.append(t+h)
+                if accurate or h <= min_step or h >= max_step:
+                    u = u_new
+                    t = t+h
+                    self.u_all.append(u)
+                    self.t_all.append(t)
+
 
                 # prevent the error of dividing absolute zero
-                error = np.asarray([(1e-16 if x == 0. else x) \
-                                    for x in error])
+                error[error == 0] = 1E-15
+                #error = np.asarray([(1e-16 if x == 0. else x) \
+                #                    for x in error])
+[[[[rykk inn
+            # Normarized error rate
+            rms = error/tol
+            rms_norm = np.sqrt(np.sum(rms*rms)/self.neq)
 
-                # Normarized error rate
-                rms = error/tol
-                rms_norm = np.sqrt(np.sum(rms*rms)/self.neq)
+            order = float(self._method_order[0])
+            # factor to adjust the size of next step
+            # Formula is from <Numerical Methods for Engineers,
+            #  Chappra & Cannle>
+            s = .8 *((1./rms_norm)**(1/order))
+            # scalar should in range(0.1, 4.)
+            # for better accuracy and smoothness
+            s = middle(s, 0.1, 4.0)
+            h *= s
 
-                order = float(self._method_order[0])
-                # factor to adjust the size of next step
-                # Formula is from <Numerical Methods for Engineers,
-                #  Chappra & Cannle>
-                s = .8 *((1./rms_norm)**(1/order))
-                # scalar should in range(0.1, 4.)
-                # for better accuracy and smoothness
-                s = middle(s)
-                h *= s
+            # step size should in range(min_step, max_step)
+            h = middle(h, y=min_step, z=max_step)
+            # in case for last intern step
+            h = min(h, t_np1 - t_intermediate[-1])
 
-                # step size should in range(min_step, max_step)
-                h = middle(h, y=min_step, z=max_step)
-                # in case for last intern step
-                h = min(h, t_next - t_intermediate[-1])
-
-            self.u_all.append(np.array(u_intermediate))
-            self.t_all.append(np.array(t_intermediate))
-
-        else:
-            # Run algorithm for explicit 1-level RungeKutta method
-            k = np.zeros((k_len, self.neq), float)  # intern stages
-            for m in range(k_len):
-                k_factors = (np.dot(factors_u, k))[m]
-                k[m] = f(u_n + dt*k_factors,t_n + dt*factors_t[m])
-            u_new = u_n + dt*(np.dot(factors_u_new, k))
         return u_new
 
 
-class RungeKutta2(RungeKutta):
+class RungeKutta2(RungeKutta1level):
     """
     Standard Runge-Kutta method of order 2.
     Implementation in the general RungeKutta Python framework.
@@ -192,7 +292,7 @@ class RungeKutta2(RungeKutta):
          [0., 0., 1.]])
     _method_order = 2
 
-class RungeKutta3(RungeKutta):
+class RungeKutta3(RungeKutta1level):
     """
     Standard Runge-Kutta method of order 3.
     Implementation in the general RungeKutta Python framework.
@@ -206,7 +306,7 @@ class RungeKutta3(RungeKutta):
          [0., .16666667, .66666667, .16666667]])
     _method_order = 3
 
-class RungeKutta1(RungeKutta):
+class RungeKutta1(RungeKutta1level):
     """
     Explicit Forward Euler method implemented
     in the general RungeKutta Python framework.
@@ -218,7 +318,7 @@ class RungeKutta1(RungeKutta):
          [0., 1.]])
     _method_order = 1
 
-class RungeKutta4(RungeKutta):
+class RungeKutta4(RungeKutta1level):
     """
     Standard Runge-Kutta method of order 4.
     Implementation in the general RungeKutta Python framework.
@@ -233,7 +333,7 @@ class RungeKutta4(RungeKutta):
          [0., .16666667, .33333333, .33333333, .16666667]])
     _method_order = 4
 
-class DormandPrince(RungeKutta):
+class DormandPrince(RungeKutta2level):
     """
     Dormand&Prince Runge-Kutta method of order (5, 4).
     Implementation in the general RungeKutta Python framework.
@@ -253,7 +353,7 @@ class DormandPrince(RungeKutta):
     _method_order = (5,4)
 
 
-class Fehlberg(RungeKutta):
+class Fehlberg(RungeKutta2level):
     """
     Adaptive Runge-Kutta-Fehlberg method of order (4, 5).
     Implementation in the general RungeKutta Python framework.
@@ -271,7 +371,7 @@ class Fehlberg(RungeKutta):
          [0., .11851852, 0., .51898635, .50613149, -.18, .03636364]])
     _method_order = (4,5)
 
-class CashKarp(RungeKutta):
+class CashKarp(RungeKutta2level):
     """
     Adaptive Cash-Karp Runge-Kutta method of order (5, 4).
     Implementation in the general RungeKutta Python framework.
@@ -289,7 +389,7 @@ class CashKarp(RungeKutta):
          [0., .10217737, 0., .3839079, .24459274, .01932199, .25]])
     _method_order = (5,4)
 
-class BogackiShampine(RungeKutta):
+class BogackiShampine(RungeKutta2level):
     """
     Adaptive Bogacki-Shampine Runge-Kutta method of order (3, 2).
     Implementation in the general RungeKutta Python framework.
@@ -305,7 +405,7 @@ class BogackiShampine(RungeKutta):
          [0., .29166667, .25, .33333333, .125]])
     _method_order = (3,2)
 
-class MyRungeKutta(RungeKutta):
+class MyRungeKutta(RungeKutta2level):
     """
     User-supplied RungeKutta method, which is defined by providing
     butcher-table in an 2d-array.

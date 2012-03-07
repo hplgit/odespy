@@ -4,8 +4,8 @@ def myrhs(y, x):
     return -y
 
 import odesolvers
-method = odesolvers.RK4(myrhs)
-method.set_initial_condition(1)
+solver = odesolvers.RK4(myrhs)
+solver.set_initial_condition(1)
 
 import numpy
 # Make sure integration interval [0, L] is large enough
@@ -17,7 +17,7 @@ def terminate(y, x, stepnumber):
     tol = 0.001
     return True if abs(y[stepnumber]) < tol else False
 
-y, x = method.solve(x_points, terminate)
+y, x = solver.solve(x_points, terminate)
 
 print 'Final y(x=%g)=%g' % (x[-1], y[-1])
 

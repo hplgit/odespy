@@ -179,6 +179,11 @@ _parameters = dict(
         default=1E-4,
         type=float),
 
+    verbose = dict(
+        help='Integer reflecting output of intermediate quantities',
+        default=0,
+        type=int),
+
     start_method = dict(
         help='Method for the first steps in multi-step solvers',
         default='RK2',
@@ -213,11 +218,6 @@ _parameters = dict(
         default=0.5,
         type=(int,float),
         range=[0, 1]),
-
-    spcrad = dict(
-        help='Function of (u, t) to estimate spectral radius of Jacobian '\
-             'matrix in the rkc.f solver.',
-        type=callable),
 
     # Parameters for adaptive methods
 
@@ -367,68 +367,16 @@ _parameters = dict(
              isinstance(x, float),float_seq)).all(),
         default = []),
 
-    jac_lsodi = dict(
-        help='Callable object to define the full Jacobian matrix dr/du'\
-             'where r = g - A*s.',
-        type=callable),
-
-    jac_banded_lsodi = dict(
-        help='Callable object to define the banded Jacobian matrix dr/du'\
-             'where r = g - A*s.',
-        type=callable),
-
-    adda_lsodi = dict(
-        help='Callable object to add the matrix A = A(u,t) to another '\
-             'matrix p stored in the same form as A.',
-        type=callable),
-
-    adda_banded_lsodi = dict(
-        help='Callable object to add the banded matrix A = A(u,t) to another'\
-             'matrix P stored in the same form.',
-        type=callable),
-
-    jac_lsodis = dict(
-        help='Callable object to supply the jth column of the sparse '\
-             'Jacobian matrix dr/du where r = g - A*s.',
-        type=callable),
-
-    adda_lsodis = dict(
-        help='Callable object to add j-th column of matrix A = A(u,t) to '\
-             'another matrix stored in sparse from.',
-        type=callable),
-
-    jac_lsoibt = dict(
-        help='Callable object to supply the jth column of the Jacobian'\
-             'matrix dr/du where r= g-A*s, stored in block-tridiagonal form. ',
-        type=callable),
-
-    adda_lsoibt = dict(
-        help='Callable object to add matrix A = A(u,t) to another matrix P'\
-             ',stored in block-tridiagonal form.',
-        type=callable),
-
     # ja, ia, jc & ic are used to describe the sparse structure
-    # of matrices in Lsodes and Lsodis
+    # of matrices
     ja = dict(
-        help='Integer array containing the row indices of sparse matrix' \
-             'where nonzero elements occur, reading in columnwise order. '\
-             'Used in Lsodes and Lsodis.',
+        help='Integer array containing the row indices of nonzero entries '
+              'in a sparse matrix (CRS storage scheme)'.
         type=(list,tuple,np.ndarray)),
 
     ia = dict(
-        help='Integer Array with length neq+1 which contains starting'\
-             'locations in ja of the descriptions of columns 1...neq. '\
-             ' Used in Lsodes and Lsodis.',
-        type=(list,tuple,np.ndarray)),
-
-    jc = dict(
-        help='Integer Array with length neq+1 which contains starting'\
-             'locations in jc of the descriptions of columns 1...neq. '\
-             ' Used in Lsodis.',
-        type=(list,tuple,np.ndarray)),
-
-    ic = dict(
-        help='Array which contains starting locations in jc. Used in Lsodis',
+        help='Integer array containing info where the different rows '\
+              'of a sparse matrix start (CRS storage scheme)'.
         type=(list,tuple,np.ndarray)),
 
     # ml, mu describe banded Jacobian matrix.
@@ -503,54 +451,6 @@ _parameters = dict(
 
     jac_f77 = dict(
         help='Intend to supply a Fortran subroutine as jac.',
-        type=callable),
-
-    jac_banded_f77 = dict(
-        help='Intend to supply a Fortran subroutine as jac_banded.',
-        type=callable),
-
-    jac_column_f77 = dict(
-        help='Intend to supply a Fortran subroutine as jac_column.',
-        type=callable),
-
-    jac_lsodi_f77 = dict(
-        help='Intend to supply a Fortran subroutine as jac_lsodi.',
-        type=callable),
-
-    jac_banded_lsodi_f77 = dict(
-        help='Intend to supply a Fortran subroutine as jac_banded_lsodi.',
-        type=callable),
-
-    adda_lsodi_f77 = dict(
-        help='Intend to supply a Fortran subroutine as adda_lsodi.',
-        type=callable),
-
-    adda_banded_lsodi_f77 = dict(
-        help='Intend to supplied a Fortran subroutine as adda_banded_lsodi. ',
-        type=callable),
-
-    res_f77 = dict(
-        help='Intend to supplied a Fortran subroutine as res. ',
-        type=callable),
-
-    spcrad_f77 = dict(
-        help='''Intend for user-supplied Fortran subroutine.
-        Similar as spcrad, a callable object to estimate the
-        spectral radius of the Jacobian matrix. In rkc.f, its
-        parameter list should in form of (neq,t,u).
-        It is encouraged that users provide a F2PY-compiled
-        Fortran subroutine or a multi-line string in Fortran
-        code to define this function. This would help to
-        improve efficiency.
-        This subroutine should be defined in form:
-        double precision function spcrad_f77(neq,t,u)
-  Cf2py intent(hide)     neq
-        integer          neq
-        double precision t,u(neq)
-        spcrad_f77 =
-        return
-        end
-        ''',
         type=callable),
 
     myadvance = dict(
@@ -680,7 +580,7 @@ class Solver:
     """
 
     _required_parameters = ['f',]
-    _optional_parameters = ['f_args', 'f_kwargs', 'complex_valued']
+    _optional_parameters = ['f_args', 'f_kwargs', 'complex_valued', 'verbose']
 
     def __init__(self, f, **kwargs):
         """
@@ -1170,14 +1070,13 @@ class Solver:
 
     def validate_data(self):
         """
-        This function is used for extra check after all the attributes,
-        (including inputs and internal parameters), have been
-        initialized, e.g. control the specific relations among values of
-        relative attributes.
+        This function is used for extra checking and validating of
+        attributes before the computations start.
 
-        In subclasses, this function can be extended when required.
-        For example, when banded Jacobian matrix is supplied in Lsode,
-        lower/higher band ('ml' & 'mu') have to be provided by user.
+        This version checks that the ``time_points`` is correctly
+        set up. The function also check that all required parameters
+        are initialized. Subclass versions may introduce additional
+        tests and help.
         """
         # self.t should be a sequence of numbers
         if (not isinstance(self.t, (list, tuple, np.ndarray))) \
@@ -2371,11 +2270,14 @@ class RK34(Adaptive):
     def initialize_for_solve(self):
         Adaptive.initialize_for_solve(self)
         self.order = 4
-        self.t_adaptive = [self.t[0]]  # computed time levels
-        self.u_adaptive = [self.u[0]]  # corresponding u values
+        self.t_all = [self.t[0]]  # computed time levels
+        self.u_all = [self.u[0]]  # corresponding u values
 
-    def intermediate_step(self, u, t, dt):
-        """Parmeters: u at time t, dt is time step."""
+    def advance_intermediate(self, u, t, dt):
+        """
+        Advance the solution an intermediate addaptive step.
+        Parmeters: u at time t, dt is current step size.
+        """
 
         f = self.f
         K1 = f(u,                   t)
@@ -2385,33 +2287,93 @@ class RK34(Adaptive):
         K4 = f(u + dt*K3,           t + dt)
 
         u_new = dt/6.*(K1 + 2*K2 + 2*K3 + K4)
-        self.t_adaptive.append(t+dt)
-        self.u_adaptive.append(u_new)
 
-        # Adjust dt
         error = dt/6.*(2*K2 + Z3 - 2*Y3 - Y4)
         error = np.linalg.norm(error)  # scalar measure
-        tol = self.rtol*np.linalg.norm(u_new) + self.atol
-        if abs_error > 1E-14:
-            dt_new *= (tol/error)**(1./self.order)
+
+        return u_new, error
+
+    def adjust_timestep(self, dt, error, u_new, order):
+        """
+        Adjust dt, given error and order::
+
+            tol = self.rtol*np.linalg.norm(u_new) + self.atol
+
+            dt_new = dt*(tol/error)**(1./order)
+        """
+        tol = self.rtol*np.linalg.norm(u) + self.atol
+        if error > 1E-14:
+            dt_new = dt*(tol/error)**(1./order)
             if self.min_step <= dt_new <= self.max_step:
                 dt = dt_new
+        return dt
 
-        return u_new, dt
 
     def advance(self):
-        """Advance from t[n] to t[n+1] in (small) adaptive steps."""
+        """
+        Advance from t[n] to t[n+1] in (small) adaptive steps.
+
+        Adaptivity logic: start with dt=t[n+1]-t[n] (one big
+        step), repeat computing the solution and an error
+        estimate e until e < tol.
+        """
+        # u, t: solution u at time t in between self.t[n] and self.t[n+1]
+        # dt: adaptive time step in between self.t[n] and self.t[n+1]
         n = self.n
-        u = self.u[n]
-        t = t_n = self.t[n]
-        t_np1 = self.t[n+1]
-        dt = self.t[n+1] - self.t[n]  # initial dt
+        u, t, t_np1 = self.u[n], self.t[n], self.t[n+1]
+        dt = tnp1 -t
+
+        min_step = getattr(self, 'min_step', dt/1000.)
+        max_step = getattr(self, 'max_step', dt)
+        if not hasattr(self, 'h'):
+            # h is current adaptive step size, use first_step if
+            # h is not yet computed
+            first_step = getattr(self, 'first_step', dt)
+            if first_step > dt:
+                first_step = dt
+            self.h = first_step
+        # else: start out with previous self.h step size
+
+        if self.verbose >= 1:
+            print '\nat user-specified time level %g, ',
+            print 'starting with h=%g' % (t, self.h)
 
         while t <= t_np1:
-            u, dt = self.intermediate_step(u, t, dt)
-            if t+dt > t_np1:  # fit last step so we hit t_np1
-                dt = t_np1 - t
-            t += dt
+            sufficiently_accurate = False
+            while not sufficiently_accurate:
+                u_new, error = self.advance_intermediate(u, t, self.h)
+
+                if self.verbose:
+                    'u=%g at t=%g is' % (u_new, t + self.h),
+
+                # Is u_new sufficiently accurate?
+                tol = self.rtol*u_norm + self.atol
+                accurate = error < tol
+                if accurate or self.h <= min_step or self.h >= max_step:
+                    sufficiently_accurate = True
+                    u = u_new
+                    t = t+self.h
+                    self.t_all.append(t)
+                    self.u_all.append(u)
+
+                    if self.verbose >= 1:
+                        print 'accepted, ',
+                else:
+                    if self.verbose >= 1:
+                        print 'rejected, ',
+
+                # Adjust time step
+                u_new_norm = np.linalg.norm(u_new)
+                if error > 1E-14:
+                    h_new = dt*(tol/error)**(1./order)
+                    if min_step <= h_new <= max_step:
+                        self.h = h_new
+
+                if t+dt > t_np1:  # fit last step so we hit t_np1 exactly
+                    self.h = t_np1 - t
+
+                if self.verbose >= 1:
+                    print 'new h=%g' % self.g
         return u
 
 
@@ -2645,7 +2607,7 @@ def list_all_solvers():
     # into the namespace for this function to work properly.
 
     superclasses = ('Solver','Adaptive', 'PyDS', 'Ode_scipy', 'Odepack',
-                    'RungeKutta', 'SolverImplicit')
+                    'RungeKutta1level', 'RungeKutta2level', 'SolverImplicit')
     import odesolvers
     class_members = inspect.getmembers(odesolvers, inspect.isclass)
     solvers = [solver[0] for solver in class_members \

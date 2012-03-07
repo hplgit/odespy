@@ -64,14 +64,14 @@ for method in solvers:
     method_name = str(method)
     results[method_name] = {'dt': 0, 'error': numpy.nan, 'cpu': 0}
 
-    method.set_initial_condition([problem.Theta, 0])
+    solver.set_initial_condition([problem.Theta, 0])
 
     N = N_per_period*problem.period
     time_points = numpy.linspace(0, T, N+1)
 
     try:
         t0 = time.clock()
-        u, t = method.solve(time_points)
+        u, t = solver.solve(time_points)
         cpu_time = time.clock() - t0
     except Exception, e:
         print method_name, 'FAILED!'

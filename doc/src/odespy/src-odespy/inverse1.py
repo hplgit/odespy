@@ -16,10 +16,10 @@ def f(x):
     #return 2*x
 
 import odesolvers
-method = odesolvers.RungeKutta2(rhs, f_args=[f], f_kwargs={'h': 1E-3})
-method.set_initial_condition(0)
+solver = odesolvers.RungeKutta2(rhs, f_args=[f], f_kwargs={'h': 1E-3})
+solver.set_initial_condition(0)
 y_points = linspace(0, 4, 41)
-x, y = method.solve(y_points)
+x, y = solver.solve(y_points)
 from matplotlib.pyplot import *
 g_e = lambda y: y**2  # exact inverse function
 y_ = linspace(0, 4, 11)
