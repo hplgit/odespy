@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 
 from os.path import join
@@ -13,7 +12,7 @@ def configuration(parent_package='',top_path=None):
                        delegate_options_to_subpackages=True,
                        quiet=True)
 
-    config.add_subpackage('odesolvers')
+    config.add_subpackage('odespy')
 
     return config
 
