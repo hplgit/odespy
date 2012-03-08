@@ -60,7 +60,7 @@ On the other hand, if the original package is also a Python software,
 developers need to install and import (in ``initialize``) the desired
 package as a Python module and just write a class in the ``Solver``
 hierarchy that calls the proper functions in the package. See the
-classes ``SymPy_odefun`` and ``Ode_scipy`` (and its subclasses).
+classes ``odefun_sympy`` and ``ode_scipy`` (and its subclasses).
 
 By an attempt to import these necessary modules (often set in method
 initialize()), we can check whether the necessary dependencies are
@@ -125,7 +125,7 @@ feasible to implement ``advance`` because one wants to rely on the
 software's ability to solve the whole ODE problem. Then it is more
 natural to write a new ``solve`` method (using ``Solver.solve`` as
 model) and call up the solve functionality in the external
-software. Class ``SymPy_odefun`` provides an example. On the other
+software. Class ``odefun_sympy`` provides an example. On the other
 hand, the wrappers for the ``scipy`` solvers (``vode`` for instance)
 applies ``solve`` from the present package and the ``scipy`` functions
 for doing one (adaptive) time step, called in the ``advance`` method.
@@ -352,14 +352,11 @@ _parameters = dict(
 
     # parameters for Jacobian
     jac_banded = dict(
-        help='Banded Jacobian (df/du) of right-hand side'\
-             'function f. Arguments: u, t, ml, mu. '\
-             'Used in Lsode, Lsoda, Lsodar.',
-        type=callable),
-
-    jac_column = dict(
-        help='A column of the Jacobian (df/du) matrix.'\
-             'Arguments: u, t, ia, ja. Used in Lsodes.',
+        help="""\
+Banded Jacobian matrix: ``jac_banded(u, t, ml, mu)``.
+``ml`` and ``mu`` are the number of lower and upper
+diagonals. The returned rectangular array should have
+shape ``neq, ml+mu+1``.""",
         type=callable),
 
     jac_constant = dict(
@@ -385,21 +382,21 @@ _parameters = dict(
     # of matrices
     ja = dict(
         help='Integer array containing the row indices of nonzero entries '
-              'in a sparse matrix (CRS storage scheme)',
+              'in a sparse matrix (CRS storage scheme).',
         type=(list,tuple,np.ndarray)),
 
     ia = dict(
         help='Integer array containing info where the different rows '\
-              'of a sparse matrix start (CRS storage scheme)',
+              'of a sparse matrix start (CRS storage scheme).',
         type=(list,tuple,np.ndarray)),
 
     # ml, mu describe banded Jacobian matrix.
     ml = dict(
-        help='Lower half-bandwidth of banded jacobian matrix',
+        help='Number of lower non-zero diagonals in a banded Jacobian.',
         type=int),
 
     mu = dict(
-        help='Upper half-bandwidth of banded jacobian matrix',
+        help='Number of upper non-zero diagonals in a banded Jacobian.',
         type=int),
 
     # mb, nb describe the block-tridiagonal form of matrix.
@@ -1015,7 +1012,10 @@ class Solver:
 
         # Detect whether data type is in complex type or not.
         if hasattr(self, 'f'):
-            value = np.array(self.f(self.U0, self.t[0]))
+            try:
+                value = np.array(self.f(self.U0, self.t[0]))
+            except IndexError:
+                raise ValueError('time_points array is empty - bug in its construction')
         else:
             value = np.asarray(self.U0)
         if value.dtype in (np.int32, np.int64, np.int):
@@ -1774,7 +1774,7 @@ def approximate_Jacobian(f, u0, t0, h):
     return J.transpose()
 
 
-class SymPy_odefun(Solver):
+class odefun_sympy(Solver):
     """
     Wrapper for the sympy.mpmath.odefun method, which applies a high-order
     Taylor series method to solve ODEs.
@@ -1802,7 +1802,7 @@ class SymPy_odefun(Solver):
         which can be used to evaluate u at any time point (ufunc(t)).
         """
         if terminate is not None:
-            print 'Warning: SymPy_odefun.solve ignores the terminate function!'
+            print 'Warning: odefun_sympy.solve ignores the terminate function!'
         self.t = np.asarray(time_points)
         self.initialize_for_solve()
 
@@ -1998,8 +1998,8 @@ class Adaptive(Solver):
             self.set(first_step=self.t[1] - self.t[0])
         time_steps = self.t[1:] - self.t[:-1]
         if not hasattr(self, 'min_step'):
-            # Use 1/10 of the user's smallest step
-            self.set(min_step=0.1*time_steps.min())
+            # Use 1/100 of the user's smallest step
+            self.set(min_step=0.01*time_steps.min())
         if not hasattr(self, 'max_step'):
             # Use 10 times the user's greatest step
             self.set(max_step=10*time_steps.max())
@@ -2210,9 +2210,6 @@ class RKFehlberg(Adaptive):
     _optional_parameters = Adaptive._optional_parameters
 
 
-    def initialize_for_solve(self):
-        Adaptive.initialize_for_solve(self)
-
     def advance(self):
         # auxilatory function to pick up the middle number among 3 floats
         def middle(x, y, z):
@@ -2223,11 +2220,7 @@ class RKFehlberg(Adaptive):
 
         dt = t_np1 - t_n
 
-        # default setting of step size
-        min_step, max_step, h = \
-            getattr(self, 'min_step', dt/1000.), \
-            getattr(self, 'max_step', dt),\
-            getattr(self, 'first_step', dt)
+        h = dt
 
         # coefficients in Butcher tableau
         c = (1/4.,
@@ -2306,15 +2299,14 @@ class RKFehlberg(Adaptive):
         return u_new
 
 
-class Ode_scipy(Adaptive):
+class ode_scipy(Adaptive):
     """
     Superclass wrapper for ``scipy.integrate.ode`` classes.
     Existing solvers in subclasses are: ``Vode``, ``Dopri5``, ``Dop853``.
     """
 
-    _optional_parameters = Solver._optional_parameters + \
-        ['jac', 'jac_kwargs', 'jac_args', 'atol', 'rtol',
-         'first_step', 'max_step', 'nsteps']
+    _optional_parameters = Adaptive._optional_parameters + \
+        ['jac', 'jac_kwargs', 'jac_args', 'nsteps']
 
     # Common scipy.integrate.ode arguments for subclass solvers
     _arglist_scipy = ['f', 'jac', 'atol', 'rtol', 'complex_valued',]
@@ -2324,7 +2316,8 @@ class Ode_scipy(Adaptive):
 
     def initialize(self):
         try:
-            import scipy.integrate.ode as si_ode
+            import scipy.integrate.ode
+            self.scipy_ode = scipy.integrate.ode
         except ImportError:
             raise ImportError('The scipy package must be installed '\
                               'in order to use class %s' % \
@@ -2346,8 +2339,7 @@ class Ode_scipy(Adaptive):
         else:
             self.jac4scipy = None
 
-        import scipy.integrate.ode as si_ode
-        self.integrator = si_ode(self.f4scipy, jac=self.jac4scipy)
+        self.integrator = self.scipy_ode(self.f4scipy, jac=self.jac4scipy)
         self.scipy_arguments = {}
 
         # Extract common arguments, and prepare to be transferred to scipy
@@ -2355,15 +2347,15 @@ class Ode_scipy(Adaptive):
             value = getattr(self, name, None)
             if value is not None:
                 if name in self._parameters and \
-                   name in Ode_scipy._name_differences:
+                   name in ode_scipy._name_differences:
                     # different names in scipy
-                    name = Ode_scipy._name_differences[name]
+                    name = ode_scipy._name_differences[name]
                 self.scipy_arguments[name] = value
 
         self.integrator = self.integrator.set_integrator(
             self.__class__.__name__.lower(), **self.scipy_arguments)
         self.integrator = self.integrator.set_initial_value(self.U0, self.t[0])
-        Solver.initialize_for_solve(self)
+        Adaptive.initialize_for_solve(self)
 
     def advance(self):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -2375,7 +2367,7 @@ class Ode_scipy(Adaptive):
         else:
             return u_new
 
-class Vode(Ode_scipy):
+class Vode(ode_scipy):
     '''
     Wrapper for scipy.integrate.ode.vode, which is a wrapper for vode.f,
     which intends to solve initial value problems of stiff or nonstiff
@@ -2384,7 +2376,7 @@ class Vode(Ode_scipy):
     '''
     quick_description = "Adams/BDF Vode adaptive method (vode.f wrapper)"
 
-    _optional_parameters = Ode_scipy._optional_parameters + \
+    _optional_parameters = ode_scipy._optional_parameters + \
                            ['adams_or_bdf', 'min_step', 'order']
 
     # argument list to be passed to scipy.ode for 'vode' method
@@ -2395,9 +2387,9 @@ class Vode(Ode_scipy):
     def initialize_for_solve(self):
         # internal argument to be transferred to scipy
         self.with_jacobian = getattr(self, 'jac', None) is not None
-        Ode_scipy.initialize_for_solve(self)
+        ode_scipy.initialize_for_solve(self)
 
-class Dopri5(Ode_scipy):
+class Dopri5(ode_scipy):
     """
     Wrapper for scipy.integrate.ode.dopri5, which applies the
     Dormand&Prince method of order 5(4), based on the Fortran
@@ -2406,14 +2398,14 @@ class Dopri5(Ode_scipy):
     """
     quick_description = "Dormand & Prince method of order 5(4) (scipy)"
 
-    _optional_parameters = Ode_scipy._optional_parameters + \
+    _optional_parameters = ode_scipy._optional_parameters + \
         ['ifactor', 'dfactor', 'beta', 'safety']
 
     # argument list to be passed to scipy.ode for 'dopri5' method
     _arglist_scipy = ('atol','rtol','safety','ifactor','dfactor','beta',
                       'nsteps','first_step','max_step')
 
-class Dop853(Ode_scipy):
+class Dop853(ode_scipy):
     """
     Wrapper for scipy.integrate.ode.dop853, which applies the
     Dormand&Prince method of order 8(5,3), based on the Fortran
@@ -2422,12 +2414,98 @@ class Dop853(Ode_scipy):
     """
     quick_description = "Adaptive Dormand & Prince method of order 8(5,3) (scipy)"
 
-    _optional_parameters = Ode_scipy._optional_parameters + \
+    _optional_parameters = ode_scipy._optional_parameters + \
         ['ifactor', 'dfactor', 'beta', 'safety']
 
     # argument list to be passed to scipy.ode for 'dop853' method
     _arglist_scipy = ('atol','rtol','safety','ifactor','dfactor','beta',
                       'nsteps','first_step','max_step')
+
+
+class lsoda_scipy(Adaptive):
+    """
+    Wrapper of the scipy.integrate.odeint solver so that it can be
+    called from the *odespy* user interface.
+    """
+    quick_description = "Wrapper of lsoda (scipy.integrate.odeint)"
+
+    _optional_parameters = Adaptive._optional_parameters + \
+        ['jac', 'jac_kwargs', 'jac_args', 'ml', 'mu',]
+
+    def initialize(self):
+        try:
+            import scipy.integrate
+            self.scipy_int = scipy.integrate
+        except ImportError:
+            raise ImportError('The scipy package must be installed '\
+                              'in order to use class %s' % \
+                              self.__class__.__name__)
+
+    #def initialize_for_solve(self):
+    # odeint applies f(u,t) and jac(u,t)
+    # min_step etc are adequately computed
+
+    def solve(self, time_points, terminate=None):
+        if terminate is not None:
+            raise ValueError(
+                'odeint_scipy.solve does not accept termiante function.')
+
+        self.t = np.asarray(time_points)
+        self.initialize_for_solve()
+        self.validate_data()
+
+        # jac_banded is not yet supported
+        ml = None  # self.ml
+        mu = None  # self.mu
+        print self.first_step, self.min_step, self.max_step
+        self.u, info = self.scipy_int.odeint(
+            self.f,
+            self.U0,
+            self.t,
+            Dfun=self.jac,
+            #ml=ml,
+            #mu=mu,
+            full_output=True,
+            rtol=self.rtol,
+            atol=self.atol,
+            #h0=self.first_step,  # NOTE: does not work well!
+            hmin=self.min_step,
+            hmax=self.max_step,
+            )
+
+        self.info = \
+        {'hu': (info['hu'],
+                'vector of step sizes successfully used for each time step.'),
+         'tcur': (info['tcur'],
+                  'vector with the value of t reached for each time step. '\
+                  '(will always be at least as large as the input times).'),
+         'tolsf': (info['tolsf'],
+                   'vector of tolerance scale factors, greater than 1.0, '\
+                   'computed when a request for too much accuracy was detected.'),
+         'tsw': (info['tsw'],
+                 'value of t at the time of the last method. '\
+                 'switch (given for each time step).'),
+         'nst': (info['nst'],
+                 'cumulative number of time steps'),
+         'nfe': (info['nfe'],
+                 'cumulative number of function evaluations for each time step'),
+         'nje': (info['nje'],
+                 'cumulative number of jacobian evaluations for each time step'),
+         'nqu': (info['nqu'],
+                 'a vector of method orders for each successful step.'),
+         'imxer': (info['imxer'],
+                   'index of the component of largest magnitude in the '\
+                   'weighted local error vector (e / ewt) on an error '\
+                   'return, -1 otherwise.'),
+         'lenrw': (info['lenrw'],
+                   'the length of the double work array required.'),
+         'leniw': (info['leniw'],
+                   'the length of integer work array required.'),
+         'mused': (info['mused'],
+                   'a vector of method indicators for each successful '\
+                   'time step: 1: adams (nonstiff), 2: bdf (stiff)')
+         }
+        return self.u, self.t
 
 
 class odelab(Adaptive):
@@ -2516,7 +2594,7 @@ def list_all_solvers():
     # Important: odespy.__init__.py must import all solver classes
     # into the namespace for this function to work properly.
 
-    superclasses = ('Solver','Adaptive', 'PyDS', 'Ode_scipy', 'Odepack',
+    superclasses = ('Solver','Adaptive', 'PyDS', 'ode_scipy', 'Odepack',
                     'RungeKutta1level', 'RungeKutta2level', 'SolverImplicit')
     import odespy
     class_members = inspect.getmembers(odespy, inspect.isclass)

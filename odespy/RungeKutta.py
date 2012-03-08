@@ -81,9 +81,6 @@ class RungeKutta2level(Adaptive):
 
     _butcher_tableau = None  # or (n+1, n) array for adaptive ones.
 
-    _optional_parameters = Adaptive._optional_parameters + \
-        ['min_step', 'max_step', 'first_step']
-
     def get_order(self):
         '''
         Return the order of current method, both for non-adaptive
@@ -104,6 +101,7 @@ class RungeKutta2level(Adaptive):
         Adaptive.initialize_for_solve(self)
         self.t_all = [self.t[0]]  # computed time levels
         self.u_all = [self.u[0]]  # corresponding u values
+        self.info = {'rejected' : 0}
 
     def advance(self):
         """Advance from t[n] to t[n+1] in (small) adaptive steps."""
@@ -113,10 +111,7 @@ class RungeKutta2level(Adaptive):
         u_n, t_n, t_next = self.u[n], self.t[n], self.t[n+1]
         dt = t_next - t_n
 
-        min_step = getattr(self, 'min_step', dt/1000.)
-        max_step = getattr(self, 'max_step', dt)
-        first_step = getattr(self, 'first_step', dt)
-        first_step = min(first_step, dt)  # dt is max choice for first_step
+        first_step = dt  # try one big step to next desired level
 
         def middle(x,y,z):    # Auxilary function
             return sorted([x,y,z])[1]
@@ -155,6 +150,7 @@ class RungeKutta2level(Adaptive):
                 k[m] = f(u+h*k_factors, t+h*factors_t[m])
             u_new = u + h*(np.dot(factors_u_new, k))
 
+            self.info['rejected'] += 1  # reduced below if accepted
             if self.verbose:
                 print '  u(t=%g)=%g: ' % (t+h, u_new),
 
@@ -165,13 +161,14 @@ class RungeKutta2level(Adaptive):
 
             accurate = (error <= tol).all()
 
-            if accurate or h <= min_step or h >= max_step:
+            if accurate or h <= self.min_step or h >= self.max_step:
                 # Accurate enough,
                 # or the step size exceeds valid range
                 u_intermediate.append(u_new)
                 t_intermediate.append(t+h)
                 self.u_all.append(u_new)
                 self.t_all.append(t+h)
+                self.info['rejected'] -= 1
 
                 if self.verbose:
                     print 'accepted, ',
@@ -181,7 +178,7 @@ class RungeKutta2level(Adaptive):
 
             if self.verbose:
                 print 'err=%s, ' % str(error),
-                if hasattr(self, 'u_exact'):
+                if hasattr(self, 'u_exact') and callable(self.u_exact):
                     print 'exact-err=%s, ' % \
                           (np.asarray(self.u_exact(t+h))-u_new),
 
@@ -205,7 +202,7 @@ class RungeKutta2level(Adaptive):
             h *= s
 
             # step size should be in range [min_step, max_step]
-            h = middle(h, min_step, max_step)
+            h = middle(h, self.min_step, self.max_step)
             # adjust h to fit the last step
             h = min(h, t_next - t_intermediate[-1])
 

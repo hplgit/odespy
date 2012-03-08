@@ -1,6 +1,6 @@
 """
 Find the inverse of a function f(x).
-Common method: solve y = f(x) wrt x.
+Common solver: solve y = f(x) wrt x.
 Here we differentiate to find x'(y) = 1/f'(x). x(0)=q where f(q)=0.
 Solving the ODE for x(y) constructs the inverse of f.
 """

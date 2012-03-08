@@ -1,4 +1,4 @@
-"""As exos3.py, but testing many more methods for a fixed resolution."""
+"""As exos3.py, but testing many more solvers for a fixed resolution."""
 
 from math import pi, sqrt
 
@@ -60,9 +60,9 @@ results = {}
 N_per_period = 20
 import numpy
 
-for method in solvers:
-    method_name = str(method)
-    results[method_name] = {'dt': 0, 'error': numpy.nan, 'cpu': 0}
+for solver in solvers:
+    solver_name = str(solver)
+    results[solver_name] = {'dt': 0, 'error': numpy.nan, 'cpu': 0}
 
     solver.set_initial_condition([problem.Theta, 0])
 
@@ -74,20 +74,20 @@ for method in solvers:
         u, t = solver.solve(time_points)
         cpu_time = time.clock() - t0
     except Exception, e:
-        print method_name, 'FAILED!'
+        print solver_name, 'FAILED!'
         print e
         continue  # continue with next pass in the loop
 
     theta = u[:,0]
     error = numpy.abs(theta_exact(t) - theta)
     error_L2 = sqrt(numpy.sum(error**2)/N)
-    #print method_name, error_L2, cpu_time
-    results[method_name]['dt'] = t[1] - t[0]
-    results[method_name]['error'] = error_L2
-    results[method_name]['cpu'] = cpu_time
+    #print solver_name, error_L2, cpu_time
+    results[solver_name]['dt'] = t[1] - t[0]
+    results[solver_name]['error'] = error_L2
+    results[solver_name]['cpu'] = cpu_time
 
 # Print
-for method_name in results:
-    print '%-50s %.1E %.2f' % (method_name,
-                               results[method_name]['error'],
-                               results[method_name]['cpu'])
+for solver_name in results:
+    print '%-50s %.1E %.2f' % (solver_name,
+                               results[solver_name]['error'],
+                               results[solver_name]['cpu'])

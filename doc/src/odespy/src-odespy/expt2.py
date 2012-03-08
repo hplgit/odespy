@@ -3,32 +3,29 @@
 from odespy.problems import Problem
 from numpy import exp, linspace
 
-class Decay(Problem):
-    """u(t) = 1 - exp(-a*t):  u' = a*(1 - u)."""
-    def __init__(self, a):
-        self.a = a
-
-    def f(self, u, t):
-        return self.a*(1 - u)
-
-    def u_exact(self, t):
-        return 1 - exp(-self.a*t)
-
 import odespy
-problem = Decay(1)
-solver = odespy.CashKarp(problem.f, verbose=2, first_step=10.0,
-                     u_exact=problem.u_exact, atol=1E-6, rtol=1E-6)
+problem = Logistic(a=2, R=1, U0=0.0001)
+solver = odespy.CashKarp
+solver = odespy.lsoda_scipy
+#solver = odespy.Lsoda
+solver = odespy.RK4
+solver = solver(problem.f, verbose=2, first_step=1.100,
+                u_exact=problem.u_exact, atol=1E-6, rtol=1E-6)
 solver.set_initial_condition(problem.u_exact(0))
 
 T = 10
-dt = 1.0
+dt = 0.5
 N = round(int(T/float(dt)))
 time_points = linspace(0, T, N+1)
 u, t = solver.solve(time_points)
 print u
 
 from matplotlib.pyplot import *
-plot(solver.t_all, solver.u_all, 'o',
-     t, u, 'b-')
-#plot(t, u, 'r-o')
+plot(t, u, 'r-o',
+     t, problem.u_exact(t), 'x')
+try:
+    hold('on')
+    plot(solver.t_all, solver.u_all, 'o')
+except:
+    pass
 show()

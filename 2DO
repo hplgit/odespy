@@ -1,7 +1,17 @@
+2DO list from Mar 7, 2012.
+
+* Wrap scipy.integrate.odeint (LSODA).
+  Status: Done (but first_step doesn't work).
+
+* Rewrite tutorial with a better sequence of examples in the beginning,
+  e.e., logistic equation.
+  Status: done.
+
 * Motivating example with F77/LSODE, Matlab ode45 and (now) scipy with
   vode (beginning of doc/src/odespy/odespy.do.txt): set adams 10-th
   order method (to demonstrate setting parameters) for Fortran and Python.
-  How is this done in pure Forgran?
+  How is this done in pure Fortran?
+  Status: much in progress.
 
 * Split class RungeKutta in two: one for 1-level methods, derived from
   Solver, and one for 2-level methods, derived from Adaptive.
@@ -75,8 +85,6 @@
     Not easy to understand.
     Status:
 
-  * What does "linearly solvers" mean? It is not a term in the .f files.
-
   * The return objects from Python functions (res, jac_lsoibt and others)
     have a strange syntax (vector * float * ...). Use std Python syntax.
     Status: not done.
@@ -86,6 +94,8 @@
     Status: not done.
 
   * Go through all English in all help and doc strings.
+    A lot of the info is incomplete, inconsistent, does not make sense, has
+    grammer mistakes, etc.
     Status: not done.
 
 * INSTALL.txt: require Py 2.7, numpy, scipy, sympy,

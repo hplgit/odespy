@@ -1,4 +1,4 @@
-"""As exos1.py, but testing several methods and setting sin(theta) to theta."""
+"""As exos1.py, but testing several solvers and setting sin(theta) to theta."""
 
 from math import pi, sqrt
 
@@ -31,9 +31,9 @@ import numpy
 import matplotlib.pyplot as mpl
 legends = []
 
-for method in solvers:
-    method_name = str(method)
-    print method_name
+for solver in solvers:
+    solver_name = str(solver)
+    print solver_name
 
     solver.set_initial_condition([problem.Theta, 0])
     N = N_per_period*problem.period
@@ -42,7 +42,7 @@ for method in solvers:
     u, t = solver.solve(time_points)
 
     theta = u[:,0]
-    legends.append(method_name)
+    legends.append(solver_name)
     mpl.plot(t, theta)
     mpl.hold('on')
 mpl.legend(legends)

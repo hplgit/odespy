@@ -11,13 +11,14 @@ ODE problem
 \[ y'' = 3 (1 - u^2) y' + y,\quad y(0)=2,\ y'(0)=1,
 !et
 known as the van der Pool oscillator. The solution is
-desired at the times `[0.0, 0.2, 0.4, 0.6, 0.8, 1.0]`.
+desired at 150 equally spaced time levels in
+the interval `[0, 30]`.
 We want to solve this problem
 by three well-known software routines:
 
-  o `LSODE` from ODEPACK
-  o `ode45` from MATLAB
-  o `vode` from Python
+  o `LSODE` from ODEPACK (adaptive Adams and BDF methods)
+  o `ode45` from MATLAB (adaptive Runge-Kutta 4-5-th order)
+  o `vode` from Python (adaptive Adams and BDF methods)
 
 All of these routines require the ODE problem to be on the form
 $u'=f(u,t)$, which means that the
@@ -54,10 +55,10 @@ C    USE ONLY ABSOLUTE TOLERANCE:
      LRW = 52
      LIW = 20
 C    NUMBER OF TIME STEPS:
-     NOUT = 5
+     NOUT = 150
      T = 0.0D0
 C    FINAL TIME:
-     TOUT = 0.2D0
+     TOUT = 30.0D0
 C    INITIAL CONDITIONS
      U(1)= 2.0D0
      U(2) = 0.0D0
@@ -83,7 +84,8 @@ C    CALL ADAPTIVE TIME STEPPING AT EACH OF THE TARGET TIME LEVELS
      END
 !ec
 
-MATLAB, on the other hand, requires very compact code. The definition
+__MATLAB.__
+The problem can be solved with very compact code in MATLAB. The definition
 of the ODE system, the $f(u,t)$ function, must be placed in
 a function in a file, say `myode.m`:
 !bc mcod
@@ -91,29 +93,54 @@ function F = myode(t, u);
 F(1,1) = u(2)
 F(2,1) = 3*(1 - u(1)*u(1))*u(2) - u(1)
 !ec
-In MATLAB we can solve the problem by
+In MATLAB we can then solve the problem by
 !bc ipy
->> [u1, u2] = ode45('myode', [0, 1], [2; 0])
+>> options = odeset('RelTol',0.0,'AbsTol',1e-6);
+>> tspan = [0 30];
+>> u0 = [2; 0]
+>> [t, u] = ode45('myode', tspan, u0, options]);
 !ec
 
+__Python.__
 Calling up the `vode` method from the `scipy` library in Python
-goes as follows:
+also results in compact code:
 !bc pycod
 from scipy.integrate import ode
 
 u0 = [2.0, 0.0]
-t = 0
 
 def f(t, u):
     return [u[1], 3.*(1. - u[0]*u[0])*u[1] - u[0]]
 
 # integration
 r = ode(f).set_integrator('vode', method='adams',
-                          order=10, with_jacobian=False)
-r.set_initial_value(u0, t0)
-while r.successful() and r.t <= 1.0:
-    r.integrate(r.t + 0.2)
+                          order=10, rol=0, atol=1e-6,
+                          with_jacobian=False)
+r.set_initial_value(u0, 0)
+T = 30
+dt = T/150.
+u = [];  t = []
+while r.successful() and r.t <= T:
+    r.integrate(r.t + dt)
+    u.append(r.y);  t.append(r.t)
 !ec
+Suppose you want to compare these methods and their implementations.
+This requires three different main programs and (worst) three
+different implementations of the definition of the mathematical problem.
+Some has the signature $f(u,t)$ while others require $f(t,u)$, and
+this difference between packages is often a cause of errors.
+
+__Unified Interface.__ The `odespy` package provides a unified
+interface to all the three mentioned types of methods so we can do
+this:
+
+@@@CODE src-odespy/motivation1.py
+
+The same `f` and the same call syntax can be reused across methods
+and software.
+
+
+
 
 ======= Basic Usage =======
 
@@ -240,44 +267,61 @@ plot(t, u_0, t, u_k)
 show()
 !ec
 
-===== Example: Exponential Growth =====
+===== Basic Example: Logistic Growth =====
 label{ode:sec:exgr}
 
-Our first example concerns the simple scalar ODE problem $u'=cu$,
-$u(0)=A$, where $A>0$ and $c>0$ are known constants. Using a standard
+Our first example concerns the simple scalar ODE problem $u'=au(1-u/R)$,
+$u(0)=A$, where $A>0$, $a>0$, and $R>0$ are known constants. This is
+a common model for population dynamics in ecology where $u$ is the
+number of individuals, $a$ the initial growth rate, $R$ is the
+maximum number of individuals that the environment allows (the so-called
+*carrying capacity* of the environment).
+Using a standard
 Runge-Kutta method of order four, the code for solving the problem in
-the time interval $[0,40]$, with $N=30$ time steps, looks like this:
+the time interval $[0,10]$, with $N=30$ time steps, looks like this:
 
-@@@CODE src-odespy/growth1.py  fromto: c = @
+@@@CODE src-odespy/logistic1.py  fromto: def f@def u_exact
 
 With the `RK4` method and other non-adaptive methods
 the time steps are dictated by the `time_points` array.
 A constant time step of size is implied in the present example.
 
+We can easily plot the numerical solution and compare with the exact
+solution (which is known for this equation):
 
-=== Parameters in the Right-Hand Side Function ===
+@@@CODE src-odespy/logistic1.py  fromto: def u_exact@
+
+FIGURE: [figs-odespy/logistic1.png, width=400] Solution of the logistic equation with the 4-th order Runge-Kutta method (solid line) and comparison with the exact solution (dots).
+
+===== Parameters in the Right-Hand Side Function =====
 label{ode:sec:exgr:farg}
 
 The right-hand side function and all physical parameters are often
 lumped together in a class, for instance,
 
-@@@CODE src-odespy/growth2.py  fromto: class Exponential@import numpy
+@@@CODE src-odespy/logistic.py  fromto: class Logistic@import odespy
 
-We may also compare the numerical and exact solution:
+Note that introducing local variables like `a` and `R`, instead of
+using `self.a` and `self.A`, makes the code closer to mathematics.
+This can be convenient when proof reading the implementation of
+complicated ODEs.
 
-@@@CODE src-odespy/growth2.py  fromto: u_exact = @
+The numerical solution is found by
 
-Instead of having the `c` variable as a global variable or
-in a class, we may include it as an extra argument to `f`, either
-as a positional argument or as a keyword argument. Positional arguments
-can be sent to `f` via the constructor argument `f_args` (a list/tuple of
-variables), while a dictionary `f_kwargs` is used to transfer
-keyword arguments to `f` via the constructor:
+@@@CODE src-odespy/growth2.py  fromto: import odespy@from matplotlib
 
-@@@CODE src-odespy/growth3.py  fromto: \# f has extra@method\.set_initial
+Instead of having the problem parameters `a` and `R` in the ODE as
+global variables or in a class, we may include them as extra arguments
+to `f`, either as positional arguments or as keyword
+arguments. Positional arguments can be sent to `f` via the constructor
+argument `f_args` (a list/tuple of variables), while a dictionary
+`f_kwargs` is used to transfer keyword arguments to `f` via the
+constructor:
 
-The right-hand side function `f` may feature both extra positional
-arguments and extra keyword arguments,
+@@@CODE src-odespy/logistic3.py  fromto: def f@solver\.set_initial
+
+Here we used keyword arguments in `f`, but in general a mix
+of positional and keword arguments can be used:
 !bc pycod
 def f(u, t, arg1, arg2, arg3, ..., kwarg1=val1, kwarg2=val2, ...):
     ...
@@ -287,50 +331,70 @@ method = odespy.classname(f,
                     f_kwargs=dict(kwarg1=val1, kwarg2=val2, ...))
 
 # Alternative setting of f_args and f_kwargs
-method.set(f_args=[arg1, arg2, arg3, ...],
+solver.set(f_args=[arg1, arg2, arg3, ...],
            f_kwargs=dict(kwarg1=val1, kwarg2=val2, ...))
 !ec
 Solvers will call `f` as `f(u, t, *f_args, **f_kwargs)`.
 
-=== Continuing a Previous Simulation ===
+===== Continuing a Previous Simulation =====
 
 It is easy to simulate for some time interval $[0, T_1]$,
 the continue with $u(T_1)$ as new initial condition and simulate for
 $t$ in $[T_1, T_2]$ and so on. Let us divide the time
-domain $[0,40]$ into subdomains and compute the solution for
+domain into subdomains and compute the solution for
 each subdomain in sequence. The following program performs the steps.
 
-@@@CODE src-odespy/growth4.py  fromto:c = 0.1@
+@@@CODE src-odespy/logistic4.py  fromto: def f@show\(
 
+===== Termination Criterion for the Simulation =====
 
-===== Example: Decay Equation =====
+We know that the solution $u$ of the logistic equation approaches
+$R$ as $t\rightarrow\infty$|$t becomes large$. Instead of
+using a trial and error process for determining an appropriate
+time integral for integration, the `solver.solve` method accepts
+a user-defined function `terminate` that can be used to implement
+a criterion for terminating the solution.
+Mathematically, the relevant criterion is
+$||u-R||<\hbox{tol}$|$||u - R|| < tol$, where tol is an acceptable
+tolerance, say $100$ in the present case where $R=10^5$.
+The `terminate` function implements the criterion
+and returns true if the criterion is met:
 
-The second example also concerns the ODE $u'=cu$, but this time with
-$c<0$. We want to integrate until the asymptotic value $u=0$ is
-reached with an accuracy of $0.001$. For this purpose we need a
-`terminate` function, which returns `True` when the termination
-criterion is met:
+@@@CODE src-odespy/logistic5.py  fromto: def terminate@u, t =
 
-@@@CODE src-odespy/decay1.py  fromto: tol =@u, t =
+Note that the simulation is anyway stopped for $t > T$ so $T$
+must be large enough for the termination criterion to be reached.
+With a `terminate` function it is also convenient to specify the
+time step `dt` and not the total number of time steps.
 
-The complete program may take the form
+A complete program can be as follows:
 
-@@@CODE src-odespy/decay1.py  fromto: c = -@
+@@@CODE src-odespy/logistic5.py
 
-Note that the size of the returned arrays `u` and `t` fits
-the time interval up to the point of termination by `terminate`.
+===== An Class-Based Implementation =====
 
+The previous code example can be recast into a more class-based
+("object-oriented programming") example. We lump all data related
+to the problem (the "physics") into a problem class `Logistic`, while
+all data related to the numerical solution and its quality are
+taken care of by class `Solver`. The code below illustrates
+the idea:
 
-===== Example: Decay Equation with Other Symbols =====
+@@@CODE src-odespy/logistic6.py
+
+===== Using Other Symbols =====
 
 The `odespy` package applies `u` for the unknown function or
 vector of unknown functions and `t` as the name of the independent
 variable. Many problems involve other symbols for functions and
 independent variables. These symbols should be reflected in the code.
-For example, here is a coding example involving the differential
-equation $y'(x)=-y(x)$, $y(0)=1$:
+For example, here is a coding example involving the logistic
+equation written as $y'(x)=au(x)(1-u(x)/R(x))$, where now $R=R(x)$
+is considered. Following the setup froom the very first program
+above solving the logistic ODE, we can easily introduce our own
+nomenclature:
 
-@@@CODE src-odespy/decay2.py  fromto: def myrhs@
+@@@CODE src-odespy/logistic7.py
 
 As shown, we use `y` for `u`, `x` for `t`, and `x_points` instead
 of `time_points`.
@@ -411,7 +475,7 @@ an alarming feature: the amplitude grows (indicating increasing
 energy in the system). Changing `T` to 28 periods instead of 10
 makes the numerical solution explode.
 
-FIGURE: [figs-tut/exos1a.png, width=500] Comparison of large-amplitude numerical solution with corresponding analytical solution (derived for small amplitudes).
+FIGURE: [figs-odespy/exos1a.png, width=500] Comparison of large-amplitude numerical solution with corresponding analytical solution (derived for small amplitudes).
 
 Changing solution method is a matter of substituting `Heun` by `RK4`,
 for instance:
@@ -421,7 +485,7 @@ for instance:
 The amplitude is now correct, but the numerical solution has a different
 frequency than the inaccurate analytical "solution".
 
-FIGURE: [figs-tut/exos1b.png, width=500] Switching to a 4-th order Runge-Kutta method improves the numerical solution.
+FIGURE: [figs-odespy/exos1b.png, width=500] Switching to a 4-th order Runge-Kutta method improves the numerical solution.
 
 Changing $\Theta$|$Theta$ to a small value, say 0.05, makes the two curves
 coincide. The next section shows how easy it is to run a problem with a set
@@ -551,7 +615,7 @@ The loop over the chosen solvers may look like
 
 @@@CODE src-odespy/osc2.py  fromto: N_per_period =@
 
-FIGURE: [figs-tut/exos2.png, width=500] Comparison of solutions.
+FIGURE: [figs-odespy/exos2.png, width=500] Comparison of solutions.
 
 We can extend this program to compute the error in each numerical
 solution for different time step sizes.
@@ -665,7 +729,7 @@ We can easily compare different methods:
 
 @@@CODE src-odespy/exsos1.py f = White@savefig
 
-FIGURE: [figs-tut/exsos1.png, width=500] Oscillator driven by white noise.
+FIGURE: [figs-odespy/exsos1.png, width=500] Oscillator driven by white noise.
 
 The `Heun` and `RK2` methods give coinciding solutions while
 the `ForwardEuler` method gives too large amplitudes.

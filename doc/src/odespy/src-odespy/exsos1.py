@@ -28,10 +28,10 @@ from matplotlib.pyplot import *
 import odespy
 
 f = WhiteNoiseOscillator(b=0.1, c=pi**2, sigma=1)
-methods = [odespy.Heun(f), odespy.RK4(f),
+solvers = [odespy.Heun(f), odespy.RK4(f),
            odespy.ForwardEuler(f)]
-for method in methods:
-    f.connect_solver(method)
+for solver in solvers:
+    f.connect_solver(solver)
     solver.set_initial_condition([0,0])  # start from rest
     T = 60   # with c=pi**2, the period is 1
     u, t = solver.solve(linspace(0, T, 10001))
@@ -40,7 +40,7 @@ for method in methods:
     plot(t, x)
     hold(True)
 
-legend([str(m) for m in methods])
+legend([str(m) for m in solvers])
 savefig('tmp.png')
 show()
 

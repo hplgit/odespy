@@ -686,7 +686,7 @@ RungeKutta3
 RK4
 RungeKutta4
 RKFehlberg
-SymPy_odefun
+odefun_sympy
 ThetaRule
 Trapezoidal
 Vode
@@ -1357,7 +1357,7 @@ The ``odespy`` package depends on several other packages:
  * ``scipy`` for running the ``Vode`` Adams/BDF solver and the
    Dormand-Prince adaptive methods ``Dop853``, and ``Dopri5``.
 
- * ``sympy`` for running the extremely accurate ``SymPy_odefun`` solver.
+ * ``sympy`` for running the extremely accurate ``odefun_sympy`` solver.
 
 These packages are readily downloaded and installed by the
 standard ``setup.py`` script as shown above.

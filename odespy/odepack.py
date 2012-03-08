@@ -1,3 +1,5 @@
+__author__ = ['Liwei Wang, Univ. of Oslo']
+
 from solvers import Solver
 import numpy as np
 import sys, inspect
@@ -44,9 +46,8 @@ This subroutine should be defined in form::
     jac_banded = dict(
         help='''Function for Jacobian on banded matrix form.
 Used in Lsode, Lsoda, Lsodar.
-jac_banded(u,t,ml,mu) returns df/du
-vector * float * int * int -->  2d-array
-''',
+``jac_banded(u,t,ml,mu)`` returns df/du as an
+array of size ``neq`` times ``ml+mu+1``.''',
         paralist_old='u,t,ml,mu',
         paralist_new='t,u,ml,mu',
         array_order='Fortran',
@@ -102,11 +103,10 @@ This subroutine should be defined in form::
         type=callable),
 
     jac_column = dict(
-        help='''A callable object to specify a
-column of Jacobian (df/du) matrix.
-jac(u,t,j,ia,ja): j-th column of Jacobian (df/du)
- vector * float * integer * integer vector
- * integer vector    --->  vector''',
+        help='''\
+A callable object to specify a column of the Jacobian.
+``jac(u,t,j,ia,ja)`` returns the j-th column of the
+Jacobian.''',
         paralist_old='u,t,j',
         paralist_new='t,u,j',
         name_wrapped='jac_column_f77',
@@ -472,10 +472,12 @@ solvers._parameters.update(_parameters_Odepack)
 class Odepack(Solver):
     """
     This is a superclass for wrapping for seven solvers in the Fortran
-    package ODEPACK, which is available at netlib repository
-    (www.netlib.org/odepack).
+    package ODEPACK (available at the netlib repository:
+    www.netlib.org/odepack).
 
-    Super class for the following set of solvers.
+    _WARNING_: The documentation of these classes and the parameters
+    is very incomplete, sometimes inconsistent and suffers from
+    bad English. Most of the solvers work, though.
 
     *Solvers for explicitly given systems.*
     For each of the following solvers, it is assumed that the ODEs are
@@ -500,7 +502,7 @@ class Odepack(Solver):
                      systems that arise are solved by direct methods (LU
                      factor/solve).
 
-       Lsodes        solves systems du/dt = f, and in the stiff case
+       Lsodes        Solves systems du/dt = f, and in the stiff case
                      treats Jacobian matrix in general sparse form. It can
                      determine the sparsity structure on its own, or optionally
                      accepts this information from the user.
@@ -508,14 +510,14 @@ class Odepack(Solver):
                      to solve the linear systems that arise, by a sparse
                      (direct) LU factorization/ backsolve method.
 
-       Lsoda         solves systems du/dt = f, with a dense or banded
+       Lsoda         Solves systems du/dt = f, with a dense or banded
                      Jacobian when the problem is stiff, but it automatically
                      selects between nonstiff (Adams) and stiff (BDF)
                      methods. It uses the nonstiff method initially, and
                      dynamically monitors data in order to decide which
                      method to use.
 
-       Lsodar        a variant of Lsoda with a rootfinding capability added.
+       Lsodar        A variant of Lsoda with a rootfinding capability added.
                      Thus it solves problems du/dt = f with dense or banded
                      Jacobian and automatic method selection, and at the same
                      time, it finds the roots of any of a set of given functions
@@ -539,15 +541,15 @@ class Odepack(Solver):
     ===============  ==========================================================
     Name             Description
     ===============  ==========================================================
-       Lsodi         solves linearly implicit systems in which the
+       Lsodi         Solves linearly implicit systems in which the
                      matrices involved (A, dg/du, and d(A du/dt)/du) are all
                      assumed to be either dense or banded.
 
-       Lsodibt       solves linearly implicit systems in which the matrices
+       Lsodibt       Solves linearly implicit systems in which the matrices
                      involved are all assumed to be block-tridiagonal.  Linear
                      systems are solved by the LU method.
 
-       Lsodis        solves linearly implicit systems in which the
+       Lsodis        Solves linearly implicit systems in which the
                      matrices involved are all assumed to be sparse.
                      Either determines the sparsity structure or accepts it from
                      the user, and uses parts of the Yale Sparse Matrix Package
@@ -853,7 +855,7 @@ class Odepack(Solver):
 
     def set_ydoti(self):
         '''
-        ``ydoti`` is an array used in linearly solvers.
+        ``ydoti`` is an array used in linearly implicit solvers.
         It has to be extended if its length is smaller than neq.
         '''
         ydoti = getattr(self, 'ydoti', [])
@@ -979,7 +981,7 @@ class Odepack(Solver):
 	Then we could expand work array to avoid this error.
         '''
         print 'The length of real work array has been reset to %d' % new_lrw
-        if expand:          # Expand real arrays for linearly solvers
+        if expand:          # Expand real arrays for linearly implicit solvers
             self.rwork = list(self.rwork) + [0.]*(new_lrw-self.lrw)
         self.lrw = new_lrw
 
@@ -990,7 +992,7 @@ class Odepack(Solver):
 	Then we could expand work array to required length to avoid this error.
         '''
         print 'The length of integer work array has been reset to %d' % new_liw
-        if expand:          # Expand integer arrays for linearly solvers
+        if expand:          # Expand integer arrays for linearly implicit solvers
             self.iwork = list(self.iwork) + [0.]*(new_liw - self.liw)
         self.liw = new_liw
 
@@ -1035,7 +1037,7 @@ class Odepack(Solver):
 
     def solve(self, time_points, terminate=None):
         '''
-        This function is involved for non-linearly solvers in ODEPACK, i.e.
+        This function is involved for non-linearly implicit solvers in ODEPACK, i.e.
         Lsode, Lsoda, Lsodar, and Lsodes.
         '''
 
@@ -1129,7 +1131,7 @@ class Odepack(Solver):
                 else:
                     sys.exit(1)
                 if tried > 5:     # prevent endless loop
-                    sys.exit(1)
+                    raise ValueError('aborted execution of 5 tries...')
                 nstart, istate = nstop, 1
         self.u, self.t = u[:nstop], self.t[:nstop]
 
@@ -1137,18 +1139,20 @@ class Odepack(Solver):
 
     def advance(self):
         '''
-        This function intends to one step forward for linearly solvers
+        This function intends to one step forward for linearly implicit solvers
         (Lsodi, Lsodis, Lsoibt) in ODEPACK.
-        For these linearly solvers, if extra wrappers are added in Fortran
-        code, there are often memory errors. Besides, sometimes there
-        are unavoidable errors caused by bugs in the Ubuntu/Linux libraries
-        as libc.
-        To make these solvers more reliable on all platforms, this function
-        is used to call solvers in ODEPACK (dlsodi, dlsodis, dlsoibt) directly
-        without any wrappers in Fortran. However, this would lead to efficiency
-        lost with long work arrays as input parameters for Fortran code.
-        In Lsodi, Lsodis and Lsoibt, Solver.solve() would be applied to get the
-        desired solution, which will direct to this function to step forward.
+
+        For these linearly implicit solvers, if extra wrappers are
+        added in Fortran code, there are often memory errors. Besides,
+        sometimes there are unavoidable errors caused by bugs in the
+        Ubuntu/Linux libraries as libc.  To make these solvers more
+        reliable on all platforms, this function is used to call
+        solvers in ODEPACK (dlsodi, dlsodis, dlsoibt) directly without
+        any wrappers in Fortran. However, this would lead to
+        efficiency lost with long work arrays as input parameters for
+        Fortran code.  In Lsodi, Lsodis and Lsoibt, Solver.solve()
+        would be applied to get the desired solution, which will
+        direct to this function to step forward.
         '''
         itask = 1   # initial status
         istate = self.ydoti_flag
