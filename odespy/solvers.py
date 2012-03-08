@@ -42,7 +42,7 @@ for instance.
 Adaptive solver
 ---------------
 
-See examples in the ``solver.py`` file, class ``RK43``,
+See examples in the ``solver.py`` file, class ``RK34``,
 for instance.
 
 Wrapping other packages
@@ -183,6 +183,11 @@ _parameters = dict(
         help='Integer reflecting output of intermediate quantities',
         default=0,
         type=int),
+
+    u_exact = dict(
+        help='Function of t returning exact solution',
+        default=None,
+        type=callable),
 
     start_method = dict(
         help='Method for the first steps in multi-step solvers',
@@ -580,7 +585,8 @@ class Solver:
     """
 
     _required_parameters = ['f',]
-    _optional_parameters = ['f_args', 'f_kwargs', 'complex_valued', 'verbose']
+    _optional_parameters = ['f_args', 'f_kwargs', 'complex_valued',
+                            'verbose', 'u_exact']
 
     def __init__(self, f, **kwargs):
         """
@@ -2180,6 +2186,8 @@ class AdaptiveResidual(Adaptive):
 
 class RK34(Adaptive):
     """
+    NOTE: This class does not work!
+
     Adaptive 4th-order Runge-Kutta method.
     For each time level t[n], the method takes many
     adaptively chosen (small) time steps to hit the
@@ -2188,6 +2196,9 @@ class RK34(Adaptive):
     self.u_adaptive and self.t_adaptive, if desired.
     """
     quick_description = "Adaptive 4th-order Runge-Kutta method"
+
+    def __init__(self, *args, **kwargs):
+        raise Exception('Buggy code')
 
     def initialize_for_solve(self):
         Adaptive.initialize_for_solve(self)
@@ -2204,32 +2215,16 @@ class RK34(Adaptive):
         f = self.f
         K1 = f(u,                   t)
         K2 = f(u + dt*K1/2.,        t + dt/2.)
-        K3 = f(u + dt*K2/2,         t + dt/2)
+        K3 = f(u + dt*K2/2.,        t + dt/2.)
         Z3 = f(u - dt*K1 + 2*dt*K2, t + dt)
         K4 = f(u + dt*K3,           t + dt)
 
         u_new = dt/6.*(K1 + 2*K2 + 2*K3 + K4)
 
-        error = dt/6.*(2*K2 + Z3 - 2*Y3 - Y4)
+        error = dt/6.*(2*K2 + Z3 - 2*K3 - K4)
         error = np.linalg.norm(error)  # scalar measure
 
         return u_new, error
-
-    def adjust_timestep(self, dt, error, u_new, order):
-        """
-        Adjust dt, given error and order::
-
-            tol = self.rtol*np.linalg.norm(u_new) + self.atol
-
-            dt_new = dt*(tol/error)**(1./order)
-        """
-        tol = self.rtol*np.linalg.norm(u) + self.atol
-        if error > 1E-14:
-            dt_new = dt*(tol/error)**(1./order)
-            if self.min_step <= dt_new <= self.max_step:
-                dt = dt_new
-        return dt
-
 
     def advance(self):
         """
@@ -2245,62 +2240,66 @@ class RK34(Adaptive):
         Then proceed with a new step. Continue until next user-specified
         time level.
         """
+        # auxilatory function to pick up the middle number from 3 floats
+        def middle(x, y, z):
+           return sorted([x, y, z])[1]
+
         # u, t: solution u at time t in between self.t[n] and self.t[n+1]
         n = self.n
         u, t, t_np1 = self.u[n], self.t[n], self.t[n+1]
-        dt = tnp1 -t
+        dt = t_np1 -t
 
         min_step = getattr(self, 'min_step', dt/1000.)
         max_step = getattr(self, 'max_step', dt)
-        if not hasattr(self, 'h'):
-            # h is current adaptive step size, use first_step if
-            # h is not yet computed
-            first_step = getattr(self, 'first_step', dt)
-            if first_step > dt:
-                first_step = dt
-            self.h = first_step
-        # else: start out with previous self.h step size
+        first_step = getattr(self, 'first_step', dt)
+        if first_step > dt:
+            first_step = dt
+        self.h = first_step
 
-        if self.verbose >= 1:
-            print '\nat user-specified time level %g, ',
-            print 'starting with h=%g' % (t, self.h)
+        if self.verbose:
+            print '\nadvance solution in [%g, %g], ' % (t, t_np1),
+            print 'starting with h=%g' % self.h
 
-        while t <= t_np1:
+        while t < t_np1:
+
             sufficiently_accurate = False
             while not sufficiently_accurate:
                 u_new, error = self.advance_intermediate(u, t, self.h)
 
                 if self.verbose:
-                    'u=%g at t=%g is' % (u_new, t + self.h),
+                    print 'u(t=%g): %g, ' % (t + self.h, u_new),
 
                 # Is u_new sufficiently accurate?
-                tol = self.rtol*u_norm + self.atol
-                accurate = error < tol
+                u_new_norm = np.linalg.norm(u_new)
+                tol = self.rtol*u_new_norm + self.atol
+                accurate = error <= tol
                 if accurate or self.h <= min_step or self.h >= max_step:
                     sufficiently_accurate = True
                     u = u_new
-                    t = t+self.h
+                    t = t + self.h
                     self.t_all.append(t)
                     self.u_all.append(u)
 
-                    if self.verbose >= 1:
+                if self.verbose:
+                    if sufficiently_accurate:
                         print 'accepted, ',
-                else:
-                    if self.verbose >= 1:
+                    else:
                         print 'rejected, ',
+                    print ' err=%g (tol=%.1E), ' % (error, tol),
+                    if hasattr(self, 'u_exact'):
+                        print 'exact-err: %g, ' % \
+                              (np.abs(np.asarray(self.u_exact(t))-u)),
 
                 # Adjust time step
-                u_new_norm = np.linalg.norm(u_new)
                 if error > 1E-14:
-                    h_new = dt*(tol/error)**(1./order)
-                    if min_step <= h_new <= max_step:
-                        self.h = h_new
+                    h_new = self.h*(tol/error)**(1./self.order)
+                    print 'changing time step', h_new, min_step, max_step
+                    self.h = middle(min_step, h_new, max_step)
 
-                if t+dt > t_np1:  # fit last step so we hit t_np1 exactly
-                    self.h = t_np1 - t
+                self.h = min(self.h, t_np1-t)  # fit last step
 
-                if self.verbose >= 1:
-                    print 'new h=%g' % self.g
+                if self.verbose:
+                    print 'new h=%g' % self.h
         return u
 
 
@@ -2315,8 +2314,8 @@ class RKFehlberg(Adaptive):
         Adaptive.initialize_for_solve(self)
 
     def advance(self):
-        # auxilatory function to pick up the middle number from 3 floats
-        def middle(x, y=.1, z=4.):
+        # auxilatory function to pick up the middle number among 3 floats
+        def middle(x, y, z):
            return sorted([x, y, z])[1]
 
         f, n, rtol, atol = self.f, self.n, self.rtol, self.atol
@@ -2359,8 +2358,9 @@ class RKFehlberg(Adaptive):
              2197/4104.,
              -1/5.)
 
-        # u_i and t_i are intermediate steps between t_n and t_np1
+        # u_i and t_i hold intermediate steps between t_n and t_np1
         u_i = [u_n]; t_i = [t_n]
+        t = t_n
 
         while abs(t - t_n) < abs(t_np1 - t_n):
             u, t = u_i[-1], t_i[-1]
@@ -2395,10 +2395,10 @@ class RKFehlberg(Adaptive):
             # Factor to adjust next step size
             s = (tol/(2*error))**0.25
             # Factor should be in a reasonable range[0.1,4.0]
-            s = min(map(middle, s)) if self.neq > 1 else middle(s)
+            s = min(map(middle, s, 0.1, 0.4)) if self.neq > 1 else middle(s, 0.1, 0.4)
 
             # Step size should be in range [min_step, max_step]
-            h = middle(h*s, y=min_step, z=max_step)
+            h = middle(h*s, min_step, max_step)
 
             # h should be set to 't_np1-t_i[-1]' at the last intern step.
             h = min(h, t_np1-t_i[-1])

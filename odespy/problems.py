@@ -3,8 +3,9 @@ class Problem:
     complex_ = False
 
     parameters = dict(
-        T=dict(help='stop time', default=1, type=float)
-        U0=dict(help'initial condition', default=0))
+        T=dict(help='stop time', default=1, type=float),
+        U0=dict(help='initial condition', default=0.0, type=float),
+        )
 
     def __init__(self):
         pass
@@ -22,7 +23,7 @@ class Problem:
     def define_command_line_arguments(self, parser):
         raise NotImpelementedError
 
-    def set_parameters(self, args)
+    def set_parameters(self, args):
         raise NotImpelementedError
 
     def u_exact(self, t):

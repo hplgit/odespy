@@ -118,7 +118,7 @@ class RungeKutta2level(Adaptive):
         first_step = getattr(self, 'first_step', dt)
         first_step = min(first_step, dt)  # dt is max choice for first_step
 
-        def middle(x,y=.1,z=4.):    # Auxilary function
+        def middle(x,y,z):    # Auxilary function
             return sorted([x,y,z])[1]
 
         # Extract coefficients from Butcher-tableau
@@ -140,16 +140,23 @@ class RungeKutta2level(Adaptive):
         u, t, h = u_n, t_n, first_step               # initial values
         k = np.zeros((k_len, self.neq), self.dtype)  # intern stages
 
+        if self.verbose:
+            print 'advance solution in [%s, %s], h=%g' % (t_n, t_next, h)
+
         # Loop until next time point is reached
         while (abs(t - t_n) < abs(t_next - t_n)):
             u, t = u_intermediate[-1], t_intermediate[-1]
-            # internal steps
+
+            # Internal steps
             k[:, :] = 0.   # initialization for next step
             for m in range(k_len):
                 k_factors = (np.dot(factors_u, k))[m]
                 #print u, u+h*k_factors, f(u+h*k_factor, 0.5), self.dtype
                 k[m] = f(u+h*k_factors, t+h*factors_t[m])
             u_new = u + h*(np.dot(factors_u_new, k))
+
+            if self.verbose:
+                print '  u(t=%g)=%g: ' % (t+h, u_new),
 
             # local error between 2 levels
             error = h*np.abs(np.dot(factors_error, k))
@@ -160,14 +167,26 @@ class RungeKutta2level(Adaptive):
 
             if accurate or h <= min_step or h >= max_step:
                 # Accurate enough,
-                # or the step size exceeds valid range.
+                # or the step size exceeds valid range
                 u_intermediate.append(u_new)
                 t_intermediate.append(t+h)
                 self.u_all.append(u_new)
                 self.t_all.append(t+h)
 
+                if self.verbose:
+                    print 'accepted, ',
+            else:
+                if self.verbose:
+                    print 'rejected, ',
 
-           # prevent the error of dividing absolute zero
+            if self.verbose:
+                print 'err=%s, ' % str(error),
+                if hasattr(self, 'u_exact'):
+                    print 'exact-err=%s, ' % \
+                          (np.asarray(self.u_exact(t+h))-u_new),
+
+
+           # Replace 0 values by 1e-16 since we will divide by error
             error = np.asarray([(1e-16 if x == 0. else x) \
                                 for x in error])
 
@@ -180,102 +199,24 @@ class RungeKutta2level(Adaptive):
             # Formula is from <Numerical Methods for Engineers,
             #  Chappra & Cannle>
             s = .8 *((1./rms_norm)**(1/order))
-            # scalar should in range(0.1, 4.)
+            # scalar should be in range(0.1, 4.)
             # for better accuracy and smoothness
             s = middle(s, 0.1, 4.0)
             h *= s
 
-            # step size should in range(min_step, max_step)
-            h = middle(h, y=min_step, z=max_step)
-            # in case for last intern step
+            # step size should be in range [min_step, max_step]
+            h = middle(h, min_step, max_step)
+            # adjust h to fit the last step
             h = min(h, t_next - t_intermediate[-1])
 
+            if self.verbose:
+                print 'new h=%g' % h
+
+            if h == 0:
+                break
+
         return u_new
 
-    def advance(self):
-        """Advance from t[n] to t[n+1] in (small) adaptive steps."""
-
-        n = self.n
-        u, t, t_np1 = self.u[n], self.t[n], self.t[n+1]
-        dt = tnp1 -t
-
-        f = self.f
-
-        min_step = getattr(self, 'min_step', dt/1000.)
-        max_step = getattr(self, 'max_step', dt)
-        first_step = getattr(self, 'first_step', dt)
-        first_step = min(first_step, dt)  # dt is max choice for first_step
-        h = first_step
-
-        def middle(x,y=.1,z=4.):    # Auxilary function
-            return sorted([x,y,z])[1]
-
-        # Extract coefficients from Butcher-tableau
-        table = self._butcher_tableau
-        k_len = table.shape[1] - 1   # number of internal stages
-
-        # coefficients for internal stages
-        factors_u = np.asarray(table[:k_len, 1:])
-        # coefficients for t
-        factors_t = table[:k_len, 0]
-        # coefficients for u_new
-        factors_u_new = table[k_len, 1:]
-
-        # coefficients for local error between 2 levels
-        factors_error = table[k_len+1, 1:] - factors_u_new
-
-        k = np.zeros((k_len, self.neq), self.dtype)  # intern stages
-
-        # Loop until next time point is reached
-        while t <= t_np1:
-            sufficiently_accurate = False
-            while not sufficiently_accurate:
-
-                # internal steps
-                k[:, :] = 0.   # initialization for next step
-                for m in range(k_len):
-                    k_factors = (np.dot(factors_u, k))[m]
-                    k[m] = f(u+h*k_factors, t+h*factors_t[m])
-                u_new = u + h*(np.dot(factors_u_new, k))
-
-                # local error between 2 levels is the error estimate
-                error = h*np.abs(np.dot(factors_error, k))
-
-                # Is u_new sufficiently accurate?
-                tol = self.rtol*np.abs(u_new) + self.atol
-                accurate = (error <= tol).all()
-
-                if accurate or h <= min_step or h >= max_step:
-                    u = u_new
-                    t = t+h
-                    self.u_all.append(u)
-                    self.t_all.append(t)
-
-
-                # prevent the error of dividing absolute zero
-                error[error == 0] = 1E-15
-                #error = np.asarray([(1e-16 if x == 0. else x) \
-                #                    for x in error])
-
-                # Normarized error rate
-                rms = error/tol
-                rms_norm = np.sqrt(np.sum(rms*rms)/self.neq)
-
-                order = float(self._method_order[0])
-                # factor to adjust the size of next step
-                # Formula is from <Numerical Methods for Engineers,
-                #  Chappra & Cannle>
-                s = .8 *((1./rms_norm)**(1/order))
-                # scalar should in range(0.1, 4.)
-                # for better accuracy and smoothness
-                s = middle(s, 0.1, 4.0)
-                h *= s
-
-                # step size should in range(min_step, max_step)
-                h = middle(h, y=min_step, z=max_step)
-                # in case for last intern step
-                h = min(h, t_np1 - t_intermediate[-1])
-        return u_new
 
 
 class RungeKutta2(RungeKutta1level):
