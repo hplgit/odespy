@@ -1387,6 +1387,7 @@ for classname in classnames:
     doc_str = getattr(class_, '__doc__')
     fixed_width = None if class_.__module__ in ('solvers', 'RungeKutta') \
         else (21,49)
+    fixed_width = None
     setattr(class_, '__doc__',
             doc_str + table_of_parameters(class_, fixed_width=fixed_width))
     if hasattr(class_, 'quick_description'):

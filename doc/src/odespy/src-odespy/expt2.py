@@ -3,16 +3,6 @@
 from odespy.problems import Problem
 from numpy import exp, linspace
 
-class Gaussian(Problem):
-    def __init__(self, mu, sigma):
-        self.mu, self.sigma = float(mu), float(sigma)
-
-    def u_exact(self, t):
-        return 0.1 + 1/sqrt(2*pi)*exp(-(t-self.mu)**2/self.sigma**2)
-
-    def f(self, u, t):
-        return -2*(t-self.mu)/self.sigma**2*u
-
 class Decay(Problem):
     """u(t) = 1 - exp(-a*t):  u' = a*(1 - u)."""
     def __init__(self, a):

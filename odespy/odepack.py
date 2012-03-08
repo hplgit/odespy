@@ -8,7 +8,7 @@ _parameters_Odepack = dict(
     # arguments to the f and jac functions
 
     f_f77 = dict(
-        help='Intend to supply a Fortran subroutine as f.      '\
+        help='Fortran subroutine for f.                        '\
              'This subroutine should be defined in form::      '\
              '                                                 '\
              '        subroutine f_f77(neq,t,u,udot)           '\
@@ -22,7 +22,7 @@ _parameters_Odepack = dict(
         type=callable),
 
     jac_f77 = dict(
-        help='Intend to supply a Fortran subroutine as jac.    '\
+        help='Fortran subroutine for jac.                      '\
              'This subroutine should be defined in form::      '\
              '                                                 '\
              '       subroutine jac_f77(neq,t,u,ml,mu,pd,      '\
@@ -45,13 +45,12 @@ _parameters_Odepack = dict(
              ' vector * float * int * int -->   2d-array       ',
         paralist_old='u,t,ml,mu',
         paralist_new='t,u,ml,mu',
-        returnArrayOrder='Fortran',
+        array_order='Fortran',
         name_wrapped='jac_banded_f77',
         type=callable),
 
     jac_banded_f77 = dict(
-        help='Intend to supply a Fortran subroutine as jac_band'\
-             'jac_banded.                                      '\
+        help='Fortran subroutine for jac_banded.               '\
              'This subroutine should be defined in form::      '\
              '                                                 '\
              '        subroutine jac_banded_f77(neq,t,u,ml,    '\
@@ -77,8 +76,8 @@ _parameters_Odepack = dict(
         type=callable),
 
     g_f77 = dict(
-        help='Intend to supply a Fortran subroutine as g.      '\
-             'This subroutine should be defined in form::       '\
+        help='Fortran subroutine for g.                        '\
+             'This subroutine should be defined in form::      '\
              '                                                 '\
              '        subroutine g_f77(neq, t, u, ng, groot)   '\
              '  Cf2py intent(hide) neq                         '\
@@ -105,8 +104,7 @@ _parameters_Odepack = dict(
         type=callable),
 
     jac_column_f77 = dict(
-        help='Intend to supply a Fortran subroutine as         '\
-             'jac_column.                                      '\
+        help='Fortran subroutine for jac_column.               '\
              'This subroutine should be defined in form::      '\
              '                                                 '\
              '        subroutine jac_column_f77(neq, t, u, j,  '\
@@ -146,7 +144,7 @@ _parameters_Odepack = dict(
         type=callable),
 
     res_f77 = dict(
-        help='Intend to supply a Fortran subroutine as res.    '\
+        help='Fortran subroutine for res.                      '\
              'This subroutine should be defined in form::      '\
              '                                                 '\
              '      subroutine res_f77(neq, t, u, s, r, ires)  '\
@@ -200,8 +198,7 @@ _parameters_Odepack = dict(
         type=callable),
 
     jac_banded_lsodi_f77 = dict(
-        help='Intend to supply a Fortran subroutine as         '\
-             'jac_banded_lsodi.                                '\
+        help='Fortran subroutine for jac_banded_lsodi.         '\
              'This subroutine should be defined in form::      '\
              '                                                 '\
              '       subroutine jac_banded_lsodi_f77(neq, t, u,'\
@@ -223,13 +220,12 @@ _parameters_Odepack = dict(
              '  ---->  2d-array with dimension (neq,neq)       ',
         paralist_old='u,t,p',
         paralist_new='t,u,p',
-        returnArrayOrder='Fortran',
+        array_order='Fortran',
         name_wrapped='adda_lsodi_f77',
         type=callable),
 
     adda_lsodi_f77 = dict(
-        help='Intend to supply a Fortran subroutine as         '\
-             'adda_lsodi.                                      '\
+        help='Fortran subroutine for adda_lsodi.               '\
              'This subroutine should be defined in form::      '\
              '                                                 '\
              '        subroutine adda_lsodi_f77(neq, t, u, ml, '\
@@ -258,8 +254,7 @@ _parameters_Odepack = dict(
         type=callable),
 
     adda_banded_lsodi_f77 = dict(
-        help='Intend to supply a Fortran subroutine as         '\
-             'adda_banded.                                     '\
+        help='Fortran subroutine for adda_banded.              '\
              'This subroutine should be defined in form::      '\
              '                                                 '\
              '       subroutine adda_banded_lsodi_f77(neq, t,  '\
@@ -507,9 +502,9 @@ class Odepack(Solver):
                      to solve the linear systems that arise, by a direct method.
     ===============  ==========================================================
 
-    *Note*: It is encouraged that users provide a F2PY-compiled Fortran
-    subroutine or a multi-line string in Fortran code to define
-    user-supplied function. This would help to improve efficiency.
+    *Note*: For large ODE system the user is encouraged that users provide
+    a nF2PY-compiled Fortran subroutine or a multi-line string Fortran code
+    to define the ODE. This would help to improve efficiency.
     """
 
     # Default parameter-list for all solvers in OdePack
@@ -584,7 +579,7 @@ class Odepack(Solver):
         if 'jac' in self._parameters:
             self._parameters['jac']['paralist_old'] = 'u,t'
             self._parameters['jac']['paralist_new'] = 't,u'
-            self._parameters['jac']['returnArrayOrder'] = 'Fortran'
+            self._parameters['jac']['array_order'] = 'Fortran'
             self._parameters['jac']['name_wrapped'] = 'jac_f77'
         # If jac is input in form of jac(t,u),
         # wrap jac_f77 to the general form jac(u,t) for switch_to().
@@ -808,7 +803,7 @@ class Odepack(Solver):
         self.set_iopt()            # Flag for optional inputs
         self.set_ydoti()           # Extend length of array ydoti
         # itol is a flag to indicate whether tolerance parameters are input
-        # as scarlars or vectors.
+        # as scalars or vectors
         self.itol = (not isinstance(self.rtol, (int, float)))*2 + \
             (not isinstance(self.atol, (int, float))) + 1
         Solver.initialize_for_solve(self)   # Common settings in super class
@@ -1104,7 +1099,7 @@ class Lsode(Odepack):
         # wrap jac_banded to jac_banded_f77 for Fortran code
         self._parameters['jac_banded']['paralist_old'] = 'u,t,ml,mu'
         self._parameters['jac_banded']['paralist_new'] = 't,u,ml,mu'
-        self._parameters['jac_banded']['returnArrayOrder'] = 'Fortran'
+        self._parameters['jac_banded']['array_order'] = 'Fortran'
         self._parameters['jac_banded']['name_wrapped'] = 'jac_banded_f77'
         # If jac_banded is input in form of jac(t,u,ml,mu),
         # wrap jac_banded_f77 to the general form jac_banded(u,t,ml,mu)
@@ -1217,7 +1212,7 @@ class Lsoda(Odepack):
         # wrap jac_banded to jac_banded_f77 for Fortran code
         self._parameters['jac_banded']['paralist_old'] = 'u,t,ml,mu'
         self._parameters['jac_banded']['paralist_new'] = 't,u,ml,mu'
-        self._parameters['jac_banded']['returnArrayOrder'] = 'Fortran'
+        self._parameters['jac_banded']['array_order'] = 'Fortran'
         self._parameters['jac_banded']['name_wrapped'] = 'jac_banded_f77'
         # If jac_banded is input in form of jac(t,u,ml,mu),
         # wrap jac_banded_f77 to the general form jac_banded(u,t,ml,mu)
@@ -1334,7 +1329,7 @@ class Lsodar(Odepack):
         # wrap jac_banded to jac_banded_f77 for Fortran code
         self._parameters['jac_banded']['paralist_old'] = 'u,t,ml,mu'
         self._parameters['jac_banded']['paralist_new'] = 't,u,ml,mu'
-        self._parameters['jac_banded']['returnArrayOrder'] = 'Fortran'
+        self._parameters['jac_banded']['array_order'] = 'Fortran'
         self._parameters['jac_banded']['name_wrapped'] = 'jac_banded_f77'
         # If jac_banded is input in form of jac(t,u,ml,mu),
         # wrap jac_banded_f77 to the general form jac_banded(u,t,ml,mu)

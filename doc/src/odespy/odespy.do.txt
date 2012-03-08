@@ -8,19 +8,41 @@ The `odespy` package grew out of the desire to have a unified interface
 to lots of different methods and software for ODEs. Consider the
 ODE problem
 !bt
-\[ u'' = 3 (1 - u^2) u' + u,\quad u(0)=2,\ u'(0)=1
+\[ y'' = 3 (1 - u^2) y' + y,\quad y(0)=2,\ y'(0)=1,
 !et
-known as the van der Pool oscillator.
+known as the van der Pool oscillator. The solution is
+desired at the times `[0.0, 0.2, 0.4, 0.6, 0.8, 1.0]`.
+We want to solve this problem
+by three well-known software routines:
 
-[0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+  o `LSODE` from ODEPACK
+  o `ode45` from MATLAB
+  o `vode` from Python
 
+All of these routines require the ODE problem to be on the form
+$u'=f(u,t)$, which means that the
+the second-order differential equation must be
+recast as a system of two ODEs, and we have to identify the two components
+of the $f(u,t)$ function:
+!bt
+\[ u^{(0)}'(t)= u^{(1)},\quad u^{(1)'(t)=3(1-(u^{(0)}})^2u^{(1)} + u^{(0)}\]
+\[ u^{(0)}(0)=2,\quad u^{(1)}(0)=1.
+\[ f^{(0)}(u^{(0)}, u^{(1)}, t)= u^{(1)},\quad f^{(1)(u^{(0)}, u^{(1)}, t)=3(1-(u^{(0)}})^2u^{(1)} + u^{(0)}\]
+!et
+The mentioned ODE software needs a specification of the $f(u,t)$
+through some user-written function that takes $u$ and $t$ as input and
+delivers $f$ as output.
+
+__LSODE.__ Using `LSODE` and other ODEPACK routines requires the
+ODE problem to be specified in FORTRAN and the solver to be called
+from FORTRAN:
 !bc fpro
      program main
      external f
      integer i, iopt, iout, istate, itask, itol, iwork,
     1   lrw, liw, mf, neq, nout
      double precision atol, t, tout, rtol, rwork, u, urr
-     dimension u(2), rwork(52), iwork(20), urr(5,2)
+     dimension u(2), rwork(52), iwork(20), u1(5), u2(5)
      neq = 2
      mf = 10
      itol = 1
@@ -38,9 +60,10 @@ known as the van der Pool oscillator.
      do 100 iout = 1, nout
        call dlsode(f,neq,u,t,tout,itol,rtol,atol,itask,
     1     istate,iopt,rwork,lrw,iwork,liw,jac,mf)
-       urr(iout,1) = u(1)
-       urr(iout,2) = u(2)
- 100   tout = tout + 2d-1
+       u1(iout) = u(1)
+       u2(iout) = u(2)
+       tout = tout + 2.0d-1
+ 100 continue
      end
 
      subroutine f(neq, t, u, udot)
@@ -53,15 +76,37 @@ known as the van der Pool oscillator.
      end
 !ec
 
-`myode.m`:
+MATLAB, on the other hand, requires very compact code. The definition
+of the ODE system, the $f(u,t)$ function, must be placed in
+a function in a file, say `myode.m`:
 !bc mcod
       function F = myode(t, u);
       F(1,1) = u(2)
       F(2,1) = 3*(1 - u(1)*u(1))*u(2) - u(1)
 !ec
-
+In MATLAB we can solve the problem by
 !bc ipy
->> [tv, uv] = ode45('myode', [0, 1], [2; 0])
+>> [u1, u2] = ode45('myode', [0, 1], [2; 0])
+!ec
+
+Calling up the `vode` method from the `scipy` library in Python
+goes as follows:
+!bc pycod
+from scipy.integrate import ode
+
+u0 = [2.0, 0.0]
+t = 0
+
+def f(t, u):
+    return [u[1], 3.*(1. - u[0]*u[0])*u[1] - u[0]]
+
+# integration
+r = ode(f).set_integrator('vode', method='adams',
+                          order=10, with_jacobian=False)
+r.set_initial_value(u0, t0)
+while r.successful() and r.t <= 1.0:
+    r.integrate(r.t + 0.2)
+!ec
 
 ======= Basic Usage =======
 
@@ -177,7 +222,8 @@ Extract solution components for plotting and further analysis.
 Since the `u` array returned from `method.solve` stores all unknown
 functions at all discrete time levels, one usually wants to extract
 individual unknowns as one-dimensional arrays. Here is an example
-where unknown $0$ and $k$ are extracted in individual arrays and plotted:
+where unknown number $0$ and $k$ are extracted in individual arrays
+and plotted:
 !bc pycod
 u_0 = u[:,0]
 u_k = u[:,k]
@@ -258,7 +304,7 @@ reached with an accuracy of $0.001$. For this purpose we need a
 `terminate` function, which returns `True` when the termination
 criterion is met:
 
-@@@CODE src-odespy/decay1.py  tol =@u, t =
+@@@CODE src-odespy/decay1.py  fromto: tol =@u, t =
 
 The complete program may take the form
 

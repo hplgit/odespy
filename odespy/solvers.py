@@ -1306,7 +1306,7 @@ class Solver:
         parameters = self._parameters
         # Extract function parameters that are required to be wrapped
         func_list = [[name,
-                      parameters[name].get('returnArrayOrder', None),
+                      parameters[name].get('array_order', None),
                       parameters[name].get('paralist_old', None),
                       parameters[name].get('paralist_new', None),
                       parameters[name].get('name_wrapped', name)]
@@ -1316,13 +1316,13 @@ class Solver:
                          (parameters[name]['type'] is callable or \
                           parameters[name]['type'] is (callable, str)) and \
                          ('paralist_new' in parameters[name] or \
-                          'returnArrayOrder' in parameters[name])]
+                          'array_order' in parameters[name])]
         # name in self.__dict__  --> existing attributes in current instance
         # parameters[name]['type'] is callable or (callable, str)
         #             -->     callable objects
         # 'paralist_new' in parameters[name]
         #    --> new parameter-list is defined to be wrapped
-        # 'returnArrayOrder' in parameters[name]
+        # 'array_order' in parameters[name]
         #    --> this function return an array, and should be wrapped either in
         #    Fortran order or C (default) order.
         func_input = {}
@@ -2304,7 +2304,14 @@ class RK34(Adaptive):
 
 
 class RKFehlberg(Adaptive):
-    """The classical adaptive Runge-Kutta-Fehlberg method of order 4-5."""
+    """
+    The classical adaptive Runge-Kutta-Fehlberg method of order 4-5.
+    The method is available in more sophisticated form as
+    class Fehlberg (subclass of ``RungeKutta2level`` in the RungeKutta
+    module).
+    """
+    # Just an example of a straightforward implementation of a classical method
+
     quick_description = "Adaptive Runge-Kutta-Fehlberg (4,5) method"
 
     _optional_parameters = Adaptive._optional_parameters
@@ -2405,10 +2412,11 @@ class RKFehlberg(Adaptive):
 
         return u_new
 
+
 class Ode_scipy(Adaptive):
     """
-    Super class wrapper for scipy.integrate.ode classes.
-    Existing solvers in subclasses are: Vode, Dopri5, Dop853.
+    Superclass wrapper for ``scipy.integrate.ode`` classes.
+    Existing solvers in subclasses are: ``Vode``, ``Dopri5``, ``Dop853``.
     """
 
     _optional_parameters = Solver._optional_parameters + \
