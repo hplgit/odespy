@@ -8,41 +8,45 @@ _parameters_Odepack = dict(
     # arguments to the f and jac functions
 
     f_f77 = dict(
-        help='Fortran subroutine for f.                        '\
-             'This subroutine should be defined in form::      '\
-             '                                                 '\
-             '        subroutine f_f77(neq,t,u,udot)           '\
-             '  Cf2py intent(hide)   neq                       '\
-             '  Cf2py intent(out)    udot                      '\
-             '        integer neq                              '\
-             '        double precision t,u(neq),udot(neq)      '\
-             '        udot = ...                               '\
-             '        return                                   '\
-             '        end                                      ',
+        help='''Fortran subroutine for f.
+This subroutine should be defined in form::
+
+        subroutine f_f77(neq,t,u,udot)
+  Cf2py intent(hide)   neq
+  Cf2py intent(out)    udot
+        integer neq
+        double precision t,u(neq),udot(neq)
+        udot = ...
+        return
+        end
+
+''',
         type=callable),
 
     jac_f77 = dict(
-        help='Fortran subroutine for jac.                      '\
-             'This subroutine should be defined in form::      '\
-             '                                                 '\
-             '       subroutine jac_f77(neq,t,u,ml,mu,pd,      '\
-             '      1      nrowpd)                             '\
-             ' Cf2py intent(hide) neq,ml,mu,nrowpd             '\
-             ' Cf2py intent(out) pd                            '\
-             '       integer neq,ml,mu,nrowpd                  '\
-             '       double precision t,u,pd                   '\
-             '       dimension u(neq),pd(neq,neq)              '\
-             '       pd = ...                                  '\
-             '       return                                    '\
-             '       end                                       ',
+        help='''Fortran subroutine for jac.
+This subroutine should be defined in form::
+
+       subroutine jac_f77
+      1 (neq, t, u, ml, mu, pd, nrowpd)
+ Cf2py intent(hide) neq,ml,mu,nrowpd
+ Cf2py intent(out) pd
+       integer neq,ml,mu,nrowpd
+       double precision t,u,pd
+       dimension u(neq),pd(neq,neq)
+       pd = ...
+       return
+       end
+
+''',
         type=callable),
 
     jac_banded = dict(
-        help='A callable object to define the banded Jacobian  '\
-             'matrix(df/du) of right-hand side function f.     '\
-             'Used in Lsode, Lsoda, Lsodar.                    '\
-             ' jac_banded(u,t,ml,mu) returns df/du             '\
-             ' vector * float * int * int -->   2d-array       ',
+        help='''Function for Jacobian on banded matrix form.
+Used in Lsode, Lsoda, Lsodar.
+jac_banded(u,t,ml,mu) returns df/du
+vector * float * int * int -->  2d-array
+''',
         paralist_old='u,t,ml,mu',
         paralist_new='t,u,ml,mu',
         array_order='Fortran',
@@ -50,174 +54,187 @@ _parameters_Odepack = dict(
         type=callable),
 
     jac_banded_f77 = dict(
-        help='Fortran subroutine for jac_banded.               '\
-             'This subroutine should be defined in form::      '\
-             '                                                 '\
-             '        subroutine jac_banded_f77(neq,t,u,ml,    '\
-             '       1                          mu,pd,nrowpd)  '\
-             '  Cf2py intent(hide) neq,ml,mu,nrowpd            '\
-             '  Cf2py intent(out) pd                           '\
-             '        integer neq,ml,mu,nrowpd                 '\
-             '        double precision t,u,pd                  '\
-             '        dimension u(neq),pd(nrowpd,neq)          '\
-             '        pd = ...                                 '\
-             '        return                                   '\
-             '        end                                      ',
+        help='''Fortran subroutine for jac_banded.
+This subroutine should be defined in form::
+
+        subroutine jac_banded_f77
+       1  (neq,t,u,ml, mu,pd,nrowpd)
+  Cf2py intent(hide) neq,ml,mu,nrowpd
+  Cf2py intent(out) pd
+        integer neq,ml,mu,nrowpd
+        double precision t,u,pd
+        dimension u(neq),pd(nrowpd,neq)
+        pd = ...
+        return
+        end
+
+''',
         type=callable),
 
     g = dict(
-        help='Callable object to define constraint functions,  '\
-             'whose roots are desired during the integration.  '\
-             ' g(u, t) --> values of constraint functions      '\
-             ' scalar/vector * float --> scalar/vector         ',
+        help='''Callable object to define constraint functions,
+whose roots are desired during the integration.
+ g(u, t) --> values of constraint functions
+ scalar/vector * float --> scalar/vector
+ ''',
         paralist_old='u,t',
         paralist_new='t,u',
         name_wrapped='g_f77',
         type=callable),
 
     g_f77 = dict(
-        help='Fortran subroutine for g.                        '\
-             'This subroutine should be defined in form::      '\
-             '                                                 '\
-             '        subroutine g_f77(neq, t, u, ng, groot)   '\
-             '  Cf2py intent(hide) neq                         '\
-             '  Cf2py optional, intent(hide) ng                '\
-             '  Cf2py intent(in) t, u                          '\
-             '  Cf2py intent(out) groot                        '\
-             '        integer neq, ng                          '\
-             '        double precision t, u, groot             '\
-             '        dimension u(neq), groot(ng)              '\
-             '        groot = ...                              '\
-             '        return                                   '\
-             '        end                                      ',
+        help='''Fortran subroutine for g.
+This subroutine should be defined in form::
+
+        subroutine g_f77(neq, t, u, ng, groot)
+  Cf2py intent(hide) neq
+  Cf2py optional, intent(hide) ng
+  Cf2py intent(in) t, u
+  Cf2py intent(out) groot
+        integer neq, ng
+        double precision t, u, groot
+        dimension u(neq), groot(ng)
+        groot = ...
+        return
+        end
+
+''',
         type=callable),
 
     jac_column = dict(
-        help='A callable object to specify a column of Jacobian'\
-             ' (df/du) matrix.                                 '\
-             'jac(u,t,j,ia,ja): jth column of Jacobian (df/du) '\
-             ' vector * float * integer * integer vector       '\
-             ' * integer vector    --->  vector                ',
+        help='''A callable object to specify a
+column of Jacobian (df/du) matrix.
+jac(u,t,j,ia,ja): j-th column of Jacobian (df/du)
+ vector * float * integer * integer vector
+ * integer vector    --->  vector''',
         paralist_old='u,t,j',
         paralist_new='t,u,j',
         name_wrapped='jac_column_f77',
         type=callable),
 
     jac_column_f77 = dict(
-        help='Fortran subroutine for jac_column.               '\
-             'This subroutine should be defined in form::      '\
-             '                                                 '\
-             '        subroutine jac_column_f77(neq, t, u, j,  '\
-             '       1       ia, ja, pd)                       '\
-             '  Cf2py intent(hide) neq, ia, ja                 '\
-             '  Cf2py intent(out) pd                           '\
-             '        integer neq, j, ia, ja                   '\
-             '        double precision t, u, pd                '\
-             '        dimension u(neq), pd(neq), ia(neq + 1),  '\
-             '       1       ja(*)                             '\
-             '        pd = ...                                 '\
-             '        return                                   '\
-             '        end                                      ',
+        help='''Fortran subroutine for jac_column.
+This subroutine should be defined in form::
+
+        subroutine jac_column_f77
+       1  (neq, t, u, j, ia, ja, pd)
+  Cf2py intent(hide) neq, ia, ja
+  Cf2py intent(out) pd
+        integer neq, j, ia, ja
+        double precision t, u, pd
+        dimension u(neq), pd(neq), ia(neq + 1), ja(*)
+        pd = ...
+        return
+        end
+
+''',
         type=callable),
 
     # parameters for linearly implicit ODE solvers: Lsodi, Lsoibt, Lsodis
     res = dict(
-        help='User-supplied function to calculate the residual '\
-             'vector, defined by r =  g(u,t) - A(u,t) * s.     '\
-             'Used in the linearly implicit solvers: Lsodi,    '\
-             'Lsodis, Lsoibt.                                  '\
-             'res(u,t,s,ires)   -->   (r,ires)                 '\
-             'vector * float * vector * int -->  vector * int  '\
-             ' "ires" is a flag both for input and output.     '\
-             'On input, ires indicates how ODEPACK would use   '\
-             'the returned array "r":                          '\
-             'ires == 1: the full residual exactly.            '\
-             'ires == 2: "r" is used only to computejacobian   '\
-             '           dr/du by difference quotients.        '\
-             '"res" should set flag "ires" if it encounters a  '\
-             'halt condition or illegal input. Otherwise, it   '\
-             'should not be reset. On output, value 1 or -1    '\
-             'represents a normal return.                      ',
+        help='''User-supplied function to calculate the residual
+vector, defined by r =  g(u,t) - A(u,t) * s.
+Used in the linearly implicit solvers: Lsodi,
+Lsodis, Lsoibt.
+res(u,t,s,ires)   -->   (r,ires)
+vector * float * vector * int -->  vector * int
+ "ires" is a flag both for input and output.
+On input, ires indicates how ODEPACK would use
+the returned array "r":
+ires == 1: the full residual exactly.
+ires == 2: "r" is used only to compute Jacobian
+           dr/du by difference quotients.
+"res" should set flag "ires" if it encounters a
+halt condition or illegal input. Otherwise, it
+should not be reset. On output, value 1 or -1
+represents a normal return.
+''',
         paralist_old='u,t,s,ires',
         paralist_new='t,u,s,ires',
         name_wrapped='res_f77',
         type=callable),
 
     res_f77 = dict(
-        help='Fortran subroutine for res.                      '\
-             'This subroutine should be defined in form::      '\
-             '                                                 '\
-             '      subroutine res_f77(neq, t, u, s, r, ires)  '\
-             ' Cf2py intent(hide) neq                          '\
-             ' Cf2py intent(out) r                             '\
-             ' Cf2py intent(in,out) ires                       '\
-             '      double precision t, u, s, r                '\
-             '      dimension u(neq, s(neq), r(neq)            '\
-             '      ...                                        '\
-             '      return                                     '\
-             '      end                                        ',
+        help='''Fortran subroutine for res.
+This subroutine should be defined in form::
+
+      subroutine res_f77(neq, t, u, s, r, ires)
+ Cf2py intent(hide) neq
+ Cf2py intent(out) r
+ Cf2py intent(in,out) ires
+      double precision t, u, s, r
+      dimension u(neq, s(neq), r(neq)
+      ...
+      return
+      end
+
+''',
         type=callable),
 
     jac_lsodi = dict(
-        help='Callable object to define the full Jacobian      '\
-             'matrix dr/du where r = g - A*s.                  '\
-             'jac(u,t,s)    --> dr/du                          '\
-             'vector * float * vector                          '\
-             '   ---->  2d-array with dimension (neq,neq)      ',
+        help='''Callable object to define the full Jacobian
+matrix dr/du where r = g - A*s.
+jac(u,t,s)    --> dr/du
+vector * float * vector
+   ---->  2d-array with dimension (neq,neq).''',
         paralist_old='u,t,s',
         paralist_new='t,u,s',
         name_wrapped='jac_lsodi_f77',
         type=callable),
 
     jac_lsodi_f77 = dict(
-        help='Intend to supply Fortran subroutine as jac_lsodi.'\
-             'This subroutine should be defined in form::      '\
-             '                                                 '\
-             '       subroutine jac_lsodi_f77(neq, t, u, s, ml,'\
-             '      1           mu, pd, nrowpd)                '\
-             ' Cf2py intent(in, hide) neq, ml, mu, nrowpd      '\
-             ' Cf2py intent(out) pd                            '\
-             '       integer neq, ml, mu, nrowpd               '\
-             '       double precision t, u, pd, s              '\
-             '       dimension u(neq), s(neq), pd(nrowpd, neq) '\
-             '       pd = ...                                  '\
-             '       return                                    '\
-             '       end                                       ',
+        help='''Fortran subroutine for jac_lsodi.
+This subroutine should be defined in form::
+
+       subroutine jac_lsodi_f77
+      1  (neq, t, u, s, ml, mu, pd, nrowpd)
+ Cf2py intent(in, hide) neq, ml, mu, nrowpd
+ Cf2py intent(out) pd
+       integer neq, ml, mu, nrowpd
+       double precision t, u, pd, s
+       dimension u(neq), s(neq), pd(nrowpd, neq)
+       pd = ...
+       return
+       end
+
+''',
         type=callable),
 
     jac_banded_lsodi = dict(
-        help='Callable object to define the banded Jacobian    '\
-             'matrix dr/du where r = g - A*s.                  '\
-             'jac(u,t,s,ml,mu), where ml & mu are lower & upper'\
-             'half-bandwidth of banded matrix.                 '\
-             'vector * float * vector * int * int              '\
-             '   --->  2d-array with dimension (*,neq)         ',
+        help='''Callable object to define the banded Jacobian
+matrix dr/du where r = g - A*s.
+jac(u,t,s,ml,mu), where ml & mu are lower & upper'
+half-bandwidth of banded matrix.
+vector * float * vector * int * int
+   --->  2d-array with dimension (*,neq).''',
         paralist_old='u,t,s,ml,mu',
         paralist_new='t,u,s,ml,mu',
         name_wrapped='jac_banded_lsodi_f77',
         type=callable),
 
     jac_banded_lsodi_f77 = dict(
-        help='Fortran subroutine for jac_banded_lsodi.         '\
-             'This subroutine should be defined in form::      '\
-             '                                                 '\
-             '       subroutine jac_banded_lsodi_f77(neq, t, u,'\
-             '      1      s, ml, mu, pd, nrowpd)              '\
-             ' Cf2py intent(in, hide) neq, ml, mu, nrowpd      '\
-             ' Cf2py intent(out) pd                            '\
-             '       integer neq, ml, mu, nrowpd               '\
-             '       double precision t, u, pd, s              '\
-             '       dimension u(neq), s(neq), pd(nrowpd, neq) '\
-             '       pd = ...                                  '\
-             '       return                                    '\
-             '       end                                       ',
+        help='''Fortran subroutine for jac_banded_lsodi.
+This subroutine should be defined in form::
+
+       subroutine jac_banded_lsodi_f77
+      1  (neq, t, u, s, ml, mu, pd, nrowpd)
+ Cf2py intent(in, hide) neq, ml, mu, nrowpd
+ Cf2py intent(out) pd
+       integer neq, ml, mu, nrowpd
+       double precision t, u, pd, s
+       dimension u(neq), s(neq), pd(nrowpd, neq)
+       pd = ...
+       return
+       end
+
+''',
         type=callable),
 
     adda_lsodi = dict(
-        help='Callable object to add the matrix A = A(u,t) to  '\
-             'another matrix p stored in the same form as A.   '\
-             'addaName(u,t,p)  :   vector * float * 2d-array   '\
-             '  ---->  2d-array with dimension (neq,neq)       ',
+        help='''Callable object to add the matrix A = A(u,t) to
+another matrix p stored in the same form as A.
+addaName(u,t,p)  :   vector * float * 2d-array
+  ---->  2d-array with dimension (neq,neq).''',
         paralist_old='u,t,p',
         paralist_new='t,u,p',
         array_order='Fortran',
@@ -225,158 +242,193 @@ _parameters_Odepack = dict(
         type=callable),
 
     adda_lsodi_f77 = dict(
-        help='Fortran subroutine for adda_lsodi.               '\
-             'This subroutine should be defined in form::      '\
-             '                                                 '\
-             '        subroutine adda_lsodi_f77(neq, t, u, ml, '\
-             '       1       mu, pd, nrowpd)                   '\
-             '  Cf2py intent(in, hide) neq, ml, mu             '\
-             '  Cf2py intent(in, hide), depend(pd) nrowpd      '\
-             '  Cf2py intent(in, out) pd                       '\
-             '        integer neq, ml, mu, nrowpd              '\
-             '        double precision t, u, pd                '\
-             '        dimension u(neq), pd(nrowpd, neq)        '\
-             '        pd = ...                                 '\
-             '        return                                   '\
-             '        end                                      ',
+        help='''Fortran subroutine for adda_lsodi.
+This subroutine should be defined in form::
+
+        subroutine adda_lsodi_f77
+       1  (neq, t, u, ml, mu, pd, nrowpd)
+  Cf2py intent(in, hide) neq, ml, mu
+  Cf2py intent(in, hide), depend(pd) nrowpd
+  Cf2py intent(in, out) pd
+        integer neq, ml, mu, nrowpd
+        double precision t, u, pd
+        dimension u(neq), pd(nrowpd, neq)
+        pd = ...
+        return
+        end
+
+''',
         type=callable),
 
     adda_banded_lsodi = dict(
-        help='Callable object to add the banded matrix         '\
-             'A = A(u,t) to another matrix stored P in the     '\
-             'same form as A, i.e. add A(i,j)to P(i-j+MU+1,j)  '\
-             'addaName(u,t,p,ml,mu):                           '\
-             'vector * float * 2d-array * int * int            '\
-             '    --->  2d-array with dimension (*,neq)        ',
+        help='''Callable object to add the banded matrix
+A = A(u,t) to another matrix stored P in the
+same form as A, i.e. add A(i,j)to P(i-j+MU+1,j)
+addaName(u,t,p,ml,mu):
+vector * float * 2d-array * int * int
+    --->  2d-array with dimension (*,neq).''',
         paralist_old='u,t,p,ml,mu',
         paralist_new='t,u,p,ml,mu',
         name_wrapped='adda_banded_lsodi_f77',
         type=callable),
 
     adda_banded_lsodi_f77 = dict(
-        help='Fortran subroutine for adda_banded.              '\
-             'This subroutine should be defined in form::      '\
-             '                                                 '\
-             '       subroutine adda_banded_lsodi_f77(neq, t,  '\
-             '      1         u, ml, mu, pd, nrowpd)           '\
-             ' Cf2py intent(in, hide) neq, ml, mu              '\
-             ' Cf2py intent(in, hide), depend(pd) nrowpd       '\
-             ' Cf2py intent(in, out) pd                        '\
-             '       integer neq, ml, mu, nrowpd               '\
-             '       double precision t, u, pd                 '\
-             '       dimension u(neq), pd(nrowpd, neq)         '\
-             '       pd = ...                                  '\
-             '       return                                    '\
-             '       end                                       ',
+        help='''Fortran subroutine for adda_banded.
+This subroutine should be defined in form::
+
+       subroutine adda_banded_lsodi_f77(neq, t,
+      1                  u, ml, mu, pd, nrowpd)
+ Cf2py intent(in, hide) neq, ml, mu
+ Cf2py intent(in, hide), depend(pd) nrowpd
+ Cf2py intent(in, out) pd
+       integer neq, ml, mu, nrowpd
+       double precision t, u, pd
+       dimension u(neq), pd(nrowpd, neq)
+       pd = ...
+       return
+       end
+
+''',
         type=callable),
 
     jac_lsodis = dict(
-        help='Callable object to supply the jth column of      '\
-             'the sparse Jacobian matrix dr/du where           '\
-             'r = g - A*s.                                     '\
-             'jac(u,t,s,j,ia,ja)   ----->   p                  '\
-             'vector * float * vector * int * int vector       '\
-             '  * int vector      ------>   vector             ',
+        help='''Callable object to supply the jth column of
+the sparse Jacobian matrix dr/du where
+r = g - A*s.
+jac(u,t,s,j,ia,ja)   ----->   p
+vector * float * vector * int * int vector
+  * int vector      ------>   vector.''',
         paralist_old='u,t,s,j-1,ia,ja',
         paralist_new='t,u,s,j,ia,ja',
         name_wrapped='jac_lsodis_f77',
         type=callable),
 
     adda_lsodis = dict(
-        help='Callable object to add j-th column of matrix     '\
-             'A = A(u,t) to another matrix stored in sparse    '\
-             'form.                                            '\
-             'adda(u,t,j,ia,ja,p)  :   --> p                   '\
-             'vector * float * int * int vector * int vector   '\
-             '   * vector      --->  vector                    ',
+        help='''Callable object to add j-th column of matrix
+A = A(u,t) to another matrix stored in sparse
+form.
+adda(u,t,j,ia,ja,p)  :   --> p
+vector * float * int * int vector * int vector
+   * vector      --->  vector''',
         paralist_old='u,t,j-1,ia,ja,p',
         paralist_new='t,u,j,ia,ja,p',
         name_wrapped='adda_lsodis_f77',
         type=callable),
 
     jac_lsoibt = dict(
-        help='Callable object to supply the jth column of      '\
-             'the Jacobian matrix dr/du where r = g - A*s,     '\
-             'stored in block-tridiagonal form.                '\
-             'The argument list should in form of (u,t,s).     '\
-             ' jac(u,t,s)   ----->   (pa,pb,pc)                '\
-             ' vector * float * vector   ------>  (mb*mb*nb)   '\
-             '  array * (mb*mb*nb) array * (mb*mb*nb) array    '\
-             ' pa, pb, and pc are to be loaded with partial    '\
-             ' derivatives (elements of the Jacobian matrix)   '\
-             ' on output, in terms of the block-tridiagonal    '\
-             ' structure assumed. That is, load the diagonal   '\
-             ' blocks into pa, the superdiagonal blocks (and   '\
-             ' block (nb,nb-2)) into pb, and the subdiagonal   '\
-             ' blocks (and block (1,3)) into pc.               '\
-             ' The blocks in block-row k of dr/du are to be    '\
-             ' loaded into pa(*,*,k), pb(*,*,k), and           '\
-             ' pc(*,*,k).                                      '\
-             ' Thus the affect of this function should be:     '\
-             ' pa(i,j,k) = ( (i.j) element of k-th diagonal    '\
-             '             block of dr/du)                     '\
-             ' pb(i,j,k) = ( (i,j) element of block (k,k+1)    '\
-             '             of dr/du, or block (nb,nb-2) if     '\
-             '             k == nb)                            '\
-             ' pc(i,j,k) = ( (i,j) element of block (k,k-1)    '\
-             '             of dr/du, or block (1,3) if k==1)   ',
+        help='''Callable object to supply the jth column of
+the Jacobian matrix dr/du where r = g - A*s,
+stored in block-tridiagonal form.
+The argument list should in form of (u,t,s).
+ jac(u,t,s)   ----->   (pa,pb,pc)
+ vector * float * vector   ------>  (mb*mb*nb)
+  array * (mb*mb*nb) array * (mb*mb*nb) array
+ pa, pb, and pc are to be loaded with partial
+ derivatives (elements of the Jacobian matrix)
+ on output, in terms of the block-tridiagonal
+ structure assumed. That is, load the diagonal
+ blocks into pa, the superdiagonal blocks (and
+ block (nb,nb-2)) into pb, and the subdiagonal
+ blocks (and block (1,3)) into pc.
+ The blocks in block-row k of dr/du are to be
+ loaded into pa(*,*,k), pb(*,*,k), and
+ pc(*,*,k).
+ Thus the affect of this function should be:
+ pa(i,j,k) = ( (i.j) element of k-th diagonal
+             block of dr/du)
+ pb(i,j,k) = ( (i,j) element of block (k,k+1)
+             of dr/du, or block (nb,nb-2) if
+             k == nb)               \
+ pc(i,j,k) = ( (i,j) element of block (k,k-1)
+             of dr/du, or block (1,3) if k==1).''',
         paralist_old='u,t,s',
         paralist_new='t,u,s',
         name_wrapped='jac_lsoibt_f77',
         type=callable),
 
     adda_lsoibt = dict(
-        help='Callable object to add matrix A = A(u,t) to      '\
-             'another matrix P, stored in block-tridiagonal    '\
-             'form.                                            '\
-             ' adda(u,t,pa,pb,pc)    ----->  (pa,pb,pc)        '\
-             'vector * float * (mb*mb*nb) array * (mb*mb*nb)   '\
-             'array * (mb*mb*nb) array                         '\
-             '  -->  (mb*mb*nb) array * (mb*mb*nb) array *     '\
-             '       (mb*mb*nb) array                          ',
+        help='''Callable object to add matrix A = A(u,t) to
+another matrix P, stored in block-tridiagonal
+form.                               \
+ adda(u,t,pa,pb,pc)    ----->  (pa,pb,pc)
+vector * float * (mb*mb*nb) array * (mb*mb*nb)
+array * (mb*mb*nb) array
+  -->  (mb*mb*nb) array * (mb*mb*nb) array *
+       (mb*mb*nb) array''',
         paralist_old='u,t,pa,pb,pc',
         paralist_new='t,u,pa,pb,pc',
         name_wrapped='adda_lsoibt_f77',
         type=callable),
 
+    seth = dict(
+        help='Element threshhold for sparsity determination.',
+        default=0,
+        type=int),
+
+    corrector_iter_method = dict(
+        help='Corrector iteration method choice.',
+        type=int),
+
+    lrw = dict(
+        help='Length of real work array.',
+        type=int),
+
+    liw = dict(
+        help='Length of integer work array, similiar as <lrw>.',
+        type=int),
+
+    moss = dict(
+        help=' Method to obtain sparse structure of Jacobian.',
+        type=int),
+
+    max_hnil = dict(
+        help='Maximum no of warning messages to be printed.',
+        type=int),
+
+    max_ordn = dict(
+        help='Maximum order in nonstiff methods.',
+        type=int),
+
+    max_ords = dict(
+        help='Maximum order in stiff methods.',
+        type=int),
+
     # ja, ia, ja, ic are used to describe sparse structure of
     # matrices in Lsodes and Lsodis.
     ja = dict(
-        help='Integer array containing the row indices where   '\
-             'nonzero elements occur, reading in columnwise    '\
-             'order.                                           '\
-             'Describes the sparsity matrix structure          '\
-             'together with ia.                                '\
-             'In Lsodes, ia & ja describe the structure of     '\
-             'Jacobian matrix; while in Lsodis, ia & ja are    '\
-             'used to describe the structure of matrix A.      ',
+        help='''Integer array containing the row indices where
+nonzero elements occur, reading in columnwise
+order. Describes the sparsity matrix structure
+together with ia.
+In Lsodes, ia & ja describe the structure of
+Jacobian matrix; while in Lsodis, ia & ja are
+used to describe the structure of matrix A.''',
         type=(list, tuple, np.ndarray),
         # integer sequence
         extra_check=lambda int_seq: \
             np.array(map(lambda x: isinstance(x, int),int_seq)).all()),
 
     ia = dict(
-        help='Integer array with length neq+1 which contains   '\
-             'starting locations in ja of the descriptions     '\
-             'for columns 1...neq, in that order, with ia(1)   '\
-             '== 1. The last element ia[neq+1] should equal    '\
-             'to the total number of nonzero locations assumed.'\
-             'For each column j = 1...neq, the values of the   '\
-             'row index i in column j, where a nonzero element '\
-             'may occur, are given by i == ja(k) where ia(j) <='\
-             'k < ia(j+1).                                     ',
+        help='''Integer array with length neq+1 which contains
+starting locations in ja of the descriptions
+for columns 1...neq, in that order, with ia(1)
+== 1. The last element ia[neq+1] should equal
+to the total number of nonzero locations assumed.
+For each column j = 1...neq, the values of the
+row index i in column j, where a nonzero element
+may occur, are given by i == ja(k) where ia(j) <='
+k < ia(j+1).''',
         type=(list, tuple, np.ndarray),
         # integer sequence
         extra_check=lambda int_seq: \
              np.array(map(lambda x: isinstance(x, int),int_seq)).all()),
 
     jc = dict(
-        help='Integer array which describes the sparsity       '\
-             'Jacobian structure together with ic, like ia     '\
-             'and ja.                                          '\
-             'In Lsodis, ia and ja describe the sparse         '\
-             'structure of matrix A, while ic & jc describe    '\
-             'the sparse structure of Jacobian matrix.         ',
+        help='''Integer array which describes the sparsity
+Jacobian structure together with ic, like ia
+and ja. In Lsodis, ia and ja describe the sparse
+structure of matrix A, while ic & jc describe
+the sparse structure of Jacobian matrix.''',
         type=(list, tuple, np.ndarray),
         # integer sequence
         extra_check=lambda int_seq: \
@@ -391,23 +443,23 @@ _parameters_Odepack = dict(
 
     # mb, nb describe the block-tridiagonal form of matrix.
     mb = dict(
-        help='Block size. Describe the block-tridiagonal form  '\
-             'of matrix A together with nb.                    ',
+        help='Block size. Describe the block-tridiagonal form '\
+              'of matrix A together with nb.',
         type=int,
         extra_check=lambda x: x>=1),
 
     nb = dict(
-        help='Number of blocks in the main diagonal.           '\
-             'In each of the NB block-rows of the matrix P     '\
-             '(each consisting of MB consecutive rows), the    '\
-             'nonzero elements are to lie in three             '\
-             'consecutive MB by MB blocks.  In block-rows 2    '\
-             'through NB - 1, these are centered about the     '\
-             'main diagonal. In block-rows 1 and NB, they      '\
-             'are the diagonal blocks and the two blocks       '\
-             'adjacent to the diagonal block.  (Thus block     '\
-             'positions (1,3) and (NB,NB-2) can be nonzero.)   '\
-             'Require: mb>=1, nb>=4, mb*nb==neq.',
+        help='''Number of blocks in the main diagonal.
+In each of the NB block-rows of the matrix P
+(each consisting of MB consecutive rows), the
+nonzero elements are to lie in three
+consecutive MB by MB blocks.  In block-rows 2
+through NB - 1, these are centered about the
+main diagonal. In block-rows 1 and NB, they
+are the diagonal blocks and the two blocks
+adjacent to the diagonal block.  (Thus block
+positions (1,3) and (NB,NB-2) can be nonzero.)
+Require: mb>=1, nb>=4, mb*nb==neq.''',
         type=int,
         extra_check=lambda x:x>=4),
 
@@ -511,8 +563,9 @@ class Odepack(Solver):
     # Note: f & jac are not valid in some specific solvers.
 
     _optional_parameters = Solver._optional_parameters + \
-        ['atol', 'rtol', 'adams_or_bdf', 'nsteps', 'first_step', 'min_step',
-         'max_step', 'iter_method', 'lrw', 'liw']
+        ['atol', 'rtol', 'adams_or_bdf', 'order',
+         'nsteps', 'first_step', 'min_step',
+         'max_step', 'corrector_iter_method', 'lrw', 'liw']
 
     # Error messages to print out,
     # corresponding to different values of return status-flag.
@@ -547,7 +600,7 @@ class Odepack(Solver):
     # Dictionary for extra parameters in all external functions in Fortran
     # package ODEPACK.
     # For example, _extra_args_fortran['jac_extra_args'] is defined as
-    # ('self.ml','self.mu') when jac is a banded jacobian matrix.
+    # ('self.ml','self.mu') when jac is a banded Jacobian matrix.
 
     _iwork_index = {4:'order', 5:'nsteps', 6:'max_hnil'}
     # Index in iwork_in to supply optional inputs.
@@ -599,6 +652,81 @@ class Odepack(Solver):
             raise ImportError('Cannot find the extension module _odepack.\nRun setup.py again and investigate why _odepack.so was not successfully built.')
 
 
+    def func_wrapper(self):
+        '''
+        This function is defined to wrap user-defined functions with new
+        forms of parameter-list, or wrap the returned values as numpy arrays.
+
+        Firstly, in odespy, all the user-supplied functions should have a
+        parameter list starts with "u,t,...". But in some special subclasses,
+        (like solvers in ODEPACK), all the parameter lists of user-defined
+        functions start with "t,u,...". So we need this general function to
+        wrap all these user-defined functions.
+
+        Secondly, in some user-defined functions, according to the different
+        start indices in Fortran and Python, we need to make special wrapping
+        for these uncompability. For an example, in user-defined function
+        "jac_column", column index is an internally valued parameter in
+        Fortran code. In Python, it starts from 0 instead of 1 in Fortran.
+        So we need to wrap the parameter list of user-defined "jac_column" from
+        "u,t,j" to "t,u,j+1". That is, define the Jacobian function as
+        lambda t,u,j: jac_column(u,t,j-1).
+
+        Furthermore, the return value of user-defined functions need to be
+        wrapped to Numpy arrays with great numerical features, e.g.
+        vectorization and array slicing. In order to avoid unnecessary array
+        copy by F2PY, it is always recommended to explicitly transform all
+        Numpy arrays to Fortran order in Python code.
+
+        This functions is not intended for simple solvers. So it is not called
+        automatically in current version. But for some complicated solvers as
+        ones in ODEPACK, it is very useful and convenient.
+
+        Future developers can call this functions with appropriate locations
+        and corresponding property-setting in adjust_parameters().
+
+        '''
+        import numpy as np
+        parameters = self._parameters
+        # Extract function parameters that are required to be wrapped
+        func_list = [[name,
+                      parameters[name].get('array_order', None),
+                      parameters[name].get('paralist_old', None),
+                      parameters[name].get('paralist_new', None),
+                      parameters[name].get('name_wrapped', name)]
+                     for name in parameters \
+                         if name in self.__dict__ and \
+                         'type' in parameters[name] and \
+                         (parameters[name]['type'] is callable or \
+                          parameters[name]['type'] is (callable, str)) and \
+                         ('paralist_new' in parameters[name] or \
+                          'array_order' in parameters[name])]
+        # name in self.__dict__  --> existing attributes in current instance
+        # parameters[name]['type'] is callable or (callable, str)
+        #             -->     callable objects
+        # 'paralist_new' in parameters[name]
+        #    --> new parameter-list is defined to be wrapped
+        # 'array_order' in parameters[name]
+        #    --> this function return an array, and should be wrapped either in
+        #    Fortran order or C (default) order.
+        func_input = {}
+        for name, order, arg_old, arg_new, name_new in func_list:
+            # e.g. name     = 'jac'
+            #      arg_old  = 'u,t'
+            #      arg_new  = 't,u'
+            #      order    = 'Fortran'
+            #      name_new = 'jac_f77'
+            #  Then:
+            #  self.jac_f77 = lambda t,u: np.asarray(jac(u,t), order='Fortran')
+            func_input[name] = getattr(self, name)
+            wrap_string = 'lambda %s: ' % \
+                (arg_new if arg_new is not None else arg_old)
+            wrap_string += 'np.asarray(' if order is not None else ''
+            wrap_string += 'func_input["%s"](%s)' % (name, arg_old)
+            wrap_string += ', order="Fortran"' if order=='Fortran' else ''
+            wrap_string += ')' if order is not None else ''
+            setattr(self, name_new, eval(wrap_string, locals()))
+
     def check_liwlrw(self):
         '''
         If the lengths of work arrays are specified by users, check whether
@@ -625,9 +753,9 @@ class Odepack(Solver):
                 if len(value)== 1:
                     setattr(self, name, value[0])
                 elif len(value)!= self.neq:
-                    raise AttributeError, \
+                    raise AttributeError(
                     '%s has an illegal length = %d! Valid length is %d or 1.' \
-                    % (name, len(value), self.neq)
+                        % (name, len(value), self.neq))
 
     def check_pars(self):
         ''' Some pairs of parameters should be input simutaneously.'''
@@ -639,14 +767,18 @@ class Odepack(Solver):
 
     def check_iaja(self):
         '''
-        ia, ja, ic, jc are optional inputs to describe arbitrary sparse
-        structure of matrix.
+        ``ia``, ``ja``, ``ic``, ``jc`` are optional inputs to describe
+        arbitrary sparse structure of matrix.
 
-        ia & ja are used in dlsodes,dlsodis.
-        ic & jc are used only in dlsodis.
+        ``ia`` and ``ja`` are used in dlsodes, dlsodis.
+        ``ic`` and ``jc`` are used only in dlsodis.
 
-        There are special requirements for their values.
-        len(ia/ic) = neq + 1; (ia/ic)[0] = 1; (ia/ic)[-1] = 1 + len(ja/jc)
+        There are special requirements for their values::
+
+            len(ia/ic) = neq + 1
+            (ia/ic)[0] = 1
+            (ia/ic)[-1] = 1 + len(ja/jc)
+
         '''
         for pars in (('ia','ja'),('ic','jc')):
             arg_a, arg_b = pars
@@ -674,7 +806,7 @@ class Odepack(Solver):
         '''
         Common validity check in Odepack.
         '''
-        # lower- & upper-bound for banded jacobian in range [0,neq]
+        # lower- & upper-bound for banded Jacobian in range [0,neq]
         for name in ('ml', 'mu'):
             if hasattr(self, name):
                 self._parameters[name]['range'] = (0, self.neq+1)
@@ -721,7 +853,7 @@ class Odepack(Solver):
 
     def set_ydoti(self):
         '''
-        "ydoti" is an array used in linearly solvers.
+        ``ydoti`` is an array used in linearly solvers.
         It has to be extended if its length is smaller than neq.
         '''
         ydoti = getattr(self, 'ydoti', [])
@@ -752,7 +884,7 @@ class Odepack(Solver):
     def set_jac(self):
         '''
         Set values for Jacobian matrix. In several solvers like Lsode,
-        jacobian matrix could be supplied either in full form or in banded form.
+        Jacobian matrix could be supplied either in full form or in banded form.
 
         This function intends to tell from which kind of Jacobian matrix
         is specified.
@@ -792,7 +924,7 @@ class Odepack(Solver):
         '''
         self.set_iter_method()     # method choice
         self.func_wrapper()        # wrap function parameters
-        self.set_jac()             # tell from which kind of jacobian matrix
+        self.set_jac()             # tell from which kind of Jacobian matrix
                                    # are supplied:  banded, full or None
         self.set_dummy_functions() # pass dummy values to extension module
                                    # for functions that are not involved
@@ -810,9 +942,9 @@ class Odepack(Solver):
 
     def new_stepnr(self):
         '''
-        When Fortran code returns a status "istate==-1", it indicates that
+        When Fortran code returns a status ``istate==-1``, it indicates that
         there are excessive amount of steps detected.
-        Then we could try to increase "nsteps" to avoid this error.
+        Then we could try to increase ``nsteps`` to avoid this error.
         '''
         nsteps = getattr(self, 'nsteps', 500)
         if nsteps == 2000:    # The maximum step-amount has been reached
@@ -864,11 +996,15 @@ class Odepack(Solver):
 
     def adjust_atol(self, u_current):
         '''
-        Error tolerance tol(i) became zero for some i during integration,
-        where tol = rtol(i) * u(i) + atol(i).
-        It indicates that pure absolute tolerance (atol(i)=0.0) was requested.
-        In order to avoid possible divide-zero-error, we could find the indices
-        of zero items and adjust atol.
+        Error tolerance ``tol(i)`` may become zero for some ``i``
+        during integration, where::
+
+          tol = rtol(i) * u(i) + atol(i)
+
+        It indicates that pure absolute tolerance (``atol(i)=0.0``)
+        was requested.  In order to avoid possible divide-by-zero
+        error, we find the indices of zero items and adjust
+        ``atol`` to ``1e-8``.
         '''
         tol = abs(np.asarray(u_current))*self.rtol + self.atol
         if isinstance(self.atol, float):
@@ -1108,26 +1244,27 @@ class Lsode(Odepack):
         self._parameters['jac_banded_f77']['paralist_new'] = 'u,t,ml,mu'
         self._parameters['jac_banded_f77']['name_wrapped'] = 'jac_banded'
 
-        self._parameters['iter_method']['range'] = range(6)
-        self._parameters['iter_method']['condition-list'] = \
+        self._parameters['corrector_iter_method']['range'] = range(6)
+        self._parameters['corrector_iter_method']['condition-list'] = \
                 {'1':[('jac','jac_f77'),],\
                  '4':['ml','mu',('jac_banded','jac_banded_f77')],\
                  '5':('ml','mu')}
-        self._parameters['iter_method']['help'] = \
-            'Corrector iteration method choice with 6 possible'\
-            'values:                                          '\
-            '   0: Functional iteration without any jacobian  '\
-            '      matrix involved.                           '\
-            '   1: Chord iteration with user-supplied full    '\
-            '      Jacobian.                                  '\
-            '   2: Chord iteration with internally generated  '\
-            '      full Jacobian matrix.                      '\
-            '   3: Chord iteration with internally generated  '\
-            '      diagonal Jacobian matrix.                  '\
-            '   4: Chord iteration with user-supplied banded  '\
-            '      Jacobian matrix.                           '\
-            '   5: Chord iteration with internally generated  '\
-            '      banded Jacobian matrix.                    '
+        self._parameters['corrector_iter_method']['help'] = """\
+Corrector iteration method choice with 6 possible
+values:
+
+  0. Functional iteration without any Jacobian
+     matrix involved.
+  1. Chord iteration with user-supplied full
+     Jacobian.
+  2. Chord iteration with internally generated
+     full Jacobian matrix.
+  3. Chord iteration with internally generated
+     diagonal Jacobian matrix.
+  4. Chord iteration with user-supplied banded
+     Jacobian matrix.
+  5. Chord iteration with internally generated
+     banded Jacobian matrix."""
         Odepack.adjust_parameters(self)
 
     def set_extra_args(self):
@@ -1139,7 +1276,7 @@ class Lsode(Odepack):
         Odepack.set_extra_args(self)
 
     def set_iter_method(self):
-        if not hasattr(self,'iter_method'):
+        if not hasattr(self,'corrector_iter_method'):
             with_ml_mu = hasattr(self, 'ml') and hasattr(self, 'mu')
             with_jac_banded = \
                 hasattr(self, 'jac_banded') or hasattr(self, 'jac_banded_f77')
@@ -1162,7 +1299,7 @@ class Lsode(Odepack):
                      22:(22,9,1),23:(22,10,0),24:(22,10,0),25:(22,10,0)}
         lrw_arg = mf_length[self.mf]
         self.lrw_min = lrw_arg[0] + self.neq*lrw_arg[1] + self.neq**2*lrw_arg[2]
-        if self.mf in (24,25):  # user-supplied banded jacobian matrics
+        if self.mf in (24,25):  # user-supplied banded Jacobian matrics
             self.lrw_min += (2*self.ml + self.mu)*self.neq
 
     def set_iopt(self):
@@ -1221,21 +1358,19 @@ class Lsoda(Odepack):
         self._parameters['jac_banded_f77']['paralist_new'] = 'u,t,ml,mu'
         self._parameters['jac_banded_f77']['name_wrapped'] = 'jac_banded'
 
-        self._parameters['iter_method']['range'] = [1,2,4,5]
-        self._parameters['iter_method']['condition-list'] = \
+        self._parameters['corrector_iter_method']['range'] = [1,2,4,5]
+        self._parameters['corrector_iter_method']['condition-list'] = \
                 {'1':[('jac','jac_f77'),],
                  '4':[('jac_banded','jac_banded_f77'),'ml','mu'],
                  '5':('ml','mu')}
-        self._parameters['iter_method']['help'] = \
-            'Jacobian type choice with 4 possible values:     '\
-            '   1:   User-supplied full jacobian matrix       '\
-            '   2:   Internally generated full jacobian       '\
-            '         --> Default value                       '\
-            '   4:   User-supplied banded Jacobian matrix     '\
-            '   5:   Internally generated banded Jacobian     '\
-            '        matrix                                   '
-        Odepack.adjust_parameters(self)
+        self._parameters['corrector_iter_method']['help'] = """\
+Jacobian type choice with 4 possible values:
 
+ 1. User-supplied full Jacobian matrix
+ 2. Internally generated full Jacobian (default)
+ 4. User-supplied banded Jacobian matrix
+ 5. Internally generated banded Jacobian matrix""",
+        Odepack.adjust_parameters(self)
 
     def set_extra_args(self):
 	# ml & mu are required to be extra parameters for banded Jacobian.
@@ -1246,7 +1381,7 @@ class Lsoda(Odepack):
         Odepack.set_extra_args(self)
 
     def set_iter_method(self):
-        if not hasattr(self,'iter_method'):
+        if not hasattr(self,'corrector_iter_method'):
             with_ml_mu = hasattr(self, 'ml') and hasattr(self, 'mu')
             with_jac_banded = \
                 hasattr(self, 'jac_banded') or hasattr(self, 'jac_banded_f77')
@@ -1349,18 +1484,18 @@ class Lsodar(Odepack):
         self._parameters['g_f77']['paralist_new'] = 'u,t'
         self._parameters['g_f77']['name_wrapped'] = 'g'
 
-        self._parameters['iter_method']['range'] = [1,2,4,5]
-        self._parameters['iter_method']['condition-list'] = \
+        self._parameters['corrector_iter_method']['range'] = [1,2,4,5]
+        self._parameters['corrector_iter_method']['condition-list'] = \
                 {'1':[('jac','jac_f77'),],
                  '4':[('jac_banded','jac_banded_f77'),'ml','mu'],
                  '5':('ml','mu')}
-        self._parameters['iter_method']['help'] = \
-            'Jacobian type choice with 4 possible values:     '\
-            '1:   User-supplied full jacobian matrix          '\
-            '2:   Internally generated full jacobian          '\
-            '         --> Default value                       '\
-            '4:   User-supplied banded Jacobian matrix        '\
-            '5:   Internally generated banded Jacobian matrix '
+        self._parameters['corrector_iter_method']['help'] = """\
+Jacobian type choice with 4 possible values:
+
+1. User-supplied full Jacobian matrix
+2. Internally generated full Jacobian (default)
+4. User-supplied banded Jacobian matrix
+5. Internally generated banded Jacobian matrix""",
         Odepack.adjust_parameters(self)
 
 
@@ -1373,7 +1508,7 @@ class Lsodar(Odepack):
         Odepack.set_extra_args(self)
 
     def set_iter_method(self):
-        if not hasattr(self,'iter_method'):
+        if not hasattr(self,'corrector_iter_method'):
             with_ml_mu = hasattr(self, 'ml') and hasattr(self, 'mu')
             with_jac_banded = \
                 hasattr(self, 'jac_banded') or hasattr(self, 'jac_banded_f77')
@@ -1463,29 +1598,31 @@ class Lsodes(Odepack):
                         {1: [('jac_column', 'jac_column_f77'),], \
                          0: ['ia', 'ja']}
 
-        self._parameters['moss']['help'] = '''\
-           Method choice to obtain sparse structure with 3 possible
-           values:
-               0:   means the user has supplied IA, JA.
-               1:   means the user has supplied JAC_COLUMN and the
-                    sparse structure will be obtained from NEQ initial
-                    calls to JAC_COLUMN.
-               2:   means the sparse structure will be obtained from
-                    NEQ+1 initial calls to F.                    '''
+        self._parameters['moss']['help'] = """\
+Method choice to obtain sparse structure with 3 possible
+values:
 
-        self._parameters['iter_method']['condition-list'] = \
+  0. The user has supplied IA, JA.
+  1  The user has supplied JAC_COLUMN and the
+     sparse structure will be obtained from NEQ initial
+     calls to JAC_COLUMN.
+  2. The sparse structure will be obtained from
+      NEQ+1 initial calls to F.""",
+
+        self._parameters['corrector_iter_method']['condition-list'] = \
                 {'1':[('jac_column','jac_column_f77'),],}
-        self._parameters['iter_method']['help'] = \
-            'Corrector iteration method choice with 4 possible'\
-            'values:                                          '\
-            '   0: Functional iteration without any Jacobian  '\
-            '      matrix.                                    '\
-            '   1: Chord iteration with user-supplied sparse  '\
-            '      Jacobian.                                  '\
-            '   2: Chord iteration with internally generated  '\
-            '      sparse Jacobian matrix.                    '\
-            '   3: Chord iteration with internally generated  '\
-            '      diagonal Jacobian matrix.                  '
+        self._parameters['corrector_iter_method']['help'] = """\
+Corrector iteration method choice with 4
+possible values:
+
+ 0. Functional iteration without any Jacobian
+    matrix.
+ 1. Chord iteration with user-supplied sparse
+    Jacobian.
+ 2. Chord iteration with internally generated
+    sparse Jacobian matrix.
+ 3. Chord iteration with internally generated
+    diagonal Jacobian matrix.""",
         Odepack.adjust_parameters(self)
 
     def set_iter_method(self):
@@ -1499,7 +1636,7 @@ class Lsodes(Odepack):
                 self.moss = 1
             else:
                 self.moss = 2
-        if not hasattr(self,'iter_method'):
+        if not hasattr(self,'corrector_iter_method'):
             self.iter_method = int(with_jac_column)
 
     def set_iwork_rwork(self):
@@ -1599,8 +1736,8 @@ class Lsodi(Odepack):
         Odepack.__init__(self, None, **kwargs)
 
     def adjust_parameters(self):
-        self._parameters['iter_method']['range'] = [1,2,4,5]
-        self._parameters['iter_method']['condition-list'] = \
+        self._parameters['corrector_iter_method']['range'] = [1,2,4,5]
+        self._parameters['corrector_iter_method']['condition-list'] = \
                          {'1':[('jac_lsodi','jac_lsodi_f77'),
                                ('adda_lsodi','adda_lsodi_f77'),
                                ('res', 'res_f77')],
@@ -1611,19 +1748,20 @@ class Lsodi(Odepack):
                                ('jac_banded_lsodi','jac_banded_lsodi_f77')],\
                           '5':['ml','mu', ('res', 'res_f77'),
                                ('adda_banded_lsodi','adda_banded_lsodi_f77')] }
-        self._parameters['iter_method']['help'] = \
-            'Choice for the corrector iteration method:       '\
-            '  1: Chord iteration with a user-supplied full   '\
-            '     Jacobian matrix.                            '\
-            '  2: Chord iteration with an internally generated'\
-            '     (difference quotient) full Jacobian. This   '\
-            '     uses neq+1 extra calls to "res" per dr/du   '\
-            '     evaluation. --> Default value.              '\
-            '  4: Chord iteration with a user-supplied banded '\
-            '     Jacobian matrix.                            '\
-            '  5: Chord iteration with an internally generated'\
-            '     banded Jacobian matrix. Using "ml"+"mu"+2   '\
-            '     extra calls to "res" per dr/du evaluation.  '
+        self._parameters['corrector_iter_method']['help'] = """\
+Choice for the corrector iteration method:
+
+  1. Chord iteration with a user-supplied full
+     Jacobian matrix.
+  2. Chord iteration with an internally generated
+     (difference quotient) full Jacobian. This
+     uses neq+1 extra calls to res per dr/du
+     evaluation.(Default)
+  4. Chord iteration with a user-supplied banded
+     Jacobian matrix.
+  5. Chord iteration with an internally generated
+     banded Jacobian matrix. Using ml+mu+2
+     extra calls to res per dr/du evaluation.""",
         Odepack.adjust_parameters(self)
 
     def set_extra_args(self):
@@ -1635,7 +1773,7 @@ class Lsodi(Odepack):
         Odepack.set_extra_args(self)
 
     def set_iter_method(self):
-        if not hasattr(self,'iter_method'):
+        if not hasattr(self,'corrector_iter_method'):
             with_banded_jac = hasattr(self,'jac_banded_lsodi_f77') or \
                 hasattr(self,'jac_banded_lsodi')
             with_banded_adda = hasattr(self,'adda_banded_lsodi_f77') or \
@@ -1762,41 +1900,43 @@ class Lsodis(Odepack):
         Odepack.__init__(self, None, **kwargs)
 
     def adjust_parameters(self):
-        self._parameters['iter_method']['range'] = [1,2]
-        self._parameters['iter_method']['condition-list'] = \
+        self._parameters['corrector_iter_method']['range'] = [1,2]
+        self._parameters['corrector_iter_method']['condition-list'] = \
                          {'1':['jac_lsodis',],}
-        self._parameters['iter_method']['help'] = \
-        'Choice for the corrector iteration method:       '\
-        '  1: Chord iteration with a user-supplied sparse '\
-        '     Jacobian matrix.                            '\
-        '  2: Chord iteration with an internally generated'\
-        '    (difference quotient) sparse jacobian matrix.'\
-        '    This uses extra calls to "res" per dr/du     '\
-        '    evaluation. --> Default value.               '
+        self._parameters['corrector_iter_method']['help'] = """\
+Choice for the corrector iteration method:
+
+  1. Chord iteration with a user-supplied sparse
+     Jacobian matrix.
+  2. Chord iteration with an internally generated
+     (difference quotient) sparse Jacobian matrix.
+     This uses extra calls to "res" per dr/du
+     evaluation. (Default)""",
         self._parameters['moss']['range'] = range(5)
         self._parameters['moss']['condition-list'] = \
                          {'1':['jac_lsodis',],
                           '0':['ia','ja','ic','jc'],
                           '3':['jac_lsodis','ia','ja'],
                           '4':['ia','ja']}
-        self._parameters['moss']['help'] = '''
-         Method to obtain sparse structure of jacobian matrix.
-         "moss" has 5 possible values:
-          0:   means the user has supplied IA, JA, IC, and JC.
-          1:   means the user has supplied JAC and the
-               structure will be obtained from NEQ initial
-               calls to JAC and NEQ initial calls to ADDA.
-          2:   means the structure will be obtained from NEQ+1
-               initial calls to RES and NEQ initial calls to ADDA.
-          3:   like MOSS = 1, except user has supplied IA and JA.
-          4:   like MOSS = 2, except user has supplied IA and JA ''',
+        self._parameters['moss']['help'] = """\
+Method to obtain sparse structure of Jacobian matrix.
+moss has 5 possible values:
+
+ 0. The user has supplied IA, JA, IC, and JC.
+ 1. The user has supplied JAC and the
+    structure will be obtained from NEQ initial
+    calls to JAC and NEQ initial calls to ADDA.
+ 2. The structure will be obtained from NEQ+1
+    initial calls to RES and NEQ initial calls to ADDA.
+ 3. like MOSS = 1, except user has supplied IA and JA.
+ 4. like MOSS = 2, except user has supplied IA and JA""",
         Odepack.adjust_parameters(self)
 
     def set_iter_method(self):
         with_jac = hasattr(self, 'jac_lsodis')
         with_ia_ja = hasattr(self, 'ia') and  hasattr(self, 'ja')
         with_ic_jc = hasattr(self, 'ic') and hasattr(self, 'jc')
-        if not hasattr(self, 'iter_method'):
+        if not hasattr(self, 'corrector_iter_method'):
             self.iter_method = 1 if with_jac else 2
         if not hasattr(self, 'moss'):
             if with_ia_ja and with_ic_jc:
@@ -1914,22 +2054,23 @@ class Lsoibt(Odepack):
         Odepack.__init__(self, None, **kwargs)
 
     def adjust_parameters(self):
-        self._parameters['iter_method']['range'] = [1,2]
-        self._parameters['iter_method']['condition-list'] = \
+        self._parameters['corrector_iter_method']['range'] = [1,2]
+        self._parameters['corrector_iter_method']['condition-list'] = \
                          {'1':('jac_lsoibt',),}
-        self._parameters['iter_method']['help'] = \
-        'Choice for the corrector iteration method:       '\
-        '  1: Chord iteration with a user-supplied block- '\
-        '     tridiagonal Jacobian matrix.                '\
-        '  2: Chord iteration with an internally generated'\
-        '     (difference quotient) block-tridiagonal     '\
-        '     Jacobian matrix. This uses 3*mb+1 calls to  '\
-        '     "res" per dr/du evaluation.-->Default value.'
+        self._parameters['corrector_iter_method']['help'] = """\
+Choice for the corrector iteration method:
+
+  1. Chord iteration with a user-supplied block-
+     tridiagonal Jacobian matrix.
+  2. Chord iteration with an internally generated
+     (difference quotient) block-tridiagonal
+     Jacobian matrix. This uses 3*mb+1 calls to
+     ``res`` per dr/du evaluation. (Default).""",
         Odepack.adjust_parameters(self)
 
     def set_iter_method(self):
         with_jac = hasattr(self, 'jac_lsoibt')
-        if not hasattr(self, 'iter_method'):
+        if not hasattr(self, 'corrector_iter_method'):
             self.iter_method = 1 if with_jac else 2
 
     def set_liw_min(self):

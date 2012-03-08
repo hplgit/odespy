@@ -3,6 +3,10 @@
 from solvers import Solver, Adaptive
 import numpy as np
 
+# f_f77 and other items are defined in odepack.py and will
+# be populated in solvers._parameters in any import of odepack.
+# We just need to add what rkc.py and that is not defined elsewhere:
+
 _parameters_RKC = dict(
 
     spcrad = dict(
@@ -11,16 +15,19 @@ _parameters_RKC = dict(
         type=callable),
 
     spcrad_f77 = dict(
-        help='Fortran version of spcrad function.              '\
-             'This subroutine should be defined in form:       '\
-             '        double precision function spcrad_f77(    '\
-             '       1      neq,t,u)                           '\
-             '  Cf2py intent(hide)  neq                        '\
-             '        integer       neq                        '\
-             '        double precision t,u(neq)                '\
-             '        spcrad_f77 =                             '\
-             '        return                                   '\
-             '        end                                      ',
+        help='''Fortran version of spcrad function.
+This subroutine should be defined in form:
+
+        double precision function spcrad_f77
+       1  (neq,t,u)
+  Cf2py intent(hide)  neq
+        integer       neq
+        double precision t,u(neq)
+        spcrad_f77 =
+        return
+        end
+
+''',
         type=callable),
     )
 

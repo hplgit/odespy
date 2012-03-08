@@ -1,21 +1,116 @@
-- INSTALL.txt: require Py 2.7, numpy, scipy, sympy,
+* Motivating example with F77/LSODE, Matlab ode45 and (now) scipy with
+  vode (beginning of doc/src/odespy/odespy.do.txt): set adams 10-th
+  order method (to demonstrate setting parameters) for Fortran and Python.
+  How is this done in pure Forgran?
+
+* Split class RungeKutta in two: one for 1-level methods, derived from
+  Solver, and one for 2-level methods, derived from Adaptive.
+  Status: done.
+
+* Refactor the advance method in class RungeKutta so that it clearly
+  illustrates the logical steps for students.
+  Status: done (can still be improved).
+
+* Implement RK34.
+  Status: done, but buggy. Maybe drop it?
+
+* Clean up odepack.py: Consider the feasibility of doing all points
+  below. If not done, move the package to sandbox and make no
+  claims that odespy wraps ODEPACK.
+
+* 2DO list for odepack.py:
+
+  * Get method description (what kind of numerical method is used)
+    into the doc string and preferably in the quick_description too.
+    Status: not done.
+
+  * Move complicated methods in solver.py not used elsewhere to odepack.
+    Status: done.
+
+  * Doc strings have ugly formatting both in pydoc and sphinx.
+    Use either one-line strings or multi-line strings in help,
+    and don't wrap the multi-line strings. Reformat all code examples
+    in doc strings (subroutine signatures) to proper multi-line format.
+    Remove fixed_width in the doc string formatting as this skrews
+    up the formatting in pydoc and breaks lines at strange points.
+    Get rid of everything with fixed_width and work with one or multi
+    line strings, where whitespace is exactly preserved in the latter.
+    Status: done.
+
+  * Introduce a blank line before and after Fortran subroutine signatures.
+    Status: done.
+
+  * Move _parameters items from solver.py that are specific to
+    ODEPACK to odepack.py. Change general names like iter_method to
+    more specific like correction_iter_method.
+    Status: done.
+
+  * "there are often memory errors" and similar things in doc strings,
+    and all real problems, must be seriously dealt with. Better to
+    have a separate line at the end of the doc string with a WARNING
+    about potential problems, maybe also a print statement in
+    one of the functions that are always called.
+    Very important point!
+    Status: not done.
+
+  * Use sphinx/rst list syntax in doc stings and help strings.
+    Status: some corrections.
+
+  * Variables in ODEPACK are referred to with both upper and lower
+    case variables. Must be consistent!
+    Status: not done.
+
+  * Get test cases (from tests?) into the doc strings of functions.
+    It is hard to use odepack.py because of all the parameters and
+    there is almost no documentation.
+    Status: not done.
+
+  * Why is not class Odepack derived from Adaptive?
+    It adds all the adaptive prms rtol, atol, etc.
+    Status:
+
+  * Why are lrw and liw user-given parameters? Isn't this something
+    the Python code can compute and set?
+    What does the doc strings in expand_*work really mean?
+    Not easy to understand.
+    Status:
+
+  * What does "linearly solvers" mean? It is not a term in the .f files.
+
+  * The return objects from Python functions (res, jac_lsoibt and others)
+    have a strange syntax (vector * float * ...). Use std Python syntax.
+    Status: not done.
+
+  * Typeset all variables in help and doc strings with double `` to
+    make them formatted verbatim in syntax.
+    Status: not done.
+
+  * Go through all English in all help and doc strings.
+    Status: not done.
+
+* INSTALL.txt: require Py 2.7, numpy, scipy, sympy,
   python-scitools, explain this in tutorial too, together with git clone.
-  sundials, odelib
+  sundials, odelib.
+  Status: not done.
 
-- Refactor RKFehlberg a la RK43?
+* Link to all source code files in tutorial.
+  Status: not done.
 
-- Link to all source code files in tutorial.
+* More tutorial examples: pure_diffusion, reaction_diffusion.
+  Status: note done:
 
-- Tutorial examples: zombie, u = w*1j*u, pure_diffusion, reaction_diffusion
-
-- Unit tests.
+* Unit tests.
   Make a class Problem with f, jac, stiff, complex_, a la scipy.integrate,
   but lett stiff etc be self.stiff such that parameters can vary and
   determine if the problem is stiff.
+  Status: partially done.
 
-- Get description of rkf45.f and rkc.f into doc strings.
+* Get description of rkf45.f and rkc.f into doc strings.
+  Status: not done.
 
-- more methods: radau?
+* Consider wrapping more methods like radau5, or are these methods in
+  fact available through other software (maybe already in odespy)?
+  Status: not done.
 
 setup.py:
 

@@ -136,66 +136,69 @@ import pprint, sys, os, inspect
 import numpy as np
 
 # Collection of all possible parameters in all solvers in this package
+# (their order is determined by the _optional_parameters and
+# _required_parameters lists in the solver classes)
+
 _parameters = dict(
 
     f = dict(
-        help='Right-hand side ``f(u,t)`` defining the ODE',
+        help='Right-hand side ``f(u,t)`` defining the ODE.',
         type=callable),
 
     f_args = dict(
-        help='Extra positional arguments to f: ``f(u, t, *f_args, **f_kwargs)``',
+        help='Extra positional arguments to f: ``f(u, t, *f_args, **f_kwargs).``',
         type=(tuple, list, np.ndarray),
         default=()),
 
     f_kwargs = dict(
-        help='Extra keyword arguments to f: ``f(u, t, *f_args, **f_kwargs)``',
+        help='Extra keyword arguments to f: ``f(u, t, *f_args, **f_kwargs)``.',
         type=dict,
         default={}),
 
     complex_valued = dict(
-        help='True if f is complex valued',
+        help='True if f is complex valued.',
         default=False,
         type=bool),
 
     jac = dict(
-        help='Jacobian of right-hand side function f (df/du)',
+        help='Jacobian of right-hand side function f (df/du).',
         default=None,
         type=callable),
 
     jac_args = dict(
         help='Extra positional arguments to jac: ``jac(u, t, *jac_args,'\
-             '**jac_kwargs)``',
+             '**jac_kwargs)``.',
         type=(tuple,list),
         default=()),
 
     jac_kwargs = dict(
         help='Extra keyword arguments to jac: ``jac(u, t, *jac_args,'\
-             '**jac_kwargs)``',
+             '**jac_kwargs)``.',
         type=dict,
         default={}),
 
     h_in_fd_jac = dict(
-        help='h in finite difference approximation of the Jacobian',
+        help='h in finite difference approximation of the Jacobian.',
         default=1E-4,
         type=float),
 
     verbose = dict(
-        help='Integer reflecting output of intermediate quantities',
+        help='Integer reflecting output of intermediate quantities.',
         default=0,
         type=int),
 
     u_exact = dict(
-        help='Function of t returning exact solution',
+        help='Function of t returning exact solution.',
         default=None,
         type=callable),
 
     start_method = dict(
-        help='Method for the first steps in multi-step solvers',
+        help='Method for the first steps in multi-step solvers.',
         default='RK2',
         type=str),
 
     nonlinear_solver = dict(
-        help='Newton or Picard nonlinear solver',
+        help='Newton or Picard nonlinear solver.',
         default='Picard',
         type=str,
         range=('Newton', 'Picard')),
@@ -227,30 +230,30 @@ _parameters = dict(
     # Parameters for adaptive methods
 
     atol = dict(
-        help='absolute tolerance for solution',
+        help='Absolute tolerance for solution.',
         type=(float,list,tuple,np.ndarray),
         default=1E-8),
 
     rtol = dict(
-        help='relative tolerance for solution',
+        help='Relative tolerance for solution.',
         type=(list,tuple,np.ndarray,float),
         default=1E-6),
 
     min_step = dict(
-        help='Minimum step size for an adaptive algorithm',
+        help='Minimum step size for an adaptive algorithm.',
         type=float),
 
     max_step = dict(
-        help='Maximum step size for an adaptive algorithm',
+        help='Maximum step size for an adaptive algorithm.',
         type=float),
 
     first_step = dict(
-        help='Suggested first time step size for an adaptive algorithm',
+        help='Suggested first time step size for an adaptive algorithm.',
         type=float),
 
     solver = dict(
         help='Name of solver class in solvers that need an extra solver '\
-             '(e.g., AdaptiveResidual)',
+             '(e.g., AdaptiveResidual).',
         default='RK4',
         type=str),
 
@@ -262,21 +265,27 @@ _parameters = dict(
 
     # vode parameters
     adams_or_bdf = dict(
-        help='Method in vode or solvers in odepack: "adams" or "bdf"',
+        help='Method in vode or solvers in odepack: "adams" or "bdf".',
         type=str,
         default='adams',
         range=['adams', 'bdf']),
 
+    order = dict(
+        help='Maximum order used by the integrator '\
+             '(<= 12 for "adams", <= 5 for "bdf").',
+        type=int,
+        default=4),
+
     nsteps = dict(
-        help='Max no of internal solver steps per time step',
+        help='Max no of internal solver steps per time step.',
         type=int,
         default=1000),
 
-    order = dict(
-        help='Maximum order used by the integrator '\
-             '(<= 12 for "adams", <= 5 for "bdf")',
-        type=int,
-        default=4),
+    method_order = dict(
+        help='Method order for user-defined method if known.'\
+             'A integer for 1-level methods, or a pair of   '\
+             'integer for 2-levels methods.',
+        type=(int,tuple,list,np.ndarray)),
 
     # beta, ifactor and dfactor are intended for adaptive Dormand&Prince
     # methods like dopri5 or dop853 in scipy
@@ -401,61 +410,22 @@ _parameters = dict(
         extra_check=lambda x: x>=1),
 
     nb = dict(
-        help='Number of blocks in the main diagonal. nb>=4',
+        help='Number of blocks in the main diagonal. nb>=4.',
         type=int,
         extra_check=lambda x:x>=4),
 
-    # Odepack parameters
-    seth = dict(
-        help='Element threshhold for sparsity determination.',
-        default=0,
-        type=int),
-
-    iter_method = dict(
-        help='Corrector iteration method choice',
-        type=int),
-
-    lrw = dict(
-        help='Length of real work array.',
-        type=int),
-
-    liw = dict(
-        help='Length of integer work array, similiar as <lrw>.',
-        type=int),
-
-    method_order = dict(
-        help='Method order for user-defined method if known.'\
-             'A integer for 1-level methods, or a pair of   '\
-             'integer for 2-levels methods.',
-        type=(int,tuple,list,np.ndarray)),
-
-    moss = dict(
-        help=' Method to obtain sparse structure of Jacobian.',
-        type=int),
-
-    max_hnil = dict(
-        help='Maximum no of warning messages to be printed.',
-        type=int),
-
-    max_ordn = dict(
-        help='Maximum order in nonstiff methods. ',
-        type=int),
-
-    max_ords = dict(
-        help='Maximum order in stiff methods. ',
-        type=int),
 
    # Fortran versions of f, jac, g (can be used when solver is in Fortran)
     f_f77 = dict(
-        help='Intended to supply a user-supplied Fortran subroutine as f.',
+        help='Fortran subroutine for f.',
         type=callable),
 
     g_f77 = dict(
-        help='Intend to supply a Fortran subroutine as g.',
+        help='Fortran subroutine for g.',
         type=callable),
 
     jac_f77 = dict(
-        help='Intend to supply a Fortran subroutine as jac.',
+        help='Fortran subroutine for jac.',
         type=callable),
 
     myadvance = dict(
@@ -499,14 +469,12 @@ def _format_parameters_table(parameter_names, fixed_width=None):
             text = _parameters[name]['help']
             if 'default' in _parameters[name]:
                 text += ' (default: %s)' % str(_parameters[name]['default'])
-            if fixed_width is not None:
-                line_no = len(text)/c2 if len(text) % c2 == 0 \
-                    else len(text)/c2 + 1
-                # Spilt text with fixed width
-                text = [text[i*49:(i+1)*49] for i in range(line_no)]
-            else:
-                # List of wrapped lines
+            # List of wrapped lines
+            if '\n' not in text:
                 text = textwrap.wrap(text, c2, break_long_words=False)
+            else:
+                # Multi-line help string: keep text as is (often computer code)
+                text = text.splitlines()
             for i in range(1, len(text)):   # add initial space for line 2, ...
                 text[i] = ' '*(c1+1) + text[i]
             text = '\n'.join(text)
@@ -516,7 +484,7 @@ def _format_parameters_table(parameter_names, fixed_width=None):
     s += hrule
     return s
 
-def table_of_parameters(classname, fixed_width=None):
+def table_of_parameters(classname):
     """
     Return a table (in reST format) of the required parameters
     in a class and a table of the optional parameters.
@@ -535,11 +503,11 @@ def table_of_parameters(classname, fixed_width=None):
     s = """
 Required input arguments:
 
-""" + _format_parameters_table(req_prm, fixed_width=fixed_width) + \
+""" + _format_parameters_table(req_prm) + \
 """
 Optional input arguments:
 
-""" + _format_parameters_table(opt_prm, fixed_width=fixed_width)
+""" + _format_parameters_table(opt_prm)
     # Add indent:
     indent = 4
     newlines = [' '*indent + line for line in s.splitlines()]
@@ -1206,7 +1174,7 @@ class Solver:
         provided when specified condition fulfilled.
 
         This function is not intended for simple solvers.
-        So it is not called automatically in current ODE.py.
+        So it is not called automatically in current solvers.py.
         But for some complicated solvers as ones in ODEPACK, they
         are very useful and convenient.
 
@@ -1267,81 +1235,6 @@ class Solver:
         %s must be set when %s is %s!''' % (arg_print,name,value)
         return True
 
-
-    def func_wrapper(self):
-        '''
-        This function is defined to wrap user-defined functions with new
-        forms of parameter-list, or wrap the returned values as numpy arrays.
-
-        Firstly, in odespy, all the user-supplied functions should have a
-        parameter list starts with "u,t,...". But in some special subclasses,
-        (like solvers in ODEPACK), all the parameter lists of user-defined
-        functions start with "t,u,...". So we need this general function to
-        wrap all these user-defined functions.
-
-        Secondly, in some user-defined functions, according to the different
-        start indices in Fortran and Python, we need to make special wrapping
-        for these uncompability. For an example, in user-defined function
-        "jac_column", column index is an internally valued parameter in
-        Fortran code. In Python, it starts from 0 instead of 1 in Fortran.
-        So we need to wrap the parameter list of user-defined "jac_column" from
-        "u,t,j" to "t,u,j+1". That is, define the jacobian function as
-        lambda t,u,j: jac_column(u,t,j-1).
-
-        Furthermore, the return value of user-defined functions need to be
-        wrapped to Numpy arrays with great numerical features, e.g.
-        vectorization and array slicing. In order to avoid unnecessary array
-        copy by F2PY, it is always recommended to explicitly transform all
-        Numpy arrays to Fortran order in Python code.
-
-        This functions is not intended for simple solvers. So it is not called
-        automatically in current version. But for some complicated solvers as
-        ones in ODEPACK, it is very useful and convenient.
-
-        Future developers can call this functions with appropriate locations
-        and corresponding property-setting in adjust_parameters().
-
-        '''
-        import numpy as np
-        parameters = self._parameters
-        # Extract function parameters that are required to be wrapped
-        func_list = [[name,
-                      parameters[name].get('array_order', None),
-                      parameters[name].get('paralist_old', None),
-                      parameters[name].get('paralist_new', None),
-                      parameters[name].get('name_wrapped', name)]
-                     for name in parameters \
-                         if name in self.__dict__ and \
-                         'type' in parameters[name] and \
-                         (parameters[name]['type'] is callable or \
-                          parameters[name]['type'] is (callable, str)) and \
-                         ('paralist_new' in parameters[name] or \
-                          'array_order' in parameters[name])]
-        # name in self.__dict__  --> existing attributes in current instance
-        # parameters[name]['type'] is callable or (callable, str)
-        #             -->     callable objects
-        # 'paralist_new' in parameters[name]
-        #    --> new parameter-list is defined to be wrapped
-        # 'array_order' in parameters[name]
-        #    --> this function return an array, and should be wrapped either in
-        #    Fortran order or C (default) order.
-        func_input = {}
-        for name, order, arg_old, arg_new, name_new in func_list:
-            # e.g. name     = 'jac'
-            #      arg_old  = 'u,t'
-            #      arg_new  = 't,u'
-            #      order    = 'Fortran'
-            #      name_new = 'jac_f77'
-            #  Then:
-            #  self.jac_f77 = lambda t,u: np.asarray(jac(u,t), order='Fortran')
-            func_input[name] = getattr(self, name)
-            wrap_string = 'lambda %s: ' % \
-                (arg_new if arg_new is not None else arg_old)
-            wrap_string += 'np.asarray(' if order is not None else ''
-            wrap_string += 'func_input["%s"](%s)' % (name, arg_old)
-            wrap_string += ', order="Fortran"' if order=='Fortran' else ''
-            wrap_string += ')' if order is not None else ''
-            setattr(self, name_new, eval(wrap_string, locals()))
 
 
 class MySolver(Solver):
