@@ -2212,15 +2212,14 @@ class RKFehlberg(Adaptive):
 
     def advance(self):
         # auxilatory function to pick up the middle number among 3 floats
-        def middle(x, y, z):
+        def middle(x, y=.1, z=4.):
            return sorted([x, y, z])[1]
 
         f, n, rtol, atol = self.f, self.n, self.rtol, self.atol
+        h, min_step, max_step = self.first_step, self.min_step, self.max_step
         u_n, t_n, t_np1 = self.u[n], self.t[n], self.t[n+1]
 
         dt = t_np1 - t_n
-
-        h = dt
 
         # coefficients in Butcher tableau
         c = (1/4.,
@@ -2288,7 +2287,7 @@ class RKFehlberg(Adaptive):
             # Factor to adjust next step size
             s = (tol/(2*error))**0.25
             # Factor should be in a reasonable range[0.1,4.0]
-            s = min(map(middle, s, 0.1, 0.4)) if self.neq > 1 else middle(s, 0.1, 0.4)
+            s = min(map(middle, s)) if self.neq > 1 else middle(s)
 
             # Step size should be in range [min_step, max_step]
             h = middle(h*s, min_step, max_step)

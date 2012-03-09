@@ -359,7 +359,7 @@ class MyRungeKutta(RungeKutta2level):
                            ['method_order',]
 
     def validate_data(self):
-        if not RungeKutta.validate_data(self):
+        if not Adaptive.validate_data(self):
             return False
 
         # Check for dimension of user-defined butcher table.

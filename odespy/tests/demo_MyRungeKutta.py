@@ -11,13 +11,6 @@ import numpy as np
 
 # arrays to test user-defined Runge-Kutta methods
 bt = dict(
-    RungeKutta3 =  dict(
-    table = np.array(\
-        [[0., 0., 0., 0.],
-         [.5, .5, 0., 0.],
-         [1., -1., 2., 0.],
-         [0., .16666667, .66666667, .16666667]]),
-    order = 3),
     FehlBerg = dict(
     table = np.array(\
         [[0., 0., 0., 0., 0., 0., 0.],
@@ -28,7 +21,14 @@ bt = dict(
          [.5, -.2962963, 2., -1.38167641, .45297271, -.275, 0.],
          [0., .11574074, 0., .54892788, .53533138, -.2, 0.],
          [0., .11851852, 0., .51898635, .50613149, -.18, .03636364]]),
-    order = (4,5)))
+    order = (4,5)),
+    RungeKutta3 =  dict(
+    table = np.array(\
+        [[0., 0., 0., 0.],
+         [.5, .5, 0., 0.],
+         [1., -1., 2., 0.],
+         [0., .16666667, .66666667, .16666667]]),
+    order = 3))
 
 # Test for user-defined methods:
 # Sample ODE problem: u = e**-t, T = [0.,.25,.5,.75,.1], 
