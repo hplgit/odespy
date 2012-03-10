@@ -2290,7 +2290,7 @@ class RKFehlberg(Adaptive):
             s = min(map(middle, s)) if self.neq > 1 else middle(s)
 
             # Step size should be in range [min_step, max_step]
-            h = middle(h*s, min_step, max_step)
+            h = middle(h*s, self.min_step, self.max_step)
 
             # h should be set to 't_np1-t_i[-1]' at the last intern step.
             h = min(h, t_np1-t_i[-1])

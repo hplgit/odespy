@@ -140,8 +140,6 @@ The same `f` and the same call syntax can be reused across methods
 and software.
 
 
-
-
 ======= Basic Usage =======
 
 ===== Overview =====
