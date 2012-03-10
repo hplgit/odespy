@@ -1,12 +1,12 @@
 """Gaussian function for testing adaptivity."""
 
-from odespy.problems import Problem
+from odespy.problems import Logistic
 from numpy import exp, linspace
 
 import odespy
 problem = Logistic(a=2, R=1, U0=0.0001)
-solver = odespy.CashKarp
-solver = odespy.lsoda_scipy
+solver = odespy.RKFehlberg
+#solver = odespy.lsoda_scipy
 #solver = odespy.Lsoda
 solver = odespy.RK4
 solver = solver(problem.f, verbose=2, first_step=1.100,

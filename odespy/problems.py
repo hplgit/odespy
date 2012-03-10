@@ -1,3 +1,5 @@
+import numpy as np
+
 class Problem:
     stiff = False
     complex_ = False
@@ -34,6 +36,24 @@ class Problem:
 
     # subclasses may implement computation of derived
     # quantities, e.g., energy(u, t) etc
+
+class Logistic(Problem):
+    def __init__(self, a, R, U0):
+        self.a = a
+        self.R = R
+        self.U0 = U0
+
+    def f(self, u, t):
+        a, R = self.a, self.R  # short form
+        return a*u*(1 - u/R)
+
+    def jac(self, u, t):
+        a, R = self.a, self.R  # short form
+        return a*(1 - u/R) + a*u*(1 - 1./R)
+
+    def u_exact(self, t):
+        a, R, U0 = self.a, self.R, self.U0  # short form
+        return R*U0*np.exp(a*t)/(R + U0*(np.exp(a*t) - 1))
 
 class LinearOscillator(Problem):
     pass
