@@ -1,0 +1,77 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module advance_radau5__user__routines 
+    interface advance_radau5_user_interface 
+        subroutine fcn(n,x,y,f,rpar,ipar) ! in :_radau5:radau5.f:advance_radau5:unknown_interface
+            integer intent(hide), depend(y) :: n=len(y)
+            double precision :: x
+            double precision dimension(n) :: y
+            double precision dimension(n), intent(out) :: f
+            double precision dimension(*), intent(hide) :: rpar
+            integer dimension(*), intent(hide) :: ipar
+        end subroutine fcn
+        subroutine solout(nrsol,xosol,xsol,y,cont,lrc,nsolu,rpar,ipar,irtrn) ! in :_radau5:radau5.f:advance_radau5:unknown_interface
+            integer :: nrsol
+            double precision :: xosol
+            double precision :: xsol
+            double precision dimension((n)) :: y
+            double precision dimension(4*n) :: cont
+            integer :: lrc
+            integer :: nsolu
+            double precision dimension(*), intent(hide) :: rpar
+            integer dimension(*), intent(hide) :: ipar
+            integer :: irtrn
+        end subroutine solout
+        subroutine jac(n,x,y,dfy,ldfy,rpar,ipar) ! in :_radau5:radau5.f:advance_radau5:unknown_interface
+            integer depend(y), intent(hide) :: n=len(y)
+            double precision :: x
+            double precision dimension(n) :: y
+            double precision dimension(ldfy, n), intent(out) :: dfy
+            integer depend(dfy) :: ldfy=shape(dfy,0)
+            double precision dimension(*), intent(hide) :: rpar
+            integer dimension(*), intent(hide) :: ipar
+        end subroutine jac
+        subroutine mas(n, am, lmas, rpar, ipar) ! in :_radau5:radau5.f:advance_radau5:unknown_interface
+            integer depend(am), intent(hide) :: n=shape(am,1)
+            double precision dimension(lmas,n), intent(out) :: am
+            integer intent(hide), depend(am) :: lmas=shape(am,0)
+            double precision dimension(*), intent(hide) :: rpar
+            integer dimension(*), intent(hide) :: ipar
+        end subroutine mas
+    end interface advance_radau5_user_interface
+end python module advance_radau5__user__routines
+
+
+python module _radau5 ! in 
+    interface  ! in :_radau5
+        subroutine advance_radau5(n,fcn,x,y,xend,h,rtol,atol,itol,jac,ijac,mljac,mujac,mas,imas,mlmas,mumas,work_in,lwork,iwork_in,liwork,idid) ! in :_radau5:radau5.f
+            use advance_radau5__user__routines
+            integer depend(y),intent(hide) :: n=len(y)
+            external fcn
+            double precision intent(in) :: x
+            double precision dimension(n), intent(in, out) :: y
+            double precision intent(in, out) :: xend
+            double precision intent(in) :: h
+            double precision dimension(*), intent(in) :: rtol
+            double precision dimension(*), intent(in) :: atol
+            integer intent(in) :: itol
+            external jac
+            integer intent(in) :: ijac
+            integer intent(in) :: mljac
+            integer intent(in) :: mujac
+            external mas
+            integer intent(in) :: imas
+            integer intent(in) :: mlmas
+            integer intent(in) :: mumas
+            double precision dimension(9), intent(in) :: work_in
+            integer intent(in)  :: lwork
+            integer dimension(20), intent(in) :: iwork_in
+            integer intent(in)  :: liwork
+            integer intent(out) :: idid
+        end subroutine advance_radau5
+    end interface
+end python module _radau5
+
+! This file was auto-generated with f2py (version:1).
+! See http://cens.ioc.ee/projects/f2py2e/

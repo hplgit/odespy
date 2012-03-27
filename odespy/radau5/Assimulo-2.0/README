@@ -1,0 +1,42 @@
+========
+ASSIMULO
+========
+
+README
+=======
+
+Assimulo is a Python based simulation package that allows for simulation of both 
+ordinary differential equations of the form f(t,y), (explicit problems) and 
+differential algebraic equations of the form f(t,y,yd), (implicit problems). 
+Assimulo currently supports Explicit Euler, adaptive Runge-Kutta of order 4 
+and Runge-Kutta of order 4. It also wraps the popular SUNDIALS 
+(https://computation.llnl.gov/casc/sundials/main.html) solvers CVode 
+(for explicit problems) and IDA (for implicit problems). A Python version of 
+Ernst Hairer's code (http://www.unige.ch/~hairer/software.html) Radau5 is also available. 
+CVode and IDA supports discontinuous systems of the form f(t,y,sw) and f(t,y,yd,sw) with
+event(root)-functions defined as g(t,y,sw) and g(t,y,yd,sw) where
+sw should be fixed during the integration.
+
+The package comes with a Problem specifications class and subclasses corresponding 
+to the different problem, Implicit_Problem and Explicit_Problem. To define and 
+solve a problem, first import the solver of choice and the appropriate 
+(Implicit/Explicit)_Problem class. Then define your function, f and initial conditions
+which pass to the problem class constructor. Then create your solver, set the attributes 
+(method, absolute/relative tolerance etc.) and use the simulate method to simulate.
+
+For more information about Assimulo, documentation tutorial etc, visit 
+http://www.jmodelica.org/assimulo
+
+
+INSTALL
+See the INSTALL file or the installation page on http://www.jmodelica.org/assimulo.
+
+CONTACT
+Trac-site: https://trac.jmodelica.org/assimulo/wiki
+Homepage: http://www.jmodelica.org/assimulo
+Email: chria@maths.lth.se
+
+The package is currently under development and any input is appreciated.
+
+
+

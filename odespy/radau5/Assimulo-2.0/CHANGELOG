@@ -1,0 +1,119 @@
+--- CHANGELOG ---
+
+--- Assimulo-2.0 ---
+    * Minor bug fixes in the setup script (ticket:191).
+    * Fixed bug in type checking of switches (ticket:201). 
+
+--- Assimulo-2.0b1 ---
+    * Replaced setup_source.py and setup_binary.py with a single setup.py.
+    * Base code migrated to Cython. 
+    * Results are now returned from the simulate method.
+    * Options and statistics are now stored in dictionaries.
+    * Results are stored in variables appended with _sol. For example:
+      y -> y_sol. (Also note that the result is now returned from simulate)
+    * The current time and states (state derivative) have changed name from
+      t_cur, y_cur, yd_cur -> t, y, yd.
+    * Method in IDA make_consistency have been renamed to make_consistent.
+    * Added a method get_support which returns a dictionary with information
+      about what the current solver supports.
+    * Change name of the function in Explicit_Problem, f -> rhs
+    * Change name of the function in Implicit_Problem, f -> res
+    * Multiple name changes. (To be specified)
+    * Improved the documentation
+    * Speed improvements in the Sundials wrapper.
+    * Fixed a couple of memory leaks in the Sundials wrapper.
+    * Added support for specifying a list of output points.
+
+--- Assimulo-1.4b3 ---
+    * Fixed bug with t0 != 0 when using time events and step events
+      (ticket:173)
+    * Added support for specifying initial conditions for sensitivity
+      variables (ticket:105)
+    * Allowed pbar to specified in the problem (ticket:172)
+
+--- Assimulo-1.4b2 ---
+    * Fixed statistics for SPGMR (ticket:162).
+    * Fixed bug when using fixed point iteration and jacobian related calls 
+      (ticket:152).
+    * Added options to terminate a simulation from handle_event via an 
+      exception (ticket:163).
+    * Fixed problem with atol and integers (ticket:161).
+
+--- Assimulo-1.4b1 ---
+    * Added option to use SPGMR in CVode (ticket:140).
+    * Added new attributes in CVode, maxkrylov, pretype, linearsolver (ticket:140).
+    * Added option to use a new method in Explicit_Problem, jacv (Jacobian*Vector)
+      (ticket:144).
+    * Fixed a bug with the completed simulation flag (ticket:133).
+    * Fixed a bug when y0 is provided to Radau5 in the problem class (ticket:134).
+    * Added an exception when the number of equations are zero (ticket:136).
+    * Fixed a bug in the calling sequence of an event (ticket:138).
+    * Added option to specify test attributes on tests (ticket:154).
+    * Fixed various documentation inconsistencies.
+    * Added a Kinsol wrapper (ticket:99)
+    * Added a regularization technique (ticket:135).
+    * Added SuperLU as a linear solver in Kinsol (ticket:153).
+    * Fixed various bug related to Kinsol.
+    * Updated the setup script to allow for specifying paths to SuperLU and 
+      Blas (ticket:148).
+
+--- Assimulo-1.3b1 ---
+    * Improved the tolerance handling in RungeKutta34.
+    * Improved information output from all the solvers.
+    * Implemented basic support for calculating sensitivities using IDAS.
+    * Fixed a bug with the discretization method reseting the maximum
+      order in CVode.
+    * Minor bug fix in implicit Radau interpolate.
+    * Changed the default value of pbar in CVodes and IDAs to the absolute
+      values of the parameters.
+
+--- Assimulo-1.2b1 ---
+    * Implemented basic support for calculating sensitivities using CVodes.
+    * Changed from using CVode to CVodes.
+    * Added 'echo' methods used for viewing the current solver settings.
+    * Fixed a bug with the reset method not resetting the statistics.
+    * Fixed a bug which was exposed when overwriting the switches.
+    * Added a custom error method in CVode and IDA.
+    * Fixed a segmentation fault discovered on Mac when IDAS was used.
+    * Renamed the test modules to lower-case.
+    * Renamed the setup script to setup_from_binary (used when a pre-compiled
+      binary is distributed)
+
+--- Assimulo-1.1b1 ---
+    * Fixed a bug with re-init resulting in resetting the options.
+    * Moved the result handling to the problem class.
+    * Renamed the event function to state_events.
+    * Improved the information displayed after a simulation (mainly for IDA and CVode).
+    * Added support for step events (completed_step).
+    * Added support for time events.
+    * Implemented basic support for calculating sensitivities using IDAS.
+    * Renamed the modules to correspond to Python standard (all lowercase).
+      Classes starts with a capital letter.
+    * Implemented Radau5 for both explicit and implicit problems.
+    * Wrapped an interpolate method from Sundials (IDAGetDky, CVodeGetDky)
+    * Changed from using IDA to IDAS
+    * Changed assimulo.problem.Problem_Name to problem_name.
+    * Changed assimulo.ODE.problemname to problem_name.
+    * Fixed a bug when printing information when used FixedPoint.
+    * Changed algvar to be more type independent.
+    * Added **kwargs to the plotting functionality.
+
+--- Assimulo-1.0b2 ---
+    * Added an option to mask which variables that is to be plotted.
+    * Added a .simulate function for use when simulating instead of
+      __call__. Although __call__ can still be used.
+    * Added a plotting functionality for plotting the step-size used
+      together with the order used when the simulation have been
+      run with one-step mode in either CVode or IDA.
+    * Added so that when using IDA or CVode in one-step mode, the 
+      current order and the last order are stored.
+    * Added option to specify initial step-size in CVode.
+    * Added support to switch between using the user defined Jacobian
+      in CVode or not.
+    * Added support to switch between using the user defined Jacobian
+      in IDA or not.
+    * Added support for user-defined Jacobians when using CVode.
+    * Added support for user-defined Jacobians when using IDA.
+
+--- Assimulo-1.0b1 ---
+    * The rough first version.
