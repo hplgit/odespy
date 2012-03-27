@@ -238,14 +238,6 @@ class Radau5(Solver):
         mlmas = getattr(self, 'mlmas', self.neq)
         mumas = getattr(self, 'mumas', 0)
 
-        if not hasattr(self, 'printed'):
-            print (t, u[n].copy(), t_next, h, self.rtol, self.atol, 
-                self.itol, jac, self.ijac, ml, mu, 
-                self.imas, mlmas, mumas, self.work_in,
-                self.lwork, self.iwork_in, self.liwork)
-            self.printed = 2
-
-
 
         u_new, t_new, idid = apply(self._radau5.advance_radau5, \
                (f, t, u[n].copy(), t_next, h, self.rtol, self.atol, 

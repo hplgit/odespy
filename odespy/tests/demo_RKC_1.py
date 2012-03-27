@@ -46,7 +46,7 @@ except:
 
 t0, tn = 0., 15.
 n = 9  # no of points in x grid
-x = linspace(0, 10, n)
+x = np.linspace(0, 10, n)
 dx = x[1] - x[0]
 u0 = [1.0/(1.0 + np.exp(np.sqrt(.5)*dx)) for i in range(1,n+1)]
 time_points = np.linspace(t0, tn, n_points)
@@ -80,6 +80,7 @@ st.plot(t, u[:,0], '*', title="Python function f",
         legend="Lsode", hold="on")
 
 # Test case 3: RKFehlberg
+
 m = m.switch_to(RKFehlberg)
 u,t = m.solve(time_points)
 st.plot(t, u[:,0], 'o', title="Python function f",
