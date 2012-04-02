@@ -1,7 +1,7 @@
 2DO list from Mar 7, 2012.
 
 * Wrap scipy.integrate.odeint (LSODA).
-  Status: Done (but first_step doesn't work).
+  Status: Done (but first_step parameter doesn't work, probably ok as is).
 
 * Rewrite tutorial with a better sequence of examples in the beginning,
   e.e., logistic equation.
@@ -102,6 +102,12 @@
   python-scitools, explain this in tutorial too, together with git clone.
   sundials, odelib.
   Status: not done.
+
+* Examples: shooting method for e*u''=u' (or 1D boundary value problems
+  in general; planet orbit (illustrate large ellipse and adaptivity);
+  series of SIS, SIR, SIRV models; 1D diffusion equation (use it in rkc
+  too);
+  Status: will by done by hpl.
 
 * Link to all source code files in tutorial.
   Status: not done.
