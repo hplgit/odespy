@@ -1,11 +1,11 @@
 #!/bin/sh
 
-name=wrap_odesolvers
+name=wrap_odespy
 
-doconce format latex $name
+doconce format pdflatex $name
 ptex2tex -DMINTED $name
-#latex -shell-escape $name
-#dvipdf $name
+pdflatex -shell-escape $name
+exit
 
 doconce format sphinx $name
 theme=pyramid
