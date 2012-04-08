@@ -29,9 +29,8 @@ Cf2py intent(out) udot
 
 jac_full_str = """
       subroutine jac_radau5_f77(neq,t,u,dfu,ldfu,rpar,ipar)
-Cf2py intent(hide) neq
-Cf2py intent(hide) ldfu
-Cf2py intent(hide) rpar,ipar
+Cf2py intent(hide) neq,rpar,ipar
+Cf2py intent(in)   t,u,ldfu
 Cf2py intent(out) dfu
       integer neq,ipar,ldfu
       double precision t,u,dfu,rpar
@@ -55,7 +54,6 @@ string_to_compile = '\n'.join([f_str, jac_full_str])
 from numpy import f2py
 f2py.compile(string_to_compile, modulename='callback', verbose=False)   
 import callback
-print dir(callback)
 
 f_f77, jac_f77 = callback.f_f77, callback.jac_radau5_f77
 
@@ -65,7 +63,7 @@ atol, rtol = 1e-4, 1e-4
 
 
 st.figure()
-method = Radau5
+method = Radau5Explicit
 
 # Test case 1: Radau5, with f & jac
 m = method(None, f_f77=f_f77, rtol=rtol, atol=atol, jac_radau5_f77=jac_f77)

@@ -39,7 +39,7 @@ atol, rtol = 1e-2, 1e-2
 
 
 st.figure()
-method = Radau5
+method = Radau5Explicit
 
 # Test case 1: Radau5, with f, ml, mu & jac_banded
 m = method(f, rtol=rtol, atol=atol, 

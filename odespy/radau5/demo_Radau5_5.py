@@ -89,7 +89,7 @@ exact_final = [1.07001457e-1, 2.77432492e-1, 5.02444616e-1, 7.21037157e-1,
                9.01670441e-1, 8.88832048e-1, 4.96572850e-1, 9.46924362e-2,
                -6.90855199e-3] 
 st.figure()
-method = Radau5
+method = Radau5Implicit
 
 # Test case 1: Radau5, with f, mas & jac
 m = method(f=f, mas=mas, rtol=rtol, atol=atol, jac=jac_full)
@@ -116,3 +116,5 @@ u,t = m.solve(time_points)
 st.plot(t, u[:,0], 'b-', title="Radau5 with Python functions",
         legend="with f, mas & jac_banded", hold="on")
 print 'Max error for test case 3 is %g' % max(u[-1] - exact_final)
+
+

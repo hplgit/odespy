@@ -31,13 +31,12 @@ Cf2py intent(out) udot
 
 jac_str = """
       subroutine jac_radau5_f77(neq,t,u,dfu,ldfu,rpar,ipar)
-Cf2py intent(hide) neq
-Cf2py intent(hide) ldfu
-Cf2py intent(hide) rpar,ipar
-Cf2py intent(out) dfu
+Cf2py intent(hide) neq,rpar,ipar
+Cf2py intent(in)   t,u,ldfu
+Cf2py intent(out)  dfu
       integer neq,ipar,ldfu
       double precision t,u,dfu,rpar
-      dimension u(neq),dfu(ldfu,neq),rpar(*),ipar(*)
+      dimension u(neq),dfu(ldfu,neq)
       dfu(1,1) = -.04
       dfu(1,2) = 1.D4*u(3)
       dfu(1,3) = 1.D4*u(2)
@@ -53,10 +52,11 @@ Cf2py intent(out) dfu
 
 mas_str = """
       subroutine mas_f77(neq,mas,lmas,rpar,ipar)
-Cf2py intent(hide)   neq,rpar,ipar,lmas
+Cf2py intent(hide)   neq,rpar,ipar
+Cf2py intent(in)     neq,lmas
 Cf2py intent(out)    mas
-      integer neq,lmas,ipar(*)
-      double precision mas(lmas,neq),rpar(*)
+      integer neq,lmas,ipar
+      double precision mas(lmas,neq),rpar
       mas(1,1) = 1.
       mas(1,2) = 0.
       mas(1,3) = 0.
@@ -82,7 +82,7 @@ time_points = np.linspace(t0, tn, n_points)
 atol, rtol = [1e-6,1e-8,1e-6], 1e-4
 
 st.figure()
-method = Radau5
+method = Radau5Implicit
 exact_final = [9.055142e-1, 2.240418e-5, 9.446344e-2]
 
 # Test case 1: Radau5, with f, mas & jac

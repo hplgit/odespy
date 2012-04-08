@@ -29,10 +29,11 @@ to "mas": mas(*mas_args)''',
 This subroutine should be defined in form:
 
         subroutine mas_f77(neq,mas,lmas,rpar,ipar)
-  Cf2py intent(hide)   neq,rpar,ipar,lmas
+  Cf2py intent(hide)   rpar,ipar
+  Cf2py intent(in)     neq,lmas
   Cf2py intent(out)    mas
-        integer neq,lmas,ipar(*)
-        double precision mas(lmas,neq),rpar(*)
+        integer neq,lmas,ipar
+        double precision mas(lmas,neq),rpar
         mas = ...
         return
         end
@@ -55,13 +56,12 @@ defined in form:
 
         subroutine jac_radau5_f77(neq,t,u,dfu,
        &           ldfu,rpar,ipar)
-  Cf2py intent(hide) neq
-  Cf2py intent(hide) ldfu
-  Cf2py intent(hide) rpar,ipar
+  Cf2py intent(hide) neq,rpar,ipar
+  Cf2py intent(in)   t,u,ldfu
   Cf2py intent(out) dfu
         integer neq,ipar,ldfu
         double precision t,u,dfu,rpar
-        dimension u(neq),dfu(ldfu,neq),rpar(*),ipar(*)
+        dimension u(neq),dfu(ldfu,neq)
         dfu = ...
         return
         end
@@ -74,6 +74,7 @@ defined in form:
 
 from odespy import solvers
 solvers._parameters.update(_parameters_Radau5)
+
 
 class Radau5(Solver):
     """
@@ -151,6 +152,7 @@ class Radau5(Solver):
             # for switch_to().
             f_f77 = self.f_f77
             self.f = lambda u,t: np.asarray(f_f77(t,u))
+        
         if hasattr(self, 'jac'):
             # If jac is input as full matrix in form of jac(u,t),
             # wrap jac to jac_f77 for Fortran code.
@@ -164,12 +166,28 @@ class Radau5(Solver):
             self._extra_args_fortran['jac_extra_args'] = (self.ml, self.mu)
             self.jac_radau5_f77 = lambda t,u,ml,mu: \
                 np.asarray(jac_banded(u,t,ml,mu), order='Fortran')
+        elif hasattr(self, 'jac_radau5_f77'):
+            # If jas is input as Fortran subroutine
+            jac = self.jac_radau5_f77
+            if 0 < getattr(self, 'ml', -1) < self.neq:
+                ljac = self.ml + getattr(self, 'mu', 0) + 1
+                self.jac_banded = lambda u,t,ml,mu: jac(t,u,ljac)
+            else:
+                self.jac = lambda u,t: jac(t,u,self.neq)
         
         if hasattr(self, 'mas'):
             # If mas is input as Python function in form of mas(*mas_args),
             mas = self.mas
             self.mas_f77 = lambda : np.asarray(mas(*self.mas_args), 
                                                order='Fortran')
+        elif hasattr(self, 'mas_f77'):
+            # If mas is input as Fortran subroutine
+            mas = self.mas_f77
+            if 0 < getattr(self, 'mlmas', -1) < self.neq:
+                lmas = self.mlmas + getattr(self, 'mumas', 0) + 1
+            else:
+                lmas = self.neq
+            self.mas = lambda : mas(self.neq, lmas)
 
     def set_dummy_functions(self):
         for name in ('jac_radau5_f77', 'f_f77'):
@@ -238,13 +256,20 @@ class Radau5(Solver):
         mlmas = getattr(self, 'mlmas', self.neq)
         mumas = getattr(self, 'mumas', 0)
 
-
-        u_new, t_new, idid = apply(self._radau5.advance_radau5, \
-               (f, t, u[n].copy(), t_next, h, self.rtol, self.atol, 
+        args = (f, t, u[n].copy(), t_next, h, self.rtol, self.atol, 
                 self.itol, jac, self.ijac, ml, mu, 
                 mas, self.imas, mlmas, mumas, self.work_in,
-                self.lwork, self.iwork_in, self.liwork), 
-                self._extra_args_fortran)
+                self.lwork, self.iwork_in, self.liwork)
+
+        # In the last demo, do not work without printing u_n out. Why?
+        # Try demo_Radau5_5_fortran.py
+        """
+        if not hasattr(self, 'printed'):
+            print u[n].copy()
+            self.printed = True"""
+
+        u_new, t_new, idid = apply(self._radau5.advance_radau5, \
+               args, self._extra_args_fortran)
 
         if idid < 0:          # Error occurs!
             print self._error_messages[idid] + str(t_new)
@@ -253,3 +278,13 @@ class Radau5(Solver):
 
 ### end of class Radau5 ###
 
+class Radau5Explicit(Radau5):
+    """
+    Radau5 solver for explcit ODE problem.
+    """
+    _optional_parameters = Solver._optional_parameters + \
+        ['f_f77', 'jac_radau5_f77', 'atol', 'jac_banded', 
+         'rtol', 'nsteps', 'ml', 'mu', 'first_step', 'jac', 'safety',
+         'max_step', 'nsteps']
+
+Radau5Implicit = Radau5

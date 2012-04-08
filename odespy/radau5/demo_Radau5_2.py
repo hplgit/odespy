@@ -36,7 +36,7 @@ atol, rtol = 1e-4, 1e-4
 
 
 st.figure()
-method = Radau5
+method = Radau5Explicit
 
 # Test case 1: Radau5, with f & jac
 m = method(f, rtol=rtol, atol=atol, jac=jac)

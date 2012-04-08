@@ -43,7 +43,7 @@ time_points = np.linspace(t0, tn, n_points)
 atol, rtol = [1e-6,1e-8,1e-6], 1e-4
 
 st.figure()
-method = Radau5
+method = Radau5Implicit
 exact_final = [9.055142e-1, 2.240418e-5, 9.446344e-2]
 
 # Test case 1: Radau5, with f, mas & jac
