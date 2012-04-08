@@ -13,11 +13,20 @@ def configuration(parent_package='',top_path=None):
                        quiet=True)
 
     config.add_subpackage('odespy')
+    config.get_version(join('odespy', 'version.py'))
 
     return config
 
 if __name__ == '__main__':
 
     from numpy.distutils.core import setup
-    setup(**configuration(top_path='').todict())
+    #setup(**configuration(top_path='').todict())
+    setup(
+        name='odespy',
+        url='...',
+        download_url='...',
+        license='GPL',
+        author='Liwei Wang and Hans Petter Langtangen',
+        author_email='hpl@simula.no',
+        configuration=configuration)
 

@@ -4,14 +4,13 @@
 Van Der Pol oscillator
 u''=3*(1-u*u)*u'-u, with supplied full jacobian matrix
 
-This example is the typical usage of Lsode/Lsoda with 
+This example is the typical usage of Lsode/Lsoda with
 user-supplied functions composed in Python.
 """
 
 from odespy import *
 import scitools.std as st
 import numpy as np
-from Radau5 import *
 
 def f(u,t):
     u00,u11 = u
@@ -25,9 +24,9 @@ def jac(u,t):
 
 import sys
 try:
-    n_points = int(sys.argv[1])    # Read from input 
+    n_points = int(sys.argv[1])    # Read from input
 except:
-    n_points = 10   # default number of time-steps    
+    n_points = 10   # default number of time-steps
 
 
 t0, tn, u0 = 0., 10.,  [2.,0.]
@@ -42,7 +41,7 @@ method = Radau5Explicit
 m = method(f, rtol=rtol, atol=atol, jac=jac)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], title= "Van der Pol oscillator, with Radau5 & Lsoda", 
+st.plot(t, u[:,0], title= "Van der Pol oscillator, with Radau5 & Lsoda",
         legend="Radau5 with f & jac", hold="on")
 
 # Test case 2: Radau5, with f

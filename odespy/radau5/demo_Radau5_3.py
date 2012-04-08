@@ -3,11 +3,10 @@
 """
 u'= A*y, With supplied banded jacobian matrix
 
-This example is the typical usage of Lsode/Lsoda with 
+This example is the typical usage of Lsode/Lsoda with
 user-supplied functions composed in Python.
 """
 
-from Radau5 import *
 from odespy import *
 import scitools.std as st
 import numpy as np
@@ -27,9 +26,9 @@ def jac_banded(u,t,ml,mu):
 
 import sys
 try:
-    n_points = int(sys.argv[1])    # Read from input 
+    n_points = int(sys.argv[1])    # Read from input
 except:
-    n_points = 10   # default number of time-steps    
+    n_points = 10   # default number of time-steps
 
 
 t0, tn, u0 = 0., 4.,  [1]+24*[0]
@@ -42,11 +41,11 @@ st.figure()
 method = Radau5Explicit
 
 # Test case 1: Radau5, with f, ml, mu & jac_banded
-m = method(f, rtol=rtol, atol=atol, 
+m = method(f, rtol=rtol, atol=atol,
            ml=ml, mu=mu, jac_banded=jac_banded)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], title= "Radau5 & Lsoda", 
+st.plot(t, u[:,0], title= "Radau5 & Lsoda",
         legend="Radau5 with f, ml, mu & jac", hold="on")
 
 # Test case 2: Radau5, with f, ml, mu
@@ -60,13 +59,13 @@ st.plot(t, u[:,0], '*',
 m = method(f, rtol=rtol, atol=atol)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], 'o', 
+st.plot(t, u[:,0], 'o',
         legend="with f", hold="on")
 
 method = Lsoda
 st.figure()
 # Test case 4: Lsoda, with f, ml, mu & jac_banded
-m = method(f, rtol=rtol, atol=atol, 
+m = method(f, rtol=rtol, atol=atol,
            ml=ml, mu=mu, jac_banded=jac_banded)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
@@ -74,7 +73,7 @@ st.plot(t, u[:,0],
         legend="Lsoda with f, ml, mu & jac", hold="on")
 
 # Test case 5: Lsoda, with f, ml, mu
-m = method(f, rtol=rtol, atol=atol, 
+m = method(f, rtol=rtol, atol=atol,
            ml=ml, mu=mu)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
@@ -85,6 +84,6 @@ st.plot(t, u[:,0], '*',
 m = method(f, rtol=rtol, atol=atol)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], 'o', 
+st.plot(t, u[:,0], 'o',
         legend="Lsoda with f", hold="on")
 

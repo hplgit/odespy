@@ -5,14 +5,13 @@ Same example as in demo_Radau5_2.py:
 Van Der Pol oscillator
 u''=3*(1-u*u)*u'-u, with supplied full jacobian matrix
 
-This example intends to show users how to improve efficiency with 
+This example intends to show users how to improve efficiency with
 call-back functions composed in Fortran language.
 """
 
 from odespy import *
 import scitools.std as st
 import numpy as np
-from Radau5 import *
 
 f_str = """
       subroutine f_f77(neq, t, u, udot)
@@ -45,14 +44,14 @@ Cf2py intent(out) dfu
 
 import sys
 try:
-    n_points = int(sys.argv[1])    # Read from input 
+    n_points = int(sys.argv[1])    # Read from input
 except:
-    n_points = 10   # default number of time-steps    
+    n_points = 10   # default number of time-steps
 
 # Compile these Fortran subroutines
 string_to_compile = '\n'.join([f_str, jac_full_str])
 from numpy import f2py
-f2py.compile(string_to_compile, modulename='callback', verbose=False)   
+f2py.compile(string_to_compile, modulename='callback', verbose=False)
 import callback
 
 f_f77, jac_f77 = callback.f_f77, callback.jac_radau5_f77
@@ -69,7 +68,7 @@ method = Radau5Explicit
 m = method(None, f_f77=f_f77, rtol=rtol, atol=atol, jac_radau5_f77=jac_f77)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], title= "Van der Pol oscillator, with Radau5 & Lsoda", 
+st.plot(t, u[:,0], title= "Van der Pol oscillator, with Radau5 & Lsoda",
         legend="Radau5 with f & jac", hold="on")
 
 # Test case 2: Radau5, with f

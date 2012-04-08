@@ -1375,6 +1375,7 @@ from RungeKutta import *
 from rkc import *
 from rkf45 import *
 from odepack import *
+from radau5 import *
 
 # Update doc strings with common info
 class_, doc_str, classname = None, None, None

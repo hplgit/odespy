@@ -1,8 +1,8 @@
 !    -*- f90 -*-
 ! Note: the context of this file is case sensitive.
 
-python module advance_radau5__user__routines 
-    interface advance_radau5_user_interface 
+python module advance_radau5__user__routines
+    interface advance_radau5_user_interface
         subroutine fcn(n,x,y,f,rpar,ipar) ! in :_radau5:radau5.f:advance_radau5:unknown_interface
             integer intent(hide), depend(y) :: n=len(y)
             double precision :: x
@@ -43,9 +43,9 @@ python module advance_radau5__user__routines
 end python module advance_radau5__user__routines
 
 
-python module _radau5 ! in 
+python module _radau5 ! in
     interface  ! in :_radau5
-        subroutine advance_radau5(n,fcn,x,y,xend,h,rtol,atol,itol,jac,ijac,mljac,mujac,mas,imas,mlmas,mumas,work_in,lwork,iwork_in,liwork,idid) ! in :_radau5:radau5.f
+        subroutine advance_radau5(n,fcn,x,y,xend,h,rtol,atol,itol,jac,ijac,mljac,mujac,mas,imas,mlmas,mumas,work,lwork,iwork,liwork,idid) ! in :_radau5:radau5.f
             use advance_radau5__user__routines
             integer depend(y),intent(hide) :: n=len(y)
             external fcn
@@ -64,9 +64,11 @@ python module _radau5 ! in
             integer intent(in) :: imas
             integer intent(in) :: mlmas
             integer intent(in) :: mumas
-            double precision dimension(9), intent(in) :: work_in
+!            double precision dimension(lwork), intent(in) :: work
+            double precision dimension(9), intent(in) :: work
             integer intent(in)  :: lwork
-            integer dimension(20), intent(in) :: iwork_in
+!            integer dimension(liwork), intent(in,out) :: iwork
+            integer dimension(20), intent(in) :: iwork
             integer intent(in)  :: liwork
             integer intent(out) :: idid
         end subroutine advance_radau5

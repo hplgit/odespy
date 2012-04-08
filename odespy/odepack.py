@@ -11,7 +11,7 @@ _parameters_Odepack = dict(
 
     f_f77 = dict(
         help='''Fortran subroutine for f.
-This subroutine should be defined in form::
+This subroutine has the signature::
 
         subroutine f_f77(neq,t,u,udot)
   Cf2py intent(hide)   neq
@@ -27,7 +27,7 @@ This subroutine should be defined in form::
 
     jac_f77 = dict(
         help='''Fortran subroutine for jac.
-This subroutine should be defined in form::
+This subroutine has the signature::
 
        subroutine jac_f77
       1 (neq, t, u, ml, mu, pd, nrowpd)
@@ -44,7 +44,7 @@ This subroutine should be defined in form::
         type=callable),
 
     jac_banded = dict(
-        help='''Function for Jacobian on banded matrix form.
+        help='''Function for Jacobian in banded matrix form.
 Used in Lsode, Lsoda, Lsodar.
 ``jac_banded(u,t,ml,mu)`` returns df/du as an
 array of size ``neq`` times ``ml+mu+1``.''',
@@ -56,7 +56,7 @@ array of size ``neq`` times ``ml+mu+1``.''',
 
     jac_banded_f77 = dict(
         help='''Fortran subroutine for jac_banded.
-This subroutine should be defined in form::
+This subroutine has the signature::
 
         subroutine jac_banded_f77
        1  (neq,t,u,ml, mu,pd,nrowpd)
@@ -73,10 +73,9 @@ This subroutine should be defined in form::
         type=callable),
 
     g = dict(
-        help='''Callable object to define constraint functions,
-whose roots are desired during the integration.
- g(u, t) --> values of constraint functions
- scalar/vector * float --> scalar/vector
+        help='''Callable object to define constraint functions.
+``g(u, t)`` returns a vector of the values of the constraints
+(left-hand sides in the constraint equations).
  ''',
         paralist_old='u,t',
         paralist_new='t,u',
@@ -85,7 +84,7 @@ whose roots are desired during the integration.
 
     g_f77 = dict(
         help='''Fortran subroutine for g.
-This subroutine should be defined in form::
+This subroutine has the signature::
 
         subroutine g_f77(neq, t, u, ng, groot)
   Cf2py intent(hide) neq
@@ -114,7 +113,7 @@ Jacobian.''',
 
     jac_column_f77 = dict(
         help='''Fortran subroutine for jac_column.
-This subroutine should be defined in form::
+This subroutine has the signature::
 
         subroutine jac_column_f77
        1  (neq, t, u, j, ia, ja, pd)
@@ -135,18 +134,17 @@ This subroutine should be defined in form::
         help='''User-supplied function to calculate the residual
 vector, defined by r =  g(u,t) - A(u,t) * s.
 Used in the linearly implicit solvers: Lsodi,
-Lsodis, Lsoibt.
-res(u,t,s,ires)   -->   (r,ires)
-vector * float * vector * int -->  vector * int
- "ires" is a flag both for input and output.
-On input, ires indicates how ODEPACK would use
-the returned array "r":
-ires == 1: the full residual exactly.
-ires == 2: "r" is used only to compute Jacobian
-           dr/du by difference quotients.
-"res" should set flag "ires" if it encounters a
-halt condition or illegal input. Otherwise, it
-should not be reset. On output, value 1 or -1
+Lsodis, Lsoibt. The ``res`` function has the
+signature ``res(u,t,s,ires)`` and returns
+the tuple ``(r,ires)``, where ``ires`` is an
+int. On input, ires indicates how ODEPACK would use
+the returned array "r": ``ires=1`` means the full
+residual exactly, ``ires=2`` means that ``r`` is
+used only to compute the Jacobian dr/du by finite
+differences.
+``res`` should set the flag ``ires`` if it encounters
+a halt condition or illegal input. Otherwise, it
+should not be reset. On output, the value 1 or -1
 represents a normal return.
 ''',
         paralist_old='u,t,s,ires',
@@ -156,7 +154,7 @@ represents a normal return.
 
     res_f77 = dict(
         help='''Fortran subroutine for res.
-This subroutine should be defined in form::
+This subroutine has the signature::
 
       subroutine res_f77(neq, t, u, s, r, ires)
  Cf2py intent(hide) neq
@@ -173,10 +171,11 @@ This subroutine should be defined in form::
 
     jac_lsodi = dict(
         help='''Callable object to define the full Jacobian
-matrix dr/du where r = g - A*s.
-jac(u,t,s)    --> dr/du
-vector * float * vector
-   ---->  2d-array with dimension (neq,neq).''',
+matrix dr/du where r = g - A*s. The
+signature of this function is ``jac(u,t,s)``,
+returning a matrix like the other ``jac``
+functions.
+''',
         paralist_old='u,t,s',
         paralist_new='t,u,s',
         name_wrapped='jac_lsodi_f77',
@@ -184,7 +183,7 @@ vector * float * vector
 
     jac_lsodi_f77 = dict(
         help='''Fortran subroutine for jac_lsodi.
-This subroutine should be defined in form::
+This subroutine has the signature::
 
        subroutine jac_lsodi_f77
       1  (neq, t, u, s, ml, mu, pd, nrowpd)
@@ -202,11 +201,11 @@ This subroutine should be defined in form::
 
     jac_banded_lsodi = dict(
         help='''Callable object to define the banded Jacobian
-matrix dr/du where r = g - A*s.
-jac(u,t,s,ml,mu), where ml & mu are lower & upper'
-half-bandwidth of banded matrix.
-vector * float * vector * int * int
-   --->  2d-array with dimension (*,neq).''',
+matrix dr/du where r = g - A*s. The
+signature is ``jac(u,t,s,ml,mu)``,
+where ``ml`` and ``mu`` are the lower and
+upper half-bandwidth of the banded matrix.
+''',
         paralist_old='u,t,s,ml,mu',
         paralist_new='t,u,s,ml,mu',
         name_wrapped='jac_banded_lsodi_f77',
@@ -214,7 +213,7 @@ vector * float * vector * int * int
 
     jac_banded_lsodi_f77 = dict(
         help='''Fortran subroutine for jac_banded_lsodi.
-This subroutine should be defined in form::
+This subroutine has the signature::
 
        subroutine jac_banded_lsodi_f77
       1  (neq, t, u, s, ml, mu, pd, nrowpd)
@@ -231,10 +230,11 @@ This subroutine should be defined in form::
         type=callable),
 
     adda_lsodi = dict(
-        help='''Callable object to add the matrix A = A(u,t) to
-another matrix p stored in the same form as A.
-addaName(u,t,p)  :   vector * float * 2d-array
-  ---->  2d-array with dimension (neq,neq).''',
+        help='''Callable object to add the matrix A = A(u,t)
+to another matrix p stored in the same form as A.
+The signature is ``adda(u,t,p)`` and it returns
+a matrix p+A (square matrix as the Jacobian).
+''',
         paralist_old='u,t,p',
         paralist_new='t,u,p',
         array_order='Fortran',
@@ -243,7 +243,7 @@ addaName(u,t,p)  :   vector * float * 2d-array
 
     adda_lsodi_f77 = dict(
         help='''Fortran subroutine for adda_lsodi.
-This subroutine should be defined in form::
+This subroutine has the signature::
 
         subroutine adda_lsodi_f77
        1  (neq, t, u, ml, mu, pd, nrowpd)
@@ -263,10 +263,11 @@ This subroutine should be defined in form::
     adda_banded_lsodi = dict(
         help='''Callable object to add the banded matrix
 A = A(u,t) to another matrix stored P in the
-same form as A, i.e. add A(i,j)to P(i-j+MU+1,j)
-addaName(u,t,p,ml,mu):
-vector * float * 2d-array * int * int
-    --->  2d-array with dimension (*,neq).''',
+same form as A. For a banded matrix, A(i,j) is
+added to P(i-j+mu+1,j). The signature is
+``adda(u,t,p,ml,mu)`` and it returns a banded
+matrix.
+''',
         paralist_old='u,t,p,ml,mu',
         paralist_new='t,u,p,ml,mu',
         name_wrapped='adda_banded_lsodi_f77',
@@ -274,7 +275,7 @@ vector * float * 2d-array * int * int
 
     adda_banded_lsodi_f77 = dict(
         help='''Fortran subroutine for adda_banded.
-This subroutine should be defined in form::
+This subroutine has the signature::
 
        subroutine adda_banded_lsodi_f77(neq, t,
       1                  u, ml, mu, pd, nrowpd)
@@ -292,12 +293,11 @@ This subroutine should be defined in form::
         type=callable),
 
     jac_lsodis = dict(
-        help='''Callable object to supply the jth column of
+        help='''Callable object to supply the j-th column of
 the sparse Jacobian matrix dr/du where
-r = g - A*s.
-jac(u,t,s,j,ia,ja)   ----->   p
-vector * float * vector * int * int vector
-  * int vector      ------>   vector.''',
+r = g - A*s. The signature is ``jac(u,t,s,j,ia,ja)``
+and a vector is returned.
+''',
         paralist_old='u,t,s,j-1,ia,ja',
         paralist_new='t,u,s,j,ia,ja',
         name_wrapped='jac_lsodis_f77',
@@ -306,15 +306,14 @@ vector * float * vector * int * int vector
     adda_lsodis = dict(
         help='''Callable object to add j-th column of matrix
 A = A(u,t) to another matrix stored in sparse
-form.
-adda(u,t,j,ia,ja,p)  :   --> p
-vector * float * int * int vector * int vector
-   * vector      --->  vector''',
+form. The signature is ``adda(u,t,j,ia,ja,p)``
+and it returns a vector.
+''',
         paralist_old='u,t,j-1,ia,ja,p',
         paralist_new='t,u,j,ia,ja,p',
         name_wrapped='adda_lsodis_f77',
         type=callable),
-
+#[[[ made doc string corrections until this place
     jac_lsoibt = dict(
         help='''Callable object to supply the jth column of
 the Jacobian matrix dr/du where r = g - A*s,

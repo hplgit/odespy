@@ -6,13 +6,12 @@ du1/dt = -0.04*u1+1e4*u2*u3
 du2/dt = 0.04*u1-1e4*u2*u3-3e7*u2*u2
 0 = u1+u2+u3-1
 
-This example is the typical usage of DAE with 
+This example is the typical usage of DAE with
 user-supplied functions composed in Python.
 """
 from odespy import *
 import scitools.std as st
 import numpy as np
-from Radau5 import *
 
 def f(u, t):
     udot = np.zeros(3, float)
@@ -22,9 +21,9 @@ def f(u, t):
     return udot
 
 def mas():
-    m = [[1, 0, 0], 
-         [0, 1, 0], 
-         [0, 0, 0]]    
+    m = [[1, 0, 0],
+         [0, 1, 0],
+         [0, 0, 0]]
     return m
 
 def jac(u, t):
@@ -34,9 +33,9 @@ def jac(u, t):
 
 import sys
 try:
-    n_points = int(sys.argv[1])    # Read from input 
+    n_points = int(sys.argv[1])    # Read from input
 except:
-    n_points = 10   # default number of time-steps    
+    n_points = 10   # default number of time-steps
 
 t0, tn, u0 = 0., 4.,  [1.,0.,0.]
 time_points = np.linspace(t0, tn, n_points)

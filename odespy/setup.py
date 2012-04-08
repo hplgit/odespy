@@ -21,8 +21,13 @@ def configuration(parent_package='',top_path=None):
                                 join('rkf45','rkf45.f'),
                                 join('rkf45','rkf45_associate.f')])
 
+    config.add_library('_radau5',
+                       sources=[join('radau5','advance_radau5.f'),
+                                join('radau5','radau5.f'),
+                                join('radau5','radaua.f'),])
+
+
     # Extensions:
-    # odepack
     config.add_extension('_odepack',
                          sources=[join('odepack','odepack.pyf')],
                          libraries=['_odepack'])
@@ -32,6 +37,9 @@ def configuration(parent_package='',top_path=None):
     config.add_extension('_rkf45',
                          sources=[join('rkf45','rkf45.pyf')],
                          libraries=['_rkf45'])
+    config.add_extension('_radau5',
+                         sources=[join('radau5','radau5.pyf')],
+                         libraries=['_radau5'])
 
     config.add_data_dir('tests')
     return config

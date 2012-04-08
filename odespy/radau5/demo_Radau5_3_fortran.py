@@ -3,11 +3,10 @@
 """
 u'= A*y, With supplied banded jacobian matrix
 
-This example is the typical usage of Lsode/Lsoda with 
+This example is the typical usage of Lsode/Lsoda with
 user-supplied functions composed in Python.
 """
 
-from Radau5 import *
 from odespy import *
 import scitools.std as st
 import numpy as np
@@ -40,7 +39,7 @@ Cf2py intent(in)   t,u,ldfu
 Cf2py intent(out)  dfu
       integer neq,ipar,ldfu
       double precision t,u,dfu,rpar
-      dimension u(neq),dfu(ldfu,neq),rpar(*),ipar(*) 
+      dimension u(neq),dfu(ldfu,neq),rpar(*),ipar(*)
       integer i,j
       do 10 j = 1,neq
         dfu(1,j) = -2.0d0
@@ -54,15 +53,15 @@ Cf2py intent(out)  dfu
 
 # Compile these Fortran subroutines
 from numpy import f2py
-f2py.compile(f_str+'\n'+jac_banded_str, modulename='callback', verbose=False)   
+f2py.compile(f_str+'\n'+jac_banded_str, modulename='callback', verbose=False)
 import callback
 f_f77, jac_banded_f77 = callback.f_f77, callback.jac_radau5_f77
 
 import sys
 try:
-    n_points = int(sys.argv[1])    # Read from input 
+    n_points = int(sys.argv[1])    # Read from input
 except:
-    n_points = 10   # default number of time-steps    
+    n_points = 10   # default number of time-steps
 
 
 t0, tn, u0 = 0., 4.,  [1]+24*[0]
@@ -75,11 +74,11 @@ st.figure()
 method = Radau5Explicit
 
 # Test case 1: Radau5, with f, ml, mu & jac_banded
-m = method(None, f_f77=f_f77, rtol=rtol, atol=atol, 
+m = method(None, f_f77=f_f77, rtol=rtol, atol=atol,
            ml=ml, mu=mu, jac_radau5_f77=jac_banded_f77)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], title= "Radau5 & Lsoda", 
+st.plot(t, u[:,0], title= "Radau5 & Lsoda",
         legend="Radau5 with f, ml, mu & jac", hold="on")
 
 # Test case 2: Radau5, with f, ml, mu
@@ -93,13 +92,13 @@ st.plot(t, u[:,0], '*',
 m = method(None, f_f77=f_f77, rtol=rtol, atol=atol)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], 'o', 
+st.plot(t, u[:,0], 'o',
         legend="with f", hold="on")
 
 method = Lsoda
 st.figure()
 # Test case 4: Lsoda, with f, ml, mu & jac_banded
-m = method(None, f_f77=f_f77, rtol=rtol, atol=atol, 
+m = method(None, f_f77=f_f77, rtol=rtol, atol=atol,
            ml=ml, mu=mu)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
@@ -110,7 +109,7 @@ st.plot(t, u[:,0],
 m = method(None, f_f77=f_f77, rtol=rtol, atol=atol)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
-st.plot(t, u[:,0], 'o', 
+st.plot(t, u[:,0], 'o',
         legend="Lsoda with f", hold="on")
 
 os.remove('callback.so')

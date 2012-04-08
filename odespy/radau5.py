@@ -7,26 +7,32 @@ import sys
 _parameters_Radau5 = dict(
 
     mas = dict(
-        help='''User-supplied function to 
-calculate the mass matrix M. This function is 
-used only when M is not I, i.e. linearly 
-implicit ODE systems. 
-M can be supplied as full matrix:
-    mas(*mas_args) --> m[neq][neq]
-Or banded matrix:
-    mas(*mas_args) --> m[mlmas+mumas+1][neq]
+        help='''User-supplied function to
+calculate the mass matrix M in the linearly
+implicit ODE system M*u' = f(u, t). This function
+is used only when M is not I (the identity).
+M can be supplied as full matrix or banded
+matrix. The ``mas`` function returns M
+and takes any number of user-defined parameters
+as arguments, given through the parameter
+``mas_args``. If M is sparse, a banded
+matrix with dimensions ``(mlmas+mumas+1,neq)``
+is returned, where ``mlmas`` and ``mumas`` are
+the lower and upper half-bandwidth of the banded
+matrix, and ``neq`` is the number of equations.
 ''',
         type=callable),
 
     mas_args = dict(
-        help='''Extra positional arguments 
-to "mas": mas(*mas_args)''',
+        help='''Extra positional arguments
+to the ``mas`` function (it is called as
+``mas(*mas_args)``.''',
         type=(tuple, list, np.ndarray),
         default=()),
 
     mas_f77 = dict(
         help='''Fortran subroutine for mas.
-This subroutine should be defined in form:
+This subroutine has the signature::
 
         subroutine mas_f77(neq,mas,lmas,rpar,ipar)
   Cf2py intent(hide)   rpar,ipar
@@ -50,12 +56,12 @@ This subroutine should be defined in form:
         type=int),
 
     jac_radau5_f77 = dict(
-        help='''Fortran subroutine for jac to be 
-provided to Radau5. This subroutine should be 
-defined in form:
+        help='''Fortran subroutine for jac to be
+provided to Radau5. This subroutine should be
+defined as::
 
-        subroutine jac_radau5_f77(neq,t,u,dfu,
-       &           ldfu,rpar,ipar)
+        subroutine jac_radau5_f77
+       &           (neq,t,u,dfu,ldfu,rpar,ipar)
   Cf2py intent(hide) neq,rpar,ipar
   Cf2py intent(in)   t,u,ldfu
   Cf2py intent(out) dfu
@@ -68,41 +74,37 @@ defined in form:
 
 ''',
         type=callable),
-
-
 )
 
-from odespy import solvers
+import solvers
 solvers._parameters.update(_parameters_Radau5)
 
 
 class Radau5(Solver):
     """
-    This is a wrapper for Radau5.f, a numerical solution of a 
-    stiff (or differential algebraic) system of first order 
-    ordinary differential equations
-                     M*u' = f(u,t).
-    The ODE system can be (linearly) implicit (mass-matrix "M" 
-    is not identity matrix I) or explicit (M is I).
+    This is a wrapper for radau5.f, a file containing the
+    the ``radau5`` FORTRAN subtroutine for the numerical solution
+    of a stiff ODEs or differential algebraic (DAE) systems,
+    involving first order equations on the form
+
+    .. math:: Mu' = f(u,t).
+
+    The ODE system can be linearly implicit (mass-matrix :math:`M`
+    is not identity matrix) or explicit.
 
     The method used is an implicit Runge-Kutta method (Radau IIA)
-    of order 5 with step size control. Based on the FORTRAN code
-    RADAU5.f by E.Hairer and G.Wanner, which can be found here: 
-    http://www.unige.ch/~hairer/software.html
-    
-    Details about the implementation (FORTRAN) can be found in the book,::
-    
-        Solving Ordinary Differential Equations II,
-        Stiff and Differential-Algebraic Problems
-        
-        Authors: E. Hairer and G. Wanner
-        Springer-Verlag, ISBN: 3-540-60452-9
+    of order 5 with step size control. The file ``radau5.f`` can
+    be downloaded from `<http://www.unige.ch/~hairer/software.html>`_.
+    Details about the implementation can be found in the book
+    "Solving Ordinary Differential Equations II, Stiff and
+    Differential-Algebraic Problems", by E. Hairer and G. Wanner,
+    2nd ed., 1996, published by Springer-Verlag (ISBN: 3-540-60452-9).
     """
 
     _optional_parameters = Solver._optional_parameters + \
-        ['f_f77', 'jac_radau5_f77', 'atol', 'jac_banded', 
+        ['f_f77', 'jac_radau5_f77', 'atol', 'jac_banded',
          'rtol', 'nsteps', 'ml', 'mu', 'first_step', 'jac', 'safety',
-         'max_step', 'nsteps', 'mas', 'mas_f77', 'mlmas', 'mumas', 
+         'max_step', 'nsteps', 'mas', 'mas_f77', 'mlmas', 'mumas',
          'mas_args']
     _error_messages = {
         -1: 'INPUT IS NOT CONSISTENT',
@@ -133,10 +135,10 @@ class Radau5(Solver):
             if hasattr(self, name):
                 self._parameters[name]['range'] = (0, self.neq+1)
 
-        withBandedJac = hasattr(self, 'jac_banded')
+        has_banded_jac = hasattr(self, 'jac_banded')
         ml, mu = getattr(self, 'ml', None), getattr(self, 'mu', None)
-        if withBandedJac and ((ml is None) or (mu is None)):
-            raise ValueError('"ml" & "mu" have to be provided when banded Jacobian matrix is involved! Your input is (%s, %s).' % (ml, mu))
+        if has_banded_jac and ((ml is None) or (mu is None)):
+            raise ValueError('"ml" and "mu" have to be provided when banded Jacobian matrix is involved! Your input is (%s, %s).' % (ml, mu))
         return Solver.validate_data(self)
 
     def func_wrappers(self):
@@ -152,12 +154,12 @@ class Radau5(Solver):
             # for switch_to().
             f_f77 = self.f_f77
             self.f = lambda u,t: np.asarray(f_f77(t,u))
-        
+
         if hasattr(self, 'jac'):
             # If jac is input as full matrix in form of jac(u,t),
             # wrap jac to jac_f77 for Fortran code.
             jac = self.jac
-            self.jac_radau5_f77 = lambda t,u: np.asarray(jac(u,t), 
+            self.jac_radau5_f77 = lambda t,u: np.asarray(jac(u,t),
                                                          order='Fortran')
         elif hasattr(self, 'jac_banded'):
             # If jac is input as banded matrix in form of jac_banded(u,t,ml,mu),
@@ -174,11 +176,11 @@ class Radau5(Solver):
                 self.jac_banded = lambda u,t,ml,mu: jac(t,u,ljac)
             else:
                 self.jac = lambda u,t: jac(t,u,self.neq)
-        
+
         if hasattr(self, 'mas'):
             # If mas is input as Python function in form of mas(*mas_args),
             mas = self.mas
-            self.mas_f77 = lambda : np.asarray(mas(*self.mas_args), 
+            self.mas_f77 = lambda : np.asarray(mas(*self.mas_args),
                                                order='Fortran')
         elif hasattr(self, 'mas_f77'):
             # If mas is input as Fortran subroutine
@@ -192,7 +194,7 @@ class Radau5(Solver):
     def set_dummy_functions(self):
         for name in ('jac_radau5_f77', 'f_f77'):
             if getattr(self, name, None) is None:
-                setattr(self, name, lambda x,y:0.)        
+                setattr(self, name, lambda x,y:0.)
         if not hasattr(self, 'mas_f77'):
             setattr(self, 'mas_f77', lambda : 0.)
 
@@ -220,12 +222,15 @@ class Radau5(Solver):
         self.set_dummy_functions()
 
         # Arrays to specify how the problem is to be solved.
+        """
+        Liwei version
         self.iwork_in = np.zeros(20, int)
         self.work_in = np.zeros(9, float)
         self.iwork_in[1] = getattr(self, 'nsteps', 0)
         self.work_in[1] = getattr(self, 'safety')
         self.work_in[6] = getattr(self, 'max_step', 0.)
         self.liwork = 3*self.neq + 20
+        """
 
         ljac = self.neq if ((not hasattr(self, 'ml')) or \
             (self.ml == self.neq)) else (self.ml + self.mu + 1)
@@ -235,6 +240,16 @@ class Radau5(Solver):
         le = self.neq if ((not hasattr(self, 'ml')) or \
             (self.ml == self.neq)) else (2*self.ml + self.mu + 1)
         self.lwork = self.neq*(ljac + lmas + 3*le + 12) + 20
+        self.liwork = 3*self.neq + 20
+
+#        self.iwork = np.zeros(self.liwork, int)
+#        self.work = np.zeros(self.lwork, float)
+        self.iwork = np.zeros(20, int)
+        self.work = np.zeros(9, float)
+	print 'liwork:', self.liwork, 'lwork:', self.lwork
+        self.iwork[1] = getattr(self, 'nsteps', 0)
+        self.work[1] = getattr(self, 'safety')
+        self.work[6] = getattr(self, 'max_step', 0.)
 
         Solver.initialize_for_solve(self)   # Common settings
 
@@ -249,17 +264,17 @@ class Radau5(Solver):
         mas = getattr(self.mas_f77, '_cpointer', self.mas_f77)
         f = getattr(self.f_f77, '_cpointer', self.f_f77)
         jac = getattr(self.jac_radau5_f77, '_cpointer', self.jac_radau5_f77)
-        
+
         h = getattr(self, 'first_step', 0.)
         ml = getattr(self, 'ml', self.neq)
         mu = getattr(self, 'mu', 0)
         mlmas = getattr(self, 'mlmas', self.neq)
         mumas = getattr(self, 'mumas', 0)
 
-        args = (f, t, u[n].copy(), t_next, h, self.rtol, self.atol, 
-                self.itol, jac, self.ijac, ml, mu, 
-                mas, self.imas, mlmas, mumas, self.work_in,
-                self.lwork, self.iwork_in, self.liwork)
+        args = (f, t, u[n].copy(), t_next, h, self.rtol, self.atol,
+                self.itol, jac, self.ijac, ml, mu,
+                mas, self.imas, mlmas, mumas, self.work,
+                self.lwork, self.iwork, self.liwork)
 
         # In the last demo, do not work without printing u_n out. Why?
         # Try demo_Radau5_5_fortran.py
@@ -268,10 +283,11 @@ class Radau5(Solver):
             print u[n].copy()
             self.printed = True"""
 
-        u_new, t_new, idid = apply(self._radau5.advance_radau5, \
-               args, self._extra_args_fortran)
+        #u_new, t_new, iwork, idid = self._radau5.advance_radau5(
+        u_new, t_new, idid = self._radau5.advance_radau5(
+                             *args, **self._extra_args_fortran)
 
-        if idid < 0:          # Error occurs!
+        if idid < 0:          # Error occurred
             print self._error_messages[idid] + str(t_new)
             sys.exit(1)   # Interrupt
 	return u_new
@@ -283,7 +299,7 @@ class Radau5Explicit(Radau5):
     Radau5 solver for explcit ODE problem.
     """
     _optional_parameters = Solver._optional_parameters + \
-        ['f_f77', 'jac_radau5_f77', 'atol', 'jac_banded', 
+        ['f_f77', 'jac_radau5_f77', 'atol', 'jac_banded',
          'rtol', 'nsteps', 'ml', 'mu', 'first_step', 'jac', 'safety',
          'max_step', 'nsteps']
 

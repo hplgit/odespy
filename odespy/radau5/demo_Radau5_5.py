@@ -30,7 +30,6 @@ Simplified Galerkin Solution of Burgers Equation
 from odespy import *
 import scitools.std as st
 import numpy as np
-from Radau5 import *
 
 def f(u, t):
     udot = np.zeros(9, float)
@@ -41,20 +40,20 @@ def f(u, t):
     return udot
 
 def mas():
-    m = [[4./6., 1./6.,    0., 0., 0., 0., 0., 0., 0.], 
-         [1./6., 4./6., 1./6., 0., 0., 0., 0., 0., 0.], 
+    m = [[4./6., 1./6.,    0., 0., 0., 0., 0., 0., 0.],
+         [1./6., 4./6., 1./6., 0., 0., 0., 0., 0., 0.],
          [0., 1./6., 4./6., 1./6., 0., 0., 0., 0., 0.],
          [0., 0., 1./6., 4./6., 1./6., 0., 0., 0., 0.],
-         [0., 0., 0., 1./6., 4./6., 1./6., 0., 0., 0.], 
+         [0., 0., 0., 1./6., 4./6., 1./6., 0., 0., 0.],
          [0., 0., 0., 0., 1./6., 4./6., 1./6., 0., 0.],
          [0., 0., 0., 0., 0., 1./6., 4./6., 1./6., 0.],
-         [0., 0., 0., 0., 0., 0., 1./6., 4./6., 1./6.], 
-         [0., 0., 0., 0., 0., 0., 0.   , 1./6., 4./6.]]    
+         [0., 0., 0., 0., 0., 0., 1./6., 4./6., 1./6.],
+         [0., 0., 0., 0., 0., 0., 0.   , 1./6., 4./6.]]
     return m
 
 def mas_banded():
-    m = [[   0., 1./6., 1./6., 1./6., 1./6., 1./6., 1./6., 1./6., 1./6.], 
-         [4./6., 4./6., 4./6., 4./6., 4./6., 4./6., 4./6., 4./6., 4./6.], 
+    m = [[   0., 1./6., 1./6., 1./6., 1./6., 1./6., 1./6., 1./6., 1./6.],
+         [4./6., 4./6., 4./6., 4./6., 4./6., 4./6., 4./6., 4./6., 4./6.],
          [1./6., 1./6., 1./6., 1./6., 1./6., 1./6., 1./6., 1./6.,    0.]]
     return m
 
@@ -87,7 +86,7 @@ atol, rtol = 1e-3, 1e-3
 
 exact_final = [1.07001457e-1, 2.77432492e-1, 5.02444616e-1, 7.21037157e-1,
                9.01670441e-1, 8.88832048e-1, 4.96572850e-1, 9.46924362e-2,
-               -6.90855199e-3] 
+               -6.90855199e-3]
 st.figure()
 method = Radau5Implicit
 
@@ -108,7 +107,7 @@ st.plot(t, u[:,0], 'r*', title="Radau5 with Python functions",
 print 'Max error for test case 2 is %g' % max(u[-1] - exact_final)
 
 # Test case 3: Radau5, with f, mas_banded, ml, mu & jac_banded
-m = method(f=f, mas=mas_banded, rtol=rtol, atol=atol, 
+m = method(f=f, mas=mas_banded, rtol=rtol, atol=atol,
            ml=ml, mu=mu, jac_banded=jac_banded,
            mlmas=mlmas, mumas=mumas)
 m.set_initial_condition(u0)

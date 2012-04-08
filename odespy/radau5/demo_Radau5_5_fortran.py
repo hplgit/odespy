@@ -4,7 +4,7 @@
 Sample example as in demo_Lsodi_1.py:
 Simplified Galerkin Solution of Burgers Equation
 
-This example is the typical usage of Lsodi with 
+This example is the typical usage of Lsodi with
 user-supplied functions composed in Fortran code.
 
 """
@@ -12,7 +12,6 @@ from odespy import *
 import scitools.std as st
 import numpy as np
 import os
-from Radau5 import *
 
 f_str = """
       subroutine f_f77(neq, t, u, udot)
@@ -131,12 +130,12 @@ atol, rtol = 1e-3, 1e-3
 
 exact_final = [1.07001457e-1, 2.77432492e-1, 5.02444616e-1, 7.21037157e-1,
                9.01670441e-1, 8.88832048e-1, 4.96572850e-1, 9.46924362e-2,
-               -6.90855199e-3] 
+               -6.90855199e-3]
 st.figure()
 method = Radau5Implicit
 
 # Test case 1: Radau5, with f, mas & jac
-m = method(None, f_f77=f_str, mas_f77=mas_f77, rtol=rtol, atol=atol, 
+m = method(None, f_f77=f_str, mas_f77=mas_f77, rtol=rtol, atol=atol,
            jac_radau5_f77=jac_str)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
@@ -162,8 +161,8 @@ f_f77, mas_banded, jac_banded = \
     callback2.f_f77, callback2.mas_f77, callback2.jac_radau5_f77
 
 # Test case 3: Radau5, with f, mas_banded, ml, mu & jac_banded
-m = method(None, f_f77=f_f77, rtol=rtol, atol=atol, 
-           mlmas=mlmas, mumas=mumas, mas_f77=mas_banded, 
+m = method(None, f_f77=f_f77, rtol=rtol, atol=atol,
+           mlmas=mlmas, mumas=mumas, mas_f77=mas_banded,
            ml=ml, mu=mu,
            jac_radau5_f77=jac_banded)
 

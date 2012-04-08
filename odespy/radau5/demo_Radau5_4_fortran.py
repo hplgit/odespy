@@ -4,7 +4,7 @@
 Sample example as in demo_Lsodi_1.py:
 Simplified Galerkin Solution of Burgers Equation
 
-This example is the typical usage of Lsodi with 
+This example is the typical usage of Lsodi with
 user-supplied functions composed in Fortran code.
 
 """
@@ -12,7 +12,6 @@ from odespy import *
 import scitools.std as st
 import numpy as np
 import os
-from Radau5 import *
 
 f_str = """
       subroutine f_f77(neq, t, u, udot)
@@ -86,7 +85,7 @@ method = Radau5Implicit
 exact_final = [9.055142e-1, 2.240418e-5, 9.446344e-2]
 
 # Test case 1: Radau5, with f, mas & jac
-m = method(None, f_f77=f_str, rtol=rtol, atol=atol, 
+m = method(None, f_f77=f_str, rtol=rtol, atol=atol,
            jac_radau5_f77=jac_str, mas_f77=mas_str)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
