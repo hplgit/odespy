@@ -64,12 +64,13 @@ python module _radau5 ! in
             integer intent(in) :: imas
             integer intent(in) :: mlmas
             integer intent(in) :: mumas
-!            double precision dimension(lwork), intent(in) :: work
-            double precision dimension(9), intent(in) :: work
             integer intent(in)  :: lwork
-!            integer dimension(liwork), intent(in,out) :: iwork
-            integer dimension(20), intent(in) :: iwork
             integer intent(in)  :: liwork
+            double precision dimension(lwork), intent(in) :: work
+!            double precision dimension(9), intent(in) :: work
+            integer dimension(liwork), intent(in,out) :: iwork
+!            integer dimension(liwork), intent(in) :: iwork
+!            integer dimension(20), intent(in) :: iwork
             integer intent(out) :: idid
         end subroutine advance_radau5
     end interface

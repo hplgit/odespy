@@ -1,12 +1,30 @@
       subroutine advance_radau5(
      &     n, fcn, x, y, xend, h, rtol, atol, itol,
+     &     jac, ijac, mljac, mujac, mas, imas, mlmas, mumas, work,
+     &     lwork, iwork, liwork, idid)
+      external fcn, jac, mas
+      integer n, itol, ijac, mljac, mujac, imas, mlmas, mumas, lwork,
+     &     iwork_in, liwork, idid
+      double precision x, y, xend, h, rtol, atol, work_in
+      dimension y(n), rtol(*), atol(*), work(lwork), iwork(liwork)
+
+      integer iout
+      call radau5(n, fcn, x, y, xend, h, rtol, atol, itol, jac, ijac,
+     &     mljac, mujac, mas, imas, mlmas, mumas, solout, iout, work,
+     &     lwork, iwork, liwork, rpar, ipar, idid)
+      return
+      end
+
+      subroutine advance_radau5_liwei(
+     &     n, fcn, x, y, xend, h, rtol, atol, itol,
      &     jac, ijac, mljac, mujac, mas, imas, mlmas, mumas, work_in,
      &     lwork, iwork_in, liwork, idid)
       external fcn, jac, mas
       integer n, itol, ijac, mljac, mujac, imas, mlmas, mumas, lwork,
      &     iwork_in, liwork, idid
       double precision x, y, xend, h, rtol, atol, work_in
-      dimension y(n), rtol(*), atol(*), work_in(9), iwork_in(20)
+      dimension y(n), rtol(*), atol(*)
+      dimension work_in(lwork), iwork_in(liwork)
 
       double precision, allocatable :: work(:)
       integer, allocatable :: iwork(:)
@@ -21,7 +39,7 @@
       iout = 0
       call radau5(n, fcn, x, y, xend, h, rtol, atol, itol, jac, ijac,
      &     mljac, mujac, mas, imas, mlmas, mumas, solout, iout, work,
-     &     lwork, iwork, liwork, rapr, ipar, idid)
+     &     lwork, iwork, liwork, rpar, ipar, idid)
 
 
 C     n -- neq, fcn -- f, x--t, y--u0, xend--tend, h -- first_step,
@@ -35,21 +53,4 @@ C     ouput: x, y, h, idid, iwork(14-20)
       return
       end
 
-C     hpl version (iwork and work from Python)
-      subroutine advance_radau5_hpl(
-     &     n, fcn, x, y, xend, h, rtol, atol, itol,
-     &     jac, ijac, mljac, mujac, mas, imas, mlmas, mumas, work,
-     &     lwork, iwork, liwork, idid)
-      external fcn, jac, mas
-      integer n, itol, ijac, mljac, mujac, imas, mlmas, mumas, lwork,
-     &     iwork_in, liwork, idid
-      double precision x, y, xend, h, rtol, atol, work_in
-      dimension y(n), rtol(*), atol(*), work(lwork), iwork(liwork)
-
-      integer iout
-      call radau5(n, fcn, x, y, xend, h, rtol, atol, itol, jac, ijac,
-     &     mljac, mujac, mas, imas, mlmas, mumas, solout, iout, work,
-     &     lwork, iwork, liwork, rapr, ipar, idid)
-      return
-      end
 

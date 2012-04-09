@@ -221,17 +221,6 @@ class Radau5(Solver):
         self.imas = int(hasattr(self, 'mas_f77'))
         self.set_dummy_functions()
 
-        # Arrays to specify how the problem is to be solved.
-        """
-        Liwei version
-        self.iwork_in = np.zeros(20, int)
-        self.work_in = np.zeros(9, float)
-        self.iwork_in[1] = getattr(self, 'nsteps', 0)
-        self.work_in[1] = getattr(self, 'safety')
-        self.work_in[6] = getattr(self, 'max_step', 0.)
-        self.liwork = 3*self.neq + 20
-        """
-
         ljac = self.neq if ((not hasattr(self, 'ml')) or \
             (self.ml == self.neq)) else (self.ml + self.mu + 1)
         lmas = 0 if not self.imas else (self.neq \
@@ -242,11 +231,9 @@ class Radau5(Solver):
         self.lwork = self.neq*(ljac + lmas + 3*le + 12) + 20
         self.liwork = 3*self.neq + 20
 
-#        self.iwork = np.zeros(self.liwork, int)
-#        self.work = np.zeros(self.lwork, float)
-        self.iwork = np.zeros(20, int)
-        self.work = np.zeros(9, float)
-	print 'liwork:', self.liwork, 'lwork:', self.lwork
+        # Arrays to specify how the problem is to be solved.
+        self.iwork = np.zeros(self.liwork, int)
+        self.work = np.zeros(self.lwork, float)
         self.iwork[1] = getattr(self, 'nsteps', 0)
         self.work[1] = getattr(self, 'safety')
         self.work[6] = getattr(self, 'max_step', 0.)
@@ -274,7 +261,7 @@ class Radau5(Solver):
         args = (f, t, u[n].copy(), t_next, h, self.rtol, self.atol,
                 self.itol, jac, self.ijac, ml, mu,
                 mas, self.imas, mlmas, mumas, self.work,
-                self.lwork, self.iwork, self.liwork)
+                self.iwork)
 
         # In the last demo, do not work without printing u_n out. Why?
         # Try demo_Radau5_5_fortran.py
@@ -283,8 +270,7 @@ class Radau5(Solver):
             print u[n].copy()
             self.printed = True"""
 
-        #u_new, t_new, iwork, idid = self._radau5.advance_radau5(
-        u_new, t_new, idid = self._radau5.advance_radau5(
+        u_new, t_new, iwork, idid = self._radau5.advance_radau5(
                              *args, **self._extra_args_fortran)
 
         if idid < 0:          # Error occurred
