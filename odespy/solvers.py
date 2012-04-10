@@ -432,6 +432,39 @@ shape ``neq, ml+mu+1``.""",
 
     )
 
+def compile_f77(*function_strings, **kwargs):
+    """
+    Compile a list of strings, each string containing a Fortran 77
+    subroutine (typically for f, jac, etc.).
+    Return the extension module if keyword argument
+    `return_module=True`, otherwise return the subroutines/functions
+    corresponding to the given strings (default).
+    The name of the extension module is ``tmp_callback`` and the
+    corresponding file (to be cleaned up) is ``tmp_callback.so``.
+    """
+    return_module = kwargs.get('return_module', False)
+
+    string_to_compile = '\n'.join(function_strings)
+    from numpy import f2py
+    f2py.compile(string_to_compile, modulename='tmp_callback', verbose=False)
+    import tmp_callback
+
+    if return_module:
+        return tmp_callback
+    else:
+        import re
+        routine_names = []
+        cpattern = re.compile(r'subroutine\s+([A-Za-z0-9_]+)')
+        for s in function_strings:
+            m = cpattern.search(s)
+            if m:
+                routine_names.append(m.group(1).strip())
+            else:
+                raise SyntaxError(
+                    'Could not extract subroutine name from\n%s' % s)
+
+        return [eval('tmp_callback.' + name) for name in routine_names]
+
 
 def _format_parameters_table(parameter_names, fixed_width=None):
     """
