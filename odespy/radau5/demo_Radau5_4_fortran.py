@@ -72,9 +72,9 @@ Cf2py intent(out)    mas
 # compile these Fortran subroutines
 string_to_compile = '\n'.join([f_str, jac_str])
 from numpy import f2py
-f2py.compile(string_to_compile, modulename = "callback", verbose=False)
-import callback
-f_f77, jac_radau5_f77 = callback.f_f77, callback.jac_radau5_f77
+f2py.compile(string_to_compile, modulename = "tmp_callback", verbose=False)
+import tmp_callback
+f_f77, jac_radau5_f77 = tmp_callback.f_f77, tmp_callback.jac_radau5_f77
 
 t0, tn, u0, n_points = 0., 4.,  [1.,0.,0.], 10
 time_points = np.linspace(t0, tn, n_points)
@@ -101,4 +101,4 @@ st.plot(t, u[:,0], 'g*', title="Radau5 with Fortran subroutines",
         legend="with f & mas", hold="on")
 print 'Max error for test case 2 is %g' % max(u[-1] - exact_final)
 
-os.remove('callback.so')
+os.remove('tmp_callback.so')

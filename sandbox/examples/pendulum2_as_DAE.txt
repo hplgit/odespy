@@ -1,0 +1,2 @@
+http://apmonitor.com/wiki/index.php/Apps/PendulumMotion
+http://sundials.2283335.n4.nabble.com/pendulum-example-td3240916.html

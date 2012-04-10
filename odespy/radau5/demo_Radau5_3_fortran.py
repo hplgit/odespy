@@ -53,9 +53,9 @@ Cf2py intent(out)  dfu
 
 # Compile these Fortran subroutines
 from numpy import f2py
-f2py.compile(f_str+'\n'+jac_banded_str, modulename='callback', verbose=False)
-import callback
-f_f77, jac_banded_f77 = callback.f_f77, callback.jac_radau5_f77
+f2py.compile(f_str+'\n'+jac_banded_str, modulename='tmp_callback', verbose=False)
+import tmp_callback
+f_f77, jac_banded_f77 = tmp_callback.f_f77, tmp_callback.jac_radau5_f77
 
 import sys
 try:
@@ -112,4 +112,4 @@ u,t = m.solve(time_points)
 st.plot(t, u[:,0], 'o',
         legend="Lsoda with f", hold="on")
 
-os.remove('callback.so')
+os.remove('tmp_callback.so')

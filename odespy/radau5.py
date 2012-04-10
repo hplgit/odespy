@@ -194,7 +194,7 @@ class Radau5(Solver):
     def set_dummy_functions(self):
         for name in ('jac_radau5_f77', 'f_f77'):
             if getattr(self, name, None) is None:
-                setattr(self, name, lambda x,y:0.)
+                setattr(self, name, lambda x, y: 0.)
         if not hasattr(self, 'mas_f77'):
             setattr(self, 'mas_f77', lambda : 0.)
 

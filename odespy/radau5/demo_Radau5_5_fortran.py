@@ -116,10 +116,10 @@ Cf2py intent(out)    mas
 
 string_to_compile = '\n'.join([f_str, jac_str, mas_str])
 from numpy import f2py
-f2py.compile(string_to_compile, modulename = "callback", verbose=False)
-import callback
+f2py.compile(string_to_compile, modulename = "tmp_callback", verbose=False)
+import tmp_callback
 f_f77, mas_f77, jac_radau5_f77 = \
-    callback.f_f77, callback.mas_f77, callback.jac_radau5_f77
+    tmp_callback.f_f77, tmp_callback.mas_f77, tmp_callback.jac_radau5_f77
 
 u0 = np.zeros(9, float)
 u0[1], u0[2:5], u0[5] = .5, 1., .5
@@ -152,13 +152,13 @@ st.plot(t, u[:,0], 'r*', title="Radau5 with Fortran subroutines",
 print 'Max error for test case 2 is %g' % max(u[-1] - exact_final)
 
 # compile these Fortran subroutines
-os.remove('callback.so')
+os.remove('tmp_callback.so')
 string_to_compile = '\n'.join([f_str, jac_banded_str, mas_banded_str])
 from numpy import f2py
-f2py.compile(string_to_compile, modulename = "callback2", verbose=False)
-import callback2
+f2py.compile(string_to_compile, modulename = "tmp_callback2", verbose=False)
+import tmp_callback2
 f_f77, mas_banded, jac_banded = \
-    callback2.f_f77, callback2.mas_f77, callback2.jac_radau5_f77
+    tmp_callback2.f_f77, tmp_callback2.mas_f77, tmp_callback2.jac_radau5_f77
 
 # Test case 3: Radau5, with f, mas_banded, ml, mu & jac_banded
 m = method(None, f_f77=f_f77, rtol=rtol, atol=atol,
@@ -172,5 +172,5 @@ st.plot(t, u[:,0], 'b-', title="Radau5 with Fortran subroutines",
         legend="with f, mas_banded & jac_banded", hold="on")
 print 'Max error for test case 3 is %g' % max(u[-1] - exact_final)
 
-os.remove('callback2.so')
+os.remove('tmp_callback2.so')
 

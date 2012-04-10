@@ -51,10 +51,10 @@ except:
 # Compile these Fortran subroutines
 string_to_compile = '\n'.join([f_str, jac_full_str])
 from numpy import f2py
-f2py.compile(string_to_compile, modulename='callback', verbose=False)
-import callback
+f2py.compile(string_to_compile, modulename='tmp_callback', verbose=False)
+import tmp_callback
 
-f_f77, jac_f77 = callback.f_f77, callback.jac_radau5_f77
+f_f77, jac_f77 = tmp_callback.f_f77, tmp_callback.jac_radau5_f77
 
 t0, tn, u0 = 0., 10.,  [2.,0.]
 time_points = np.linspace(t0, tn, n_points)
@@ -90,4 +90,4 @@ m.set_initial_condition(u0)
 u,t = m.solve(time_points)
 st.plot(t, u[:,0], '*', legend="Lsoda with f", hold="on")
 
-os.remove('callback.so')
+os.remove('tmp_callback.so')

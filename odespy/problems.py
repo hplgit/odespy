@@ -4,35 +4,53 @@ class Problem:
     stiff = False
     complex_ = False
 
-    parameters = dict(
-        T=dict(help='stop time', default=1, type=float),
-        U0=dict(help='initial condition', default=0.0, type=float),
-        )
-
     def __init__(self):
         pass
 
+    def get_initial_condition(self):
+        """Return vector of initial conditions."""
+        if hasattr(self, 'U0'):
+            return self.U0
+        else:
+            raise NotImplementedError(
+                'class %s must implement get_initial_condition' %
+                self.__class__.__name__)
+
     def f(self, u, t):
+        """Python function for the right-hand side of the ODE u'=f(u,t)."""
         raise NotImpelementedError
 
     def jac(self, u, t):
+        """Python function for the Jacobian of the right-hand side: df/du."""
         raise NotImpelementedError
 
     def constraints(self, u, t):
+        """Python function for additional constraints: g(u,t)=0."""
         raise NotImpelementedError
-
 
     def define_command_line_arguments(self, parser):
-        raise NotImpelementedError
-
-    def set_parameters(self, args):
+        """Initialize an argparse object for reading command-line
+        option-value pairs."""
         raise NotImpelementedError
 
     def u_exact(self, t):
-        pass
+        """
+        Implementation of the exact solution.
+        Return None if no exact solution is available.
+        """
+        return None
 
-    def verify(self, u, atol=1e-6, rtol=1e-5):
-        pass
+    def verify(self, u, t, atol=1e-6, rtol=1e-5):
+        """
+        Return True if u at time points t coincides with an exact
+        solution within the prescribed tolerances.
+        Return None if the solution cannot be verified.
+        """
+        u_e = self.u_exact(t)
+        if u_e is None:
+            return None
+
+        return np.allclose(u, u_e, rtol, atol)
 
     # subclasses may implement computation of derived
     # quantities, e.g., energy(u, t) etc
@@ -60,3 +78,39 @@ class LinearOscillator(Problem):
 # compute potental and kinetic energy, use their sum
 # to verify
 # offer analytical solution with damping, also with sin/cos excitation
+
+class VanDerPolOscillator(Problem):
+    """
+    Classical van der Pool oscillator:
+
+    ..math:: y'' = \mu (1 - y^2) y' - y
+
+    with initial conditions :math:`y(0)=2, y'(0)=1`.
+    The equation is rewritten as a system
+
+    ..math::
+             u_0' &= u_1
+             u_1' &= \mu (1-u_0^2)u_1 - u_0
+
+    with a Jacobian
+
+    ..math::
+             \left(\begin{array}{cc}
+             0 & 1\\
+             -2\mu u_0 - 1 & \mu (1-u_0^2)
+             \end{array}\right)
+    """
+    def __init__(self, mu=3.):
+        self.mu = mu
+
+    def f(u, t):
+        u_0, u_1 = u
+        mu = self.mu
+        return [u_1, mu*(1 - u_0**2)*u_1 - u_0]
+
+    def jac(u, t):
+        u_0, u_1 = u
+        mu = self.mu
+        return [[0., 1.],
+                [-2*mu*u_0*u_1 - 1, mu*(1 - u_0**2)]]
+
