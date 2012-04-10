@@ -32,7 +32,7 @@ Cf2py intent(out) udot
 """
 
 jac_str = """
-      subroutine jac_radau5_f77(neq,t,u,dfu,ldfu,rpar,ipar)
+      subroutine jac_f77_radau5(neq,t,u,dfu,ldfu,rpar,ipar)
 Cf2py intent(hide) neq
 Cf2py intent(hide) rpar,ipar
 Cf2py intent(in)   t,u,ldfu
@@ -54,7 +54,7 @@ Cf2py intent(out)  dfu
 """
 
 jac_banded_str = """
-      subroutine jac_radau5_f77(neq,t,u,dfu,ldfu,rpar,ipar)
+      subroutine jac_f77_radau5(neq,t,u,dfu,ldfu,rpar,ipar)
 Cf2py intent(hide) neq,rpar,ipar
 Cf2py intent(in) t,u,ldfu
 Cf2py intent(out) dfu
@@ -118,8 +118,8 @@ string_to_compile = '\n'.join([f_str, jac_str, mas_str])
 from numpy import f2py
 f2py.compile(string_to_compile, modulename = "tmp_callback", verbose=False)
 import tmp_callback
-f_f77, mas_f77, jac_radau5_f77 = \
-    tmp_callback.f_f77, tmp_callback.mas_f77, tmp_callback.jac_radau5_f77
+f_f77, mas_f77, jac_f77_radau5 = \
+    tmp_callback.f_f77, tmp_callback.mas_f77, tmp_callback.jac_f77_radau5
 
 u0 = np.zeros(9, float)
 u0[1], u0[2:5], u0[5] = .5, 1., .5
@@ -136,7 +136,7 @@ method = Radau5Implicit
 
 # Test case 1: Radau5, with f, mas & jac
 m = method(None, f_f77=f_str, mas_f77=mas_f77, rtol=rtol, atol=atol,
-           jac_radau5_f77=jac_str)
+           jac_f77_radau5=jac_str)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
 st.plot(t, u[:,0], 'b-', title="Radau5 with Fortran subroutines",
@@ -158,13 +158,13 @@ from numpy import f2py
 f2py.compile(string_to_compile, modulename = "tmp_callback2", verbose=False)
 import tmp_callback2
 f_f77, mas_banded, jac_banded = \
-    tmp_callback2.f_f77, tmp_callback2.mas_f77, tmp_callback2.jac_radau5_f77
+    tmp_callback2.f_f77, tmp_callback2.mas_f77, tmp_callback2.jac_f77_radau5
 
 # Test case 3: Radau5, with f, mas_banded, ml, mu & jac_banded
 m = method(None, f_f77=f_f77, rtol=rtol, atol=atol,
            mlmas=mlmas, mumas=mumas, mas_f77=mas_banded,
            ml=ml, mu=mu,
-           jac_radau5_f77=jac_banded)
+           jac_f77_radau5=jac_banded)
 
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)

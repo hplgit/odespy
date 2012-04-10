@@ -33,7 +33,7 @@ Cf2py intent(out) ydot
 """
 
 jac_banded_str = """
-      subroutine jac_radau5_f77(neq,t,u,dfu,ldfu,rpar,ipar)
+      subroutine jac_f77_radau5(neq,t,u,dfu,ldfu,rpar,ipar)
 Cf2py intent(hide) neq,rpar,ipar
 Cf2py intent(in)   t,u,ldfu
 Cf2py intent(out)  dfu
@@ -55,7 +55,7 @@ Cf2py intent(out)  dfu
 from numpy import f2py
 f2py.compile(f_str+'\n'+jac_banded_str, modulename='tmp_callback', verbose=False)
 import tmp_callback
-f_f77, jac_banded_f77 = tmp_callback.f_f77, tmp_callback.jac_radau5_f77
+f_f77, jac_banded_f77 = tmp_callback.f_f77, tmp_callback.jac_f77_radau5
 
 import sys
 try:
@@ -75,7 +75,7 @@ method = Radau5Explicit
 
 # Test case 1: Radau5, with f, ml, mu & jac_banded
 m = method(None, f_f77=f_f77, rtol=rtol, atol=atol,
-           ml=ml, mu=mu, jac_radau5_f77=jac_banded_f77)
+           ml=ml, mu=mu, jac_f77_radau5=jac_banded_f77)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
 st.plot(t, u[:,0], title= "Radau5 & Lsoda",

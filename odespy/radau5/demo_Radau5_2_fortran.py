@@ -27,7 +27,7 @@ Cf2py intent(out) udot
 """
 
 jac_full_str = """
-      subroutine jac_radau5_f77(neq,t,u,dfu,ldfu,rpar,ipar)
+      subroutine jac_f77_radau5(neq,t,u,dfu,ldfu,rpar,ipar)
 Cf2py intent(hide) neq,rpar,ipar
 Cf2py intent(in)   t,u,ldfu
 Cf2py intent(out) dfu
@@ -60,7 +60,7 @@ st.figure()
 method = Radau5Explicit
 
 # Test case 1: Radau5, with f & jac
-m = method(None, f_f77=f_f77, rtol=rtol, atol=atol, jac_radau5_f77=jac_f77)
+m = method(None, f_f77=f_f77, rtol=rtol, atol=atol, jac_f77_radau5=jac_f77)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
 st.plot(t, u[:,0], title= "Van der Pol oscillator, with Radau5 & Lsoda",
@@ -80,7 +80,7 @@ u,t = m.solve(time_points)
 st.plot(t, u[:,0], legend="Lsoda with f & jac", hold="on")
 
 # Test case 4: Lsoda, with f & jac
-m.set(jac_radau5_f77=jac_f77)
+m.set(jac_f77_radau5=jac_f77)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
 st.plot(t, u[:,0], '*', legend="Lsoda with f", hold="on")

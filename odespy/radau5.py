@@ -55,12 +55,12 @@ This subroutine has the signature::
         help='Upper bandwith of mass matrix M',
         type=int),
 
-    jac_radau5_f77 = dict(
+    jac_f77_radau5 = dict(
         help='''Fortran subroutine for jac to be
 provided to Radau5. This subroutine should be
 defined as::
 
-        subroutine jac_radau5_f77
+        subroutine jac_f77_radau5
        &           (neq,t,u,dfu,ldfu,rpar,ipar)
   Cf2py intent(hide) neq,rpar,ipar
   Cf2py intent(in)   t,u,ldfu
@@ -102,7 +102,7 @@ class Radau5(Solver):
     """
 
     _optional_parameters = Solver._optional_parameters + \
-        ['f_f77', 'jac_radau5_f77', 'atol', 'jac_banded',
+        ['f_f77', 'jac_f77_radau5', 'atol', 'jac_banded',
          'rtol', 'nsteps', 'ml', 'mu', 'first_step', 'jac', 'safety',
          'max_step', 'nsteps', 'mas', 'mas_f77', 'mlmas', 'mumas',
          'mas_args']
@@ -159,18 +159,18 @@ class Radau5(Solver):
             # If jac is input as full matrix in form of jac(u,t),
             # wrap jac to jac_f77 for Fortran code.
             jac = self.jac
-            self.jac_radau5_f77 = lambda t,u: np.asarray(jac(u,t),
+            self.jac_f77_radau5 = lambda t,u: np.asarray(jac(u,t),
                                                          order='Fortran')
         elif hasattr(self, 'jac_banded'):
             # If jac is input as banded matrix in form of jac_banded(u,t,ml,mu),
-            # wrap jac_banded to jac_radau5_f77 for Fortran code.
+            # wrap jac_banded to jac_f77_radau5 for Fortran code.
             jac_banded = self.jac_banded
             self._extra_args_fortran['jac_extra_args'] = (self.ml, self.mu)
-            self.jac_radau5_f77 = lambda t,u,ml,mu: \
+            self.jac_f77_radau5 = lambda t,u,ml,mu: \
                 np.asarray(jac_banded(u,t,ml,mu), order='Fortran')
-        elif hasattr(self, 'jac_radau5_f77'):
+        elif hasattr(self, 'jac_f77_radau5'):
             # If jas is input as Fortran subroutine
-            jac = self.jac_radau5_f77
+            jac = self.jac_f77_radau5
             if 0 < getattr(self, 'ml', -1) < self.neq:
                 ljac = self.ml + getattr(self, 'mu', 0) + 1
                 self.jac_banded = lambda u,t,ml,mu: jac(t,u,ljac)
@@ -192,7 +192,7 @@ class Radau5(Solver):
             self.mas = lambda : mas(self.neq, lmas)
 
     def set_dummy_functions(self):
-        for name in ('jac_radau5_f77', 'f_f77'):
+        for name in ('jac_f77_radau5', 'f_f77'):
             if getattr(self, name, None) is None:
                 setattr(self, name, lambda x, y: 0.)
         if not hasattr(self, 'mas_f77'):
@@ -217,7 +217,7 @@ class Radau5(Solver):
         self.func_wrappers()
         self.set_tol()
         # Flags to indicate whether jac and mas are provided
-        self.ijac = int(hasattr(self, 'jac_radau5_f77'))
+        self.ijac = int(hasattr(self, 'jac_f77_radau5'))
         self.imas = int(hasattr(self, 'mas_f77'))
         self.set_dummy_functions()
 
@@ -250,7 +250,7 @@ class Radau5(Solver):
 
         mas = getattr(self.mas_f77, '_cpointer', self.mas_f77)
         f = getattr(self.f_f77, '_cpointer', self.f_f77)
-        jac = getattr(self.jac_radau5_f77, '_cpointer', self.jac_radau5_f77)
+        jac = getattr(self.jac_f77_radau5, '_cpointer', self.jac_f77_radau5)
 
         h = getattr(self, 'first_step', 0.)
         ml = getattr(self, 'ml', self.neq)
@@ -285,7 +285,7 @@ class Radau5Explicit(Radau5):
     Radau5 solver for explcit ODE problem.
     """
     _optional_parameters = Solver._optional_parameters + \
-        ['f_f77', 'jac_radau5_f77', 'atol', 'jac_banded',
+        ['f_f77', 'jac_f77_radau5', 'atol', 'jac_banded',
          'rtol', 'nsteps', 'ml', 'mu', 'first_step', 'jac', 'safety',
          'max_step', 'nsteps']
 

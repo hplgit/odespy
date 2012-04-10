@@ -114,3 +114,21 @@ class VanDerPolOscillator(Problem):
         return [[0., 1.],
                 [-2*mu*u_0*u_1 - 1, mu*(1 - u_0**2)]]
 
+    def f_f77(self):
+        """Return f(u,t) as Fortran source code string."""
+        return """
+      subroutine f_f77(neq, t, u, udot)
+Cf2py intent(hide) neq
+Cf2py intent(out) udot
+      integer neq
+      double precision t, u, udot
+      dimension u(neq), udot(neq)
+      udot(1) = u(2)
+      udot(2) = %g*(1d0 - u(1)**2)*u(2) - u(1)
+      return
+      end
+""" % self.mu
+
+    def jac_f77(self):
+        """Return f(u,t) as Fortran source code string."""
+        return """

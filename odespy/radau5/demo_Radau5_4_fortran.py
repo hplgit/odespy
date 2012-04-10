@@ -29,7 +29,7 @@ Cf2py intent(out) udot
 """
 
 jac_str = """
-      subroutine jac_radau5_f77(neq,t,u,dfu,ldfu,rpar,ipar)
+      subroutine jac_f77_radau5(neq,t,u,dfu,ldfu,rpar,ipar)
 Cf2py intent(hide) neq,rpar,ipar
 Cf2py intent(in)   t,u,ldfu
 Cf2py intent(out)  dfu
@@ -74,7 +74,7 @@ string_to_compile = '\n'.join([f_str, jac_str])
 from numpy import f2py
 f2py.compile(string_to_compile, modulename = "tmp_callback", verbose=False)
 import tmp_callback
-f_f77, jac_radau5_f77 = tmp_callback.f_f77, tmp_callback.jac_radau5_f77
+f_f77, jac_f77_radau5 = tmp_callback.f_f77, tmp_callback.jac_f77_radau5
 
 t0, tn, u0, n_points = 0., 4.,  [1.,0.,0.], 10
 time_points = np.linspace(t0, tn, n_points)
@@ -86,7 +86,7 @@ exact_final = [9.055142e-1, 2.240418e-5, 9.446344e-2]
 
 # Test case 1: Radau5, with f, mas & jac
 m = method(None, f_f77=f_str, rtol=rtol, atol=atol,
-           jac_radau5_f77=jac_str, mas_f77=mas_str)
+           jac_f77_radau5=jac_str, mas_f77=mas_str)
 m.set_initial_condition(u0)
 u,t = m.solve(time_points)
 st.plot(t, u[:,0], 'r-', title="Radau5 with Fortran subroutines",
