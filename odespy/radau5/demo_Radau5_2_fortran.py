@@ -25,6 +25,18 @@ Cf2py intent(out) udot
       return
       end
 """
+f_str = """
+      subroutine f_f77(neq, t, u, udot)
+Cf2py intent(hide) neq
+Cf2py intent(out) udot
+      integer neq
+      double precision t, u, udot
+      dimension u(neq), udot(neq)
+      udot(1) = u(2)
+      udot(2) = 3*(1 - u(1)**2)*u(2) - u(1)
+      return
+      end
+"""
 
 jac_full_str = """
       subroutine jac_f77_radau5(neq,t,u,dfu,ldfu,rpar,ipar)
@@ -38,6 +50,22 @@ Cf2py intent(out) dfu
       dfu(1,2) = 1d0
       dfu(2,1) = -6d0*u(1)*u(2) - 1d0
       dfu(2,2) = 3d0*(1d0-u(1)**2)
+      return
+      end
+"""
+
+jac_full_str = """
+      subroutine jac_f77_radau5(neq,t,u,dfu,ldfu,rpar,ipar)
+Cf2py intent(hide) neq,rpar,ipar
+Cf2py intent(in)   t,u,ldfu
+Cf2py intent(out) dfu
+      integer neq,ipar,ldfu
+      double precision t,u,dfu,rpar
+      dimension u(neq),dfu(ldfu,neq),rpar(*),ipar(*)
+      dfu(1,1) = 0
+      dfu(1,2) = 1
+      dfu(2,1) = -6*u(1)*u(2) - 1
+      dfu(2,2) = 3*(1d0-u(1)**2)
       return
       end
 """
