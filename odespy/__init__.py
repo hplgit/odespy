@@ -8,7 +8,7 @@ supported.  A wide range of numerical methods for ODEs are offered:
 
 # Insert tutorial from ../doc/src/odespy/odespy.rst
 
-__tutorial__ = r'''
+_tutorial = r'''
 Basic Usage
 ===========
 
@@ -1393,7 +1393,7 @@ for classname in classnames:
 
 
 # Make tables of solver name and quick description
-__doc__ =  __doc__ + typeset_toc(toc) + __tutorial__
+__doc__ =  __doc__ + typeset_toc(toc) + _tutorial
 
 # Do not pollute namespace
 del class_, doc_str, classname, classnames, toc, typeset_toc, \

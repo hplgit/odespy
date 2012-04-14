@@ -1,7 +1,7 @@
 from solvers import Solver, Adaptive
 import numpy as np
 
-def calculate_order_1_level(coefficients):
+def _calculate_order_1_level(coefficients):
     """
     Calculate order of 1-level RungeKutta method
     with help of the known solution u = -e**t.
@@ -35,7 +35,7 @@ class RungeKutta1level(Solver):
         """Return the order of the current method."""
         order = getattr(self, 'method_order', None)
         if order is None:       # User-supplied method in MyRungeKutta
-            order = calculate_order_1_level(self.butcher_tableau)
+            order = _calculate_order_1_level(self.butcher_tableau)
         return order
 
     def advance(self):
@@ -93,8 +93,8 @@ class RungeKutta2level(Adaptive):
             table_1, table_2 = coefficients[:-1,], \
                         np.vstack((coefficients[:-2,],coefficients[-1,]))
             # Calculate order seperately
-            order = [calculate_order_1_level(table_1),
-                     calculate_order_1_level(table_2)]
+            order = [_calculate_order_1_level(table_1),
+                     _calculate_order_1_level(table_2)]
         return order
 
     def initialize_for_solve(self):
