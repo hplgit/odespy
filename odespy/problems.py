@@ -41,6 +41,13 @@ class Problem:
     def __init__(self):
         pass
 
+    def __contains__(self, attr):
+        return hasattr(self, attr) and callable(getattr(self,attr))
+
+    def terminate(self, u, t, step_number):
+        """Default terminate function, always returning False."""
+        return False
+
     def get_initial_condition(self):
         """
         Return vector of initial conditions.
@@ -83,8 +90,8 @@ class Problem:
 
         if atol is None or rtol is None:
             if not (u.shape == u_e.shape):
-                raise ValueError('u is %s and u_e is %s' %
-                                 u.shape, u_e.shape)
+                raise ValueError('u has shape %s and u_e has %s' %
+                                 (u.shape, u_e.shape))
             return np.abs(u - u_e).max()
         else:
             return np.allclose(u, u_e, rtol, atol)
@@ -102,52 +109,79 @@ def convergence(u, t, u_ref=None, t_ref=None):
     raise NotImplementedError
 
 class Linear1(Problem):
-    """Linear solution, which is exactly reproduced by all methods."""
+    """
+    Linear solution of a nonlinear ODE,
+    which is normally exactly reproduced by a numerical method.
+    """
     short_description = "u' = a + (u - a*t - b)**c, u(0)=b"
 
     def __init__(self, a=1, b=0, c=2):
         self.a, self.b, self.c = a, b, c
         self.U0 = b
+        self.not_suitable_solvers = [
+            'AdaptiveResidual', 'Lsodi', 'Lsodis', 'Lsoibt']
+        if self.a < 0:
+            self.not_suitable_solvers += ['lsoda_scipy', 'odefun_sympy']
 
     def f(self, u, t):
-        return self.a + (u - self.a - self.b)**self.c
+        return self.a + (u - self.a*t - self.b)**self.c
 
     def jac(self, u, t):
-        return self.c*(u - self.a - self.b)**(self.c-1)
+        return self.c*(u - self.a*t - self.b)**(self.c-1)
 
     def u_exact(self, t):
         return self.a*t + self.b
 
     def default_parameters(self):
-        return {'time_points': np.linspace(0, 2./self.a, 3)}
+        return {'time_points': np.linspace(0, 2./self.a, 3),
+                'max_iter': 10, 'eps_iter': 1E-6}
 
-class Linear2(Problem):
+class Linear2(Linear1):
     """
-    Linear solution of 2x2 system,
-    which is exactly reproduced by all methods.
+    Linear solution of nonlinear 2x2 system,
+    which is normally exactly reproduced by a numerical method.
     """
-    short_description = "2x2 system with linear solution"
+    short_description = "2x2 nonlinear system with linear solution"
 
     def __init__(self, a=1, b=0, c=2):
-        self.a, self.b, self.c = a, b, c
-        self.U0 = b
+        Linear1.__init__(self, a, b, c)
+        self.U0 = [self.b, self.b]
 
     def f(self, u, t):
-        u_0, u_1 = u
-        return [self.a + (u_1 - self.a - self.b)**self.c,
-                self.a + (u_0 - self.a - self.b)**self.c]
+        return [self.a + (u[1] - self.a*t - self.b)**self.c,
+                self.a + (u[0] - self.a*t - self.b)**self.c]
 
     def jac(self, u, t):
-        u_0, u_1 = u
-        return [[0, self.c*(u_1 - self.a - self.b)**(self.c-1)],
-                [self.c*(u_0 - self.a - self.b)**(self.c-1), 0]]
+        return [[0, self.c*(u[1] - self.a*t - self.b)**(self.c-1)],
+                [self.c*(u[0] - self.a*t - self.b)**(self.c-1), 0]]
+
+    def spcrad(self, u, t):
+        J = self.jac(u, t)
+        return np.abs(np.linalg.eigvals(J)).max()
 
     def u_exact(self, t):
         func = self.a*t + self.b
         return np.array([func, func]).transpose()
 
-    def default_parameters(self):
-        return {'time_points': np.linspace(0, 2./self.a, 4)}
+
+class Linear2t(Linear2):
+    """
+    Linear solution of trivial 2x2 system,
+    which is normally exactly reproduced by a numerical method.
+    """
+    short_description = "2x2 trivial system with linear solution"
+
+    def f(self, u, t):
+        return [self.a,
+                self.a]
+
+    def jac(self, u, t):
+        return [[0, 0],
+                [0, 0]]
+
+    def spcrad(self, u, t):
+        return 0.0
+
 
 
 class Exponential(Problem):
@@ -558,16 +592,68 @@ Cf2py intent(out) pd
 """ % (self.mu, self.mu)
 
 
-def tester(problems, methods, time_points, terminate=None,
-           compare_tol=1E-4):
+def tester(problems, methods, time_points=None, compare_tol=1E-4,
+           solver_prm={}):
+    """
+    `problems` is a list of Problem subclass instances made ready.
+    `methods` is a list of strings holding the method names.
+    """
+    import odespy
     results = {}
-    for pname in problems:
-        for mname in methods:
-            solver = methods[mname]
-            problem = problems[pname]
+    error_msg = {}
+    for problem in problems:
+        pname = problem.__class__.__name__
+        print 'problem ', pname
+        methods4problem = [method for method in methods
+                           if method not in problem.not_suitable_solvers]
+        defaults = problem.default_parameters()
+        if time_points is None:
+            time_points = defaults['time_points']
+        results[pname] = {'t': time_points}
+        error_msg[pname] = {}
+
+        this_solver_prm = solver_prm.copy()
+        names_in_problem = 'jac', 'spcrad', 'u_exact',
+        for name in names_in_problem:
+            # Set parameter if problem has it and user has
+            # not specified it in solver_prm
+            if name in problem and name not in solver_prm:
+                this_solver_prm[name] = getattr(problem, name)
+        names_in_defaults = 'atol', 'rtol', 'max_iter', 'eps_iter'
+        for name in names_in_defaults:
+            if name in defaults and name not in solver_prm:
+                this_solver_prm[name] = defaults[name]
+
+        for method in methods4problem:
+            print '  testing', method,
+            solver = eval('odespy.'+method)(problem.f)
+
+            # Important to set parameters before setting initial cond.
+            solver.set(**this_solver_prm)
+
             solver.set_initial_condition(problem.get_initial_condition())
-            u, t = solver.solve(time_points, terminate)
-            results[(mname, pname)] = (u, t)
+
+            u, t = solver.solve(time_points, problem.terminate)
+
+            error = problem.verify(u, t)
+            if error is not None:
+                results[pname][method] = (u, error)
+                print error,
+                if error > compare_tol:
+                    print 'WARNING: tolerance %.0E exceeded' % compare_tol,
+            else:
+                results[pname][method] = (u,)
+            print
+    return results
+
+"""
+
+Radau5 {'rtol': 0.01, 'atol': 0.01, 'max_iter': 10, 'jac': <bound method Linear2.jac of <problems.Linear2 instance at 0x1fdd8c0>>, 'eps_iter': 1e-06, 'spcrad': <bound method Linear2.spcrad of <problems.Linear2 instance at 0x1fdd8c0>>}
+1.7763568394e-15
+Radau5Explicit {'rtol': 0.01, 'atol': 0.01, 'max_iter': 10, 'jac': <bound method Linear2.jac of <problems.Linear2 instance at 0x1fdd8c0>>, 'eps_iter': 1e-06, 'spcrad': <bound method Linear2.spcrad of <problems.Linear2 instance at 0x1fdd8c0>>}
+1.7763568394e-15
+Radau5Implicit {'rtol': 0.01, 'atol': 0.01, 'max_iter': 10, 'jac': <bound method Linear2.jac of <problems.Linear2 instance at 0x1fdd8c0>>, 'eps_iter': 1e-06, 'spcrad': <bound method Linear2.spcrad of <problems.Linear2 instance at 0x1fdd8c0>>}
+
     # Compare with exact solution
     # Compare solutions within tolerance
     failure = {}
@@ -586,4 +672,4 @@ def tester(problems, methods, time_points, terminate=None,
                 else:
                     failure[pname][mname] = np.abs(reference_solution - u).max()
     return failure
-
+"""

@@ -1026,11 +1026,19 @@ class Solver:
         for n in range(N):
             self.n = n
             self.u[n+1] = self.advance()   # new value
+
+            if self.verbose > 0:
+                print '%s, step %d, t=%g' % \
+                      (self.__class__.__name__, n+1, self.t[n+1])
             if terminate(self.u, self.t, n+1):
                 print self.__class__.__name__, \
                       'terminated at t=%g' % self.t[n+1]
-                self.u, self.t = self.u[:n+2], self.t[:n+2]
+                if not self.disk_storage:
+                    self.u, self.t = self.u[:n+2], self.t[:n+2]
+                # else: must keep original size of file, rest is 0
                 break  # terminate time loop over n
+        if self.disk_storage:
+            self.u.flush()
         return self.u, self.t
 
 
@@ -1856,8 +1864,8 @@ class odefun_sympy(Solver):
         The class stores an attribute ufunc (return from odefun)
         which can be used to evaluate u at any time point (ufunc(t)).
         """
-        if terminate is not None:
-            print 'Warning: odefun_sympy.solve ignores the terminate function!'
+        # Note: disk_storage is ignored - all computations in odefun
+
         self.t = np.asarray(time_points)
         self.initialize_for_solve()
 
@@ -1869,6 +1877,11 @@ class odefun_sympy(Solver):
         # at the specified time points
         self.u = np.array([self.ufunc(t) for t in time_points])
         self.t = np.asarray(time_points)
+
+        if terminate is not None:
+            for step_no in range(len(self.t)):
+                if terminate(self.u, self.t, step_no):
+                    return self.u[:step_no+1], self.t[:step_no+1]
         return self.u, self.t
 
 
@@ -2502,10 +2515,6 @@ class lsoda_scipy(Adaptive):
     # min_step etc are adequately computed
 
     def solve(self, time_points, terminate=None):
-        if terminate is not None:
-            raise ValueError(
-                'odeint_scipy.solve does not accept termiante function.')
-
         self.t = np.asarray(time_points)
         self.initialize_for_solve()
         self.validate_data()
@@ -2513,7 +2522,6 @@ class lsoda_scipy(Adaptive):
         # jac_banded is not yet supported
         ml = None  # self.ml
         mu = None  # self.mu
-        print self.first_step, self.min_step, self.max_step
         self.u, info = self.scipy_int.odeint(
             self.f,
             self.U0,
@@ -2561,6 +2569,16 @@ class lsoda_scipy(Adaptive):
                    'a vector of method indicators for each successful '\
                    'time step: 1: adams (nonstiff), 2: bdf (stiff)')
          }
+
+        # self.u is two-dimensional, remove 2nd dimension if scalar ODE
+        if self.u.shape[1] == 1:
+            self.u = self.u.reshape(self.u.size)
+
+        if terminate is not None:
+            for step_no in range(len(self.t)):
+                if terminate(self.u, self.t, step_no):
+                    return self.u[:step_no+1], self.t[:step_no+1]
+
         return self.u, self.t
 
 
@@ -2650,12 +2668,13 @@ def list_all_solvers():
     # Important: odespy.__init__.py must import all solver classes
     # into the namespace for this function to work properly.
 
-    superclasses = ('Solver','Adaptive', 'PyDS', 'ode_scipy', 'Odepack',
-                    'RungeKutta1level', 'RungeKutta2level', 'SolverImplicit')
+    exclude = ('Solver','Adaptive', 'PyDS', 'ode_scipy', 'Odepack',
+               'RungeKutta1level', 'RungeKutta2level', 'SolverImplicit',
+               'MyRungeKutta', 'MySolver')
     import odespy
-    class_members = inspect.getmembers(odespy, inspect.isclass)
-    solvers = [solver[0] for solver in class_members \
-                   if solver[0] not in superclasses]
+    classes = inspect.getmembers(odespy, inspect.isclass)
+    solvers = [solver[0] for solver in classes
+               if solver[0] not in exclude]
     return solvers
 
 def list_available_solvers():

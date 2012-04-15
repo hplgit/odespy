@@ -216,6 +216,11 @@ array where `u[i,j]` holds the solution of the $j$-th unknown
 function at the $i$-th time point `t[i]` ($u_j(t_i)$ in mathematics
 notation).
 
+By giving the parameter `disk_storage=True` to the solver's constructor,
+the returned `u` array is memory mapped (i.e., of type `numpy.memmap`)
+such that all the data are stored on file, but parts of the array can
+be efficiently accessed.
+
 The `time_points` array specifies the time points where we want the
 solution to be computed. The returned array `t` is the same as
 `time_points`.  The simplest numerical methods in the `odespy`
@@ -1178,6 +1183,15 @@ line installs all that `odespy` may need:
 !bc sys
 sudo apt-get install python-scipy python-nose python-sympy
 !ec
+
+======= Troubleshooting =======
+
+=== Constructor takes exactly two arguments, 5 given ===
+
+Constructors in the `Solver` hierarchy take only the `f` function
+as positional argument. All other parameters to the constructor
+must be keyword arguments.
+
 
 # #ifdef EXTRA
 ======= TODO =======

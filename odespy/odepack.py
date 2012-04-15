@@ -1036,8 +1036,8 @@ class Odepack(Solver):
 
     def solve(self, time_points, terminate=None):
         '''
-        This function is involved for non-linearly implicit solvers in ODEPACK, i.e.
-        Lsode, Lsoda, Lsodar, and Lsodes.
+        This function is involved for non-linearly implicit
+        solvers in ODEPACK, i.e., Lsode, Lsoda, Lsodar, and Lsodes.
         '''
 
         itermin = int(terminate is not None)   # flag to indicate dummy function
@@ -1690,13 +1690,6 @@ class Lsodi(Odepack):
        A(u,t) * du/dt = g(t,u) ,
 
     where A(u,t) is a square matrix.
-    Or, in component form::
-
-       ( a   * ( du / dt ))  + ... +  ( a     * ( du   / dt ))  =
-          i,1      1                     i,NEQ      NEQ
-        =   g ( t, u , u ,..., u    )   ( i = 1,...,NEQ )
-             i      1   2       NEQ
-
     If A is singular, this is a differential-algebraic system.
     Either res or res_f77 need to be supplied.
 
@@ -1727,7 +1720,7 @@ class Lsodi(Odepack):
     User-supplied Subroutine RES signalled Lsodi to halt the
     integration and return (IRES = 2). Current T is '''
 
-    def __init__(self,**kwargs):
+    def __init__(self, **kwargs):
         # Different default setting of iteration methods
         with_jac = ('jac_lsodi' in kwargs) or ('jac_lsodi_f77' in kwargs) \
             or ('jac_banded_lsodi' in kwargs) or \

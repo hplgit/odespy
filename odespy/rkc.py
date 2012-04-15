@@ -45,6 +45,7 @@ class RKC(Adaptive):
     '''
     quick_description = \
         "Explicit 2nd-order Runge-Kutta-Chebyshev method (rkc.f)"
+
     _optional_parameters = Adaptive._optional_parameters + \
         ['f_f77', 'spcrad', 'spcrad_f77', 'jac_constant']
     # The following step parameters are illegal for rkc.f
@@ -184,6 +185,9 @@ ATOL =%s should be either a scalar or a vector of length NEQ=%d.
                      'max no of stages used')}
 
         self.u = np.asarray(uout[:nstop,:]).copy()
+        # self.u is two-dimensional, remove 2nd dimension if scalar ODE
+        if self.u.shape[1] == 1:
+            self.u = self.u.reshape(self.u.size)
         return self.u, self.t
 
 
