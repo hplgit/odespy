@@ -2,8 +2,41 @@ import numpy as np
 from solvers import compile_f77
 
 class Problem:
+    '''
+    The user derives a subclass and implements the right-hand side
+    function::
+
+        def f(self, u, t):
+            """Python function for the right-hand side of the ODE u'=f(u,t)."""
+
+    Optionally, the Jacobian can be computed::
+
+        def jac(self, u, t):
+            """Python function for the Jacobian of the right-hand side: df/du."""
+    Some solvers also allow constraings (DAE problems)::
+
+        def constraints(self, u, t):
+            """Python function for additional constraints: g(u,t)=0."""
+
+    Some problem classes will also define command-line arguments::
+
+        def define_command_line_arguments(self, parser):
+            """
+            Initialize an argparse object for reading command-line
+            option-value pairs. `parser` is an ``argparse`` object.
+            """
+
+    Other functions, for which there are default implementations
+    in the superclass, are ``u_exact`` for returning the exact
+    solution (if known), ``verify`` for checking that a numerical
+    solution is correct (within a tolerance of the analytical solution),
+
+    See the tutorial for examples on subclasses of ``Problem``.
+    '''
     stiff = False
     complex_ = False
+    not_suitable_solvers = []
+    short_description = ''
 
     def __init__(self):
         pass
@@ -22,22 +55,13 @@ class Problem:
                 'class %s must implement get_initial_condition' %
                 self.__class__.__name__)
 
-    def f(self, u, t):
-        """Python function for the right-hand side of the ODE u'=f(u,t)."""
-        raise NotImpelementedError
-
-    def jac(self, u, t):
-        """Python function for the Jacobian of the right-hand side: df/du."""
-        raise NotImpelementedError
-
-    def constraints(self, u, t):
-        """Python function for additional constraints: g(u,t)=0."""
-        raise NotImpelementedError
-
-    def define_command_line_arguments(self, parser):
-        """Initialize an argparse object for reading command-line
-        option-value pairs."""
-        raise NotImpelementedError
+    def default_parameters(self):
+        """
+        Compute suitable time_points, atol/rtol, etc. for the
+        particular problem. Useful for quick generation of test
+        cases, demos, unit tests, etc.
+        """
+        return {}
 
     def u_exact(self, t):
         """
@@ -46,22 +70,81 @@ class Problem:
         """
         return None
 
-    def verify(self, u, t, atol=1e-6, rtol=1e-5):
+    def verify(self, u, t, atol=None, rtol=None):
         """
         Return True if u at time points t coincides with an exact
-        solution within the prescribed tolerances.
+        solution within the prescribed tolerances. If one of the
+        tolerances is None, return max computed error (infinity norm).
         Return None if the solution cannot be verified.
         """
         u_e = self.u_exact(t)
         if u_e is None:
             return None
 
-        return np.allclose(u, u_e, rtol, atol)
+        if atol is None or rtol is None:
+            if not (u.shape == u_e.shape):
+                raise ValueError('u is %s and u_e is %s' %
+                                 u.shape, u_e.shape)
+            return np.abs(u - u_e).max()
+        else:
+            return np.allclose(u, u_e, rtol, atol)
 
     # subclasses may implement computation of derived
     # quantities, e.g., energy(u, t) etc
 
+def convergence(u, t, u_ref=None, t_ref=None):
+    """
+    Given a series of solutions and corresponding t arrays in
+    `u` and `t`, use the analytical solution or a reference solution
+    in `u_ref` and `t_ref` to compute errors. Compute pairwise
+    convergence rates for errors on consecutive time meshes.
+    """
+    raise NotImplementedError
+
+class Exponential(Problem):
+    short_description = "Exponential solution: u' = a*u + b, u(0)=A"
+
+    def __init__(self, a=1, b=0, A=1):
+        self.a, self.b, self.U0 = float(a), b, A
+        if abs(a) < 1E-15:
+            raise ValueError('a=%g is too small' % a)
+        self.not_suitable_solvers = [
+            'Lsodi', 'Lsodis', 'Lsoibt', 'MyRungeKutta',
+            'MySolver', 'Lsodes', 'SymPy_odefun']
+
+    def f(self, u, t):
+        return self.a*u + self.b
+
+    def jac(self, u, t):
+        return self.a
+
+    def f_with_args(self, u, t, a, b):
+        return a*u + b
+
+    def f_with_kwargs(self, u, t, a=1, b=0):
+        return a*u + b
+
+    def jac_with_args(self, u, t, a, b):
+        return a
+
+    def jac_with_kwargs(self, u, t, a=1, b=0):
+        return a
+
+    def u_exact(self, t):
+        a, b, A = self.a, self.b, self.A
+        return np.exp(a*t)*(A + b/a) -  b/a
+
+    def default_parameters(self):
+        T = 5/abs(self.a)
+        d = {'time_points': np.linspace(0, T, 31),
+             'atol': 1E-4, 'rtol': 1E-3}
+        if self.a < 0:
+            d['terminate'] = lambda u, t, step_no: u[step_no] < self.A/20.
+        return d
+
 class Logistic(Problem):
+    short_description = "Logistic equation"
+
     def __init__(self, a, R, U0):
         self.a = a
         self.R = R
@@ -80,38 +163,66 @@ class Logistic(Problem):
         return R*U0*np.exp(a*t)/(R + U0*(np.exp(a*t) - 1))
 
 class Gaussian(Problem):
+    short_description = "Gaussian bell as solution"
+
     def __init__(self):
         self.U0 = self.u_exact(0)
 
-    def f(u, t):
+    def f(self, u, t):
         return -(t-2)*u
 
-    def u_exact(t):
+    def jac(self, u, t):
+        return -(t-2)
+
+    def u_exact(self, t):
         return 1 + np.exp(-0.5*(t-2)**2)
 
+
+def default_oscillator(P, resolution_per_period=20):
+    n = 4.5
+    r = resolution_per_period # short form
+    print 'default', P, n*P
+    tp = np.linspace(0, n*P, r*n+1)
+    # atol=rtol since u approx 1, atol level set at the
+    # error RK4 produces with 20 steps per period, times 0.05
+    error_level = 3E-3
+    atol = rtol = 0.05*error_level
+    # E = C*dt**q
+    return dict(time_points=tp, atol=atol, rtol=rtol)
+
 class LinearOscillator(Problem):
-    def __init__(self, m, k, x0, v0, F=None):
+    short_description = "Linear oscillator: m*u'' + k*u = F(t)"
+
+    def __init__(self, m=1, k=1, x0=1, v0=0, F=None):
         self.U0 = [x0, v0]
         self.m, self.k = float(m), k
         self.F = F
 
-    def f(u, t):
+    def f(self, u, t):
         x, v = u
+        k, m = self.k, self.m
         F = 0 if self.F is None else self.F(t)
         return [v, -k/m*x + F]
 
-    def jac(u, t):
+    def jac(self, u, t):
         x, v = u
+        k, m = self.k, self.m
         return [[0, 1], [-k/m, 0]]
 
-    def u_exact(t):
+    def u_exact(self, t):
         if self.F is None:
+            k, m = self.k, self.m
             w = np.sqrt(k/m)
             x = self.U0[0]*np.cos(w*t) + self.U0[1]*np.sin(w*t)
             v = -w*self.U0[0]*np.sin(w*t) + w*self.U0[1]*np.cos(w*t)
             return np.array([x, v]).transpose()
         else:
             return None
+
+    def default_parameters(self, resolution_per_period=20):
+        w = self.k/self.m
+        P = 2*pi/np.sqrt(w)  # period
+        return default_oscillator(P, resolution_per_period)
 
     def kinetic_energy(self, u):
         v = u[:,1]
@@ -123,7 +234,38 @@ class LinearOscillator(Problem):
 
 # offer analytical solution with damping, also with sin/cos excitation
 
+class ComplexOscillator(Problem):
+    """
+    Harmonic oscillator (u'' + w*u = 0) expressed as a complex
+    ODE: u' = i*w*u.
+    """
+    short_description = "Complex oscillator: u' = i*w*u"
+
+    def __init__(self, w=1, U0=[1, 0]):
+        self.w = w
+        self.not_suitable_solvers = [
+            'BogackiShampine', 'CashKarp', 'Dop853', 'Dopri5',
+            'DormandPrince', 'Fehlberg', 'RungeKutta1',
+            'Lsoda', 'Lsodar', 'Lsode', 'Lsodes', 'Lsodi', 'Lsodis',
+            'Lsoibt', 'MyRungeKutta', 'MySolver', 'RKC', 'RKF45',
+            'RungeKutta2', 'RungeKutta3', 'RungeKutta4',
+            'odefun_sympy', 'Vode', 'lsoda_scipy']
+
+    def f(self, u, t):
+        return 1j*self.w*u
+
+    def jac(self, u, t):
+        return 1j*self.w
+
+    def u_exact(self, t):
+        return np.exp(1j*self.w*t)
+
+    def default_parameters(self, resolution_per_period=20):
+        P = 2*pi/np.sqrt(self.w)  # period
+        return default_oscillator(P, resolution_per_period)
+
 class StiffSystem2x2(Problem):
+    short_description = "Potentially stiff 2x2 system u' = 1/eps*u"
     stiff = True
 
     def __init__(self, eps=1E-2):
@@ -132,14 +274,15 @@ class StiffSystem2x2(Problem):
         if 0.2 <= eps <= 5:
             self.stiff = False
 
-    def f(u, t):
-        return [-u[0], -self.eps*u[1]]
+    def f(self, u, t):
+        return [-u[0], -1./self.eps*u[1]]
 
-    def jac(u, t):
-        return [[-1, 0], [0, -self.eps]]
+    def jac(self, u, t):
+        return [[-1, 0], [0, -1./self.eps]]
 
-    def u_exact(t):
-        return np.array([np.exp(-t), np.exp(-self.eps*t)]).transpose()
+    def u_exact(self, t):
+        return np.array([np.exp(-t), np.exp(-1./self.eps*t)]).transpose()
+
 
 class VanDerPolOscillator(Problem):
     """
@@ -162,27 +305,48 @@ class VanDerPolOscillator(Problem):
              -2\mu u_0 - 1 & \mu (1-u_0^2)
              \end{array}\right)
     """
+    short_description = "Van der Pol oscillator"
+
     def __init__(self, U0=[2, 1], mu=3., f77=False):
         self.U0 = U0
         self.mu = mu
 
-        # Compile F77
+        # Compile F77 functions
         if f77:
             self.f_f77, self.jac_f77_radau5, self.jac_f77_lsode = \
                         compile_f77([self.str_f_f77(),
                                      self.str_jac_f77_radau5(),
                                      self.str_jac_f77_lsode])
 
-    def f(u, t):
+    def f(self, u, t):
         u_0, u_1 = u
         mu = self.mu
         return [u_1, mu*(1 - u_0**2)*u_1 - u_0]
 
-    def jac(u, t):
+    def jac(self, u, t):
         u_0, u_1 = u
         mu = self.mu
         return [[0., 1.],
                 [-2*mu*u_0*u_1 - 1, mu*(1 - u_0**2)]]
+
+    def f_with_args(self, u, t, mu):
+        u_0, u_1 = u
+        return [u_1, mu*(1 - u_0**2)*u_1 - u_0]
+
+    def jac_with_args(self, u, t, mu):
+        u_0, u_1 = u
+        return [[0., 1.],
+                [-2*mu*u_0*u_1 - 1, mu*(1 - u_0**2)]]
+
+    def f_with_kwargs(self, u, t, mu=3):
+        u_0, u_1 = u
+        return [u_1, mu*(1 - u_0**2)*u_1 - u_0]
+
+    def jac_with_kwargs(self, u, t, mu=3):
+        u_0, u_1 = u
+        return [[0., 1.],
+                [-2*mu*u_0*u_1 - 1, mu*(1 - u_0**2)]]
+
 
     def str_f_f77(self):
         """Return f(u,t) as Fortran source code string."""
@@ -234,6 +398,20 @@ Cf2py intent(out) pd
       end
 """ % (self.mu, self.mu)
 
+    def u_exact(self, t):
+        if abs(self.mu) < 1E-14:
+            x = self.U0[0]*np.cos(t) + self.U0[1]*np.sin(t)
+            v = -self.U0[0]*np.sin(t) + self.U0[1]*np.cos(t)
+            return np.array([x, v]).transpose()
+        else:
+            return None
+
+    def default_parameters(self, resolution_per_period=20):
+        # Period = 2*pi for mu=0
+        P = 2*np.pi
+        return default_oscillator(P, resolution_per_period)
+
+
 
 class Diffusion1D(Problem):
     """
@@ -269,12 +447,12 @@ class Diffusion1D(Problem):
                                      self.str_jac_f77_radau5(),
                                      self.str_jac_f77_lsode])
 
-    def f(u, t):
+    def f(self, u, t):
         u_0, u_1 = u
         mu = self.mu
         return [u_1, mu*(1 - u_0**2)*u_1 - u_0]
 
-    def jac(u, t):
+    def jac(self, u, t):
         u_0, u_1 = u
         mu = self.mu
         return [[0., 1.],

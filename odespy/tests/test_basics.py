@@ -1,3 +1,4 @@
+"""Unit test for odespy solvers."""
 # Author: Liwei Wang
 
 import odespy
@@ -20,14 +21,14 @@ class TestBasics(TestCase):
         self._run_test_problems(Sine)
 
     def test_vanderpol(self):
-        self._run_test_problems(Van_Der_Pol)
+        self._run_test_problems(VanDerPol)
 
     def test_complex(self):
-        self._run_test_problems(Complex_pi)
+        self._run_test_problems(Complex)
 
     def test_switch_to(self):
         for problem in [Exponential, Sine]:
-            self.load_problem(problem)
+            self._load_problem(problem)
             method = odespy.RKFehlberg(self.f, **self.kwargs)
             method.set_initial_condition(self.u0)
             u, t = method.solve(self.time_points)
@@ -43,10 +44,9 @@ class TestBasics(TestCase):
                 decimal=2, verbose=False)
 
     def test_terminate(self):
-        for problem in [Exponential, Sine, Van_Der_Pol]:
-            self.load_problem(problem)
+        for problem in [Exponential, Sine, VanDerPol]:
+            self._load_problem(problem)
 
-            method = None
             method = odespy.RKFehlberg(self.f, **self.kwargs)
             method.set_initial_condition(self.u0)
             u, t = method.solve(self.time_points, terminate=self.terminate)
@@ -56,12 +56,11 @@ class TestBasics(TestCase):
                                 decimal=1)
 
     def test_f_args(self):
-        self.load_problem(Exponential)
+        self._load_problem(Exponential)
 
-        method = None
         method = odespy.RKFehlberg(self.f_with_args,
-                                       f_args=self.f_args,
-                                       **self.kwargs)
+                                   f_args=self.f_args,
+                                   **self.kwargs)
         method.set_initial_condition(self.u0)
         u, t = method.solve(self.time_points)
 
@@ -72,12 +71,11 @@ class TestBasics(TestCase):
             decimal=2, verbose=True)
 
     def test_f_kwargs(self):
-        self.load_problem(Exponential)
+        self._load_problem(Exponential)
 
-        method = None
         method = odespy.RKFehlberg(self.f_with_kwargs,
-                                       f_kwargs=self.f_kwargs,
-                                       **self.kwargs)
+                                   f_kwargs=self.f_kwargs,
+                                   **self.kwargs)
         method.set_initial_condition(self.u0)
         u, t = method.solve(self.time_points)
 
@@ -89,7 +87,14 @@ class TestBasics(TestCase):
 
 
 
-    def load_problem(self, problem):
+    def _load_problem(self, problem):
+        """
+        Load keys in the `problem` dict into two categories:
+        attributes (like ``self.f``, ``self.time_points``) and
+        a dict kwargs of optional parameters which can be
+        transferred as is to the solver class (a la
+        ``solver(self.f, **self.kwargs)``).
+        """
         special_names = ('f', 'time_points', 'u0', 'exact', 'exact_final',
                          'help', 'terminate', 'exceptions', 'stop_value',
                          'f_with_args', 'f_args', 'f_with_kwargs',
@@ -103,11 +108,11 @@ class TestBasics(TestCase):
 
 
     def _run_test_problems(self, problem):
-        self.load_problem(problem)
+        self._load_problem(problem)
 
         solver_no = 0      # Number of successful solvers
-        solvers = [solver for solver in odespy.list_available_solvers() \
-                       if solver not in self.exceptions]
+        solvers = [solver for solver in odespy.list_available_solvers()
+                   if solver not in self.exceptions]
 
         print self.help
         for solver in solvers:
@@ -142,6 +147,9 @@ class TestBasics(TestCase):
                     print 'Running solver', solver, 'for', problem
                     raise e
 
+# Dictionaries for each model problem, holding info about
+# f, jac, and other parameters needed in the tests
+
 Exponential = dict(
     help="Scalar ODE : Exponential u' = -u, u = exp(-t)",
     f=lambda u,t: -u,
@@ -172,7 +180,7 @@ Sine = dict(
     stop_value=0.5,  # as defined in function terminate
     u0=[0., 1.])
 
-Van_Der_Pol = dict(
+VanDerPol = dict(
     help="Van der Pol oscillator problem:  u'' = 3*(1 - u**2)*u' - u",
     f=lambda (u00,u11),t: [u11, 3.*(1 - u00**2)*u11 - u00],
     jac=lambda (u00,u11),t: [[0., 1.], [-6.*u00*u11 - 1., 3.*(1. - u00**2)]],
@@ -185,7 +193,7 @@ Van_Der_Pol = dict(
     stop_value=1.8,  # as defined in function terminate
     exact_final=[1.7508022, -0.27099777])
 
-Complex_pi = dict(
+Complex = dict(
     help=" Scalar ODE with complex value  u' =  1./(t - 1 + 1j)",
     f=lambda u, t: 1./(t - 1. + 1j),
     time_points=np.linspace(0., 2., 15),
@@ -195,7 +203,8 @@ Complex_pi = dict(
                 'Lsoda', 'Lsodar', 'Lsode', 'Lsodes', 'Lsodi', 'Lsodis',
                 'Lsoibt', 'MyRungeKutta', 'MySolver', 'RKC', 'RKF45',
                 'RungeKutta2', 'RungeKutta3', 'RungeKutta4',
-                'odefun_sympy', 'Vode', 'lsoda_scipy'],
+                'odefun_sympy', 'Vode', 'lsoda_scipy',
+                'Radau5', 'Radau5Explicit', 'Radau5Implicit'],
     exact_final=(7.27645842122e-08-1.57079632742j))
 
 if __name__ == "__main__":
