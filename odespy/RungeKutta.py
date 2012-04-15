@@ -99,8 +99,9 @@ class RungeKutta2level(Adaptive):
 
     def initialize_for_solve(self):
         Adaptive.initialize_for_solve(self)
-        self.t_all = [self.t[0]]  # computed time levels
-        self.u_all = [self.u[0]]  # corresponding u values
+        if not self.disk_storage:
+            self.u_all = [self.u[0]]  # corresponding u values
+        self.t_all = [self.t[0]]      # computed time levels
         self.info = {'rejected' : 0}
 
     def advance(self):
@@ -166,7 +167,8 @@ class RungeKutta2level(Adaptive):
                 # or the step size exceeds valid range
                 u_intermediate.append(u_new)
                 t_intermediate.append(t+h)
-                self.u_all.append(u_new)
+                if not self.disk_storage:
+                    self.u_all.append(u_new)
                 self.t_all.append(t+h)
                 self.info['rejected'] -= 1
 

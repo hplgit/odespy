@@ -29,12 +29,12 @@ class TestBasics(TestCase):
     def test_switch_to(self):
         for problem in [Exponential, Sine]:
             self._load_problem(problem)
-            method = odespy.RKFehlberg(self.f, **self.kwargs)
-            method.set_initial_condition(self.u0)
-            u, t = method.solve(self.time_points)
+            solver = odespy.RKFehlberg(self.f, **self.kwargs)
+            solver.set_initial_condition(self.u0)
+            u, t = solver.solve(self.time_points)
 
-            method_new = method.switch_to(odespy.Lsode)
-            u_new, t_new = method_new.solve(self.time_points)
+            solver_new = solver.switch_to(odespy.Lsode)
+            u_new, t_new = solver_new.solve(self.time_points)
 
             assert_array_almost_equal(\
                 u, u_new,
@@ -47,9 +47,9 @@ class TestBasics(TestCase):
         for problem in [Exponential, Sine, VanDerPol]:
             self._load_problem(problem)
 
-            method = odespy.RKFehlberg(self.f, **self.kwargs)
-            method.set_initial_condition(self.u0)
-            u, t = method.solve(self.time_points, terminate=self.terminate)
+            solver = odespy.RKFehlberg(self.f, **self.kwargs)
+            solver.set_initial_condition(self.u0)
+            u, t = solver.solve(self.time_points, terminate=self.terminate)
 
             u_stop = u[-1][0] if len(u.shape) == 2 else u[-1]
             assert_almost_equal(u_stop, self.stop_value, verbose=True,
@@ -58,11 +58,11 @@ class TestBasics(TestCase):
     def test_f_args(self):
         self._load_problem(Exponential)
 
-        method = odespy.RKFehlberg(self.f_with_args,
+        solver = odespy.RKFehlberg(self.f_with_args,
                                    f_args=self.f_args,
                                    **self.kwargs)
-        method.set_initial_condition(self.u0)
-        u, t = method.solve(self.time_points)
+        solver.set_initial_condition(self.u0)
+        u, t = solver.solve(self.time_points)
 
         exact = self.exact(t)
         assert_array_almost_equal(\
@@ -73,11 +73,11 @@ class TestBasics(TestCase):
     def test_f_kwargs(self):
         self._load_problem(Exponential)
 
-        method = odespy.RKFehlberg(self.f_with_kwargs,
+        solver = odespy.RKFehlberg(self.f_with_kwargs,
                                    f_kwargs=self.f_kwargs,
                                    **self.kwargs)
-        method.set_initial_condition(self.u0)
-        u, t = method.solve(self.time_points)
+        solver.set_initial_condition(self.u0)
+        u, t = solver.solve(self.time_points)
 
         exact = self.exact(t)
         assert_array_almost_equal(\
@@ -110,17 +110,17 @@ class TestBasics(TestCase):
     def _run_test_problems(self, problem):
         self._load_problem(problem)
 
-        solver_no = 0      # Number of successful solvers
-        solvers = [solver for solver in odespy.list_available_solvers()
-                   if solver not in self.exceptions]
+        method_no = 0      # Number of successful methods
+        methods = [method for method in odespy.list_available_solvers()
+                   if method not in self.exceptions]
 
         print self.help
-        for solver in solvers:
-            print 'Testing %s' % solver
+        for method in methods:
+            print 'Testing %s' % method
             # Start up integration
-            method = eval('odespy.%s' % solver)(self.f, **self.kwargs)
-            method.set_initial_condition(self.u0)
-            u, t = method.solve(self.time_points)
+            solver = eval('odespy.%s' % method)(self.f, **self.kwargs)
+            solver.set_initial_condition(self.u0)
+            u, t = solver.solve(self.time_points)
 
             # Compare if exact values are specified
             if hasattr(self, 'exact'):
@@ -130,7 +130,7 @@ class TestBasics(TestCase):
                     u = u.reshape(len(u), 1)
                 assert_array_almost_equal(\
                     u[:,0], exact,
-                    err_msg='Failed with solver %s' % solver,
+                    err_msg='Failed with method %s' % method,
                     decimal=1, verbose=False)
             elif hasattr(self, 'exact_final'):
                 u_final, exact_final = u[-1], self.exact_final
@@ -140,11 +140,11 @@ class TestBasics(TestCase):
                 try:
                     assert_array_almost_equal(\
                         u_final, exact_final,
-                        err_msg='Failed with result of solver %s' % solver,
+                        err_msg='Failed with result of method %s' % method,
                         decimal=1, verbose=True)
                 except Exception, e:
                     print e
-                    print 'Running solver', solver, 'for', problem
+                    print 'Running method', method, 'for', problem
                     raise e
 
 # Dictionaries for each model problem, holding info about

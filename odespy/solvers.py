@@ -187,6 +187,14 @@ _parameters = dict(
         default=0,
         type=int),
 
+    disk_storage = dict(
+        help='Indicates whether u is stored in memory or in file. '\
+             'If string, it is the filename; if False or "", u is '\
+             'kept in memory; if True, a default filename tmp_odspy.dat '\
+             'is used.',
+        default=False,
+        type=(str,bool)),
+
     u_exact = dict(
         help='Function of t returning exact solution.',
         default=None,
@@ -584,7 +592,7 @@ class Solver:
 
     _required_parameters = ['f',]
     _optional_parameters = ['f_args', 'f_kwargs', 'complex_valued',
-                            'verbose', 'u_exact']
+                            'disk_storage', 'verbose', 'u_exact']
 
     def __init__(self, f, **kwargs):
         """
@@ -1058,11 +1066,25 @@ class Solver:
         self.complex_valued = (str(self.dtype)[:7] == 'complex')
 
         # Initialization of self.u
+        if isinstance(self.disk_storage, bool) and self.disk_storage:
+            self.disk_storage = 'tmp_odespy.dat'
         N = self.t.size - 1  # no of intervals
         if self.neq == 1:  # scalar ODEs
-            self.u = np.zeros(N+1, self.dtype)
+            if self.disk_storage:
+                self.u = np.memmap(self.disk_storage,
+                                   dtype=self.dtype,
+                                   mode='w+',
+                                   shape=(N+1,))
+            else:
+                self.u = np.zeros(N+1, self.dtype)
         else:              # systems of ODEs
-            self.u = np.zeros((N+1, self.neq), self.dtype)
+            if self.disk_storage:
+                self.u = np.memmap(self.disk_storage,
+                                   dtype=self.dtype,
+                                   mode='w+',
+                                   shape=(N+1, self.neq))
+            else:
+                self.u = np.zeros((N+1, self.neq), self.dtype)
         # Assume that self.t[0] corresponds to self.U0
         self.u[0] = self.U0
 
@@ -2129,8 +2151,9 @@ class RK34(Adaptive):
     def initialize_for_solve(self):
         Adaptive.initialize_for_solve(self)
         self.order = 4
-        self.t_all = [self.t[0]]  # computed time levels
-        self.u_all = [self.u[0]]  # corresponding u values
+        if not self.disk_storage:
+            self.u_all = [self.u[0]]  # corresponding u values
+        self.t_all = [self.t[0]]      # computed time levels
 
     def advance_intermediate(self, u, t, dt):
         """
@@ -2203,8 +2226,9 @@ class RK34(Adaptive):
                     sufficiently_accurate = True
                     u = u_new
                     t = t + self.h
+                    if not self.disk_storage:
+                        self.u_all.append(u)
                     self.t_all.append(t)
-                    self.u_all.append(u)
 
                 if self.verbose:
                     if sufficiently_accurate:

@@ -32,7 +32,8 @@ to the ``mas`` function (it is called as
 
     mas_f77 = dict(
         help='''Fortran subroutine for mas.
-This subroutine has the signature::
+This subroutine has the signature
+(note that rpar,ipar are not used)::
 
         subroutine mas_f77(neq,mas,lmas,rpar,ipar)
   Cf2py intent(hide)   rpar,ipar
@@ -40,7 +41,8 @@ This subroutine has the signature::
   Cf2py intent(out)    mas
         integer neq,lmas,ipar
         double precision mas(lmas,neq),rpar
-        mas = ...
+        mas(1,1) = ...
+        ...
         return
         end
 
@@ -58,7 +60,7 @@ This subroutine has the signature::
     jac_f77_radau5 = dict(
         help='''Fortran subroutine for jac to be
 provided to Radau5. This subroutine should be
-defined as::
+defined as (note that rpar,ipar are not used)::
 
         subroutine jac_f77_radau5
        &           (neq,t,u,dfu,ldfu,rpar,ipar)
@@ -68,7 +70,9 @@ defined as::
         integer neq,ipar,ldfu
         double precision t,u,dfu,rpar
         dimension u(neq),dfu(ldfu,neq)
-        dfu = ...
+        dfu(1,1) = ...
+        dfu(1,2) = ...
+        ...
         return
         end
 

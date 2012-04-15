@@ -101,6 +101,55 @@ def convergence(u, t, u_ref=None, t_ref=None):
     """
     raise NotImplementedError
 
+class Linear1(Problem):
+    """Linear solution, which is exactly reproduced by all methods."""
+    short_description = "u' = a + (u - a*t - b)**c, u(0)=b"
+
+    def __init__(self, a=1, b=0, c=2):
+        self.a, self.b, self.c = a, b, c
+        self.U0 = b
+
+    def f(self, u, t):
+        return self.a + (u - self.a - self.b)**self.c
+
+    def jac(self, u, t):
+        return self.c*(u - self.a - self.b)**(self.c-1)
+
+    def u_exact(self, t):
+        return self.a*t + self.b
+
+    def default_parameters(self):
+        return {'time_points': np.linspace(0, 2./self.a, 3)}
+
+class Linear2(Problem):
+    """
+    Linear solution of 2x2 system,
+    which is exactly reproduced by all methods.
+    """
+    short_description = "2x2 system with linear solution"
+
+    def __init__(self, a=1, b=0, c=2):
+        self.a, self.b, self.c = a, b, c
+        self.U0 = b
+
+    def f(self, u, t):
+        u_0, u_1 = u
+        return [self.a + (u_1 - self.a - self.b)**self.c,
+                self.a + (u_0 - self.a - self.b)**self.c]
+
+    def jac(self, u, t):
+        u_0, u_1 = u
+        return [[0, self.c*(u_1 - self.a - self.b)**(self.c-1)],
+                [self.c*(u_0 - self.a - self.b)**(self.c-1), 0]]
+
+    def u_exact(self, t):
+        func = self.a*t + self.b
+        return np.array([func, func]).transpose()
+
+    def default_parameters(self):
+        return {'time_points': np.linspace(0, 2./self.a, 4)}
+
+
 class Exponential(Problem):
     short_description = "Exponential solution: u' = a*u + b, u(0)=A"
 
