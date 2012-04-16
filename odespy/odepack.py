@@ -313,33 +313,34 @@ and it returns a vector.
         paralist_new='t,u,j,ia,ja,p',
         name_wrapped='adda_lsodis_f77',
         type=callable),
-#[[[ made doc string corrections until this place
     jac_lsoibt = dict(
         help='''Callable object to supply the jth column of
 the Jacobian matrix dr/du where r = g - A*s,
 stored in block-tridiagonal form.
-The argument list should in form of (u,t,s).
- jac(u,t,s)   ----->   (pa,pb,pc)
- vector * float * vector   ------>  (mb*mb*nb)
-  array * (mb*mb*nb) array * (mb*mb*nb) array
- pa, pb, and pc are to be loaded with partial
- derivatives (elements of the Jacobian matrix)
- on output, in terms of the block-tridiagonal
- structure assumed. That is, load the diagonal
- blocks into pa, the superdiagonal blocks (and
- block (nb,nb-2)) into pb, and the subdiagonal
- blocks (and block (1,3)) into pc.
- The blocks in block-row k of dr/du are to be
- loaded into pa(*,*,k), pb(*,*,k), and
- pc(*,*,k).
- Thus the affect of this function should be:
- pa(i,j,k) = ( (i.j) element of k-th diagonal
-             block of dr/du)
- pb(i,j,k) = ( (i,j) element of block (k,k+1)
-             of dr/du, or block (nb,nb-2) if
-             k == nb)               \
- pc(i,j,k) = ( (i,j) element of block (k,k-1)
-             of dr/du, or block (1,3) if k==1).''',
+The signature is jac(u,t,s), and the return value
+is a tuple (pa,pb,pc), where each of these
+arrays has size mb*mb*nb, mb and nb being two
+parameters that can be set (see the help line for
+the parameters in the doc string of Lsoibt).
+pa, pb, and pc are to be loaded with partial
+derivatives (elements of the Jacobian matrix)
+on output, in terms of the block-tridiagonal
+structure assumed. That is, load the diagonal
+blocks into pa, the superdiagonal blocks (and
+block (nb,nb-2)) into pb, and the subdiagonal
+blocks (and block (1,3)) into pc.
+The blocks in block-row k of dr/du are to be
+loaded into pa(*,*,k), pb(*,*,k), and
+pc(*,*,k).
+Thus the affect of this function should be::
+
+  pa(i,j,k) = ( (i.j) element of k-th diagonal
+              block of dr/du)
+  pb(i,j,k) = ( (i,j) element of block (k,k+1)
+              of dr/du, or block (nb,nb-2) if
+              k == nb)               \
+  pc(i,j,k) = ( (i,j) element of block (k,k-1)
+              of dr/du, or block (1,3) if k==1).''',
         paralist_old='u,t,s',
         paralist_new='t,u,s',
         name_wrapped='jac_lsoibt_f77',
@@ -348,12 +349,10 @@ The argument list should in form of (u,t,s).
     adda_lsoibt = dict(
         help='''Callable object to add matrix A = A(u,t) to
 another matrix P, stored in block-tridiagonal
-form.                               \
- adda(u,t,pa,pb,pc)    ----->  (pa,pb,pc)
-vector * float * (mb*mb*nb) array * (mb*mb*nb)
-array * (mb*mb*nb) array
-  -->  (mb*mb*nb) array * (mb*mb*nb) array *
-       (mb*mb*nb) array''',
+form. The signature is  adda(u,t,pa,pb,pc), which
+should return (pa,pb,pc) as described for the
+jac_lsoibt parameter.
+''',
         paralist_old='u,t,pa,pb,pc',
         paralist_new='t,u,pa,pb,pc',
         name_wrapped='adda_lsoibt_f77',
@@ -396,11 +395,11 @@ array * (mb*mb*nb) array
     # matrices in Lsodes and Lsodis.
     ja = dict(
         help='''Integer array containing the row indices where
-nonzero elements occur, reading in columnwise
+the nonzero elements occur, in columnwise
 order. Describes the sparsity matrix structure
 together with ia.
-In Lsodes, ia & ja describe the structure of
-Jacobian matrix; while in Lsodis, ia & ja are
+In Lsodes, ia and ja describe the structure of
+Jacobian matrix; while in Lsodis, ia and ja are
 used to describe the structure of matrix A.''',
         type=(list, tuple, np.ndarray),
         # integer sequence
@@ -410,9 +409,9 @@ used to describe the structure of matrix A.''',
     ia = dict(
         help='''Integer array with length neq+1 which contains
 starting locations in ja of the descriptions
-for columns 1...neq, in that order, with ia(1)
-== 1. The last element ia[neq+1] should equal
-to the total number of nonzero locations assumed.
+for columns 1...neq. ia(1) == 1. The last element
+ia[neq+1] should equal to the total number of
+nonzero locations assumed.
 For each column j = 1...neq, the values of the
 row index i in column j, where a nonzero element
 may occur, are given by i == ja(k) where ia(j) <='
@@ -426,7 +425,7 @@ k < ia(j+1).''',
         help='''Integer array which describes the sparsity
 Jacobian structure together with ic, like ia
 and ja. In Lsodis, ia and ja describe the sparse
-structure of matrix A, while ic & jc describe
+structure of matrix A, while ic and jc describe
 the sparse structure of Jacobian matrix.''',
         type=(list, tuple, np.ndarray),
         # integer sequence
@@ -449,15 +448,15 @@ the sparse structure of Jacobian matrix.''',
 
     nb = dict(
         help='''Number of blocks in the main diagonal.
-In each of the NB block-rows of the matrix P
-(each consisting of MB consecutive rows), the
+In each of the nb block-rows of the matrix P
+(each consisting of mb consecutive rows), the
 nonzero elements are to lie in three
-consecutive MB by MB blocks.  In block-rows 2
-through NB - 1, these are centered about the
-main diagonal. In block-rows 1 and NB, they
+consecutive mb by mb blocks.  In block-rows 2
+through nb-1, these are centered about the
+main diagonal. In block rows 1 and nb, they
 are the diagonal blocks and the two blocks
 adjacent to the diagonal block.  (Thus block
-positions (1,3) and (NB,NB-2) can be nonzero.)
+positions (1,3) and (nb,nb-2) can be nonzero.)
 Require: mb>=1, nb>=4, mb*nb==neq.''',
         type=int,
         extra_check=lambda x:x>=4),
@@ -474,10 +473,6 @@ class Odepack(Solver):
     package ODEPACK (available at the netlib repository:
     www.netlib.org/odepack).
 
-    _WARNING_: The documentation of these classes and the parameters
-    is very incomplete, sometimes inconsistent and suffers from
-    bad English. Most of the solvers work, though.
-
     *Solvers for explicitly given systems.*
     For each of the following solvers, it is assumed that the ODEs are
     given explicitly, so that the system can be written in the form
@@ -487,42 +482,40 @@ class Odepack(Solver):
     ===============  ==========================================================
     Name             Description
     ===============  ==========================================================
-       Lsode         A wrapper to dlsode, the basic solver in ODEPACK for
-                     stiff and nonstiff systems of the form du/dt = f.
+       Lsode         A wrapper of dlsode, the basic solver in ODEPACK for
+                     stiff and nonstiff systems of the form u' = f.
 
                      In the stiff case, it treats the Jacobian matrix df/du as
                      either a dense (full) or a banded matrix, and as either
-                     user-supplied or internally approximated by difference
-                     quotients.
+                     user-supplied or internally approximated by differences.
 
                      It uses Adams methods (predictor-corrector) in the
                      nonstiff case, and Backward Differentiation Formula (BDF)
                      methods (the Gear methods) in the stiff case.  The linear
                      systems that arise are solved by direct methods (LU
-                     factor/solve).
+                     factorization/backsolve).
 
-       Lsodes        Solves systems du/dt = f, and in the stiff case
+       Lsodes        Solves systems u' = f, and in the stiff case
                      treats Jacobian matrix in general sparse form. It can
                      determine the sparsity structure on its own, or optionally
                      accepts this information from the user.
                      It then uses parts of the Yale Sparse Matrix Package (YSMP)
                      to solve the linear systems that arise, by a sparse
-                     (direct) LU factorization/ backsolve method.
+                     (direct) LU factorization/backsolve method.
 
-       Lsoda         Solves systems du/dt = f, with a dense or banded
+       Lsoda         Solves systems u' = f, with a dense or banded
                      Jacobian when the problem is stiff, but it automatically
                      selects between nonstiff (Adams) and stiff (BDF)
                      methods. It uses the nonstiff method initially, and
                      dynamically monitors data in order to decide which
                      method to use.
 
-       Lsodar        A variant of Lsoda with a rootfinding capability added.
-                     Thus it solves problems du/dt = f with dense or banded
+       Lsodar        A variant of Lsoda allowing for constraints.
+                     It solves u' = with dense or banded
                      Jacobian and automatic method selection, and at the same
-                     time, it finds the roots of any of a set of given functions
-                     of the form g(u,t).  This is often useful for finding stop
-                     conditions, or for finding points at which a switch
-                     is to be made in the function f.
+                     time, it solves g(u,t) = 0. This is often useful for
+                     finding stopping conditions, or for finding points
+                     at which a switch is to be made in the function f.
     ===============  ==========================================================
 
      *Solvers for linearly implicit systems.*
@@ -541,7 +534,7 @@ class Odepack(Solver):
     Name             Description
     ===============  ==========================================================
        Lsodi         Solves linearly implicit systems in which the
-                     matrices involved (A, dg/du, and d(A du/dt)/du) are all
+                     matrices involved (A, dg/du, and d(A u')/du) are all
                      assumed to be either dense or banded.
 
        Lsodibt       Solves linearly implicit systems in which the matrices
@@ -555,8 +548,8 @@ class Odepack(Solver):
                      to solve the linear systems that arise, by a direct method.
     ===============  ==========================================================
 
-    *Note*: For large ODE system the user is encouraged that users provide
-    a nF2PY-compiled Fortran subroutine or a multi-line string Fortran code
+    *Note*: For large ODE systems the user is encouraged that users provide
+    an f2py-compiled Fortran subroutine or a multi-line string Fortran code
     to define the ODE. This would help to improve efficiency.
     """
 

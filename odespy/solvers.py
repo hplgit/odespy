@@ -1910,8 +1910,8 @@ class SolverImplicit(Solver):
             if getattr(self, 'nonlinear_solver', None) is None:
                 self.nonlinear_solver = 'Newton'  # default if jac provided
             # Wrap user-supplied Jacobian in the way f is wrapped
-            self.users_jac = self.jac
-            jac = self.jac  # XXX will not just self.jac work below?
+            self.users_jac = self.jac  # save
+            jac = self.jac
             self.jac = lambda u, t: \
                 np.asarray(jac(u, t, *self.jac_args, **self.jac_kwargs))
 

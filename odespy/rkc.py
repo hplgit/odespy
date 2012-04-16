@@ -35,14 +35,41 @@ import solvers
 solvers._parameters.update(_parameters_RKC)
 
 class RKC(Adaptive):
-    '''
-    Wrapper for rkc.f integrates initial value problems for systems of
-    first order ordinary differential equations. It is based on a
-    family of explicit Runge-Kutta-Chebyshev formulas of order two.
+    """
+    Wrapper for rkc.f, a well-known Fortran ODE solver.
 
-    The source code for rkc.f can be obtained from netlib and contains
-    more details.
-    '''
+    Besides the standard attributes of class ``Solver``, class ``RKC``
+    also stores a dictionary ``statistics``, which contains data and
+    explanations from the execution of the ``RKC`` subroutine.
+
+    The Fortran source code can be obtained from netlib and contains
+    more details. For convenience we quote here from ``rkc.f`` the
+    main description of the method:
+
+    "ABSTRACT:  RKC integrates initial value problems for systems of first
+    order ordinary differential equations.  It is based on a family of
+    explicit Runge-Kutta-Chebyshev formulas of order two.  The stability
+    of members of the family increases quadratically in the number of
+    stages m. An estimate of the spectral radius is used at each step to
+    select the smallest m resulting in a stable integration. RKC is
+    appropriate for the solution to modest accuracy of mildly stiff problems
+    with eigenvalues of Jacobians that are close to the negative real axis.
+    For such problems it has the advantages of explicit one-step methods and
+    very low storage. If it should turn out that RKC is using m far beyond
+    100, the problem is not mildly stiff and alternative methods should be
+    considered.  Answers can be obtained cheaply anywhere in the interval
+    of integration by means of a continuous extension evaluated in the
+    subroutine RKCINT.
+
+    The initial value problems arising from semi-discretization of
+    diffusion-dominated parabolic partial differential equations and of
+    reaction-diffusion equations, especially in two and three spatial
+    variables, exemplify the problems for which RKC was designed." (rkc.f)
+
+    This wrapper does not call ``RKCINT`` but runs ``RKC`` between each
+    time interval specified by the ``time_points`` array sent to the
+    ``solve`` method.
+    """
     quick_description = \
         "Explicit 2nd-order Runge-Kutta-Chebyshev method (rkc.f)"
 
@@ -119,16 +146,19 @@ ATOL =%s should be either a scalar or a vector of length NEQ=%d.
             # If spcrad is in form of spcrad(u,t), wrap for Fortran code.
             spcrad = self.spcrad
             self.spcrad_f77 = lambda t,u: np.asarray(spcrad(u,t))
-        # XXX WHY NOT CALL Adaptive.initialize?
+
+        # We call Solver and not Adaptive below because Adaptive
+        # just computes first_step, min_step and max_step, all of
+        # which are non-used parameters for rkc.f
         Solver.initialize_for_solve(self)   # Common settings
 
     def initialize(self):
-        '''Import extension module _rkc and check that it exists.'''
+        """Import extension module _rkc and check that it exists."""
         try:
             import _rkc
             self._rkc = _rkc
         except ImportError:
-            raise ImportError('Cannot find the extension module _rkc.\nRun setup.py again and investigate why _rkc.so was not successfully built.')
+            raise ImportError('Cannot find the extension module _rkc.\nRemove build directory, run setup.py again and investigate why _rkc.so was not successfully built.')
 
 
     def solve(self, time_points, terminate=None):

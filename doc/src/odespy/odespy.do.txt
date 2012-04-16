@@ -224,16 +224,14 @@ be efficiently accessed.
 The `time_points` array specifies the time points where we want the
 solution to be computed. The returned array `t` is the same as
 `time_points`.  The simplest numerical methods in the `odespy`
-package apply the `time_points` array directly in the solution. That
-is, the time steps used are given by `time_points[i] -
-time_points[i-1]`, for `i=0,1,...,len(time_points)-1`.  Some more
-advanced adaptive methods compute the time steps internally. Then the
-`time_points` array is just a specification of the time points where
-we want to know the solution.
-
-[hpl: Need to document how the tp array is used.]
-
-[hpl: Need to comment on storage.]
+package apply the `time_points` array directly for the time stepping.
+That is, the time steps used are given by
+!bc pycod
+time_points[i] - time_points[i-1]  #  i=0,1,...,len(time_points)-1
+!ec
+The adaptive schemes typically compute between each time point in
+the `time_points` array, making this array a specification where
+values of the unknowns are desired.
 
 The `solve` method in solver classes also allows a second argument,
 `terminate`, which is a user-implemented Python function specifying
@@ -273,24 +271,36 @@ plot(t, u_0, t, u_k)
 show()
 !ec
 
-===== Basic Example: Logistic Growth =====
+===== First Example: Logistic Growth =====
 label{ode:sec:exgr}
 
-Our first example concerns the simple scalar ODE problem $u'=au(1-u/R)$,
-$u(0)=A$, where $A>0$, $a>0$, and $R>0$ are known constants. This is
+Our first example concerns the simple scalar ODE problem
+# #if FORMAT in ("latex", "pdflatex", "sphinx")
+!bt
+\[
+\frac{du}{dt}=au\left(1-\frac{u}{R}\right),\quad u(0)=A,
+\]
+!et
+# #else
+$u'=au(1-u/R)$, $u(0)=A$,
+# #endif
+where $A>0$, $a>0$, and $R>0$ are known constants. This is
 a common model for population dynamics in ecology where $u$ is the
 number of individuals, $a$ the initial growth rate, $R$ is the
 maximum number of individuals that the environment allows (the so-called
 *carrying capacity* of the environment).
+
 Using a standard
 Runge-Kutta method of order four, the code for solving the problem in
-the time interval $[0,10]$, with $N=30$ time steps, looks like this:
+the time interval $[0,10]$ with $N=30$ time steps, looks like this:
 
 @@@CODE src-odespy/logistic1.py  fromto: def f@def u_exact
 
 With the `RK4` method and other non-adaptive methods
 the time steps are dictated by the `time_points` array.
 A constant time step of size is implied in the present example.
+Running an alternative numerical method just means replacing `RK4` by, e.g.,
+`RK2`, `ForwardEuler`, `BackwardEuler`, `AdamsBashforth2`, etc.
 
 We can easily plot the numerical solution and compare with the exact
 solution (which is known for this equation):
@@ -298,6 +308,12 @@ solution (which is known for this equation):
 @@@CODE src-odespy/logistic1.py  fromto: def u_exact@
 
 FIGURE: [figs-odespy/logistic1.png, width=400] Solution of the logistic equation with the 4-th order Runge-Kutta method (solid line) and comparison with the exact solution (dots).
+
+All the examples in this tutorial are found in the GitHub directory
+URL:"https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/".
+If you download the tarball or clone the GitHub repository, the examples
+reside in the directory `doc/src/odespy/src-odespy`.
+
 
 ===== Parameters in the Right-Hand Side Function =====
 label{ode:sec:exgr:farg}
@@ -410,7 +426,7 @@ of `time_points`.
 The angle $\theta$|$theta$ of a pendulum with mass $m$ and length $L$
 is governed by the equation
 (neglecting air resistance for simplicity)
-# #if FORMAT == "latex" or FORMAT == "sphinx"
+# #if FORMAT in ("latex", "pdflatex", "sphinx")
 !bt
 \[
 mL\ddot\theta + mg\sin\theta = 0,\quad \theta (0)=\Theta,\
@@ -426,7 +442,7 @@ _theta'' + c*sin(theta) = 0_, with _theta(0) = Theta_ and _theta'(0) = 0_.
 # #endif
 This problem must be expressed as a first-order ODE system if it is
 going to be solved by the tools in the `odespy` package.
-# #if FORMAT == "latex" or FORMAT == "sphinx"
+# #if FORMAT in ("latex", "pdflatex", "sphinx")
 Introducing $\omega = \dot\theta$ (the angular velocity) as auxiliary
 unknown, we get the system
 !bt
@@ -511,7 +527,7 @@ Since we want to compare numerical errors in the various
 solvers we need a test problem where the exact solution is known.
 Approximating $\sin(\theta)$|$sin(theta)$ by $\theta$|$theta$
 (valid for small $\theta$|$theta$), gives the ODE system
-# #if FORMAT == "latex" or FORMAT == "sphinx"
+# #if FORMAT in ("latex", "pdflatex", "sphinx")
 !bt
 \begin{align*}
 \dot\theta &= \omega,\\
@@ -552,7 +568,7 @@ equations. An appropriate extension of class `Problem` is therefore
 The second extension is to loop over many solvers. All
 solvers can be listed by
 !bc ipy
->>> import odespy, pprint
+>>> import odespy
 >>> solvers = list_all_solvers()
 >>> for solver in solvers:
 ...   print solver
@@ -596,10 +612,12 @@ RungeKutta3
 RK4
 RungeKutta4
 RKFehlberg
-SymPy_odefun
 ThetaRule
 Trapezoidal
 Vode
+lsoda_scipy
+odefun_sympy
+odelab
 !ec
 A similar function, `list_available_solvers`, returns a list of the
 names of the solvers that are available in the current installation
@@ -733,9 +751,9 @@ appropriate:
 
 We can easily compare different methods:
 
-@@@CODE src-odespy/exsos1.py f = White@savefig
+@@@CODE src-odespy/stoch1.py f = White@savefig
 
-FIGURE: [figs-odespy/exsos1.png, width=500] Oscillator driven by white noise.
+FIGURE: [figs-odespy/stoch1.png, width=500] Oscillator driven by white noise.
 
 The `Heun` and `RK2` methods give coinciding solutions while
 the `ForwardEuler` method gives too large amplitudes.
@@ -748,9 +766,15 @@ generator is used for all methods, so that the time evolution of
 the force is always the same - otherwise the solutions will be
 different.
 
+The complete code is available in "stoch1.py":
+"https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/stoch1.py".
 
 # #ifdef EXTRA
-===== Example: Solving a Partial Differential Equation =====
+  * Using adaptive methods: planet orbit or Gaussian
+  * Setting parameters, seeing parameters (doc str and get),
+    describe this feature under internals too
+
+===== Example: Solving a PDE =====
 
 # #endif
 

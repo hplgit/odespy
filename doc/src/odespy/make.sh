@@ -3,7 +3,7 @@
 name=wrap_odespy
 
 doconce format pdflatex $name
-ptex2tex -DMINTED $name
+ptex2tex -DMINTED -DLATEX_HEADING=traditional $name
 pdflatex -shell-escape $name
 exit
 
