@@ -554,7 +554,7 @@ class Odepack(Solver):
     """
 
     # Default parameter-list for all solvers in OdePack
-    # Note: f & jac are not valid in some specific solvers.
+    # Note: f and jac are not valid in some specific solvers.
 
     _optional_parameters = Solver._optional_parameters + \
         ['atol', 'rtol', 'adams_or_bdf', 'order',

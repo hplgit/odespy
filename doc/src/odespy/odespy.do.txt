@@ -766,8 +766,8 @@ generator is used for all methods, so that the time evolution of
 the force is always the same - otherwise the solutions will be
 different.
 
-The complete code is available in "stoch1.py":
-"https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/stoch1.py".
+The complete code is available in "sode.py":
+"https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/sode1.py".
 
 # #ifdef EXTRA
   * Using adaptive methods: planet orbit or Gaussian
