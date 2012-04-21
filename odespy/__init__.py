@@ -1376,6 +1376,7 @@ from rkc import *
 from rkf45 import *
 from odepack import *
 from radau5 import *
+import problems
 
 # Update doc strings with common info
 class_, doc_str, classname = None, None, None

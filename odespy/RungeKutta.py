@@ -221,7 +221,7 @@ class RungeKutta2level(Adaptive):
 class RungeKutta2(RungeKutta1level):
     """
     Standard Runge-Kutta method of order 2.
-    Implementation in the general RungeKutta Python framework.
+    Implementated in the general Python framework in the RungeKutta module.
     """
     quick_description = "Explicit 2nd-order Runge-Kutta method"
 
@@ -234,7 +234,7 @@ class RungeKutta2(RungeKutta1level):
 class RungeKutta3(RungeKutta1level):
     """
     Standard Runge-Kutta method of order 3.
-    Implementation in the general RungeKutta Python framework.
+    Implementated in the general Python framework in the RungeKutta module.
     """
     quick_description = "Explicit 3rd-order Runge-Kutta method"
 
@@ -260,7 +260,7 @@ class RungeKutta1(RungeKutta1level):
 class RungeKutta4(RungeKutta1level):
     """
     Standard Runge-Kutta method of order 4.
-    Implementation in the general RungeKutta Python framework.
+    Implementated in the general Python framework in the RungeKutta module.
     """
     quick_description = "Explicit 4th-order Runge-Kutta method"
 
@@ -275,7 +275,7 @@ class RungeKutta4(RungeKutta1level):
 class DormandPrince(RungeKutta2level):
     """
     Dormand&Prince Runge-Kutta method of order (5, 4).
-    Implementation in the general RungeKutta Python framework.
+    Implementated in the general Python framework in the RungeKutta module.
     """
     quick_description = "Dormand & Prince RK method of order (5, 4)"
 
@@ -295,7 +295,7 @@ class DormandPrince(RungeKutta2level):
 class Fehlberg(RungeKutta2level):
     """
     Adaptive Runge-Kutta-Fehlberg method of order (4, 5).
-    Implementation in the general RungeKutta Python framework.
+    Implementated in the general Python framework in the RungeKutta module.
     """
     quick_description = "Adaptive Runge-Kutta-Fehlberg (4,5) method"
 
@@ -313,7 +313,7 @@ class Fehlberg(RungeKutta2level):
 class CashKarp(RungeKutta2level):
     """
     Adaptive Cash-Karp Runge-Kutta method of order (5, 4).
-    Implementation in the general RungeKutta Python framework.
+    Implementated in the general Python framework in the RungeKutta module.
     """
     quick_description = "Adaptive Cash-Karp RK method of order (5, 4)"
 
@@ -331,7 +331,7 @@ class CashKarp(RungeKutta2level):
 class BogackiShampine(RungeKutta2level):
     """
     Adaptive Bogacki-Shampine Runge-Kutta method of order (3, 2).
-    Implementation in the general RungeKutta Python framework.
+    Implementated in the general Python framework in the RungeKutta module.
     """
     quick_description = "Adaptive Bogacki-Shampine RK method of order (3, 2)"
 

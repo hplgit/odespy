@@ -962,8 +962,8 @@ class Solver:
 
     def __str__(self):
         """
-        Return solvername, plus parameters that are different from
-        the default value.
+        Return solver name, plus parameters that are different from
+        their default values.
         """
         return self._print_method(with_f=False, default=False)
 
@@ -1073,14 +1073,27 @@ class Solver:
             self.dtype = value.dtype
         self.complex_valued = (str(self.dtype)[:7] == 'complex')
 
-        # Initialization of self.u
+        self._allocate_u(self.t)
+        # Assume that self.t[0] corresponds to self.U0
+        self.u[0] = self.U0
+
+        return None
+
+    def _allocate_u(self, t_array):
+        """
+        Allocate storage for the solution, given the time points
+        (in `t_array`).
+
+        Other data needed for allocating the self.u array are taken
+        from the solver instance (self.disk_storage, self.neq, self.dtype).
+        """
         if isinstance(self.disk_storage, bool) and self.disk_storage:
             self.disk_storage = 'tmp_odespy.dat'
-        N = self.t.size - 1  # no of intervals
+        N = t_array.size - 1  # no of intervals
         if self.neq == 1:  # scalar ODEs
             if self.disk_storage:
                 self.u = np.memmap(self.disk_storage,
-                                   dtype=self.dtype,
+                                   dtype=data_type,
                                    mode='w+',
                                    shape=(N+1,))
             else:
@@ -1088,15 +1101,11 @@ class Solver:
         else:              # systems of ODEs
             if self.disk_storage:
                 self.u = np.memmap(self.disk_storage,
-                                   dtype=self.dtype,
+                                   dtype=data_type,
                                    mode='w+',
                                    shape=(N+1, self.neq))
             else:
                 self.u = np.zeros((N+1, self.neq), self.dtype)
-        # Assume that self.t[0] corresponds to self.U0
-        self.u[0] = self.U0
-
-        return None
 
 
     def constant_time_step(self):
@@ -2269,9 +2278,8 @@ class RK34(Adaptive):
 class RKFehlberg(Adaptive):
     """
     The classical adaptive Runge-Kutta-Fehlberg method of order 4-5.
-    The method is available in more sophisticated form as
-    class Fehlberg (subclass of ``RungeKutta2level`` in the RungeKutta
-    module).
+    The method is also available in more sophisticated form as
+    class Fehlberg (in the RungeKutta module).
     """
     # Just an example of a straightforward implementation of a classical method
 
@@ -2584,7 +2592,17 @@ class lsoda_scipy(Adaptive):
 
 class odelab(Adaptive):
     """
-    Wrapper for the odelab package.
+    Odespy wrapper for the odelab package.
+    Typical use::
+
+        f = lambda u: -u   # u' = -u
+        import odespy, numpy
+        solver = odespy.odelab(f, odelab_solver='Butcher')
+        solver.set_initial_condition(1.0)
+        u, t = solver.solve(numpy.linspace(0, 3, 21))
+
+    Odelab offers the following solvers (parameter ``odelab_solver``):
+    %s
     """
     quick_description = "interface to all solvers in odelab"
 
@@ -2593,14 +2611,27 @@ class odelab(Adaptive):
     _optional_parameters = Adaptive._optional_parameters + \
         ['jac', 'jac_args', 'jac_kwargs', ]
 
-    solvers = 'ExplicitEuler ImplicitEuler RungeKutta4 ExplicitTrapezoidal RungeKutta34 SymplecticEuler Heun Kutta AdamsBashforth Butcher LDIRK343 LobattoIIIA LobattoIIIB LobattoIIIC LobattoIIICs LobattoIIID RadauIIA'.split()
+    solvers = 'ExplicitEuler ExplicitTrapezoidal ImplicitEuler RungeKutta34 RungeKutta4 SymplecticEuler ImplicitEuler LDIRK343 LobattoIIIA LobattoIIIB LobattoIIIC LobattoIIICs LobattoIIID MultiRKDAE RKDAE RadauIIA Spark Spark2 Spark3 Spark4'.split()
+
+    __doc__ = __doc__ % (str(solvers)[1:-1])
 
     def initialize(self):
         try:
             import odelab
             self.odelab = odelab
+            import odelab.scheme.classic as c, \
+                   odelab.scheme.geometric as g, \
+                   odelab.scheme.rungekutta as r
+            self.odelab_scheme_modules = [c, g, r]
+            schemes = []
+            for m in self.odelab_scheme_modules:
+                for e in dir(m):
+                    if e[0].isupper() and e != 'Scheme':
+                        schemes.append(e)
+            self.odelab_schemes = schemes
+
         except ImportError:
-            raise ImportError,'odelab is not installed - needed for sympy_odefun'
+            raise ImportError,'The odelab software is not installed - needed for class odelab'
 
     def initialize_for_solve(self):
         # odelab requires f(t, u), not f(u, t, *args, **kwargs)
@@ -2609,34 +2640,24 @@ class odelab(Adaptive):
         Solver.initialize_for_solve(self)
 
         if self.odelab_solver not in odelab.solvers:
-            raise ValueError('requested solver %s not in %s' % \
+            raise ValueError('requested solver %s not legal.\nLegal: %s' % \
                              (self.odelab_solver, str(odelab.solvers)))
 
         self.system = self.odelab.System(self.f4odelab)
 
         h = self.t[1] - self.t[0]
-        # odelab solvers are in different modules...
-        for module in [self.odelab.scheme.classic,
-                       self.odelab.scheme.geometric,
-                       self.odelab.scheme.rungekutta,
-                       ]:
+        # odelab solvers are in different modules
+        for module in self.odelab_scheme_modules:
             if self.odelab_solver in dir(module):
                 self.scheme = getattr(module, self.odelab_solver)(h)
                 break
+        if not hasattr(self, 'scheme'):
+            raise ValueError('%s is not a scheme in odelab\n(%s)' %
+                             ', '.join(self.odelab_schemes))
         self.solver = self.odelab.Solver(scheme=self.scheme,
                                          system=self.system)
-
-        # Set initial condition
-        self.solver.initialize(self.U0)
-        # Solve problem in odelab
-        self.solver.run(self.t[-1])
-        # Retrive solution
-        with self.solver.open_store() as events:
-            for i in range(self.neq):
-                self.u[:, i] = events[i]
-        # PROBLEM: will the events correspond to self.t? Probably
-        # not for adaptive methods...
-        return self.u, self.t
+        self.solver.tol = min(self.rtol, self.atol)
+        # No way to give Jacobian to odelab?
 
 
     def solve(self, time_points, terminate=None):
@@ -2648,16 +2669,26 @@ class odelab(Adaptive):
             print 'Warning: odelab.solve ignores the terminate function!'
         self.t = np.asarray(time_points)
         self.initialize_for_solve()
+        # Note allocating self.u based on self.t, as done in
+        # Solver.initialize_for_solve, is not correct for adaptive
+        # methods so we have to reallocate self.u below.
 
-        scheme = self.odelab.scheme.classic.ExplicitEuler
-        self.sympy.mpmath.mp.dps = 15  # accuracy
-        self.ufunc = self.sympy.mpmath.odefun(
-            self.f4odefun, time_points[0], self.U0)
-
-        # u and t to be returned are now computed by sampling self.ufunc
-        # at the specified time points
-        self.u = np.array([self.ufunc(t) for t in time_points])
-        self.t = np.asarray(time_points)
+        # Set initial condition
+        self.solver.initialize(self.U0)
+        # Solve problem in odelab
+        self.solver.run(self.t[-1])
+        # Retrive solution
+        t = self.solver.get_times()
+        if len(t) != len(self.t):
+            # Adaptive solver, need new t and u arrays
+            self.t = t
+            self._allocate_u(t)
+        with self.solver.open_store() as events:
+            if self.neq == 1:
+                self.u[:] = events[0]
+            else:
+                for i in range(self.neq):
+                    self.u[:, i] = events[i]
         return self.u, self.t
 
 

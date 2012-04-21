@@ -1,10 +1,10 @@
-The `odespy` package makes it easy to specify an ODE problem in
+The Odespy package makes it easy to specify an ODE problem in
 Python and get it solved by a wide variety of different numerical
 methods.
 
 ======= Motivation =======
 
-The `odespy` package grew out of the desire to have a unified interface
+The Odespy package grew out of the desire to have a unified interface
 to lots of different methods and software for ODEs. Consider the
 ODE problem
 !bt
@@ -37,7 +37,7 @@ The mentioned ODE software needs a specification of the $f(u,t)$
 through some user-written function that takes $u$ and $t$ as input and
 delivers $f$ as output.
 
-__LSODE.__ Using `LSODE` and other ODEPACK routines requires the
+=== LSODE === Using `LSODE` and other ODEPACK routines requires the
 ODE problem to be specified in FORTRAN and the solver to be called
 from FORTRAN:
 !bc fpro
@@ -87,7 +87,8 @@ C    CALL ADAPTIVE TIME STEPPING AT EACH OF THE TARGET TIME LEVELS
      END
 !ec
 
-__MATLAB.__
+=== MATLAB ===
+
 The problem can be solved with very compact code in MATLAB. The definition
 of the ODE system, the $f(u,t)$ function, must be placed in
 a function in a file, say `myode.m`:
@@ -104,7 +105,8 @@ In MATLAB we can then solve the problem by
 >> [t, u] = ode45('myode', tspan, u0, options]);
 !ec
 
-__Python.__
+=== Python ===
+
 Calling up the `vode` method from the `scipy` library in Python
 also results in compact code:
 !bc pycod
@@ -133,13 +135,15 @@ different implementations of the definition of the mathematical problem.
 Some has the signature $f(u,t)$ while others require $f(t,u)$, and
 this difference between packages is often a cause of errors.
 
-__Unified Interface.__ The `odespy` package provides a unified
-interface to all the three mentioned types of methods so we can do
-this:
+=== Unified Interface ===
+
+The Odespy package provides a unified interface to all the three
+mentioned types of methods. Therefore, we can easily run all of them
+in a loop:
 
 @@@CODE src-odespy/motivation1.py
 
-The same `f` and the same call syntax can be reused across methods
+Note that the same `f` and the same call syntax can be reused across methods
 and software.
 
 
@@ -164,7 +168,7 @@ argument `u` is either a `float` object (in case of a scalar ODE) or a
 `numpy` array object (in case of a system of ODEs).  Alternatively, a
 class with a `__call__` method can be used instead of a plain
 function.  Some tools in this package also allow implementation of $f$
-in Fortran or C for increased efficiency.
+in FORTRAN or C for increased efficiency.
 
 === Step 3 ===
 
@@ -185,16 +189,16 @@ solver = classname(f, prm1=value1, prm2=value2, ...)
 !ec
 or at any time using the `set` method:
 !bc pycod
-method.set(prm1=value1, prm2=value2, prm3=value3)
+solver.set(prm1=value1, prm2=value2, prm3=value3)
 ...
-method.set(prm4=value4)
+solver.set(prm4=value4)
 !ec
 
 === Step 4 ===
 
 Set the initial condition, $u(0)=U_0$,
 !bc pycod
-method.set_initial_condition(U0)
+solver.set_initial_condition(U0)
 !ec
 where `U0` is either a number, for a scalar ODE, or a sequence (list, tuple,
 `numpy` array), for a system of ODEs.
@@ -207,7 +211,7 @@ $i=0,1,\ldots,n$|$i=0,1,...,n$.
 !bc pycod
 T = ...  # end time
 time_points = numpy.linspace(0, T, n+1)
-u, t = method.solve(time_points)
+u, t = solver.solve(time_points)
 !ec
 In case of a scalar ODE, the returned solution `u` is a one-dimensional
 `numpy` array where `u[i]` holds the solution at time point `t[i]`.
@@ -223,7 +227,7 @@ be efficiently accessed.
 
 The `time_points` array specifies the time points where we want the
 solution to be computed. The returned array `t` is the same as
-`time_points`.  The simplest numerical methods in the `odespy`
+`time_points`.  The simplest numerical methods in the Odespy
 package apply the `time_points` array directly for the time stepping.
 That is, the time steps used are given by
 !bc pycod
@@ -244,7 +248,7 @@ def terminate(u, t, step_no):
     tolerance = 1E-6
     return True if abs(u[step_no] - a) < tolerance else False
 
-u, t = method.solve(time_points, terminate)
+u, t = solver.solve(time_points, terminate)
 !ec
 The arguments transferred to the `terminate` function are the
 solution array `u`, the corresponding time points `t`, and
@@ -257,7 +261,7 @@ are uncomputed future values.)
 === Step 6 ===
 
 Extract solution components for plotting and further analysis.
-Since the `u` array returned from `method.solve` stores all unknown
+Since the `u` array returned from `solver.solve` stores all unknown
 functions at all discrete time levels, one usually wants to extract
 individual unknowns as one-dimensional arrays. Here is an example
 where unknown number $0$ and $k$ are extracted in individual arrays
@@ -406,7 +410,7 @@ the idea:
 
 ===== Using Other Symbols =====
 
-The `odespy` package applies `u` for the unknown function or
+The Odespy package applies `u` for the unknown function or
 vector of unknown functions and `t` as the name of the independent
 variable. Many problems involve other symbols for functions and
 independent variables. These symbols should be reflected in the code.
@@ -441,7 +445,7 @@ introducing $c = g/L$.
 _theta'' + c*sin(theta) = 0_, with _theta(0) = Theta_ and _theta'(0) = 0_.
 # #endif
 This problem must be expressed as a first-order ODE system if it is
-going to be solved by the tools in the `odespy` package.
+going to be solved by the tools in the Odespy package.
 # #if FORMAT in ("latex", "pdflatex", "sphinx")
 Introducing $\omega = \dot\theta$ (the angular velocity) as auxiliary
 unknown, we get the system
@@ -484,7 +488,7 @@ whose period is $2\pi/\sqrt{c}$|$2*pi/sqrt(c)$.)
 
 @@@CODE src-odespy/osc1a.py  fromto: freq =@theta =
 
-The `u` returned from `method.solve` is a two-dimensional array, where the
+The `u` returned from `solver.solve` is a two-dimensional array, where the
 columns hold the various solution functions of the ODE system. That is,
 the first column holds $\theta$|$theta$ and the second column holds
 $\omega$|$omega$. For convenience we extract the individual solution
@@ -650,7 +654,7 @@ errors, respectively. The errors are computed by subtracting
 the numerical solution from the exact solution,
 !bc pycod
 theta_exact = lambda t: problem.Theta*numpy.cos(sqrt(problem.c)*t)
-u, t = method.solve(time_points)
+u, t = solver.solve(time_points)
 theta = u[:,0]
 error = numpy.abs(theta_exact(t) - theta)
 !ec
@@ -731,7 +735,7 @@ there is no difference between the Ito and Stratonovich interpretations
 of the equation.
 
 The challenge with this model problem is that stochastic differential
-equations do not fit with the user interface offered by `odespy`,
+equations do not fit with the user interface offered by Odespy,
 since the right-hand side function is assumed to be dependent only
 on the solution and the present time (`f(u,t)`), and additional
 user-defined parameters, but for the present problem the right-hand
@@ -877,14 +881,14 @@ construction time or through the `set` function:
 >>> solver.f_args
 (3,)
 >>> # Get all registered parameters in the method instance
->>> method.get()
+>>> solver.get()
 {'f_kwargs': {'b': 1}, 'f_args': (3,), 'complex_valued': False,
 'name of f': 'f'}
 !ec
 The `set` method sets parameters through keyword arguments and can
 take an arbitrary collection of such arguments:
 !bc cod
-method.set(name1=value1, name2=value2, name3=value3, ...)
+solver.set(name1=value1, name2=value2, name3=value3, ...)
 !ec
 
 The `get` method returns the parameters and their values as a dictionary.
@@ -908,7 +912,7 @@ actual solver class implements what is specific for the method in question.
 Class `Solver` is the super class of the hierarchy. Its constructor
 requires one mandatory argument: the right-hand side of the ODE,
 $f(u,t)$, coded as a Python function `f(u, t)` or given as a string
-containing code in a compiled language (Fortran, for instance)
+containing code in a compiled language (FORTRAN, for instance)
 implementing the right-hand side.  Additional keyword arguments can be
 provided to set parameters of the solver.
 
@@ -956,13 +960,13 @@ the subclass solvers:
    The method is useful when trying out a range of solvers for a
    problem.
 
-Let `method` some instance of a subclass in the hierarchy. The
+Let `solver` some instance of a subclass in the hierarchy. The
 following calls are possible (through inheriting common convenience
 methods in the super class `Solver`):
 
  * `repr(method)`: return the subclass name along with all
    registered parameters and their values. This string provides
-   complete information on the state of a subclass.
+   complete information on the initialization of a solver.
 
  * `str(method)`: return a short pretty print string reflecting
    the name of the method and the value of parameters that
@@ -970,11 +974,11 @@ methods in the super class `Solver`):
    This string is what one would use as legends in a plot or
    as method identifier in a table.
 
- * `method.get_parameter_info`: return or print all registered
+ * `solver.get_parameter_info`: return or print all registered
    parameters for the current solver and all properties for
    each parameter.
 
-After the constructor is called, `method.set_initial_condition` is
+After the constructor is called, `solver.set_initial_condition` is
 called to set the initial condition, and then `solve` is called.
 The `solve` method features the following steps:
 
@@ -1183,7 +1187,7 @@ class BackwardEuler(SolverImplicit):
 
 ======= Installation =======
 
-The `odespy` package is most easily installed by checkout out
+The Odespy package is most easily installed by checkout out
 the latest version of the source code:
 !bc sys
 git clone git@github.com:hplgit/odespy.git
@@ -1194,19 +1198,31 @@ The installation follows the expected standard procedure,
 sudo python setup.py install
 !ec
 
-The `odespy` package depends on several other packages:
+The Odespy package depends on several other packages:
 
- * `scipy` for running the `Vode` Adams/BDF solver and the
-   Dormand-Prince adaptive methods `Dop853`, and `Dopri5`.
- * `sympy` for running the extremely accurate `SymPy_odefun` solver.
+ * `scipy` for running the `Vode` Adams/BDF solver, the
+   Dormand-Prince adaptive methods `Dop853`, and `Dopri5`,
+   and the `scipy` wrapper `odeint` of the FORTRAN code `LSODA`
+   (Odespy features an alternative wrapper of the latter).
+ * `sympy` for running the extremely accurate `odefun_sympy` solver.
+ * `odelab` for accessing all the solvers in that package.
+
+For plotting you will need `matplotlib` or `scitools`.
 
 These packages are readily downloaded and installed by the
 standard `setup.py` script as shown above.
 On Ubuntu and other Debian-based Linux systems the following
-line installs all that `odespy` may need:
+line installs all that Odespy may need:
 !bc sys
-sudo apt-get install python-scipy python-nose python-sympy
+sudo apt-get install python-scipy python-nose python-sympy \
+     python-matplotlib python-scitools python-pip
 !ec
+
+The Odelab package is installed by the following command
+!bc sys
+pip install -e git+https://github.com/olivierverdier/odelab#egg=odelab
+!ec
+# Mac and Windows?
 
 ======= Troubleshooting =======
 
