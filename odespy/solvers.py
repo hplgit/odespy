@@ -2429,8 +2429,12 @@ class ode_scipy(Adaptive):
                     name = ode_scipy._name_differences[name]
                 self.scipy_arguments[name] = value
 
+        scipy_ode_classname = self.__class__.__name__.lower()
+        if self.dtype.startswith('complex') and scipy_ode_classname == 'vode':
+            scipy_ode_classname = 'zvode'
+
         self.integrator = self.integrator.set_integrator(
-            self.__class__.__name__.lower(), **self.scipy_arguments)
+            scipy_ode_classname, **self.scipy_arguments)
         self.integrator = self.integrator.set_initial_value(self.U0, self.t[0])
         Adaptive.initialize_for_solve(self)
 
@@ -2601,8 +2605,12 @@ class odelab(Adaptive):
         solver.set_initial_condition(1.0)
         u, t = solver.solve(numpy.linspace(0, 3, 21))
 
-    Odelab offers the following solvers (parameter ``odelab_solver``):
+    Odelab offers the following solvers (for parameter ``odelab_solver``):
     %s
+
+    Note: ode15s is actually scipy's vode code called with BDF order=5.
+    Odelab's DAE methods are not yet supported (could be by proper
+    wrapping of f and g in an ``odelab.system.System object``).
     """
     quick_description = "interface to all solvers in odelab"
 
@@ -2611,7 +2619,10 @@ class odelab(Adaptive):
     _optional_parameters = Adaptive._optional_parameters + \
         ['jac', 'jac_args', 'jac_kwargs', ]
 
-    solvers = 'ExplicitEuler ExplicitTrapezoidal ImplicitEuler RungeKutta34 RungeKutta4 SymplecticEuler ImplicitEuler LDIRK343 LobattoIIIA LobattoIIIB LobattoIIIC LobattoIIICs LobattoIIID MultiRKDAE RKDAE RadauIIA Spark Spark2 Spark3 Spark4'.split()
+    solvers = 'ExplicitEuler ExplicitTrapezoidal ImplicitEuler RungeKutta34 RungeKutta4 SymplecticEuler ImplicitEuler LDIRK343 LobattoIIIA LobattoIIIB LobattoIIIC LobattoIIICs LobattoIIID MultiRKDAE RKDAE RadauIIA RungeKutta Spark Spark2 Spark3 Spark4 AdamsBashforth AdamsBashforth1 AdamsBashforth2 AdamsBashforth2e Butcher Butcher1 Butcher3 ExplicitGeneralLinear GeneralLinear Heun Kutta Kutta38 Kutta4 McLachlan NonHolonomicEnergy NonHolonomicEnergy0 NonHolonomicEnergyEMP NonHolonomicLeapFrog SymplecticEuler ABLawson ABLawson2 ABLawson3 ABLawson4 ABNorset4 Exponential GenLawson45 HochOst4 Lawson4 LawsonEuler Phi Polynomial RKMK4T'.split()
+    DAE_solvers = 'SymplicticEuler MultiRKDAE RKDAE Spark Spark2 Spark3 Spark4'.split()
+    not_valid = 'SymplecticEuler LDIRK343 LobattoIIIA LobattoIIIB LobattoIIIC LobattoIIICs LobattoIIID MultiRKDAE RKDAE RadauIIA RungeKutta Spark Spark2 Spark3 Spark4 AdamsBashforth AdamsBashforth2 AdamsBashforth2e Butcher Butcher1 Butcher3 ExplicitGeneralLinear GeneralLinear Kutta McLachlan NonHolonomicEnergy NonHolonomicEnergy0 NonHolonomicEnergyEMP NonHolonomicLeapFrog SymplecticEuler ABLawson ABLawson2 ABLawson3 ABLawson4 ABNorset4 Exponential GenLawson45 HochOst4 Lawson4 LawsonEuler Phi Polynomial RKMK4T'.split()
+    solvers = [solver for solver in solvers if not solver in not_valid]
 
     __doc__ = __doc__ % (str(solvers)[1:-1])
 
@@ -2619,14 +2630,29 @@ class odelab(Adaptive):
         try:
             import odelab
             self.odelab = odelab
-            import odelab.scheme.classic as c, \
-                   odelab.scheme.geometric as g, \
-                   odelab.scheme.rungekutta as r
-            self.odelab_scheme_modules = [c, g, r]
+            import odelab.scheme.classic, \
+                   odelab.scheme.geometric, \
+                   odelab.scheme.rungekutta, \
+                   odelab.scheme.generallinear, \
+                   odelab.scheme.constrained, \
+                   odelab.scheme.exponential, \
+                   odelab.scheme
+
+            self.odelab_scheme_modules = [
+                odelab.scheme.classic,
+                odelab.scheme.geometric,
+                odelab.scheme.rungekutta,
+                odelab.scheme.generallinear,
+                odelab.scheme.constrained,
+                odelab.scheme.exponential,
+                odelab.scheme,
+                ]
+
+            # Rough way of extracting scheme classes in odelab
             schemes = []
             for m in self.odelab_scheme_modules:
                 for e in dir(m):
-                    if e[0].isupper() and e != 'Scheme':
+                    if e[0].isupper() and e != 'Scheme' and 'Error' not in e:
                         schemes.append(e)
             self.odelab_schemes = schemes
 
@@ -2639,7 +2665,8 @@ class odelab(Adaptive):
         self.f4odelab = lambda t, u: self.f(u, t, *self.f_args, **self.f_kwargs)
         Solver.initialize_for_solve(self)
 
-        if self.odelab_solver not in odelab.solvers:
+        #if self.odelab_solver not in odelab.solvers:
+        if self.odelab_solver not in self.odelab_schemes:
             raise ValueError('requested solver %s not legal.\nLegal: %s' % \
                              (self.odelab_solver, str(odelab.solvers)))
 
@@ -2668,15 +2695,25 @@ class odelab(Adaptive):
         if terminate is not None:
             print 'Warning: odelab.solve ignores the terminate function!'
         self.t = np.asarray(time_points)
-        self.initialize_for_solve()
-        # Note allocating self.u based on self.t, as done in
-        # Solver.initialize_for_solve, is not correct for adaptive
-        # methods so we have to reallocate self.u below.
 
-        # Set initial condition
-        self.solver.initialize(self.U0)
-        # Solve problem in odelab
-        self.solver.run(self.t[-1])
+        try:
+            self.initialize_for_solve()
+            # Note allocating self.u based on self.t, as done in
+            # Solver.initialize_for_solve, is not correct for adaptive
+            # methods so we have to reallocate self.u below.
+
+            # Set initial condition
+            self.solver.initialize(self.U0)
+            # Solve problem in odelab
+            self.solver.run(self.t[-1])
+        except Exception, e:
+            msg = 'odelab scheme %s did not work:\n%s' % \
+                  (self.odelab_solver, e)
+            #print msg
+            #print 'returning solution self.u as None'
+            #return None, self.t
+            raise ValueError(msg)
+
         # Retrive solution
         t = self.solver.get_times()
         if len(t) != len(self.t):
