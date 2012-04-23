@@ -320,7 +320,7 @@ _parameters = dict(
     # odelab parameters
     odelab_solver = dict(
         help='Name of Solver class in odelab',
-        default='RungeKutta34',
+        default='RungeKutta4',
         type=str),
 
     # Vode_PyDS parameters
@@ -937,10 +937,18 @@ class Solver:
 	        if f_name == '<lambda>':   # lambda function
 	  	    f_name = 'lambda u, t: ...'
             args.append('f=%s' % f_name)
+        if with_f and hasattr(self, 'users_jac'):
+            if not hasattr(self.users_jac, '__name__'):     # class instance?
+                f_name = self.users_jac.__class__.__name__
+	    else:    # Ordinary functions
+                f_name = self.users_jac.__name__
+	        if f_name == '<lambda>':   # lambda function
+	  	    f_name = 'lambda u, t: ...'
+            args.append('jac=%s' % f_name)
 
         # form all parameters
         for name in self._parameters:
-            if name != 'f' and hasattr(self, name):
+            if name != 'f' and name != 'jac' and hasattr(self, name):
                 value = getattr(self, name)
                 value_specified = True \
                     if 'default' not in self._parameters[name] \
@@ -948,9 +956,13 @@ class Solver:
                 if default or value_specified:
                     types = self._parameters[name]['type']
                     if types in (callable, (str, callable)):
-                        value = getattr(value, '__name__', \
-                                            value.__class__.__name__)
-                    args.append('%s=%s' % (name, value))
+                        value = getattr(value, '__name__',
+                                        value.__class__.__name__)
+                    if name.endswith('_f77') and value == '<lambda>':
+                        # wrapper of Fortran functions
+                        pass
+                    else:
+                        args.append('%s=%s' % (name, value))
 
         args = ', '.join(args)
         s += '(%s)' % args
@@ -1027,7 +1039,7 @@ class Solver:
             self.n = n
             self.u[n+1] = self.advance()   # new value
 
-            if self.verbose > 0:
+            if self.verbose > 1:
                 print '%s, step %d, t=%g' % \
                       (self.__class__.__name__, n+1, self.t[n+1])
             if terminate(self.u, self.t, n+1):
@@ -1071,7 +1083,15 @@ class Solver:
             self.dtype = np.complex if self.complex_valued else np.float
         else:
             self.dtype = value.dtype
-        self.complex_valued = (str(self.dtype)[:7] == 'complex')
+
+        # Check that consistent self.complex_valued is given
+        if str(self.dtype).startswith('complex'):
+            if not self.complex_valued:
+                raise ValueError("Solving a complex ODE, but parameter complex_valued is not set to True in the solver's constructor or set method")
+        else:
+            if self.complex_valued:
+                pass # ok, because real ODE can be complex by complex U0
+                #raise ValueError("Seemingly real-valued ODE problem, but parameter complex_valued is True")
 
         self._allocate_u(self.t)
         # Assume that self.t[0] corresponds to self.U0
@@ -1307,6 +1327,22 @@ class Solver:
         %s must be set when %s is %s!''' % (arg_print,name,value)
         return True
 
+    def has_u_t_all(self):
+        """
+        Return True if self.u_all and self.t_all, defined in
+        subclasses derived from Adaptive, are computed.
+        This function for testing is placed in class Solver so
+        that any class can check of intermediate time steps
+        have been computed and are available.
+        """
+        if hasattr(self, 'u_all') and hasattr(self, 't_all') and \
+           len(self.t_all) > 1:
+            return True
+        else:
+            # Remove self.u_all and self.t_all
+            if hasattr(self, 'u_all'): del self.u_all
+            if hasattr(self, 't_all'): del self.t_all
+            return False
 
 
 class MySolver(Solver):
@@ -2082,14 +2118,30 @@ class Adaptive(Solver):
             self.set(max_step=10*time_steps.max())
         Solver.initialize_for_solve(self)
 
+        if not self.disk_storage:
+            self.u_all = [self.u[0]]  # corresponding u values
+        self.t_all = [self.t[0]]      # computed time levels
+
+
+    """
+    # Better to have self.has_ut_all to decide if self.u_all and self.t_all
+    # are computed
+    def solve(self, time_points, terminate=None):
+        # Check that self.u_all and self.t_all are ok
+        u, t = Solver.solve(self, time_points, terminate)
+        if len(self.u_all) == 1:
+            # self.u_all was not computed
+            self.u_all = self.u
+            self.t_all = self.t
+        else:
+            self.u_all, self.t_all = np.array(self.u_all), np.array(self.t_all)
+        return u, t
+    """
 
 class AdaptiveResidual(Adaptive):
     """
     Designed for educational purposes to demonstrate a possible
     adaptive strategy.
-
-    Currently, only scalar ODE problems can be applied for purpose of
-    simplification.
     """
     quick_description = "Very simple adaptive strategy based on the residual"
 
@@ -2108,17 +2160,17 @@ class AdaptiveResidual(Adaptive):
         u_mean = 0.5*(u_n + u_next)
         u_diff = u_next - u_n
         # Central 2nd order difference approx to the residual
-        # Valid for scalar ODE only
-        return abs(u_diff/dt - self.f(u_mean, t_mean))
+        r = u_diff/dt - self.f(u_mean, t_mean)
+        r = np.abs(r).max()
+        return r
 
-    def solve(self, time_points, terminate=None, print_info=False):
+    def solve(self, time_points, terminate=None):
+        if terminate is None:
+            terminate = lambda u, t, n: False
+
         self.users_time_points = np.asarray(time_points).copy()
         self.t = t = self.users_time_points
         self.initialize_for_solve()
-        # Assume scalar equation...
-        if not isinstance(self.U0, (float,int)):
-            raise TypeError('Initial condition is not scalar - '
-                            'AdaptiveResidual can only work with scalar ODEs')
         self.validate_data()
         self.u = [self.U0]
         self.t = [t[0]]
@@ -2129,28 +2181,36 @@ class AdaptiveResidual(Adaptive):
             ntpoints = 1
             # Halve the time step until residual is small enough
             while R > self.atol:
-                ntpoints *= 2
-                time_points = np.linspace(t[k-1], t[k], ntpoints)
+                time_points = np.linspace(t[k-1], t[k], ntpoints+1)
                 dt = time_points[1] - time_points[0]
-                if dt < self.min_step:
-                    print 'AdaptiveResidual with %s solver, too small %s < %s, R=%s > %s' % (self.solver.__class__.__name__, dt, self.min_step, R, self.atol)
+                if self.verbose > 0:
+                    print 'dt=%g, ' % dt,
+                if dt < self.min_step and self.verbose > 0:
+                    print 'too small %s < %s, ' % (dt, self.min_step)
                     print
                     break
-                if dt > self.max_step:
-                    print 'AdaptiveResidual with %s solver, too large step %s > %s, R=%s > %s' % (self.solver.__class__.__name__, dt, self.max_step, R, self.atol)
+                if dt > self.max_step and self.verbose > 0:
+                    print 'too large %s > %s, ' % (dt, self.max_step)
                     break
 
                 self.solver.set_initial_condition(self.u[-1])
-                u_new, tnew = self.solver.solve(time_points, terminate)
-                R = self.residual(u_new[-2], u_new[-1], tnew[-2], tnew[-1])
-                if print_info:
-                    print '\n%d time points in (t[%d], t[%d]) = (%.3g, %.3g)' \
-                        % (ntpoints, k-1, k, t[k-1], t[k])
-                    print 'Residual = %g, Tolerance = %g, calling %s' % \
+                u_new, t_new = self.solver.solve(time_points, terminate=None)
+                #R = self.residual(u_new[-2], u_new[-1], t_new[-2], t_new[-1])
+                R = self.residual(u_new[0], u_new[-1], t_new[0], t_new[-1])
+                if self.verbose > 0:
+                    print '\n%d time points in (t[%d], t[%d]) = (%.3g, %.3g), ' \
+                        % (ntpoints+1, k-1, k, t[k-1], t[k])
+                    print 'Residual=%.1E, tolerance=%.1E, calling %s' % \
                         (R, self.atol, self.solver.__class__.__name__)
                 # reintegrate with time_step = dt/2
+                ntpoints *= 2
             self.u.extend(u_new[1:])
-            self.t.extend(tnew[1:])
+            self.t.extend(t_new[1:])
+            if terminate(self.u, self.t, len(self.u)-1):
+                break
+
+        self.u = np.array(self.u);  self.t = np.array(self.t)
+        self.u_all = self.u;  self.t_all = self.t
         return self.u, self.t
 
 
@@ -2357,6 +2417,8 @@ class RKFehlberg(Adaptive):
             if rms_norm <= 1. or h <= min_step:
                 u_i.append(u_new)
                 t_i.append(t+h)
+                self.u_all.append(u_new)
+                self.t_all.append(t+h)
 
             # prevent the error of dividing absolute zero
             error = np.asarray([(1e-16 if x == 0. else x) for x in error]) \
@@ -2430,7 +2492,7 @@ class ode_scipy(Adaptive):
                 self.scipy_arguments[name] = value
 
         scipy_ode_classname = self.__class__.__name__.lower()
-        if self.dtype.startswith('complex') and scipy_ode_classname == 'vode':
+        if self.complex_valued and scipy_ode_classname == 'vode':
             scipy_ode_classname = 'zvode'
 
         self.integrator = self.integrator.set_integrator(
@@ -2765,5 +2827,21 @@ def list_available_solvers():
                 # Perhaps the required dependency is not installed.
                 pass
     return available_solvers
+
+def list_not_suitable_complex_solvers():
+    """List all solvers that do not work for complex-valued ODEs."""
+    return [
+        'BogackiShampine', 'CashKarp', 'Dop853', 'Dopri5',
+        'DormandPrince', 'Fehlberg',
+        'RungeKutta1',
+        'RungeKutta2', 'RungeKutta3', 'RungeKutta4',
+        'Lsoda', 'Lsodar', 'Lsode', 'Lsodes',
+        'Lsodi', 'Lsodis', 'Lsoibt',
+        'RKC', 'RKF45',
+        'odefun_sympy', 'lsoda_scipy',
+        'Radau5', 'Radau5Explicit', 'Radau5Implicit',
+        ]
+
+
 
 

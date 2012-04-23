@@ -1203,15 +1203,15 @@ class Odepack(Solver):
 
 class Lsode(Odepack):
     '''
-    Basic Solver in ODEPACK package.
-    Solves the initial-value problem for stiff or nonstiff systems
-    of first-order ODE::
 
-        du/dt = f(u,t)
+    A Python wrapper of the LSODE (Livermore Solver for Ordinary
+    Differential Equations) FORTRAN subroutine.  Basic Solver in
+    ODEPACK package from netib.  Solves the initial-value problem for
+    stiff or nonstiff systems of first-order ODE, :math:`u' = f(u,t)`
+    via Adams or BDF methods (for the nonstiff and stiff cases,
+    respectively).  Can generate the Jacobian, or apply a
+    user-supplied Jacobian in dense or banded format.
 
-    or, in component form::
-
-        du(i)/dt = f(u,t)[i] for i in 1,...,neq
     '''
     quick_description = "LSODE solver for a stiff or nonstiff system"
 
@@ -1308,21 +1308,18 @@ values:
 
 class Lsoda(Odepack):
     '''
-    A variant version of the DLSODE package.
-    It switches automatically between stiff and nonstiff methods.
-    This means that the user does not have to determine whether the problem
-    is stiff or not, and the solver will automatically choose the appropriate
-    method.  It always starts with the nonstiff method.
-    Solves the initial-value problem for stiff or nonstiff systems of
-    first-order ODE::
 
-        du/dt = f(u,t)
+    A Python wrapper of the LSODA FORTRAN subroutine from ODEPACK.
+    This subroutine automatically shifts between stiff (BDF) and
+    nonstiff (Adams) methods, such that the user does not need to
+    determine whether the problem is stiff or not (as is the case when
+    using the LSODE subroutine and class :class:`Lsode`). The
+    integration always starts with the nonstiff method.  Can generate
+    the Jacobian, or apply a user-supplied Jacobian in dense or banded
+    format.
 
-    or, in component form::
-
-        du(i)/dt = f(u,t)[i] for i in 1,...,neq
     '''
-    quick_description = "LSODA solver with stiff-nonstiff auto shift"
+    quick_description ="LSODA solver with stiff-nonstiff auto shift"
 
     _optional_parameters = Odepack._optional_parameters + \
         ['jac_banded', 'jac_banded_f77', 'ml', 'mu', 'jac', 'jac_f77',
@@ -1411,32 +1408,30 @@ Jacobian type choice with 4 possible values:
 
 class Lsodar(Odepack):
     '''
-    A variant version of the DLSODE package.
-    It differs from DLSODE in two ways.
 
-    It switches automatically between stiff and nonstiff methods.
+    A Python wrapper of the LSODAR subroutine in ODEPACK.
+    LSODAR is a variant of LSODE and differs from the latter in
+    two ways.
+
+    Quote from the LSODAR source code documentation:
+    "(a) It switches automatically between stiff and nonstiff methods.
     This means that the user does not have to determine whether the
-    problem is stiff or not, and the solver will automatically choose
-    the appropriate method.  It always starts with the nonstiff method.
-    It finds the root of at least one of a set of constraint functions
-    g(i) of the independent and dependent variables.
-    It finds only those roots for which some g(i), as a function of t,
-    changes sign in the interval of integration.
-    It then returns the solution at the root, if that occurs sooner
-    than the specified stop condition, and otherwise returns the
-    solution according to the specified stop condition.
-    Solves the initial-value problem for stiff or nonstiff systems of
-    first-order ODE::
+    problem is stiff or not, and the solver will automatically choose the
+    appropriate method.  It always starts with the nonstiff method.
+    (b) It finds the root of at least one of a set of constraint
+    functions g(i) of the independent and dependent variables.
+    It finds only those roots for which some g(i), as a function
+    of t, changes sign in the interval of integration.
+    It then returns the solution at the root, if that occurs
+    sooner than the specified stop condition, and otherwise returns
+    the solution according the specified stop condition."
 
-       du/dt = f(u,t),
+    The mathematical problem reads
 
-    or, in component form::
+    ..:math::
+               u' &= f(u, t),
+          g(u,t)  &= 0.
 
-       du(i)/dt = f(u,t)[i] for i in 1,...,neq
-
-    At the same time, it locates the roots of any of a set of functions::
-
-       g(i) = g(i,t,u(1),...,u(NEQ))  (i = 1,...,ng).
     '''
     quick_description = "LSODAR method with stiff-nonstiff auto shift"
 
@@ -1552,15 +1547,11 @@ Jacobian type choice with 4 possible values:
 
 class Lsodes(Odepack):
     """
-    A variant of the DLSODE package, and is intended for initial problems
-    in which the Jacobian matrix df/du has an arbitrary sparse structure
-    (when the problem is stiff)::
-
-        du/dt = f(u,t),
-
-    or, in component form::
-
-        du(i)/dt = f(u,t)[i] for i in 1,...,neq
+    A Python wrapper of the LSODES subroutine from ODEPACK.
+    LSODES is a variant of LSODE intended for problems where the
+    Jacobian is provided via a sparse matrix data structure
+    consisting of the parameters ``jac_column``, ``ia``, ``ja``,
+    and optionally ``jac_column_f77``.
     """
     quick_description = "LSODES solver for sparse Jacobians"
 
@@ -1676,16 +1667,18 @@ possible values:
 
 class Lsodi(Odepack):
     '''
-    A variant version of the DLSODE package.
-    Solves the initial value problem for linearly implicit systems of first
-    order ODEs::
+    A Python wrapper of the LSODI subroutine from ODEPACK, targeting
+    ODE problems of the form
 
-       A(u,t) * du/dt = g(t,u) ,
+    ..math::
+               A(u,t) u' & = g(u,t)
 
-    where A(u,t) is a square matrix.
-    If A is singular, this is a differential-algebraic system.
-    Either res or res_f77 need to be supplied.
-
+    where :math:`A(u,t)` is a square matrix and :math:`g` some function.
+    If :math:`A` is singular, this is a differential-algebraic system.
+    The user input is in the form of a residual function
+    :math:`r = g - As` for some vector :math:`s`. The residual :math:`r`
+    is provided by the user function ``res`` (Python) or ``res_f77``
+    (FORTRAN).
     '''
     quick_description = "LSODI solver for linearly implicit systems"
 
@@ -1837,23 +1830,10 @@ Choice for the corrector iteration method:
 
 class Lsodis(Odepack):
     '''
-    A variant version of Lsodi, and is intended for stiff problems
-    in which the matrix A and the Jacobian matrix d(g - A*s)/du have
-    arbitrary sparse structures.
-    Solves the initial value problem for linearly implicit systems
-    of first order ODEs::
-
-       A(u,t) * du/dt = g(u,t),
-
-    where A(u,t) is a square matrix.
-    Or, in component form::
-
-      ( a   * ( du / dt ))  + ... +  ( a     * ( du   / dt ))  =
-         i,1      1                     i,NEQ      NEQ
-       =   g ( t, u , u ,..., u    )   ( i = 1,...,NEQ )
-            i      1   2       NEQ
-
-    If A is singular, this is a differential-algebraic system.
+    A Python wrapper of the LSODIS subroutine from ODEPACK.
+    This subroutine is a variant of LSODI, intended for stiff problems
+    in which the matrix A and the Jacobian of the residual wrt the
+    unknown functions have a sparse structure.
     '''
     quick_description = "LSODIS solver for linearly implicit sparse systems"
 
@@ -1992,22 +1972,10 @@ moss has 5 possible values:
 
 class Lsoibt(Odepack):
     '''
-    A variant version of Lsodi_ODEPACK, for the case where the matrices
-    A, dg/du, and d(A*s)/du are all block-tridiagonal.
-    Solves the initial value problem for linearly implicit systems of first
-    order ODEs::
-
-       A(u,t) * du/dt = g(u,t),
-
-    where A(u,t) is a square matrix.
-    Or, in component form::
-
-      ( a   * ( du / dt ))  + ... +  ( a     * ( du   / dt ))  =
-         i,1      1                     i,NEQ      NEQ
-       =   g ( t, u , u ,..., u    )   ( i = 1,...,NEQ )
-            i      1   2       NEQ
-
-    If A is singular, this is a differential-algebraic system.
+    A Python wrapper of the LSOIBT subroutine from ODEPACK.
+    This subroutine is a variant of LSODI for the case where the
+    matrices :math:`A`, :math:`dg/du`, and :math:`d(As)/du` are all
+    block tridiagonal.
     '''
     quick_description = "LSOIBIT solver for linearly implicit block tridiag systems"
 

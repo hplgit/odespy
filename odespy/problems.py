@@ -245,20 +245,37 @@ class Logistic(Problem):
         a, R, U0 = self.a, self.R, self.U0  # short form
         return R*U0*np.exp(a*t)/(R + U0*(np.exp(a*t) - 1))
 
-class Gaussian(Problem):
-    short_description = "Gaussian bell as solution"
+class Gaussian1(Problem):
+    short_description = "1 + Gaussian function as solution"
 
-    def __init__(self):
+    def __init__(self, c=2.0, s=1.0):
+        self.c, self.s = c, float(s)
         self.U0 = self.u_exact(0)
 
     def f(self, u, t):
-        return -(t-2)*u
+        return -((t-self.c)/self.s**2)*(u-1)
 
     def jac(self, u, t):
-        return -(t-2)
+        return -(t-self.c)/self.s**2
 
     def u_exact(self, t):
-        return 1 + np.exp(-0.5*(t-2)**2)
+        return 1 + np.exp(-0.5*((t-self.c)/self.s)**2)
+
+class Gaussian0(Problem):
+    short_description = "Gaussian function as solution"
+
+    def __init__(self, c=2.0, s=1.0):
+        self.c, self.s = c, float(s)
+        self.U0 = self.u_exact(0)
+
+    def f(self, u, t):
+        return -((t-self.c)/self.s**2)*u
+
+    def jac(self, u, t):
+        return -(t-self.c)/self.s**2
+
+    def u_exact(self, t):
+        return np.exp(-0.5*((t-self.c)/self.s)**2)
 
 
 def default_oscillator(P, resolution_per_period=20):
@@ -326,13 +343,7 @@ class ComplexOscillator(Problem):
 
     def __init__(self, w=1, U0=[1, 0]):
         self.w = w
-        self.not_suitable_solvers = [
-            'BogackiShampine', 'CashKarp', 'Dop853', 'Dopri5',
-            'DormandPrince', 'Fehlberg', 'RungeKutta1',
-            'Lsoda', 'Lsodar', 'Lsode', 'Lsodes', 'Lsodi', 'Lsodis',
-            'Lsoibt', 'MyRungeKutta', 'MySolver', 'RKC', 'RKF45',
-            'RungeKutta2', 'RungeKutta3', 'RungeKutta4',
-            'odefun_sympy', 'Vode', 'lsoda_scipy']
+        self.not_suitable_solvers = list_not_suitable_complex_solvers()
 
     def f(self, u, t):
         return 1j*self.w*u

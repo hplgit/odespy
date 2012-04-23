@@ -196,15 +196,10 @@ VanDerPol = dict(
 Complex = dict(
     help=" Scalar ODE with complex value  u' =  1./(t - 1 + 1j)",
     f=lambda u, t: 1./(t - 1. + 1j),
+    complex_valued=True,
     time_points=np.linspace(0., 2., 15),
     u0=0.,
-    exceptions=['BogackiShampine', 'CashKarp', 'Dop853', 'Dopri5',
-                'DormandPrince', 'Fehlberg', 'RungeKutta1',
-                'Lsoda', 'Lsodar', 'Lsode', 'Lsodes', 'Lsodi', 'Lsodis',
-                'Lsoibt', 'MyRungeKutta', 'MySolver', 'RKC', 'RKF45',
-                'RungeKutta2', 'RungeKutta3', 'RungeKutta4',
-                'odefun_sympy', 'Vode', 'lsoda_scipy',
-                'Radau5', 'Radau5Explicit', 'Radau5Implicit'],
+    exceptions=odespy.list_not_suitable_complex_solvers(),
     exact_final=(7.27645842122e-08-1.57079632742j))
 
 if __name__ == "__main__":

@@ -99,9 +99,6 @@ class RungeKutta2level(Adaptive):
 
     def initialize_for_solve(self):
         Adaptive.initialize_for_solve(self)
-        if not self.disk_storage:
-            self.u_all = [self.u[0]]  # corresponding u values
-        self.t_all = [self.t[0]]      # computed time levels
         self.info = {'rejected' : 0}
 
     def advance(self):
@@ -136,7 +133,7 @@ class RungeKutta2level(Adaptive):
         u, t, h = u_n, t_n, first_step               # initial values
         k = np.zeros((k_len, self.neq), self.dtype)  # intern stages
 
-        if self.verbose:
+        if self.verbose > 0:
             print 'advance solution in [%s, %s], h=%g' % (t_n, t_next, h)
 
         # Loop until next time point is reached
@@ -152,7 +149,7 @@ class RungeKutta2level(Adaptive):
             u_new = u + h*(np.dot(factors_u_new, k))
 
             self.info['rejected'] += 1  # reduced below if accepted
-            if self.verbose:
+            if self.verbose > 0:
                 print '  u(t=%g)=%g: ' % (t+h, u_new),
 
             # local error between 2 levels
@@ -164,7 +161,8 @@ class RungeKutta2level(Adaptive):
 
             if accurate or h <= self.min_step or h >= self.max_step:
                 # Accurate enough,
-                # or the step size exceeds valid range
+                # or the step size exceeds valid range,
+                # must accept this solution
                 u_intermediate.append(u_new)
                 t_intermediate.append(t+h)
                 if not self.disk_storage:
@@ -172,17 +170,19 @@ class RungeKutta2level(Adaptive):
                 self.t_all.append(t+h)
                 self.info['rejected'] -= 1
 
-                if self.verbose:
+                if self.verbose > 0:
                     print 'accepted, ',
             else:
-                if self.verbose:
+                if self.verbose > 0:
                     print 'rejected, ',
 
-            if self.verbose:
+            if self.verbose > 0:
                 print 'err=%s, ' % str(error),
                 if hasattr(self, 'u_exact') and callable(self.u_exact):
                     print 'exact-err=%s, ' % \
                           (np.asarray(self.u_exact(t+h))-u_new),
+                if h <= self.min_step:
+                    print 'h=min_step!! ',
 
 
            # Replace 0 values by 1e-16 since we will divide by error
@@ -208,7 +208,7 @@ class RungeKutta2level(Adaptive):
             # adjust h to fit the last step
             h = min(h, t_next - t_intermediate[-1])
 
-            if self.verbose:
+            if self.verbose > 0:
                 print 'new h=%g' % h
 
             if h == 0:

@@ -146,6 +146,40 @@ in a loop:
 Note that the same `f` and the same call syntax can be reused across methods
 and software.
 
+===== Numerical Methods Offered by Odespy =====
+
+Odelab features a unified interface to a range of different methods for
+ODEs (and also some for DAEs):
+
+  * Pure Python implementations of classical explicit schemes such as
+    the Forward Euler method (also called Euler);
+    Runge-Kutta methods of 2nd, 3rd, and 4th order; Heun's method;
+    Adams-Bashforth methods of 2nd, 3rd, and 4th order;
+    Adams-Bashforth-Moulton methods of 2nd and 3rd order;
+  * Pure Python implementations of classical implicit schemes such as
+    Backward Euler; 2-step backward scheme; the $\theta$|$theta$ rule;
+    the Midpoint (or Trapezoidal) method;
+  * Pure Python implementations of adaptive explicit Runge-Kutta
+    methods of type Runge-Kutta-Fehlberg of order (4,5), Dormand-Prince
+    of order (4,5), Cash-Karp of order (4,5), Bogacki-Shampine of order (2,3).
+  * Wrappers for all FORTRAN solvers in ODEPACK.
+  * Wrappers for the wrappers of FORTRAN solvers in `scipy`:
+    `vode` and `zvode` (adaptive Adams or BDF);
+    `dopri5` (adaptive Dormand-Prince of order (4,5));
+    `dop853` (adaptive Dormand-Prince of order 8(5,3));
+    `odeint` (adaptive Adams or BDF, basically the same as `vode`).
+  * Wrapper for the Runge-Kutta-Chebyshev formulas of order 2 as
+    offered by the well-known FORTRAN code `rkc.f`.
+  * Wrapper for a of the Runge-Kutta-Fehlberg method of
+    order (4,5) as provided by the well-known FORTRAN code `rkf45.f`.
+  * Wrapper for the Radau5 method as provided by the well-known FORTRAN code
+    `radau5.f`.
+  * Wrapper for some solvers in the "`odelab`": "https://github.com/olivierverdier/odelab" package.
+
+The ODE problem can always be specified in Python, but for wrappers of
+FORTRAN codes one can also implement the problem in FORTRAN and avoid
+callback to Python.
+
 
 ======= Basic Usage =======
 
@@ -606,7 +640,6 @@ Lsoibt
 MidpointImplicit
 MidpointIter
 MyRungeKutta
-MySolver
 RKC
 RKF45
 RK2
@@ -710,6 +743,137 @@ ThetaRule            r: 87.8, 0.2, 1.7, 2.0 E_min=5.3E-02
 Leapfrog             r: 95.9, 18.0, 1.0, 2.0 E_min=1.1E-01
 LeapfrogFiltered     r: -0.0, 121.2, 0.3, 0.1 E_min=5.2E-01
 !ec
+
+===== Example: Using Adaptive Methods =====
+
+The solvers used in the previous examples have all employed a constant
+time step $\Delta t$. Many solvers available through the Odespy
+interface are adaptive in the sense that $\Delta t$ is adjusted
+throughout the solution process to meet a prescribed tolerance for
+the estimated error.
+
+Simple methods such as `RK4` apply time steps
+!bc pycod
+dt = time_points[k+1] - time_points[k]
+!ec
+while adaptive methods will use several (smaller) time steps than `dt`
+in each `dt` interval to ensure that the estimated numerical error is
+smaller than some prescribed tolerance. The estimated numerical error
+may be a rather crude quantitative measure of the true numerical
+error (which we do not know since the exact solution of the problem is
+in general not known).
+
+Some adaptive solvers record the intermediate solutions in each `dt`
+interval in arrays `self.u_all` and `self.t_all`.  Examples include
+`RKFehlberg`, `Fehlberg`, `DormandPrince`, `CashKarp`, and
+`BogackiShampine`. Other adaptive solvers (`Vode`, `Lsode`, `Lsoda`,
+`RKC`, `RKF45`, etc.)  do not give access to intermediate solution
+steps between the user-given time points, specified in the
+`solver.solve` call, and then we only have access to the solution at
+the user-given time points as returned by this call. One can run `if
+solver.has_u_t_all()` to test if the `solver.u_all` and `solver.t_all`
+arrays are available.  These are of interest to see how the adaptive
+strategy works between the user-specified time points.
+
+=== The Test Problem ===
+
+We consider the ODE problem for testing adaptive solvers:
+# #if FORMAT in ("latex", "pdflatex", "sphinx")
+!bt
+\[ u' = -\frac{t-c}{s^2} u\]
+!et
+# #else
+$u' = -u(t-c)/s^2$.
+# #endif
+The exact solution is a Gaussian function,
+!bt
+u(t) = \exp{\left(-\frac{1}{2}\left(\frac{t-c}{s}\right)^2\right)}
+!et
+centered around $t=c$ and width characteristic width ("standard
+deviation") $s$. The initial condition is taken as the exact $u$ at $t=0$.
+
+Since the Gaussian function is significantly different from zero only in the
+interval $[c-3s, c+3s]$, one may expect that adaptive methods will
+efficiently take larger steps when $u$ is almost constant and increase
+the resolution when $u$ changes substantially in the vicinity
+of $t=c$. We can test if this is the case with several solvers.
+
+=== Running the Runge-Kutta-Fehlberg Method ===
+
+One of the most widely used adaptive methods for ODE problems is the
+Runge-Kutta-Fehlberg method of order (4,5). This method is available
+in three alternative implementations in Odespy: a direct Python
+version (`RKFehlberg`), a specialization of a generalized
+implementation of explicit adaptive Runge-Kutta methods
+(`Fehlberg`), and as a FORTRAN code (`RKF45`). The following
+program[[[
+
+Just some initial experimentation will show that this is indeed a
+challenging ODE problem where different numerical methods lead to
+different results, and some solvers are not capable of solving
+the problems (!). The performance of the solvers are strongly sensitive
+to the values of $c$ and $s$, or more precisely, the parameter $c/s$
+(the number of standard deviation distances from $t=0$ to $t=c$).
+The reason is that for a large $c/s$, $u'(t)\approx 0$|$u' approx 0$,
+but as $t$ progresses, the method needs to pick up the point
+where $u'$ starts to change more such that the peak of the Gaussian
+function is picked up.
+
+
+===== Example: Solving a Complex ODE Problem =====
+
+Many of the solvers offered by Odespy can deal with complex-valued
+ODE problems. Consider
+# #if FORMAT in ("latex", "pdflatex", "sphinx")
+!bt
+\[ u' = iwu,\quad u(0)=1,\]
+!et
+# #else
+$u' = iwu$, with $u(0)=1$,
+# #endif
+where $i=\sqrt{-1}$|$i=sqrt(-1)$ is the imaginary unit.
+The right-hand side is implemented as `1j*w*u` in Python since
+Python applies `j` as the imaginary unit in complex numbers.
+
+=== Quick Implementation ===
+
+For complex-valued ODEs, i.e., complex-valued right-hand side functions
+or initial conditions, the argument `complex_valued=True` must be
+supplied to the constructor. A complete program reads
+
+@@@CODE src-odespy/complex1.py fromto: def f@from matplotlib
+
+The function `odespy.list_not_suitable_complex_solvers()`
+returns a list of all the classes in Odespy that are not suitable
+for complex-valued ODE problems.
+
+=== Comparison of Methods ===
+
+We can try three classes that do work for complex-valued ODEs: `Vode`,
+`RK4`, and `RKFehlberg`. Comparing these with respect to CPU time and
+final error for a very long time integration of 600 periods is carried
+out by the following program.
+
+@@@CODE src-odespy/complex2.py fromto: def f@
+Note that the solution and the corresponding time values can always
+be recovered as `solver.u` and `solver.t`, respectively.
+
+The output from the program may read
+!bc dat
+Exact: u(600)=1
+Vode            u(600)=1.001587 (error:  -1.59E-03, cpu: 1.0)
+RK4             u(600)=0.997328 (error:   2.67E-03, cpu: 1.3)
+RKFehlberg      u(600)=1.000953 (error:  -9.53E-04, cpu: 7.5)
+!ec
+The `Vode` solver is a wrapper of the C code `zvode` in
+`scipy.integrate.ode` and is an adaptive Adams method, `RK4` is
+compact and straightforward Runge-Kutta method of order 4 with
+constant step size, and `RKFehlberg` is a Python implementation of
+the adaptive Runge-Kutta-Fehlberg method of order (4,5).
+These methods give approximately the same final error, but with
+different CPU times. We observe that the very simple `RK4`
+solver in pure Python compares favorably with the much more
+sophisticated solver `zvode` in C.
 
 ===== Example: Solving a Stochastic Differential Equation =====
 
@@ -1218,11 +1382,17 @@ sudo apt-get install python-scipy python-nose python-sympy \
      python-matplotlib python-scitools python-pip
 !ec
 
-The Odelab package is installed by the following command
+The Odelab package is installed by either
 !bc sys
 pip install -e git+https://github.com/olivierverdier/odelab#egg=odelab
 !ec
-# Mac and Windows?
+or downloading the source and running `setup.py`:
+!bc sys
+git clone git://github.com/olivierverdier/odelab.git
+cd odelab
+sudo python setup.py install
+!ec
+
 
 ======= Troubleshooting =======
 
