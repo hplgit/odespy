@@ -228,10 +228,10 @@ class Exponential(Problem):
 class Logistic(Problem):
     short_description = "Logistic equation"
 
-    def __init__(self, a, R, U0):
+    def __init__(self, a, R, A):
         self.a = a
         self.R = R
-        self.U0 = U0
+        self.U0 = A
 
     def f(self, u, t):
         a, R = self.a, self.R  # short form

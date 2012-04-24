@@ -539,7 +539,7 @@ an alarming feature: the amplitude grows (indicating increasing
 energy in the system). Changing `T` to 28 periods instead of 10
 makes the numerical solution explode.
 
-FIGURE: [figs-odespy/exos1a.png, width=500] Comparison of large-amplitude numerical solution with corresponding analytical solution (derived for small amplitudes).
+FIGURE: [figs-odespy/osc1a.png, width=500] Comparison of large-amplitude numerical solution with corresponding analytical solution (derived for small amplitudes).
 
 Changing solution method is a matter of substituting `Heun` by `RK4`,
 for instance:
@@ -549,7 +549,7 @@ for instance:
 The amplitude is now correct, but the numerical solution has a different
 frequency than the inaccurate analytical "solution".
 
-FIGURE: [figs-odespy/exos1b.png, width=500] Switching to a 4-th order Runge-Kutta method improves the numerical solution.
+FIGURE: [figs-odespy/osc1b.png, width=500] Switching to a 4-th order Runge-Kutta method improves the numerical solution.
 
 Changing $\Theta$|$Theta$ to a small value, say 0.05, makes the two curves
 coincide. The next section shows how easy it is to run a problem with a set
@@ -681,7 +681,7 @@ The loop over the chosen solvers may look like
 @@@CODE src-odespy/osc2.py  fromto: N_per_period =@
 A complete program is available as "`osc2.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py".
 
-FIGURE: [figs-odespy/exos2.png, width=500] Comparison of solutions.
+FIGURE: [figs-odespy/osc2.png, width=500] Comparison of solutions.
 
 We can extend this program to compute the error in each numerical
 solution for different time step sizes.
@@ -940,22 +940,30 @@ The lesson learned in this example is two-fold: 1) several methods should
 be tested to gain reliability in the results, and Odespy makes such tests
 very straightforward, and 2) strict tolerances, far below
 the default values, may be necessary for some methods, here `Vode` and
-`Lsoda` in particular.
+`Lsoda` in particular. We remark that it is the ODE problem that causes
+difficulties: changing the problem to `odespy.problems.Logistic`
+shows that all the curves cannot be distinguished visually.
 
-The present test problem can be made increasingly more difficult by
-increasing the value of $c/s$.
+The present test problem with a Gaussian function as solution
+can be made increasingly more difficult by
+increasing the value of $c/s$, i.e., a more peaked function moved to
+the right.
 
-Just some initial experimentation will show that this is indeed a
-challenging ODE problem where different numerical methods lead to
-different results, and some solvers are not capable of solving
-the problems (!). The performance of the solvers are strongly sensitive
-to the values of $c$ and $s$, or more precisely, the parameter $c/s$
-(the number of standard deviation distances from $t=0$ to $t=c$).
-The reason is that for a large $c/s$, $u'(t)\approx 0$|$u' approx 0$,
-but as $t$ progresses, the method needs to pick up the point
-where $u'$ starts to change more such that the peak of the Gaussian
-function is picked up.
+=== Extensive Testing ===
 
+The program "`gaussian4.py`":
+"https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian4.py"
+sets up an extensive experiments involving a lot of solvers, several
+$c/s$ values, and several error tolerances.  The experiments clearly
+demonstrate how challenging this ODE problem is for many adaptive
+solvers unless $c/s$ is moderate and a strict tolerance (much lower
+than the real accuracy level) is used. One can especially see the
+fundamental difficulties that `Vode`, `Lsode`, and `Lsoda` (all stiff
+and nonstiff versions) face when $c/s\geq 8$: these solvers do not
+manage to pick up any variation in $u$. Nevertheless, for less
+demanding ODEs these solvers may perform very well, but it is highly
+recommended to always use the power of the unified Odespy interface
+to test several different adaptive methods.
 
 ===== Example: Solving a Complex ODE Problem =====
 
@@ -1002,15 +1010,15 @@ Vode            u(600)=1.001587 (error:  -1.59E-03, cpu: 1.0)
 RK4             u(600)=0.997328 (error:   2.67E-03, cpu: 1.3)
 RKFehlberg      u(600)=1.000953 (error:  -9.53E-04, cpu: 7.5)
 !ec
-The `Vode` solver is a wrapper of the C code `zvode` in
-`scipy.integrate.ode` and is an adaptive Adams method, `RK4` is
-compact and straightforward Runge-Kutta method of order 4 with
-constant step size, and `RKFehlberg` is a Python implementation of
-the adaptive Runge-Kutta-Fehlberg method of order (4,5).
-These methods give approximately the same final error, but with
-different CPU times. We observe that the very simple `RK4`
-solver in pure Python compares favorably with the much more
-sophisticated solver `zvode` in C.
+The `Vode` solver is a wrapper of the FORTRAN code `zvode.f` in
+`scipy.integrate.ode` and is an adaptive Adams method (as run here),
+`RK4` is compact and straightforward Runge-Kutta method of order 4 in
+pure Python with constant step size, and `RKFehlberg` is a pure Python
+implementation of the adaptive Runge-Kutta-Fehlberg method of order
+(4,5).  These methods give approximately the same final error, but
+with different CPU times. We observe that the very simple `RK4` solver
+in pure Python compares favorably with the much more sophisticated
+FORTRAN subroutine `zvode`.
 
 ===== Example: Solving a Stochastic Differential Equation =====
 
