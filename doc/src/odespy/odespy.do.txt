@@ -139,7 +139,7 @@ this difference between packages is often a cause of errors.
 
 The Odespy package provides a unified interface to all the three
 mentioned types of methods. Therefore, we can easily run all of them
-in a loop:
+in a loop (program "`motivation.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/motivation1.py"):
 
 @@@CODE src-odespy/motivation1.py
 
@@ -330,7 +330,8 @@ maximum number of individuals that the environment allows (the so-called
 
 Using a standard
 Runge-Kutta method of order four, the code for solving the problem in
-the time interval $[0,10]$ with $N=30$ time steps, looks like this:
+the time interval $[0,10]$ with $N=30$ time steps, looks like this
+(program "`logistic1.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic1.py"):
 
 @@@CODE src-odespy/logistic1.py  fromto: def f@def u_exact
 
@@ -369,6 +370,7 @@ complicated ODEs.
 The numerical solution is found by
 
 @@@CODE src-odespy/logistic2.py  fromto: import odespy@from matplotlib
+The complete program is available in the file program "`logistic2.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic2.py".
 
 Instead of having the problem parameters `a` and `R` in the ODE as
 global variables or in a class, we may include them as extra arguments
@@ -402,7 +404,8 @@ It is easy to simulate for some time interval $[0, T_1]$,
 the continue with $u(T_1)$ as new initial condition and simulate for
 $t$ in $[T_1, T_2]$ and so on. Let us divide the time
 domain into subdomains and compute the solution for
-each subdomain in sequence. The following program performs the steps.
+each subdomain in sequence. The following program performs the steps
+("`logistic4.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic4.py").
 
 @@@CODE src-odespy/logistic4.py  fromto: def f@show\(
 
@@ -427,7 +430,7 @@ must be large enough for the termination criterion to be reached.
 With a `terminate` function it is also convenient to specify the
 time step `dt` and not the total number of time steps.
 
-A complete program can be as follows:
+A complete program can be as follows ("`logistic5.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic5.py"):
 
 @@@CODE src-odespy/logistic5.py
 
@@ -438,7 +441,7 @@ The previous code example can be recast into a more class-based
 to the problem (the "physics") into a problem class `Logistic`, while
 all data related to the numerical solution and its quality are
 taken care of by class `Solver`. The code below illustrates
-the idea:
+the idea ("`logistic6.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic26py"):
 
 @@@CODE src-odespy/logistic6.py
 
@@ -452,7 +455,7 @@ For example, here is a coding example involving the logistic
 equation written as $y'(x)=au(x)(1-u(x)/R(x))$, where now $R=R(x)$
 is considered. Following the setup froom the very first program
 above solving the logistic ODE, we can easily introduce our own
-nomenclature:
+nomenclature ("`logistic7.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic7.py"):
 
 @@@CODE src-odespy/logistic7.py
 
@@ -529,6 +532,7 @@ $\omega$|$omega$. For convenience we extract the individual solution
 components in individual arrays:
 
 @@@CODE src-odespy/osc1a.py  fromto: theta =@import matplotlib
+The complete program is available in the file "`osc1a.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc1a.py".
 
 Looking at the plot reveals that the numerical solution has
 an alarming feature: the amplitude grows (indicating increasing
@@ -675,6 +679,7 @@ in the current mathematical model.
 The loop over the chosen solvers may look like
 
 @@@CODE src-odespy/osc2.py  fromto: N_per_period =@
+A complete program is available as "`osc2.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py".
 
 FIGURE: [figs-odespy/exos2.png, width=500] Comparison of solutions.
 
@@ -699,7 +704,7 @@ error_L2 = sqrt(numpy.sum(error**2)/dt)
 !ec
 where `dt` is the time step size.
 
-Typical loops over solvers and resolutions look as follows:
+Typical loops over solvers and resolutions look as follows ("`osc3.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc3.py"):
 
 @@@CODE src-odespy/osc3.py  fromto: T = num_periods@\# Print
 
@@ -780,7 +785,10 @@ strategy works between the user-specified time points.
 We consider the ODE problem for testing adaptive solvers:
 # #if FORMAT in ("latex", "pdflatex", "sphinx")
 !bt
-\[ u' = -\frac{t-c}{s^2} u\]
+\begin{equation}
+u' = -\frac{t-c}{s^2} u
+label{gaussian:ode:eq}
+\end{equation}
 !et
 # #else
 $u' = -u(t-c)/s^2$.
@@ -798,15 +806,144 @@ efficiently take larger steps when $u$ is almost constant and increase
 the resolution when $u$ changes substantially in the vicinity
 of $t=c$. We can test if this is the case with several solvers.
 
+=== Running Simple Methods ===
+
+Let us first use a simple standard method like the 2nd- and 4th-order
+Runge-Kutta methods with constant step size. With the former method
+(`RK2`), $c=3$, $s=0.5$, and $41$ uniformly distributed points,
+the discrepancy between the numerical and exact solution in
+Figure ref{gaussian:fig:RK2:41} is substantial. Increasing the number
+of points by a factor of 10 gives a solution much closer to the
+exact one, and switching to the 4th-order method (`RK4`) makes the
+curves visually coincide. The problem is therefore quite straightforward
+to solve using a sufficient number of points and a higher-order method.
+
+FIGURE: [figs-odespy/gaussian_RK2_41.png, width=500] 2nd-order Runge-Kutta method with 41 points for solving (ref{gaussian:ode:eq}).  label{gaussian:fig:RK2:41}
+
+A simple program testing one numerical method goes as follows ("`gaussian1.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py").
+
+@@@CODE src-odespy/gaussian1.py
+
+
 === Running the Runge-Kutta-Fehlberg Method ===
 
-One of the most widely used adaptive methods for ODE problems is the
+One of the most widely used general-purpose, adaptive methods for
+ODE problems is the
 Runge-Kutta-Fehlberg method of order (4,5). This method is available
 in three alternative implementations in Odespy: a direct Python
 version (`RKFehlberg`), a specialization of a generalized
 implementation of explicit adaptive Runge-Kutta methods
-(`Fehlberg`), and as a FORTRAN code (`RKF45`). The following
-program[[[
+(`Fehlberg`), and as a FORTRAN code (`RKF45`). We can try one of
+these,
+!bc pycod
+method = odespy.Fehlberg
+!ec
+Figure ref{gaussian:fig:Fehlberg:41} shows how `Fehlberg` with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (113 adaptively selected points in time).
+
+FIGURE: [figs-odespy/gaussian_RK2_41.png, width=500] Adaptive Runge-Kutta-Fehlberg method with 41 points for solving (ref{gaussian:ode:eq}).  label{gaussian:fig:Fehlberg:41}
+
+Adaptive algorithms apply an error estimate based on considering a higher-order method as exact, in this case a method of order 5, and a method of lower order (here 4) as the numerically predicted solution. The user can specify an error tolerance. In the program above we just relied to the default tolerance, which can be printed by
+!bc pycod
+print solver.get()
+!ec
+yielding a list of all optional parameters:
+!bc dat
+{'f_kwargs': {}, 'f_args': (),
+ 'max_step': 1.5000000000000036, 'verbose': 0,
+ 'min_step': 0.0014999999999999946,
+ 'first_step': 0.14999999999999999,
+ 'rtol': 1e-06, 'atol': 1e-08,
+ 'name of f': 'f', 'complex_valued': False,
+ 'disk_storage': False, 'u_exact': None}
+!ec
+The tolerances involved are of relative and absolute type, i.e.,
+!bc pycod
+estimated_error <= tol = rtol*abs(u) + atol
+!ec
+is the typical test if the solution is accurate enough.
+For very small `u`, `atol` comes into play, while for large `u`, the
+relative tolerance `rtol` dominates.
+
+In this particular example, running `RK4` with 113 equally spaced points
+yields a maximum value of 0.9946, while `Fehlberg` results in 0.9849.
+That is, the much simpler and faster `RK4` method is also more accurate
+than the all-round, "reliable" Runge-Kutta-Fehlberg method with an
+error tolerance of $10^-6$. As we see, the actually error is of the
+order $10^{-2}$ for the latter method.
+
+We can specify stricter tolerances and also control the minimum
+allowed step size, `min_step`, which might be too large to achieve
+the desired error level ("`gaussian2.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian2.py"):
+
+@@@CODE src-odespy/gaussian2.py fromto: rtol = @solver\.set_initial_
+
+This adjustment does not improve the accuracy. Setting `rtol=1E-12` does:
+the `Fehlberg` solver then applies 800 points and achieves a maximum
+value of 1.00004.
+
+=== Testing More Adaptive Solvers ===
+
+We have already solved (ref{gaussian:ode:eq}) with sufficient accuracy, but
+let us see how other methods perform, as this will most likely result in
+a surprise. Below is a program ("`gaussian3.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian3.py") that compares several famous and
+widely used methods in the same plot.
+
+@@@CODE src-odespy/gaussian3.py
+
+The default discretization applies $N=40$ equal-sized time intervals,
+but adaptive methods should be able to adjust themselves to the
+desired error level. Figures ref{gaussian3:fig1:41} and
+ref{gaussian3:fig1err:41} show that this expected behavior is not the
+case. There is substantial discrepancy between the methods!
+Surprisingly, the well-known FORTRAN codes accessed by the `Vode`
+(`vode.f`) and `Lsoda` (from ODEPACK) methods give really inaccurate
+results, despite setting `Vode` to use a stiff solver of order 4, and
+`Lsoda` should automatically select between nonstiff and stiff solvers
+(of default order 4 in this case).
+
+FIGURE: [figs-odespy/gaussian3_41.png, width=500] Comparison of adaptive methods for (ref{gaussian:ode:eq}).  label{gaussian3:fig1:41}
+
+FIGURE: [figs-odespy/gaussian3e_41.png, width=500] Comparison of errors in adaptive methods for (ref{gaussian:ode:eq}).  label{gaussian3:fig1err:41}
+
+Numerically, the program writes out the following results for the
+maximum value of the solution:
+!bc dat
+0.9976  DormandPrince
+0.6669  BogackiShampine
+0.9814  RKFehlberg
+0.5413  Vode
+0.9738  RKF45
+1.1346  Lsoda
+!ec
+The clearly most accurate method is `DormandPrince`  - the default
+method used by Matlab's `ode45` solver, which probably the world's
+most popular ODE solver.
+
+The remedy to get all the tested solvers to perform well is to
+choose a much stricter tolerance. Figure ref{gaussian3:fig2:41} shows
+the coinciding curves. Numerically, we now have
+!bc dat
+0.9991  DormandPrince
+0.9951  BogackiShampine
+0.9984  RKFehlberg
+1.0051  Vode
+0.9957  RKF45
+1.0039  Lsoda
+!ec
+For the methods `DormandPrince`,  `RKFehlberg`, and
+`BogackiShampine` we have information about the number of adaptive
+time points used: 305, 357, and 3999, respectively.
+
+FIGURE: [figs-odespy/gaussian3_41_Em10.png, width=500] Comparison of adaptive methods with error tolerance $10^{-10}$ for (ref{gaussian:ode:eq}).  label{gaussian3:fig2:41}
+
+The lesson learned in this example is two-fold: 1) several methods should
+be tested to gain reliability in the results, and Odespy makes such tests
+very straightforward, and 2) strict tolerances, far below
+the default values, may be necessary for some methods, here `Vode` and
+`Lsoda` in particular.
+
+The present test problem can be made increasingly more difficult by
+increasing the value of $c/s$.
 
 Just some initial experimentation will show that this is indeed a
 challenging ODE problem where different numerical methods lead to

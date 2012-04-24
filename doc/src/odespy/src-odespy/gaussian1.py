@@ -8,8 +8,8 @@ problem = odespy.problems.Gaussian0(c=center_point, s=s)
 npoints = 41
 tp = np.linspace(0, 2*center_point, npoints)
 
-solver = odespy.Fehlberg(problem.f)
-#solver = odespy.Vode(problem.f)
+method = odespy.RK4
+solver = method(problem.f)
 solver.set_initial_condition(problem.U0)
 
 u, t = solver.solve(tp)

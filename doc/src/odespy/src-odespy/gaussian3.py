@@ -18,14 +18,13 @@ def run(problem, tp, solver):
     legend.append(method)
     plt.hold('on')
 
-atol = 1E-8
-rtol = atol
+rtol = 1E-6
+atol = rtol
 s = 0.5
 npoints = 41
 center_point = 3
 problem = odespy.problems.Gaussian0(c=center_point, s=s)
 tp = np.linspace(0, 2*center_point, npoints)
-min_step = 0.01
 min_step = 0.0001
 
 methods = ['DormandPrince', 'BogackiShampine',
@@ -34,7 +33,7 @@ solvers = [eval('odespy.' + method)(
            problem.f, atol=atol, rtol=rtol,
            min_step=min_step)
            for method in methods]
-solvers[1].set(adams_or_bdf='bdf')
+solvers[1].set(adams_or_bdf='bdf', order=4)  # Vode
 
 legend = []
 for solver in solvers:
@@ -45,6 +44,7 @@ legend.append('exact')
 plt.legend(legend)
 plt.savefig('tmp1.png')
 
+# Plot errors
 plt.figure()
 exact = problem.u_exact(tp)
 for solver in solvers:

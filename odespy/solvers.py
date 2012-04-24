@@ -884,10 +884,10 @@ class Solver:
             # Remove f and jac since these are wrappers of the
             # user's functions. Instead, insert an entries that
             # reflect the name of user-supplied functions
-            all_args.remove('f')
+            del all_args['f']
             all_args['name of f'] = self.users_f.func_name
             if 'jac' in all_args:
-                all_args.remove('jac')
+                del all_args['jac']
                 all_args['name of jac'] = self.users_jac.func_name
 
             if print_info:

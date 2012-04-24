@@ -8,19 +8,18 @@ problem = odespy.problems.Gaussian0(c=center_point, s=s)
 npoints = 41
 tp = np.linspace(0, 2*center_point, npoints)
 
-atol = 1E-8
-rtol = atol
-min_step = 0.0001
+rtol = 1E-6
+atol = rtol
+min_step = 0.000001
 
 solver = odespy.Fehlberg(problem.f, atol=atol, rtol=rtol,
                          min_step=min_step)
-solver = odespy.Fehlberg(problem.f)
 solver.set_initial_condition(problem.U0)
 
 u, t = solver.solve(tp)
 
 method = solver.__class__.__name__
-print '%.4f  %s' % (u.max(), method)
+print '%.8f  %s' % (u.max(), method)
 
 if solver.has_u_t_all():
     plt.plot(solver.t_all, solver.u_all, tp, problem.u_exact(tp))
@@ -31,4 +30,3 @@ else:
 plt.legend([method, 'exact'])
 plt.savefig('tmp.png')
 plt.show()
-
