@@ -168,8 +168,8 @@ numerical methods and implementations:
     methods of type Runge-Kutta-Fehlberg of order (4,5), Dormand-Prince
     of order (4,5), Cash-Karp of order (4,5), Bogacki-Shampine of order (2,3).
   * Wrappers for all FORTRAN solvers in ODEPACK.
-  * Wrappers for the wrappers of FORTRAN solvers in "`scipy`": "http://www.scipy.org":
-    `vode` and `zvode` (adaptive Adams or BDF from "`vode.f`": "http://www.netlib.org/ode/vode.f");
+  * Wrappers for the wrappers of FORTRAN solvers in "SciPy": "http://www.scipy.org":
+    `vode` and `zvode` (adaptive Adams or BDF from "vode.f": "http://www.netlib.org/ode/vode.f");
     `dopri5` (adaptive Dormand-Prince method of order (4,5));
     `dop853` (adaptive Dormand-Prince method of order 8(5,3));
     `odeint` (adaptive Adams or BDF, basically the same as `vode`, but in the implementation `lsoda` from "ODEPACK": "http://www.netlib.org/odepack/").

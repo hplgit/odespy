@@ -23,16 +23,16 @@ implementations:
   * Wrappers for all FORTRAN solvers in ODEPACK.
 
   * Wrappers for the wrappers of FORTRAN solvers in ``scipy` <http://www.scipy.org>`_:
-    ``vode`` and ``zvode`` (adaptive Adams or BDF from ``vode.f` <http://www.netlib.org/ode/vode.f>`_);
+    ``vode`` and ``zvode`` (adaptive Adams or BDF from ```vode.f`` <http://www.netlib.org/ode/vode.f>`_);
     ``dopri5`` (adaptive Dormand-Prince method of order (4,5));
     ``dop853`` (adaptive Dormand-Prince method of order 8(5,3));
     ``odeint`` (adaptive Adams or BDF, basically the same as ``vode``, but in the implementation ``lsoda`` from `ODEPACK <http://www.netlib.org/odepack/>`_).
 
   * Wrapper for the Runge-Kutta-Chebyshev formulas of order 2 as
-    offered by the well-known FORTRAN code ``rkc.f` <http://www.netlib.org/ode/rkc.f>`_.
+    offered by the well-known FORTRAN code ```rkc.f`` <http://www.netlib.org/ode/rkc.f>`_.
 
   * Wrapper for a of the Runge-Kutta-Fehlberg method of
-    order (4,5) as provided by the well-known FORTRAN code ``rkf45.f` <http://www.netlib.org/ode/rkf45.f>`_.
+    order (4,5) as provided by the well-known FORTRAN code ```rkf45.f`` <http://www.netlib.org/ode/rkf45.f>`_.
 
   * Wrapper for the Radau5 method as provided by the well-known FORTRAN code
     ``radau5.f` <http://www.unige.ch/~hairer/prog/stiff/radau5.f>`_.
