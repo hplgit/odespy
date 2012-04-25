@@ -1,4 +1,0 @@
-The odesolvers package contains tools for solving ordinary
-differential equations (ODEs). The user specifies the problem through
-high-level Python code. Both scalar ODEs and systems of ODEs are
-supported.  A wide range of numerical methods for ODEs are offered.

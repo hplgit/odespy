@@ -140,7 +140,7 @@ different implementations of the definition of the mathematical problem.
 Some has the signature $f(u,t)$ while others require $f(t,u)$, and
 this difference between packages is often a cause of errors.
 
-===== The Odespy Unified Interface =====
+===== Odespy's Unified Interface =====
 
 The Odespy package provides a unified interface to all the three
 mentioned types of methods. Therefore, we can easily run all of them
@@ -153,8 +153,8 @@ and software.
 
 ===== Methods and Implementations Offered by Odespy =====
 
-Odelab features a unified interface to a range of different methods for
-ODEs (and also some for DAEs):
+Odespy features a unified interface to the following collection of
+numerical methods and implementations:
 
   * Pure Python implementations of classical explicit schemes such as
     the Forward Euler method (also called Euler);
@@ -168,10 +168,10 @@ ODEs (and also some for DAEs):
     methods of type Runge-Kutta-Fehlberg of order (4,5), Dormand-Prince
     of order (4,5), Cash-Karp of order (4,5), Bogacki-Shampine of order (2,3).
   * Wrappers for all FORTRAN solvers in ODEPACK.
-  * Wrappers for the wrappers of FORTRAN solvers in `scipy`:
+  * Wrappers for the wrappers of FORTRAN solvers in "`scipy`": "http://www.scipy.org":
     `vode` and `zvode` (adaptive Adams or BDF from "`vode.f`": "http://www.netlib.org/ode/vode.f");
-    `dopri5` (adaptive Dormand-Prince of order (4,5));
-    `dop853` (adaptive Dormand-Prince of order 8(5,3));
+    `dopri5` (adaptive Dormand-Prince method of order (4,5));
+    `dop853` (adaptive Dormand-Prince method of order 8(5,3));
     `odeint` (adaptive Adams or BDF, basically the same as `vode`, but in the implementation `lsoda` from "ODEPACK": "http://www.netlib.org/odepack/").
   * Wrapper for the Runge-Kutta-Chebyshev formulas of order 2 as
     offered by the well-known FORTRAN code "`rkc.f`": "http://www.netlib.org/ode/rkc.f".
@@ -1028,6 +1028,10 @@ implementation of the adaptive Runge-Kutta-Fehlberg method of order
 with different CPU times. We observe that the very simple `RK4` solver
 in pure Python compares favorably with the much more sophisticated
 FORTRAN subroutine `zvode`.
+
+===== Example: Make a Subclass of Problem =====
+
+subclassing or using problems.py
 
 ===== Example: Solving a Stochastic Differential Equation =====
 
