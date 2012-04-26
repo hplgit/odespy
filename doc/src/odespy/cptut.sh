@@ -12,4 +12,5 @@ git commit -am 'Added new official odespy files in doc/tutorial.'
 
 doconce format rst wrap_odespy
 cp wrap_odespy.rst ../../../../odespy.wiki/Tutorial.rest
+cp figs-odespy/*.png ../../../../odespy.wiki/figs-odespy
 
