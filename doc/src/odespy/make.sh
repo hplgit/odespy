@@ -12,7 +12,6 @@ ptex2tex -DMINTED -DLATEX_HEADING=traditional $name
 pdflatex -shell-escape $name
 pdflatex -shell-escape $name
 
-
 doconce format sphinx $name
 theme=pyramid
 #theme=fenics_minimal
