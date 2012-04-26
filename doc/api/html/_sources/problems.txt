@@ -1,9 +1,0 @@
-
-:mod:`odespy.problems`
-======================
-
-.. automodule:: odespy.problems
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:

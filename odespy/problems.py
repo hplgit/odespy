@@ -389,7 +389,7 @@ class VanDerPolOscillator(Problem):
     The equation is rewritten as a system
 
     .. math::
-             u_0' &= u_1
+             u_0' &= u_1, \\
              u_1' &= \mu (1-u_0^2)u_1 - u_0
 
     with a Jacobian

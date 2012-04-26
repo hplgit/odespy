@@ -1,9 +1,0 @@
-
-:mod:`odespy.rkc`
-=================
-
-.. automodule:: odespy.rkc
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:

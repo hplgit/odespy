@@ -944,21 +944,19 @@ Return None if the solution cannot be verified.</p>
 <dd><p>Bases: <a class="reference internal" href="#odespy.problems.Problem" title="odespy.problems.Problem"><tt class="xref py py-class docutils literal"><span class="pre">odespy.problems.Problem</span></tt></a></p>
 <blockquote>
 <div><p>Classical van der Pool oscillator:</p>
-<p>..math:: y&#8217;&#8217; = mu (1 - y^2) y&#8217; - y</p>
+<div class="math">
+\[y'' = \mu (1 - y^2) y' - y\]</div>
 <p>with initial conditions <span class="math">\(y(0)=2, y'(0)=1\)</span>.
 The equation is rewritten as a system</p>
-<dl class="docutils">
-<dt>..math::</dt>
-<dd>u_0&#8217; &amp;= u_1
-u_1&#8217; &amp;= mu (1-u_0^2)u_1 - u_0</dd>
-</dl>
+<div class="math">
+\[\begin{split}u_0' &amp;= u_1, \
+u_1' &amp;= \mu (1-u_0^2)u_1 - u_0\end{split}\]</div>
 <p>with a Jacobian</p>
-<dl class="docutils">
-<dt>..math::</dt>
-<dd>left(egin{array}{cc}
-0 &amp; 1-2mu u_0 - 1 &amp; mu (1-u_0^2)
-end{array}</dd>
-</dl>
+<div class="math">
+\[\begin{split}\left(egin{array}{cc}
+0 &amp; 1\
+-2\mu u_0 - 1 &amp; \mu (1-u_0^2)
+\end{array}\end{split}\]</div>
 </div></blockquote>
 <p>ight)</p>
 <p class="rubric">Methods</p>

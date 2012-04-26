@@ -1,9 +1,0 @@
-
-:mod:`odespy.rkf45`
-===================
-
-.. automodule:: odespy.rkf45
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:
