@@ -4,13 +4,6 @@
 This module contains the base class ``Solver``
 package and the implementations of many subclasses.
 
-
-How to implement a new solver
-=============================
-
-Simple explicit solver
-----------------------
-
 A new non-adaptive time-stepping scheme can often be implemented by
 just subclassing ``Solver`` and writing the ``advance`` method
 to define the time-stepping scheme. Here is how the 4th-order
@@ -33,21 +26,13 @@ Runge-Kutta is implemented::
 The ``quick_description`` string is needed for the class to appear
 in the package's table of contents.
 
-Implicit solver
----------------
+Implicit solver: See examples in the ``solver.py`` file,
+class ``BackwardEuler``, for instance.
 
-See examples in the ``solver.py`` file, class ``BackwardEuler``,
+Adaptive solver: See examples in the ``solver.py`` file, class ``RKFehlberg``,
 for instance.
 
-Adaptive solver
----------------
-
-See examples in the ``solver.py`` file, class ``RK34``,
-for instance.
-
-Wrapping other packages
------------------------
-
+*Wrapping other packages*.
 This section is for developers who intend to wrap an existing
 package and integrate with the present one..
 
@@ -66,9 +51,7 @@ By an attempt to import these necessary modules (often set in method
 initialize()), we can check whether the necessary dependencies are
 installed properly.
 
-Definition of parameters and their properties
----------------------------------------------
-
+*Definition of parameters and their properties*.
 Each solver has a set of specific parameters depending on its
 underlying method. For example, adaptive solvers will be more
 likely to apply (many) attributes for step-size control.
@@ -104,9 +87,7 @@ len(ja)``. These checks are done in Python before calling the Fortran
 solver.
 
 
-The solve and advance methods
------------------------------
-
+*The solve and advance methods*.
 Simple methods can just implement ``advance`` to bring the solution
 one step forward in time. The existing ``solve`` method derived from
 the superclass is general enough to administer the whole solution

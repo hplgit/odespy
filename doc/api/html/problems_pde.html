@@ -1,0 +1,220 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>odespy.problems_pde &mdash; Odespy API 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pyramid.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Odespy API 0.2 documentation" href="index.html" />
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+
+  </head>
+  <body>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Odespy API 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-odespy.problems_pde">
+<span id="odespy-problems-pde"></span><h1><a class="reference internal" href="#module-odespy.problems_pde" title="odespy.problems_pde"><tt class="xref py py-mod docutils literal"><span class="pre">odespy.problems_pde</span></tt></a><a class="headerlink" href="#module-odespy.problems_pde" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="odespy.problems_pde.Diffusion1D">
+<em class="property">class </em><tt class="descclassname">odespy.problems_pde.</tt><tt class="descname">Diffusion1D</tt><big>(</big><em>I</em>, <em>L</em>, <em>U_L</em>, <em>U_R</em>, <em>n</em>, <em>a</em>, <em>x=None</em>, <em>jac_format='banded'</em>, <em>f77=False</em>, <em>I_vectorized=True</em><big>)</big><a class="reference internal" href="_modules/odespy/problems_pde.html#Diffusion1D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.problems_pde.Diffusion1D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="problems.html#odespy.problems.Problem" title="odespy.problems.Problem"><tt class="xref py py-class docutils literal"><span class="pre">odespy.problems.Problem</span></tt></a></p>
+<blockquote>
+<div><p>Classical 1D diffusion equation:</p>
+<p>..math:</p>
+</div></blockquote>
+<p>rac{partial u}{partial t} = a
+rac{partial^2 u}{partial x^2}</p>
+<blockquote>
+<div><p>with initial condition <span class="math">\(u(x,0)=I(x)\)</span> and boundary condtions
+<span class="math">\(u(0,t)=U_L(t), u(L,t)=U_R(t)\)</span>.</p>
+<dl class="docutils">
+<dt>..math::</dt>
+<dd>u_0&#8217; &amp;= u_1
+u_1&#8217; &amp;= mu (1-u_0^2)u_1 - u_0</dd>
+</dl>
+<p>with a Jacobian</p>
+<dl class="docutils">
+<dt>..math::</dt>
+<dd>left(egin{array}{cc}
+0 &amp; 1-2mu u_0 - 1 &amp; mu (1-u_0^2)
+end{array}</dd>
+</dl>
+</div></blockquote>
+<p>ight)</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">default_parameters</span></tt>()</td>
+<td>Compute suitable time_points, atol/rtol, etc.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.problems_pde.Diffusion1D.f" title="odespy.problems_pde.Diffusion1D.f"><tt class="xref py py-obj docutils literal"><span class="pre">f</span></tt></a>(u,&nbsp;t)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_initial_condition</span></tt>()</td>
+<td>Return vector of initial conditions.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.problems_pde.Diffusion1D.jac" title="odespy.problems_pde.Diffusion1D.jac"><tt class="xref py py-obj docutils literal"><span class="pre">jac</span></tt></a>(u,&nbsp;t)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.problems_pde.Diffusion1D.jac_banded" title="odespy.problems_pde.Diffusion1D.jac_banded"><tt class="xref py py-obj docutils literal"><span class="pre">jac_banded</span></tt></a>(u,&nbsp;t)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.problems_pde.Diffusion1D.str_f_f77" title="odespy.problems_pde.Diffusion1D.str_f_f77"><tt class="xref py py-obj docutils literal"><span class="pre">str_f_f77</span></tt></a>()</td>
+<td>Return f(u,t) as Fortran source code string.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.problems_pde.Diffusion1D.str_jac_f77_fadau5" title="odespy.problems_pde.Diffusion1D.str_jac_f77_fadau5"><tt class="xref py py-obj docutils literal"><span class="pre">str_jac_f77_fadau5</span></tt></a>()</td>
+<td>Return f(u,t) as Fortran source code string.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.problems_pde.Diffusion1D.str_jac_f77_lsode_dense" title="odespy.problems_pde.Diffusion1D.str_jac_f77_lsode_dense"><tt class="xref py py-obj docutils literal"><span class="pre">str_jac_f77_lsode_dense</span></tt></a>()</td>
+<td>Return Fortran source for dense Jacobian matrix in LSODE format.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">terminate</span></tt>(u,&nbsp;t,&nbsp;step_number)</td>
+<td>Default terminate function, always returning False.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">u_exact</span></tt>(t)</td>
+<td>Implementation of the exact solution.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">verify</span></tt>(u,&nbsp;t[,&nbsp;atol,&nbsp;rtol])</td>
+<td>Return True if u at time points t coincides with an exact</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="odespy.problems_pde.Diffusion1D.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>I</em>, <em>L</em>, <em>U_L</em>, <em>U_R</em>, <em>n</em>, <em>a</em>, <em>x=None</em>, <em>jac_format='banded'</em>, <em>f77=False</em>, <em>I_vectorized=True</em><big>)</big><a class="reference internal" href="_modules/odespy/problems_pde.html#Diffusion1D.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.problems_pde.Diffusion1D.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odespy.problems_pde.Diffusion1D.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odespy.problems_pde'</em><a class="headerlink" href="#odespy.problems_pde.Diffusion1D.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.problems_pde.Diffusion1D.f">
+<tt class="descname">f</tt><big>(</big><em>u</em>, <em>t</em><big>)</big><a class="reference internal" href="_modules/odespy/problems_pde.html#Diffusion1D.f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.problems_pde.Diffusion1D.f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.problems_pde.Diffusion1D.jac">
+<tt class="descname">jac</tt><big>(</big><em>u</em>, <em>t</em><big>)</big><a class="reference internal" href="_modules/odespy/problems_pde.html#Diffusion1D.jac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.problems_pde.Diffusion1D.jac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.problems_pde.Diffusion1D.jac_banded">
+<tt class="descname">jac_banded</tt><big>(</big><em>u</em>, <em>t</em><big>)</big><a class="reference internal" href="_modules/odespy/problems_pde.html#Diffusion1D.jac_banded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.problems_pde.Diffusion1D.jac_banded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.problems_pde.Diffusion1D.str_f_f77">
+<tt class="descname">str_f_f77</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/problems_pde.html#Diffusion1D.str_f_f77"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.problems_pde.Diffusion1D.str_f_f77" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return f(u,t) as Fortran source code string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.problems_pde.Diffusion1D.str_jac_f77_fadau5">
+<tt class="descname">str_jac_f77_fadau5</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/problems_pde.html#Diffusion1D.str_jac_f77_fadau5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.problems_pde.Diffusion1D.str_jac_f77_fadau5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return f(u,t) as Fortran source code string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.problems_pde.Diffusion1D.str_jac_f77_lsode_dense">
+<tt class="descname">str_jac_f77_lsode_dense</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/problems_pde.html#Diffusion1D.str_jac_f77_lsode_dense"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.problems_pde.Diffusion1D.str_jac_f77_lsode_dense" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return Fortran source for dense Jacobian matrix in LSODE format.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Odespy API 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Liwei Wang and Hans Petter Langtangen.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>
