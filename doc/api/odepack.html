@@ -1,0 +1,3100 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>odespy.odepack &mdash; Odespy API 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pyramid.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Odespy API 0.2 documentation" href="index.html" />
+    <link rel="prev" title="odespy.version" href="version.html" />
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+
+  </head>
+  <body>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="version.html" title="odespy.version"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Odespy API 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-odespy.odepack">
+<span id="odespy-odepack"></span><h1><a class="reference internal" href="#module-odespy.odepack" title="odespy.odepack"><tt class="xref py py-mod docutils literal"><span class="pre">odespy.odepack</span></tt></a><a class="headerlink" href="#module-odespy.odepack" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="odespy.odepack.Lsoda">
+<em class="property">class </em><tt class="descclassname">odespy.odepack.</tt><tt class="descname">Lsoda</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoda"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoda" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odespy.odepack.Odepack" title="odespy.odepack.Odepack"><tt class="xref py py-class docutils literal"><span class="pre">odespy.odepack.Odepack</span></tt></a></p>
+<p>A Python wrapper of the LSODA FORTRAN subroutine from ODEPACK.
+This subroutine automatically shifts between stiff (BDF) and
+nonstiff (Adams) methods, such that the user does not need to
+determine whether the problem is stiff or not (as is the case when
+using the LSODE subroutine and class <a class="reference internal" href="#odespy.odepack.Lsode" title="odespy.odepack.Lsode"><tt class="xref py py-class docutils literal"><span class="pre">Lsode</span></tt></a>). The
+integration always starts with the nonstiff method.  Can generate
+the Jacobian, or apply a user-supplied Jacobian in dense or banded
+format.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE.</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span>
+<span class="pre">*f_args,</span> <span class="pre">**f_kwargs).</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt>. (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued. (default: False)</td>
+</tr>
+<tr class="row-odd"><td>disk_storage</td>
+<td>Indicates whether u is stored in memory or in
+file. If string, it is the filename; if False or
+&#8220;&#8221;, u is kept in memory; if True, a default
+filename tmp_odspy.dat is used. (default: False)</td>
+</tr>
+<tr class="row-even"><td>verbose</td>
+<td>Integer reflecting output of intermediate
+quantities. (default: 0)</td>
+</tr>
+<tr class="row-odd"><td>u_exact</td>
+<td>Function of t returning exact solution. (default:
+None)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>Absolute tolerance for solution. (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>Relative tolerance for solution. (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>adams_or_bdf</td>
+<td>Method in vode or solvers in odepack: &#8220;adams&#8221; or
+&#8220;bdf&#8221;. (default: adams)</td>
+</tr>
+<tr class="row-odd"><td>order</td>
+<td>Maximum order used by the integrator (&lt;= 12 for
+&#8220;adams&#8221;, &lt;= 5 for &#8220;bdf&#8221;). (default: 4)</td>
+</tr>
+<tr class="row-even"><td>nsteps</td>
+<td>Max no of internal solver steps per time step.
+(default: 1000)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive
+algorithm.</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-even"><td>corrector_iter_method</td>
+<td>Corrector iteration method choice.</td>
+</tr>
+<tr class="row-odd"><td>lrw</td>
+<td>Length of real work array.</td>
+</tr>
+<tr class="row-even"><td>liw</td>
+<td>Length of integer work array, similiar as &lt;lrw&gt;.</td>
+</tr>
+<tr class="row-odd"><td>jac_banded</td>
+<td>Function for Jacobian in banded matrix form.
+Used in Lsode, Lsoda, Lsodar.
+<tt class="docutils literal"><span class="pre">jac_banded(u,t,ml,mu)</span></tt> returns df/du as an
+array of size <tt class="docutils literal"><span class="pre">neq</span></tt> times <tt class="docutils literal"><span class="pre">ml+mu+1</span></tt>.</td>
+</tr>
+<tr class="row-even"><td>jac_banded_f77</td>
+<td><p class="first">Fortran subroutine for jac_banded.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine jac_banded_f77
+     1  (neq,t,u,ml, mu,pd,nrowpd)
+Cf2py intent(hide) neq,ml,mu,nrowpd
+Cf2py intent(out) pd
+      integer neq,ml,mu,nrowpd
+      double precision t,u,pd
+      dimension u(neq),pd(nrowpd,neq)
+      pd = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>ml</td>
+<td>Number of lower non-zero diagonals in a banded
+Jacobian.</td>
+</tr>
+<tr class="row-even"><td>mu</td>
+<td>Number of upper non-zero diagonals in a banded
+Jacobian.</td>
+</tr>
+<tr class="row-odd"><td>jac</td>
+<td>Jacobian of right-hand side function f (df/du).
+(default: None)</td>
+</tr>
+<tr class="row-even"><td>jac_f77</td>
+<td><p class="first">Fortran subroutine for jac.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine jac_f77
+     1 (neq, t, u, ml, mu, pd, nrowpd)
+Cf2py intent(hide) neq,ml,mu,nrowpd
+Cf2py intent(out) pd
+      integer neq,ml,mu,nrowpd
+      double precision t,u,pd
+      dimension u(neq),pd(neq,neq)
+      pd = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>max_ordn</td>
+<td>Maximum order in nonstiff methods.</td>
+</tr>
+<tr class="row-even"><td>max_ords</td>
+<td>Maximum order in stiff methods.</td>
+</tr>
+<tr class="row-odd"><td>f_f77</td>
+<td><p class="first">Fortran subroutine for f.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine f_f77(neq,t,u,udot)
+Cf2py intent(hide)   neq
+Cf2py intent(out)    udot
+      integer neq
+      double precision t,u(neq),udot(neq)
+      udot = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_atol</span></tt>(u_current)</td>
+<td>Error tolerance <tt class="docutils literal"><span class="pre">tol(i)</span></tt> may become zero for some <tt class="docutils literal"><span class="pre">i</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsoda.adjust_parameters" title="odespy.odepack.Lsoda.adjust_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt></a>()</td>
+<td>Properties for new parameters in this solver.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>This function intends to one step forward for linearly implicit solvers</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_iaja</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ia</span></tt>, <tt class="docutils literal"><span class="pre">ja</span></tt>, <tt class="docutils literal"><span class="pre">ic</span></tt>, <tt class="docutils literal"><span class="pre">jc</span></tt> are optional inputs to describe</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_liwlrw</span></tt>()</td>
+<td>If the lengths of work arrays are specified by users, check whether</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_pars</span></tt>()</td>
+<td>Some pairs of parameters should be input simutaneously.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_tol</span></tt>()</td>
+<td>atol &amp; rtol should be defined as scalars or vectors with length neq.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_iwork</span></tt>(new_liw[,&nbsp;expand])</td>
+<td>Extension module return an actually required length for integer work array when it is too short.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_rwork</span></tt>(new_lrw[,&nbsp;expand])</td>
+<td>Length of real work array is smaller than actually required length.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">has_u_t_all</span></tt>()</td>
+<td>Return True if self.u_all and self.t_all, defined in</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Import extension module _odesolver and check that it exists.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td>In the long parameter-lists for solvers in ODEPACK, quite a few</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">new_stepnr</span></tt>()</td>
+<td>When Fortran code returns a status <tt class="docutils literal"><span class="pre">istate==-1</span></tt>, it indicates that</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">print_roots</span></tt>(jroot,&nbsp;t_current,&nbsp;u_current)</td>
+<td>Roots found at current T for some constraint functions.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_dummy_functions</span></tt>()</td>
+<td>Functions have to get dummy values before they are passed to extension</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsoda.set_extra_args" title="odespy.odepack.Lsoda.set_extra_args"><tt class="xref py py-obj docutils literal"><span class="pre">set_extra_args</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsoda.set_iopt" title="odespy.odepack.Lsoda.set_iopt"><tt class="xref py py-obj docutils literal"><span class="pre">set_iopt</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsoda.set_iter_method" title="odespy.odepack.Lsoda.set_iter_method"><tt class="xref py py-obj docutils literal"><span class="pre">set_iter_method</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_iwork_rwork</span></tt>()</td>
+<td>Initialize arrays for optional inputs, and calculate the</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsoda.set_jac" title="odespy.odepack.Lsoda.set_jac"><tt class="xref py py-obj docutils literal"><span class="pre">set_jac</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsoda.set_liw_min" title="odespy.odepack.Lsoda.set_liw_min"><tt class="xref py py-obj docutils literal"><span class="pre">set_liw_min</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsoda.set_lrw_min" title="odespy.odepack.Lsoda.set_lrw_min"><tt class="xref py py-obj docutils literal"><span class="pre">set_lrw_min</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_ydoti</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ydoti</span></tt> is an array used in linearly implicit solvers.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>This function is involved for non-linearly implicit</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">tol_multiply</span></tt>(tolsf)</td>
+<td>This function is used to adjust tolerance parameters for Fortran part.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>Common validity check in Odepack.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odespy.odepack.Lsoda.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odespy.odepack'</em><a class="headerlink" href="#odespy.odepack.Lsoda.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoda.adjust_parameters">
+<tt class="descname">adjust_parameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoda.adjust_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoda.adjust_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Properties for new parameters in this solver.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="odespy.odepack.Lsoda.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'LSODA solver with stiff-nonstiff auto shift'</em><a class="headerlink" href="#odespy.odepack.Lsoda.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoda.set_extra_args">
+<tt class="descname">set_extra_args</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoda.set_extra_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoda.set_extra_args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoda.set_iopt">
+<tt class="descname">set_iopt</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoda.set_iopt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoda.set_iopt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoda.set_iter_method">
+<tt class="descname">set_iter_method</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoda.set_iter_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoda.set_iter_method" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoda.set_jac">
+<tt class="descname">set_jac</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoda.set_jac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoda.set_jac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoda.set_liw_min">
+<tt class="descname">set_liw_min</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoda.set_liw_min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoda.set_liw_min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoda.set_lrw_min">
+<tt class="descname">set_lrw_min</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoda.set_lrw_min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoda.set_lrw_min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odespy.odepack.Lsodar">
+<em class="property">class </em><tt class="descclassname">odespy.odepack.</tt><tt class="descname">Lsodar</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odespy.odepack.Odepack" title="odespy.odepack.Odepack"><tt class="xref py py-class docutils literal"><span class="pre">odespy.odepack.Odepack</span></tt></a></p>
+<p>A Python wrapper of the LSODAR subroutine in ODEPACK.
+LSODAR is a variant of LSODE and differs from the latter in
+two ways.</p>
+<p>Quote from the LSODAR source code documentation:
+&#8220;(a) It switches automatically between stiff and nonstiff methods.
+This means that the user does not have to determine whether the
+problem is stiff or not, and the solver will automatically choose the
+appropriate method.  It always starts with the nonstiff method.
+(b) It finds the root of at least one of a set of constraint
+functions g(i) of the independent and dependent variables.
+It finds only those roots for which some g(i), as a function
+of t, changes sign in the interval of integration.
+It then returns the solution at the root, if that occurs
+sooner than the specified stop condition, and otherwise returns
+the solution according the specified stop condition.&#8221;</p>
+<p>The mathematical problem reads</p>
+<dl class="docutils">
+<dt>..:math::</dt>
+<dd><blockquote class="first">
+<div>u&#8217; &amp;= f(u, t),</div></blockquote>
+<p class="last">g(u,t)  &amp;= 0.</p>
+</dd>
+</dl>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE.</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span>
+<span class="pre">*f_args,</span> <span class="pre">**f_kwargs).</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt>. (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued. (default: False)</td>
+</tr>
+<tr class="row-odd"><td>disk_storage</td>
+<td>Indicates whether u is stored in memory or in
+file. If string, it is the filename; if False or
+&#8220;&#8221;, u is kept in memory; if True, a default
+filename tmp_odspy.dat is used. (default: False)</td>
+</tr>
+<tr class="row-even"><td>verbose</td>
+<td>Integer reflecting output of intermediate
+quantities. (default: 0)</td>
+</tr>
+<tr class="row-odd"><td>u_exact</td>
+<td>Function of t returning exact solution. (default:
+None)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>Absolute tolerance for solution. (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>Relative tolerance for solution. (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>adams_or_bdf</td>
+<td>Method in vode or solvers in odepack: &#8220;adams&#8221; or
+&#8220;bdf&#8221;. (default: adams)</td>
+</tr>
+<tr class="row-odd"><td>order</td>
+<td>Maximum order used by the integrator (&lt;= 12 for
+&#8220;adams&#8221;, &lt;= 5 for &#8220;bdf&#8221;). (default: 4)</td>
+</tr>
+<tr class="row-even"><td>nsteps</td>
+<td>Max no of internal solver steps per time step.
+(default: 1000)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive
+algorithm.</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-even"><td>corrector_iter_method</td>
+<td>Corrector iteration method choice.</td>
+</tr>
+<tr class="row-odd"><td>lrw</td>
+<td>Length of real work array.</td>
+</tr>
+<tr class="row-even"><td>liw</td>
+<td>Length of integer work array, similiar as &lt;lrw&gt;.</td>
+</tr>
+<tr class="row-odd"><td>jac_banded</td>
+<td>Function for Jacobian in banded matrix form.
+Used in Lsode, Lsoda, Lsodar.
+<tt class="docutils literal"><span class="pre">jac_banded(u,t,ml,mu)</span></tt> returns df/du as an
+array of size <tt class="docutils literal"><span class="pre">neq</span></tt> times <tt class="docutils literal"><span class="pre">ml+mu+1</span></tt>.</td>
+</tr>
+<tr class="row-even"><td>jac_banded_f77</td>
+<td><p class="first">Fortran subroutine for jac_banded.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine jac_banded_f77
+     1  (neq,t,u,ml, mu,pd,nrowpd)
+Cf2py intent(hide) neq,ml,mu,nrowpd
+Cf2py intent(out) pd
+      integer neq,ml,mu,nrowpd
+      double precision t,u,pd
+      dimension u(neq),pd(nrowpd,neq)
+      pd = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>ml</td>
+<td>Number of lower non-zero diagonals in a banded
+Jacobian.</td>
+</tr>
+<tr class="row-even"><td>mu</td>
+<td>Number of upper non-zero diagonals in a banded
+Jacobian.</td>
+</tr>
+<tr class="row-odd"><td>jac</td>
+<td>Jacobian of right-hand side function f (df/du).
+(default: None)</td>
+</tr>
+<tr class="row-even"><td>jac_f77</td>
+<td><p class="first">Fortran subroutine for jac.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine jac_f77
+     1 (neq, t, u, ml, mu, pd, nrowpd)
+Cf2py intent(hide) neq,ml,mu,nrowpd
+Cf2py intent(out) pd
+      integer neq,ml,mu,nrowpd
+      double precision t,u,pd
+      dimension u(neq),pd(neq,neq)
+      pd = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>max_ordn</td>
+<td>Maximum order in nonstiff methods.</td>
+</tr>
+<tr class="row-even"><td>max_ords</td>
+<td>Maximum order in stiff methods.</td>
+</tr>
+<tr class="row-odd"><td>g</td>
+<td>Callable object to define constraint functions.
+<tt class="docutils literal"><span class="pre">g(u,</span> <span class="pre">t)</span></tt> returns a vector of the values of the constraints
+(left-hand sides in the constraint equations).</td>
+</tr>
+<tr class="row-even"><td>g_f77</td>
+<td><p class="first">Fortran subroutine for g.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine g_f77(neq, t, u, ng, groot)
+Cf2py intent(hide) neq
+Cf2py optional, intent(hide) ng
+Cf2py intent(in) t, u
+Cf2py intent(out) groot
+      integer neq, ng
+      double precision t, u, groot
+      dimension u(neq), groot(ng)
+      groot = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>ng</td>
+<td>No of components in constraint function g.</td>
+</tr>
+<tr class="row-even"><td>f_f77</td>
+<td><p class="first">Fortran subroutine for f.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine f_f77(neq,t,u,udot)
+Cf2py intent(hide)   neq
+Cf2py intent(out)    udot
+      integer neq
+      double precision t,u(neq),udot(neq)
+      udot = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_atol</span></tt>(u_current)</td>
+<td>Error tolerance <tt class="docutils literal"><span class="pre">tol(i)</span></tt> may become zero for some <tt class="docutils literal"><span class="pre">i</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodar.adjust_parameters" title="odespy.odepack.Lsodar.adjust_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt></a>()</td>
+<td>Properties for new parameters in this solver.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>This function intends to one step forward for linearly implicit solvers</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_iaja</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ia</span></tt>, <tt class="docutils literal"><span class="pre">ja</span></tt>, <tt class="docutils literal"><span class="pre">ic</span></tt>, <tt class="docutils literal"><span class="pre">jc</span></tt> are optional inputs to describe</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_liwlrw</span></tt>()</td>
+<td>If the lengths of work arrays are specified by users, check whether</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_pars</span></tt>()</td>
+<td>Some pairs of parameters should be input simutaneously.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_tol</span></tt>()</td>
+<td>atol &amp; rtol should be defined as scalars or vectors with length neq.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_iwork</span></tt>(new_liw[,&nbsp;expand])</td>
+<td>Extension module return an actually required length for integer work array when it is too short.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_rwork</span></tt>(new_lrw[,&nbsp;expand])</td>
+<td>Length of real work array is smaller than actually required length.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">has_u_t_all</span></tt>()</td>
+<td>Return True if self.u_all and self.t_all, defined in</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Import extension module _odesolver and check that it exists.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td>In the long parameter-lists for solvers in ODEPACK, quite a few</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">new_stepnr</span></tt>()</td>
+<td>When Fortran code returns a status <tt class="docutils literal"><span class="pre">istate==-1</span></tt>, it indicates that</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">print_roots</span></tt>(jroot,&nbsp;t_current,&nbsp;u_current)</td>
+<td>Roots found at current T for some constraint functions.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_dummy_functions</span></tt>()</td>
+<td>Functions have to get dummy values before they are passed to extension</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodar.set_extra_args" title="odespy.odepack.Lsodar.set_extra_args"><tt class="xref py py-obj docutils literal"><span class="pre">set_extra_args</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodar.set_iopt" title="odespy.odepack.Lsodar.set_iopt"><tt class="xref py py-obj docutils literal"><span class="pre">set_iopt</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsodar.set_iter_method" title="odespy.odepack.Lsodar.set_iter_method"><tt class="xref py py-obj docutils literal"><span class="pre">set_iter_method</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_iwork_rwork</span></tt>()</td>
+<td>Initialize arrays for optional inputs, and calculate the</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsodar.set_jac" title="odespy.odepack.Lsodar.set_jac"><tt class="xref py py-obj docutils literal"><span class="pre">set_jac</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodar.set_liw_min" title="odespy.odepack.Lsodar.set_liw_min"><tt class="xref py py-obj docutils literal"><span class="pre">set_liw_min</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsodar.set_lrw_min" title="odespy.odepack.Lsodar.set_lrw_min"><tt class="xref py py-obj docutils literal"><span class="pre">set_lrw_min</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_ydoti</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ydoti</span></tt> is an array used in linearly implicit solvers.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsodar.solve" title="odespy.odepack.Lsodar.solve"><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt></a>(time_points[,&nbsp;terminate])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">tol_multiply</span></tt>(tolsf)</td>
+<td>This function is used to adjust tolerance parameters for Fortran part.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>Common validity check in Odepack.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odespy.odepack.Lsodar.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odespy.odepack'</em><a class="headerlink" href="#odespy.odepack.Lsodar.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodar.adjust_parameters">
+<tt class="descname">adjust_parameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodar.adjust_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodar.adjust_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Properties for new parameters in this solver.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="odespy.odepack.Lsodar.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'LSODAR method with stiff-nonstiff auto shift'</em><a class="headerlink" href="#odespy.odepack.Lsodar.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodar.set_extra_args">
+<tt class="descname">set_extra_args</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodar.set_extra_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodar.set_extra_args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodar.set_iopt">
+<tt class="descname">set_iopt</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodar.set_iopt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodar.set_iopt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodar.set_iter_method">
+<tt class="descname">set_iter_method</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodar.set_iter_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodar.set_iter_method" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodar.set_jac">
+<tt class="descname">set_jac</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodar.set_jac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodar.set_jac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodar.set_liw_min">
+<tt class="descname">set_liw_min</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodar.set_liw_min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodar.set_liw_min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodar.set_lrw_min">
+<tt class="descname">set_lrw_min</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodar.set_lrw_min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodar.set_lrw_min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodar.solve">
+<tt class="descname">solve</tt><big>(</big><em>time_points</em>, <em>terminate=None</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodar.solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodar.solve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odespy.odepack.Lsode">
+<em class="property">class </em><tt class="descclassname">odespy.odepack.</tt><tt class="descname">Lsode</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odespy.odepack.Odepack" title="odespy.odepack.Odepack"><tt class="xref py py-class docutils literal"><span class="pre">odespy.odepack.Odepack</span></tt></a></p>
+<p>A Python wrapper of the LSODE (Livermore Solver for Ordinary
+Differential Equations) FORTRAN subroutine.  Basic Solver in
+ODEPACK package from netib.  Solves the initial-value problem for
+stiff or nonstiff systems of first-order ODE, <span class="math">\(u' = f(u,t)\)</span>
+via Adams or BDF methods (for the nonstiff and stiff cases,
+respectively).  Can generate the Jacobian, or apply a
+user-supplied Jacobian in dense or banded format.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE.</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span>
+<span class="pre">*f_args,</span> <span class="pre">**f_kwargs).</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt>. (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued. (default: False)</td>
+</tr>
+<tr class="row-odd"><td>disk_storage</td>
+<td>Indicates whether u is stored in memory or in
+file. If string, it is the filename; if False or
+&#8220;&#8221;, u is kept in memory; if True, a default
+filename tmp_odspy.dat is used. (default: False)</td>
+</tr>
+<tr class="row-even"><td>verbose</td>
+<td>Integer reflecting output of intermediate
+quantities. (default: 0)</td>
+</tr>
+<tr class="row-odd"><td>u_exact</td>
+<td>Function of t returning exact solution. (default:
+None)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>Absolute tolerance for solution. (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>Relative tolerance for solution. (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>adams_or_bdf</td>
+<td>Method in vode or solvers in odepack: &#8220;adams&#8221; or
+&#8220;bdf&#8221;. (default: adams)</td>
+</tr>
+<tr class="row-odd"><td>order</td>
+<td>Maximum order used by the integrator (&lt;= 12 for
+&#8220;adams&#8221;, &lt;= 5 for &#8220;bdf&#8221;). (default: 4)</td>
+</tr>
+<tr class="row-even"><td>nsteps</td>
+<td>Max no of internal solver steps per time step.
+(default: 1000)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive
+algorithm.</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-even"><td>corrector_iter_method</td>
+<td>Corrector iteration method choice.</td>
+</tr>
+<tr class="row-odd"><td>lrw</td>
+<td>Length of real work array.</td>
+</tr>
+<tr class="row-even"><td>liw</td>
+<td>Length of integer work array, similiar as &lt;lrw&gt;.</td>
+</tr>
+<tr class="row-odd"><td>jac_banded</td>
+<td>Function for Jacobian in banded matrix form.
+Used in Lsode, Lsoda, Lsodar.
+<tt class="docutils literal"><span class="pre">jac_banded(u,t,ml,mu)</span></tt> returns df/du as an
+array of size <tt class="docutils literal"><span class="pre">neq</span></tt> times <tt class="docutils literal"><span class="pre">ml+mu+1</span></tt>.</td>
+</tr>
+<tr class="row-even"><td>jac_banded_f77</td>
+<td><p class="first">Fortran subroutine for jac_banded.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine jac_banded_f77
+     1  (neq,t,u,ml, mu,pd,nrowpd)
+Cf2py intent(hide) neq,ml,mu,nrowpd
+Cf2py intent(out) pd
+      integer neq,ml,mu,nrowpd
+      double precision t,u,pd
+      dimension u(neq),pd(nrowpd,neq)
+      pd = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>ml</td>
+<td>Number of lower non-zero diagonals in a banded
+Jacobian.</td>
+</tr>
+<tr class="row-even"><td>mu</td>
+<td>Number of upper non-zero diagonals in a banded
+Jacobian.</td>
+</tr>
+<tr class="row-odd"><td>jac</td>
+<td>Jacobian of right-hand side function f (df/du).
+(default: None)</td>
+</tr>
+<tr class="row-even"><td>jac_f77</td>
+<td><p class="first">Fortran subroutine for jac.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine jac_f77
+     1 (neq, t, u, ml, mu, pd, nrowpd)
+Cf2py intent(hide) neq,ml,mu,nrowpd
+Cf2py intent(out) pd
+      integer neq,ml,mu,nrowpd
+      double precision t,u,pd
+      dimension u(neq),pd(neq,neq)
+      pd = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>order</td>
+<td>Maximum order used by the integrator (&lt;= 12 for
+&#8220;adams&#8221;, &lt;= 5 for &#8220;bdf&#8221;). (default: 4)</td>
+</tr>
+<tr class="row-even"><td>f_f77</td>
+<td><p class="first">Fortran subroutine for f.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine f_f77(neq,t,u,udot)
+Cf2py intent(hide)   neq
+Cf2py intent(out)    udot
+      integer neq
+      double precision t,u(neq),udot(neq)
+      udot = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_atol</span></tt>(u_current)</td>
+<td>Error tolerance <tt class="docutils literal"><span class="pre">tol(i)</span></tt> may become zero for some <tt class="docutils literal"><span class="pre">i</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsode.adjust_parameters" title="odespy.odepack.Lsode.adjust_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt></a>()</td>
+<td>Properties for new parameters in this solver.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>This function intends to one step forward for linearly implicit solvers</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_iaja</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ia</span></tt>, <tt class="docutils literal"><span class="pre">ja</span></tt>, <tt class="docutils literal"><span class="pre">ic</span></tt>, <tt class="docutils literal"><span class="pre">jc</span></tt> are optional inputs to describe</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_liwlrw</span></tt>()</td>
+<td>If the lengths of work arrays are specified by users, check whether</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_pars</span></tt>()</td>
+<td>Some pairs of parameters should be input simutaneously.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_tol</span></tt>()</td>
+<td>atol &amp; rtol should be defined as scalars or vectors with length neq.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_iwork</span></tt>(new_liw[,&nbsp;expand])</td>
+<td>Extension module return an actually required length for integer work array when it is too short.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_rwork</span></tt>(new_lrw[,&nbsp;expand])</td>
+<td>Length of real work array is smaller than actually required length.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">has_u_t_all</span></tt>()</td>
+<td>Return True if self.u_all and self.t_all, defined in</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Import extension module _odesolver and check that it exists.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td>In the long parameter-lists for solvers in ODEPACK, quite a few</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">new_stepnr</span></tt>()</td>
+<td>When Fortran code returns a status <tt class="docutils literal"><span class="pre">istate==-1</span></tt>, it indicates that</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">print_roots</span></tt>(jroot,&nbsp;t_current,&nbsp;u_current)</td>
+<td>Roots found at current T for some constraint functions.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_dummy_functions</span></tt>()</td>
+<td>Functions have to get dummy values before they are passed to extension</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsode.set_extra_args" title="odespy.odepack.Lsode.set_extra_args"><tt class="xref py py-obj docutils literal"><span class="pre">set_extra_args</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsode.set_iopt" title="odespy.odepack.Lsode.set_iopt"><tt class="xref py py-obj docutils literal"><span class="pre">set_iopt</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsode.set_iter_method" title="odespy.odepack.Lsode.set_iter_method"><tt class="xref py py-obj docutils literal"><span class="pre">set_iter_method</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_iwork_rwork</span></tt>()</td>
+<td>Initialize arrays for optional inputs, and calculate the</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsode.set_jac" title="odespy.odepack.Lsode.set_jac"><tt class="xref py py-obj docutils literal"><span class="pre">set_jac</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsode.set_liw_min" title="odespy.odepack.Lsode.set_liw_min"><tt class="xref py py-obj docutils literal"><span class="pre">set_liw_min</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsode.set_lrw_min" title="odespy.odepack.Lsode.set_lrw_min"><tt class="xref py py-obj docutils literal"><span class="pre">set_lrw_min</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_ydoti</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ydoti</span></tt> is an array used in linearly implicit solvers.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>This function is involved for non-linearly implicit</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">tol_multiply</span></tt>(tolsf)</td>
+<td>This function is used to adjust tolerance parameters for Fortran part.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>Common validity check in Odepack.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odespy.odepack.Lsode.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odespy.odepack'</em><a class="headerlink" href="#odespy.odepack.Lsode.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsode.adjust_parameters">
+<tt class="descname">adjust_parameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsode.adjust_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsode.adjust_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Properties for new parameters in this solver.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="odespy.odepack.Lsode.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'LSODE solver for a stiff or nonstiff system'</em><a class="headerlink" href="#odespy.odepack.Lsode.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsode.set_extra_args">
+<tt class="descname">set_extra_args</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsode.set_extra_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsode.set_extra_args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsode.set_iopt">
+<tt class="descname">set_iopt</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsode.set_iopt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsode.set_iopt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsode.set_iter_method">
+<tt class="descname">set_iter_method</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsode.set_iter_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsode.set_iter_method" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsode.set_jac">
+<tt class="descname">set_jac</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsode.set_jac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsode.set_jac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsode.set_liw_min">
+<tt class="descname">set_liw_min</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsode.set_liw_min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsode.set_liw_min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsode.set_lrw_min">
+<tt class="descname">set_lrw_min</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsode.set_lrw_min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsode.set_lrw_min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odespy.odepack.Lsodes">
+<em class="property">class </em><tt class="descclassname">odespy.odepack.</tt><tt class="descname">Lsodes</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odespy.odepack.Odepack" title="odespy.odepack.Odepack"><tt class="xref py py-class docutils literal"><span class="pre">odespy.odepack.Odepack</span></tt></a></p>
+<p>A Python wrapper of the LSODES subroutine from ODEPACK.
+LSODES is a variant of LSODE intended for problems where the
+Jacobian is provided via a sparse matrix data structure
+consisting of the parameters <tt class="docutils literal"><span class="pre">jac_column</span></tt>, <tt class="docutils literal"><span class="pre">ia</span></tt>, <tt class="docutils literal"><span class="pre">ja</span></tt>,
+and optionally <tt class="docutils literal"><span class="pre">jac_column_f77</span></tt>.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE.</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_atol</span></tt>(u_current)</td>
+<td>Error tolerance <tt class="docutils literal"><span class="pre">tol(i)</span></tt> may become zero for some <tt class="docutils literal"><span class="pre">i</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodes.adjust_parameters" title="odespy.odepack.Lsodes.adjust_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt></a>()</td>
+<td>Properties for new parameters in this solver.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>This function intends to one step forward for linearly implicit solvers</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_iaja</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ia</span></tt>, <tt class="docutils literal"><span class="pre">ja</span></tt>, <tt class="docutils literal"><span class="pre">ic</span></tt>, <tt class="docutils literal"><span class="pre">jc</span></tt> are optional inputs to describe</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_liwlrw</span></tt>()</td>
+<td>If the lengths of work arrays are specified by users, check whether</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_pars</span></tt>()</td>
+<td>Some pairs of parameters should be input simutaneously.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_tol</span></tt>()</td>
+<td>atol &amp; rtol should be defined as scalars or vectors with length neq.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_iwork</span></tt>(new_liw[,&nbsp;expand])</td>
+<td>Extension module return an actually required length for integer work array when it is too short.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_rwork</span></tt>(new_lrw[,&nbsp;expand])</td>
+<td>Length of real work array is smaller than actually required length.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">has_u_t_all</span></tt>()</td>
+<td>Return True if self.u_all and self.t_all, defined in</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Import extension module _odesolver and check that it exists.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td>In the long parameter-lists for solvers in ODEPACK, quite a few</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">new_stepnr</span></tt>()</td>
+<td>When Fortran code returns a status <tt class="docutils literal"><span class="pre">istate==-1</span></tt>, it indicates that</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">print_roots</span></tt>(jroot,&nbsp;t_current,&nbsp;u_current)</td>
+<td>Roots found at current T for some constraint functions.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_dummy_functions</span></tt>()</td>
+<td>Functions have to get dummy values before they are passed to extension</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_extra_args</span></tt>()</td>
+<td>Setting for extra parameters of user-defined functions.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodes.set_iopt" title="odespy.odepack.Lsodes.set_iopt"><tt class="xref py py-obj docutils literal"><span class="pre">set_iopt</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsodes.set_iter_method" title="odespy.odepack.Lsodes.set_iter_method"><tt class="xref py py-obj docutils literal"><span class="pre">set_iter_method</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodes.set_iwork_rwork" title="odespy.odepack.Lsodes.set_iwork_rwork"><tt class="xref py py-obj docutils literal"><span class="pre">set_iwork_rwork</span></tt></a>()</td>
+<td>Initialization of work arrays with caculated length and optional inputs.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_jac</span></tt>()</td>
+<td>Set values for Jacobian matrix. In several solvers like Lsode,</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_liw_min</span></tt>()</td>
+<td>Calculate the necessary length of integer work arrays when it is not specified explicitly by users.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_lrw_min</span></tt>()</td>
+<td>Calculate the necessary length of real work arrays for Fortran code.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_ydoti</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ydoti</span></tt> is an array used in linearly implicit solvers.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>This function is involved for non-linearly implicit</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">tol_multiply</span></tt>(tolsf)</td>
+<td>This function is used to adjust tolerance parameters for Fortran part.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>Common validity check in Odepack.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odespy.odepack.Lsodes.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odespy.odepack'</em><a class="headerlink" href="#odespy.odepack.Lsodes.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodes.adjust_parameters">
+<tt class="descname">adjust_parameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodes.adjust_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodes.adjust_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Properties for new parameters in this solver.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="odespy.odepack.Lsodes.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'LSODES solver for sparse Jacobians'</em><a class="headerlink" href="#odespy.odepack.Lsodes.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodes.set_iopt">
+<tt class="descname">set_iopt</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodes.set_iopt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodes.set_iopt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodes.set_iter_method">
+<tt class="descname">set_iter_method</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodes.set_iter_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodes.set_iter_method" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodes.set_iwork_rwork">
+<tt class="descname">set_iwork_rwork</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodes.set_iwork_rwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodes.set_iwork_rwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization of work arrays with caculated length and optional inputs.
+In ODEPACK, &#8220;iwork&#8221; &amp; &#8220;rwork&#8221; should be initialized with the specific
+optional parameters in all the solvers.
+&#8220;liw&#8221; &amp; &#8220;lrw&#8221; represented the length requirement of work arrays.
+Specially, in Dlsodes, ia &amp; ja should be attached to iwork_in.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odespy.odepack.Lsodi">
+<em class="property">class </em><tt class="descclassname">odespy.odepack.</tt><tt class="descname">Lsodi</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odespy.odepack.Odepack" title="odespy.odepack.Odepack"><tt class="xref py py-class docutils literal"><span class="pre">odespy.odepack.Odepack</span></tt></a></p>
+<p>A Python wrapper of the LSODI subroutine from ODEPACK, targeting
+ODE problems of the form</p>
+<dl class="docutils">
+<dt>..math::</dt>
+<dd>A(u,t) u&#8217; &amp; = g(u,t)</dd>
+</dl>
+<p>where <span class="math">\(A(u,t)\)</span> is a square matrix and <span class="math">\(g\)</span> some function.
+If <span class="math">\(A\)</span> is singular, this is a differential-algebraic system.
+The user input is in the form of a residual function
+<span class="math">\(r = g - As\)</span> for some vector <span class="math">\(s\)</span>. The residual <span class="math">\(r\)</span>
+is provided by the user function <tt class="docutils literal"><span class="pre">res</span></tt> (Python) or <tt class="docutils literal"><span class="pre">res_f77</span></tt>
+(FORTRAN).</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span>
+<span class="pre">*f_args,</span> <span class="pre">**f_kwargs).</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt>. (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued. (default: False)</td>
+</tr>
+<tr class="row-odd"><td>disk_storage</td>
+<td>Indicates whether u is stored in memory or in
+file. If string, it is the filename; if False or
+&#8220;&#8221;, u is kept in memory; if True, a default
+filename tmp_odspy.dat is used. (default: False)</td>
+</tr>
+<tr class="row-even"><td>verbose</td>
+<td>Integer reflecting output of intermediate
+quantities. (default: 0)</td>
+</tr>
+<tr class="row-odd"><td>u_exact</td>
+<td>Function of t returning exact solution. (default:
+None)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>Absolute tolerance for solution. (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>Relative tolerance for solution. (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>adams_or_bdf</td>
+<td>Method in vode or solvers in odepack: &#8220;adams&#8221; or
+&#8220;bdf&#8221;. (default: adams)</td>
+</tr>
+<tr class="row-odd"><td>order</td>
+<td>Maximum order used by the integrator (&lt;= 12 for
+&#8220;adams&#8221;, &lt;= 5 for &#8220;bdf&#8221;). (default: 4)</td>
+</tr>
+<tr class="row-even"><td>nsteps</td>
+<td>Max no of internal solver steps per time step.
+(default: 1000)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive
+algorithm.</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-even"><td>corrector_iter_method</td>
+<td>Corrector iteration method choice.</td>
+</tr>
+<tr class="row-odd"><td>lrw</td>
+<td>Length of real work array.</td>
+</tr>
+<tr class="row-even"><td>liw</td>
+<td>Length of integer work array, similiar as &lt;lrw&gt;.</td>
+</tr>
+<tr class="row-odd"><td>adda_lsodi</td>
+<td>Callable object to add the matrix A = A(u,t)
+to another matrix p stored in the same form as A.
+The signature is <tt class="docutils literal"><span class="pre">adda(u,t,p)</span></tt> and it returns
+a matrix p+A (square matrix as the Jacobian).</td>
+</tr>
+<tr class="row-even"><td>adda_banded_lsodi</td>
+<td>Callable object to add the banded matrix
+A = A(u,t) to another matrix stored P in the
+same form as A. For a banded matrix, A(i,j) is
+added to P(i-j+mu+1,j). The signature is
+<tt class="docutils literal"><span class="pre">adda(u,t,p,ml,mu)</span></tt> and it returns a banded
+matrix.</td>
+</tr>
+<tr class="row-odd"><td>adda_lsodi_f77</td>
+<td><p class="first">Fortran subroutine for adda_lsodi.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine adda_lsodi_f77
+     1  (neq, t, u, ml, mu, pd, nrowpd)
+Cf2py intent(in, hide) neq, ml, mu
+Cf2py intent(in, hide), depend(pd) nrowpd
+Cf2py intent(in, out) pd
+      integer neq, ml, mu, nrowpd
+      double precision t, u, pd
+      dimension u(neq), pd(nrowpd, neq)
+      pd = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td>adda_banded_lsodi_f77</td>
+<td><p class="first">Fortran subroutine for adda_banded.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine adda_banded_lsodi_f77(neq, t,
+     1                  u, ml, mu, pd, nrowpd)
+Cf2py intent(in, hide) neq, ml, mu
+Cf2py intent(in, hide), depend(pd) nrowpd
+Cf2py intent(in, out) pd
+      integer neq, ml, mu, nrowpd
+      double precision t, u, pd
+      dimension u(neq), pd(nrowpd, neq)
+      pd = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>jac_lsodi</td>
+<td>Callable object to define the full Jacobian
+matrix dr/du where r = g - A*s. The
+signature of this function is <tt class="docutils literal"><span class="pre">jac(u,t,s)</span></tt>,
+returning a matrix like the other <tt class="docutils literal"><span class="pre">jac</span></tt>
+functions.</td>
+</tr>
+<tr class="row-even"><td>jac_banded_lsodi</td>
+<td>Callable object to define the banded Jacobian
+matrix dr/du where r = g - A*s. The
+signature is <tt class="docutils literal"><span class="pre">jac(u,t,s,ml,mu)</span></tt>,
+where <tt class="docutils literal"><span class="pre">ml</span></tt> and <tt class="docutils literal"><span class="pre">mu</span></tt> are the lower and
+upper half-bandwidth of the banded matrix.</td>
+</tr>
+<tr class="row-odd"><td>jac_lsodi_f77</td>
+<td><p class="first">Fortran subroutine for jac_lsodi.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine jac_lsodi_f77
+     1  (neq, t, u, s, ml, mu, pd, nrowpd)
+Cf2py intent(in, hide) neq, ml, mu, nrowpd
+Cf2py intent(out) pd
+      integer neq, ml, mu, nrowpd
+      double precision t, u, pd, s
+      dimension u(neq), s(neq), pd(nrowpd, neq)
+      pd = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td>jac_banded_lsodi_f77</td>
+<td><p class="first">Fortran subroutine for jac_banded_lsodi.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine jac_banded_lsodi_f77
+     1  (neq, t, u, s, ml, mu, pd, nrowpd)
+Cf2py intent(in, hide) neq, ml, mu, nrowpd
+Cf2py intent(out) pd
+      integer neq, ml, mu, nrowpd
+      double precision t, u, pd, s
+      dimension u(neq), s(neq), pd(nrowpd, neq)
+      pd = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>res</td>
+<td>User-supplied function to calculate the residual
+vector, defined by r =  g(u,t) - A(u,t) * s.
+Used in the linearly implicit solvers: Lsodi,
+Lsodis, Lsoibt. The <tt class="docutils literal"><span class="pre">res</span></tt> function has the
+signature <tt class="docutils literal"><span class="pre">res(u,t,s,ires)</span></tt> and returns
+the tuple <tt class="docutils literal"><span class="pre">(r,ires)</span></tt>, where <tt class="docutils literal"><span class="pre">ires</span></tt> is an
+int. On input, ires indicates how ODEPACK would use
+the returned array &#8220;r&#8221;: <tt class="docutils literal"><span class="pre">ires=1</span></tt> means the full
+residual exactly, <tt class="docutils literal"><span class="pre">ires=2</span></tt> means that <tt class="docutils literal"><span class="pre">r</span></tt> is
+used only to compute the Jacobian dr/du by finite
+differences.
+<tt class="docutils literal"><span class="pre">res</span></tt> should set the flag <tt class="docutils literal"><span class="pre">ires</span></tt> if it encounters
+a halt condition or illegal input. Otherwise, it
+should not be reset. On output, the value 1 or -1
+represents a normal return.</td>
+</tr>
+<tr class="row-even"><td>order</td>
+<td>Maximum order used by the integrator (&lt;= 12 for
+&#8220;adams&#8221;, &lt;= 5 for &#8220;bdf&#8221;). (default: 4)</td>
+</tr>
+<tr class="row-odd"><td>ml</td>
+<td>Number of lower non-zero diagonals in a banded
+Jacobian.</td>
+</tr>
+<tr class="row-even"><td>mu</td>
+<td>Number of upper non-zero diagonals in a banded
+Jacobian.</td>
+</tr>
+<tr class="row-odd"><td>ydoti</td>
+<td>Real array for the initial value of dy/dt.
+(default: [])</td>
+</tr>
+<tr class="row-even"><td>nsteps</td>
+<td>Max no of internal solver steps per time step.
+(default: 1000)</td>
+</tr>
+<tr class="row-odd"><td>res_f77</td>
+<td><p class="first">Fortran subroutine for res.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>     subroutine res_f77(neq, t, u, s, r, ires)
+Cf2py intent(hide) neq
+Cf2py intent(out) r
+Cf2py intent(in,out) ires
+     double precision t, u, s, r
+     dimension u(neq, s(neq), r(neq)
+     ...
+     return
+     end</pre>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_atol</span></tt>(u_current)</td>
+<td>Error tolerance <tt class="docutils literal"><span class="pre">tol(i)</span></tt> may become zero for some <tt class="docutils literal"><span class="pre">i</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodi.adjust_parameters" title="odespy.odepack.Lsodi.adjust_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>This function intends to one step forward for linearly implicit solvers</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_iaja</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ia</span></tt>, <tt class="docutils literal"><span class="pre">ja</span></tt>, <tt class="docutils literal"><span class="pre">ic</span></tt>, <tt class="docutils literal"><span class="pre">jc</span></tt> are optional inputs to describe</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_liwlrw</span></tt>()</td>
+<td>If the lengths of work arrays are specified by users, check whether</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_pars</span></tt>()</td>
+<td>Some pairs of parameters should be input simutaneously.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_tol</span></tt>()</td>
+<td>atol &amp; rtol should be defined as scalars or vectors with length neq.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_iwork</span></tt>(new_liw[,&nbsp;expand])</td>
+<td>Extension module return an actually required length for integer work array when it is too short.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_rwork</span></tt>(new_lrw[,&nbsp;expand])</td>
+<td>Length of real work array is smaller than actually required length.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">has_u_t_all</span></tt>()</td>
+<td>Return True if self.u_all and self.t_all, defined in</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Import extension module _odesolver and check that it exists.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td>In the long parameter-lists for solvers in ODEPACK, quite a few</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">new_stepnr</span></tt>()</td>
+<td>When Fortran code returns a status <tt class="docutils literal"><span class="pre">istate==-1</span></tt>, it indicates that</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">print_roots</span></tt>(jroot,&nbsp;t_current,&nbsp;u_current)</td>
+<td>Roots found at current T for some constraint functions.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsodi.set_dummy_functions" title="odespy.odepack.Lsodi.set_dummy_functions"><tt class="xref py py-obj docutils literal"><span class="pre">set_dummy_functions</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodi.set_extra_args" title="odespy.odepack.Lsodi.set_extra_args"><tt class="xref py py-obj docutils literal"><span class="pre">set_extra_args</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodi.set_iopt" title="odespy.odepack.Lsodi.set_iopt"><tt class="xref py py-obj docutils literal"><span class="pre">set_iopt</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsodi.set_iter_method" title="odespy.odepack.Lsodi.set_iter_method"><tt class="xref py py-obj docutils literal"><span class="pre">set_iter_method</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodi.set_iwork_rwork" title="odespy.odepack.Lsodi.set_iwork_rwork"><tt class="xref py py-obj docutils literal"><span class="pre">set_iwork_rwork</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsodi.set_jac" title="odespy.odepack.Lsodi.set_jac"><tt class="xref py py-obj docutils literal"><span class="pre">set_jac</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodi.set_liw_min" title="odespy.odepack.Lsodi.set_liw_min"><tt class="xref py py-obj docutils literal"><span class="pre">set_liw_min</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsodi.set_lrw_min" title="odespy.odepack.Lsodi.set_lrw_min"><tt class="xref py py-obj docutils literal"><span class="pre">set_lrw_min</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_ydoti</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ydoti</span></tt> is an array used in linearly implicit solvers.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsodi.solve" title="odespy.odepack.Lsodi.solve"><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt></a>(time_points[,&nbsp;terminate])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">tol_multiply</span></tt>(tolsf)</td>
+<td>This function is used to adjust tolerance parameters for Fortran part.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>Common validity check in Odepack.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="odespy.odepack.Lsodi.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodi.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodi.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odespy.odepack.Lsodi.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odespy.odepack'</em><a class="headerlink" href="#odespy.odepack.Lsodi.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodi.adjust_parameters">
+<tt class="descname">adjust_parameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodi.adjust_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodi.adjust_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odespy.odepack.Lsodi.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'LSODI solver for linearly implicit systems'</em><a class="headerlink" href="#odespy.odepack.Lsodi.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodi.set_dummy_functions">
+<tt class="descname">set_dummy_functions</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodi.set_dummy_functions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodi.set_dummy_functions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodi.set_extra_args">
+<tt class="descname">set_extra_args</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodi.set_extra_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodi.set_extra_args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodi.set_iopt">
+<tt class="descname">set_iopt</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodi.set_iopt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodi.set_iopt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodi.set_iter_method">
+<tt class="descname">set_iter_method</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodi.set_iter_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodi.set_iter_method" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodi.set_iwork_rwork">
+<tt class="descname">set_iwork_rwork</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodi.set_iwork_rwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodi.set_iwork_rwork" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodi.set_jac">
+<tt class="descname">set_jac</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodi.set_jac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodi.set_jac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodi.set_liw_min">
+<tt class="descname">set_liw_min</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodi.set_liw_min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodi.set_liw_min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodi.set_lrw_min">
+<tt class="descname">set_lrw_min</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodi.set_lrw_min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodi.set_lrw_min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodi.solve">
+<tt class="descname">solve</tt><big>(</big><em>time_points</em>, <em>terminate=None</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodi.solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodi.solve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odespy.odepack.Lsodis">
+<em class="property">class </em><tt class="descclassname">odespy.odepack.</tt><tt class="descname">Lsodis</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odespy.odepack.Odepack" title="odespy.odepack.Odepack"><tt class="xref py py-class docutils literal"><span class="pre">odespy.odepack.Odepack</span></tt></a></p>
+<p>A Python wrapper of the LSODIS subroutine from ODEPACK.
+This subroutine is a variant of LSODI, intended for stiff problems
+in which the matrix A and the Jacobian of the residual wrt the
+unknown functions have a sparse structure.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>res</td>
+<td>User-supplied function to calculate the residual
+vector, defined by r =  g(u,t) - A(u,t) * s.
+Used in the linearly implicit solvers: Lsodi,
+Lsodis, Lsoibt. The <tt class="docutils literal"><span class="pre">res</span></tt> function has the
+signature <tt class="docutils literal"><span class="pre">res(u,t,s,ires)</span></tt> and returns
+the tuple <tt class="docutils literal"><span class="pre">(r,ires)</span></tt>, where <tt class="docutils literal"><span class="pre">ires</span></tt> is an
+int. On input, ires indicates how ODEPACK would use
+the returned array &#8220;r&#8221;: <tt class="docutils literal"><span class="pre">ires=1</span></tt> means the full
+residual exactly, <tt class="docutils literal"><span class="pre">ires=2</span></tt> means that <tt class="docutils literal"><span class="pre">r</span></tt> is
+used only to compute the Jacobian dr/du by finite
+differences.
+<tt class="docutils literal"><span class="pre">res</span></tt> should set the flag <tt class="docutils literal"><span class="pre">ires</span></tt> if it encounters
+a halt condition or illegal input. Otherwise, it
+should not be reset. On output, the value 1 or -1
+represents a normal return.</td>
+</tr>
+<tr class="row-odd"><td>adda_lsodis</td>
+<td>Callable object to add j-th column of matrix
+A = A(u,t) to another matrix stored in sparse
+form. The signature is <tt class="docutils literal"><span class="pre">adda(u,t,j,ia,ja,p)</span></tt>
+and it returns a vector.</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span>
+<span class="pre">*f_args,</span> <span class="pre">**f_kwargs).</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt>. (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued. (default: False)</td>
+</tr>
+<tr class="row-odd"><td>disk_storage</td>
+<td>Indicates whether u is stored in memory or in
+file. If string, it is the filename; if False or
+&#8220;&#8221;, u is kept in memory; if True, a default
+filename tmp_odspy.dat is used. (default: False)</td>
+</tr>
+<tr class="row-even"><td>verbose</td>
+<td>Integer reflecting output of intermediate
+quantities. (default: 0)</td>
+</tr>
+<tr class="row-odd"><td>u_exact</td>
+<td>Function of t returning exact solution. (default:
+None)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>Absolute tolerance for solution. (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>Relative tolerance for solution. (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>adams_or_bdf</td>
+<td>Method in vode or solvers in odepack: &#8220;adams&#8221; or
+&#8220;bdf&#8221;. (default: adams)</td>
+</tr>
+<tr class="row-odd"><td>order</td>
+<td>Maximum order used by the integrator (&lt;= 12 for
+&#8220;adams&#8221;, &lt;= 5 for &#8220;bdf&#8221;). (default: 4)</td>
+</tr>
+<tr class="row-even"><td>nsteps</td>
+<td>Max no of internal solver steps per time step.
+(default: 1000)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive
+algorithm.</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-even"><td>corrector_iter_method</td>
+<td>Corrector iteration method choice.</td>
+</tr>
+<tr class="row-odd"><td>lrw</td>
+<td>Length of real work array.</td>
+</tr>
+<tr class="row-even"><td>liw</td>
+<td>Length of integer work array, similiar as &lt;lrw&gt;.</td>
+</tr>
+<tr class="row-odd"><td>jac_lsodis</td>
+<td>Callable object to supply the j-th column of
+the sparse Jacobian matrix dr/du where
+r = g - A*s. The signature is <tt class="docutils literal"><span class="pre">jac(u,t,s,j,ia,ja)</span></tt>
+and a vector is returned.</td>
+</tr>
+<tr class="row-even"><td>moss</td>
+<td>Method to obtain sparse structure of Jacobian.</td>
+</tr>
+<tr class="row-odd"><td>ia</td>
+<td>Integer array with length neq+1 which contains
+starting locations in ja of the descriptions
+for columns 1...neq. ia(1) == 1. The last element
+ia[neq+1] should equal to the total number of
+nonzero locations assumed.
+For each column j = 1...neq, the values of the
+row index i in column j, where a nonzero element
+may occur, are given by i == ja(k) where ia(j) &lt;=&#8217;
+k &lt; ia(j+1).</td>
+</tr>
+<tr class="row-even"><td>ja</td>
+<td>Integer array containing the row indices where
+the nonzero elements occur, in columnwise
+order. Describes the sparsity matrix structure
+together with ia.
+In Lsodes, ia and ja describe the structure of
+Jacobian matrix; while in Lsodis, ia and ja are
+used to describe the structure of matrix A.</td>
+</tr>
+<tr class="row-odd"><td>ic</td>
+<td>Array which contains starting locations in jc.</td>
+</tr>
+<tr class="row-even"><td>jc</td>
+<td>Integer array which describes the sparsity
+Jacobian structure together with ic, like ia
+and ja. In Lsodis, ia and ja describe the sparse
+structure of matrix A, while ic and jc describe
+the sparse structure of Jacobian matrix.</td>
+</tr>
+<tr class="row-odd"><td>ydoti</td>
+<td>Real array for the initial value of dy/dt.
+(default: [])</td>
+</tr>
+<tr class="row-even"><td>order</td>
+<td>Maximum order used by the integrator (&lt;= 12 for
+&#8220;adams&#8221;, &lt;= 5 for &#8220;bdf&#8221;). (default: 4)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_atol</span></tt>(u_current)</td>
+<td>Error tolerance <tt class="docutils literal"><span class="pre">tol(i)</span></tt> may become zero for some <tt class="docutils literal"><span class="pre">i</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodis.adjust_parameters" title="odespy.odepack.Lsodis.adjust_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>This function intends to one step forward for linearly implicit solvers</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_iaja</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ia</span></tt>, <tt class="docutils literal"><span class="pre">ja</span></tt>, <tt class="docutils literal"><span class="pre">ic</span></tt>, <tt class="docutils literal"><span class="pre">jc</span></tt> are optional inputs to describe</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_liwlrw</span></tt>()</td>
+<td>If the lengths of work arrays are specified by users, check whether</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_pars</span></tt>()</td>
+<td>Some pairs of parameters should be input simutaneously.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_tol</span></tt>()</td>
+<td>atol &amp; rtol should be defined as scalars or vectors with length neq.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_iwork</span></tt>(new_liw[,&nbsp;expand])</td>
+<td>Extension module return an actually required length for integer work array when it is too short.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_rwork</span></tt>(new_lrw[,&nbsp;expand])</td>
+<td>Length of real work array is smaller than actually required length.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">has_u_t_all</span></tt>()</td>
+<td>Return True if self.u_all and self.t_all, defined in</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Import extension module _odesolver and check that it exists.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td>In the long parameter-lists for solvers in ODEPACK, quite a few</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">new_stepnr</span></tt>()</td>
+<td>When Fortran code returns a status <tt class="docutils literal"><span class="pre">istate==-1</span></tt>, it indicates that</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">print_roots</span></tt>(jroot,&nbsp;t_current,&nbsp;u_current)</td>
+<td>Roots found at current T for some constraint functions.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsodis.set_dummy_functions" title="odespy.odepack.Lsodis.set_dummy_functions"><tt class="xref py py-obj docutils literal"><span class="pre">set_dummy_functions</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_extra_args</span></tt>()</td>
+<td>Setting for extra parameters of user-defined functions.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodis.set_iopt" title="odespy.odepack.Lsodis.set_iopt"><tt class="xref py py-obj docutils literal"><span class="pre">set_iopt</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsodis.set_iter_method" title="odespy.odepack.Lsodis.set_iter_method"><tt class="xref py py-obj docutils literal"><span class="pre">set_iter_method</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsodis.set_iwork_rwork" title="odespy.odepack.Lsodis.set_iwork_rwork"><tt class="xref py py-obj docutils literal"><span class="pre">set_iwork_rwork</span></tt></a>()</td>
+<td>Initialization of work arrays with caculated length and optional inputs.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_jac</span></tt>()</td>
+<td>Set values for Jacobian matrix. In several solvers like Lsode,</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_liw_min</span></tt>()</td>
+<td>Calculate the necessary length of integer work arrays when it is not specified explicitly by users.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_lrw_min</span></tt>()</td>
+<td>Calculate the necessary length of real work arrays for Fortran code.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_ydoti</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ydoti</span></tt> is an array used in linearly implicit solvers.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsodis.solve" title="odespy.odepack.Lsodis.solve"><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt></a>(time_points[,&nbsp;terminate])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">tol_multiply</span></tt>(tolsf)</td>
+<td>This function is used to adjust tolerance parameters for Fortran part.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>Common validity check in Odepack.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="odespy.odepack.Lsodis.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodis.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodis.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odespy.odepack.Lsodis.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odespy.odepack'</em><a class="headerlink" href="#odespy.odepack.Lsodis.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodis.adjust_parameters">
+<tt class="descname">adjust_parameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodis.adjust_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodis.adjust_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odespy.odepack.Lsodis.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'LSODIS solver for linearly implicit sparse systems'</em><a class="headerlink" href="#odespy.odepack.Lsodis.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodis.set_dummy_functions">
+<tt class="descname">set_dummy_functions</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodis.set_dummy_functions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodis.set_dummy_functions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodis.set_iopt">
+<tt class="descname">set_iopt</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodis.set_iopt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodis.set_iopt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodis.set_iter_method">
+<tt class="descname">set_iter_method</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodis.set_iter_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodis.set_iter_method" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodis.set_iwork_rwork">
+<tt class="descname">set_iwork_rwork</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodis.set_iwork_rwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodis.set_iwork_rwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization of work arrays with caculated length and optional inputs.
+In ODEPACK, &#8220;iwork&#8221; &amp; &#8220;rwork&#8221; should be initialized with the specific
+optional parameters in all the solvers.
+&#8220;liw&#8221; &amp; &#8220;lrw&#8221; represented the length requirement of work arrays.
+Specially, in Lsodis, (ia, ja, ic &amp; jc) should be attached to
+iwork.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsodis.solve">
+<tt class="descname">solve</tt><big>(</big><em>time_points</em>, <em>terminate=None</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsodis.solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsodis.solve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odespy.odepack.Lsoibt">
+<em class="property">class </em><tt class="descclassname">odespy.odepack.</tt><tt class="descname">Lsoibt</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoibt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoibt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odespy.odepack.Odepack" title="odespy.odepack.Odepack"><tt class="xref py py-class docutils literal"><span class="pre">odespy.odepack.Odepack</span></tt></a></p>
+<p>A Python wrapper of the LSOIBT subroutine from ODEPACK.
+This subroutine is a variant of LSODI for the case where the
+matrices <span class="math">\(A\)</span>, <span class="math">\(dg/du\)</span>, and <span class="math">\(d(As)/du\)</span> are all
+block tridiagonal.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>res</td>
+<td>User-supplied function to calculate the residual
+vector, defined by r =  g(u,t) - A(u,t) * s.
+Used in the linearly implicit solvers: Lsodi,
+Lsodis, Lsoibt. The <tt class="docutils literal"><span class="pre">res</span></tt> function has the
+signature <tt class="docutils literal"><span class="pre">res(u,t,s,ires)</span></tt> and returns
+the tuple <tt class="docutils literal"><span class="pre">(r,ires)</span></tt>, where <tt class="docutils literal"><span class="pre">ires</span></tt> is an
+int. On input, ires indicates how ODEPACK would use
+the returned array &#8220;r&#8221;: <tt class="docutils literal"><span class="pre">ires=1</span></tt> means the full
+residual exactly, <tt class="docutils literal"><span class="pre">ires=2</span></tt> means that <tt class="docutils literal"><span class="pre">r</span></tt> is
+used only to compute the Jacobian dr/du by finite
+differences.
+<tt class="docutils literal"><span class="pre">res</span></tt> should set the flag <tt class="docutils literal"><span class="pre">ires</span></tt> if it encounters
+a halt condition or illegal input. Otherwise, it
+should not be reset. On output, the value 1 or -1
+represents a normal return.</td>
+</tr>
+<tr class="row-odd"><td>adda_lsoibt</td>
+<td>Callable object to add matrix A = A(u,t) to
+another matrix P, stored in block-tridiagonal
+form. The signature is  adda(u,t,pa,pb,pc), which
+should return (pa,pb,pc) as described for the
+jac_lsoibt parameter.</td>
+</tr>
+<tr class="row-even"><td>mb</td>
+<td>Block size. Describe the block-tridiagonal form of matrix A
+together with nb.</td>
+</tr>
+<tr class="row-odd"><td>nb</td>
+<td>Number of blocks in the main diagonal.
+In each of the nb block-rows of the matrix P
+(each consisting of mb consecutive rows), the
+nonzero elements are to lie in three
+consecutive mb by mb blocks.  In block-rows 2
+through nb-1, these are centered about the
+main diagonal. In block rows 1 and nb, they
+are the diagonal blocks and the two blocks
+adjacent to the diagonal block.  (Thus block
+positions (1,3) and (nb,nb-2) can be nonzero.)
+Require: mb&gt;=1, nb&gt;=4, mb*nb==neq.</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="79%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span>
+<span class="pre">*f_args,</span> <span class="pre">**f_kwargs).</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt>. (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued. (default: False)</td>
+</tr>
+<tr class="row-odd"><td>disk_storage</td>
+<td>Indicates whether u is stored in memory or in
+file. If string, it is the filename; if False or
+&#8220;&#8221;, u is kept in memory; if True, a default
+filename tmp_odspy.dat is used. (default: False)</td>
+</tr>
+<tr class="row-even"><td>verbose</td>
+<td>Integer reflecting output of intermediate
+quantities. (default: 0)</td>
+</tr>
+<tr class="row-odd"><td>u_exact</td>
+<td>Function of t returning exact solution. (default:
+None)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>Absolute tolerance for solution. (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>Relative tolerance for solution. (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>adams_or_bdf</td>
+<td>Method in vode or solvers in odepack: &#8220;adams&#8221; or
+&#8220;bdf&#8221;. (default: adams)</td>
+</tr>
+<tr class="row-odd"><td>order</td>
+<td>Maximum order used by the integrator (&lt;= 12 for
+&#8220;adams&#8221;, &lt;= 5 for &#8220;bdf&#8221;). (default: 4)</td>
+</tr>
+<tr class="row-even"><td>nsteps</td>
+<td>Max no of internal solver steps per time step.
+(default: 1000)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive
+algorithm.</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-even"><td>corrector_iter_method</td>
+<td>Corrector iteration method choice.</td>
+</tr>
+<tr class="row-odd"><td>lrw</td>
+<td>Length of real work array.</td>
+</tr>
+<tr class="row-even"><td>liw</td>
+<td>Length of integer work array, similiar as &lt;lrw&gt;.</td>
+</tr>
+<tr class="row-odd"><td>jac_lsoibt</td>
+<td><p class="first">Callable object to supply the jth column of
+the Jacobian matrix dr/du where r = g - A*s,
+stored in block-tridiagonal form.
+The signature is jac(u,t,s), and the return value
+is a tuple (pa,pb,pc), where each of these
+arrays has size mb*mb*nb, mb and nb being two
+parameters that can be set (see the help line for
+the parameters in the doc string of Lsoibt).
+pa, pb, and pc are to be loaded with partial
+derivatives (elements of the Jacobian matrix)
+on output, in terms of the block-tridiagonal
+structure assumed. That is, load the diagonal
+blocks into pa, the superdiagonal blocks (and
+block (nb,nb-2)) into pb, and the subdiagonal
+blocks (and block (1,3)) into pc.
+The blocks in block-row k of dr/du are to be
+loaded into pa(<em>,</em>,k), pb(<em>,</em>,k), and
+pc(<em>,</em>,k).
+Thus the affect of this function should be:</p>
+<div class="last highlight-python"><pre>pa(i,j,k) = ( (i.j) element of k-th diagonal
+            block of dr/du)
+pb(i,j,k) = ( (i,j) element of block (k,k+1)
+            of dr/du, or block (nb,nb-2) if
+            k == nb)                 pc(i,j,k) = ( (i,j) element of block (k,k-1)
+            of dr/du, or block (1,3) if k==1).</pre>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td>ydoti</td>
+<td>Real array for the initial value of dy/dt.
+(default: [])</td>
+</tr>
+<tr class="row-odd"><td>order</td>
+<td>Maximum order used by the integrator (&lt;= 12 for
+&#8220;adams&#8221;, &lt;= 5 for &#8220;bdf&#8221;). (default: 4)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">adjust_atol</span></tt>(u_current)</td>
+<td>Error tolerance <tt class="docutils literal"><span class="pre">tol(i)</span></tt> may become zero for some <tt class="docutils literal"><span class="pre">i</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsoibt.adjust_parameters" title="odespy.odepack.Lsoibt.adjust_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt>()</td>
+<td>This function intends to one step forward for linearly implicit solvers</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_iaja</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ia</span></tt>, <tt class="docutils literal"><span class="pre">ja</span></tt>, <tt class="docutils literal"><span class="pre">ic</span></tt>, <tt class="docutils literal"><span class="pre">jc</span></tt> are optional inputs to describe</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_liwlrw</span></tt>()</td>
+<td>If the lengths of work arrays are specified by users, check whether</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_pars</span></tt>()</td>
+<td>Some pairs of parameters should be input simutaneously.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_tol</span></tt>()</td>
+<td>atol &amp; rtol should be defined as scalars or vectors with length neq.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_iwork</span></tt>(new_liw[,&nbsp;expand])</td>
+<td>Extension module return an actually required length for integer work array when it is too short.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">expand_rwork</span></tt>(new_lrw[,&nbsp;expand])</td>
+<td>Length of real work array is smaller than actually required length.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">has_u_t_all</span></tt>()</td>
+<td>Return True if self.u_all and self.t_all, defined in</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt>()</td>
+<td>Import extension module _odesolver and check that it exists.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt>()</td>
+<td>In the long parameter-lists for solvers in ODEPACK, quite a few</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">new_stepnr</span></tt>()</td>
+<td>When Fortran code returns a status <tt class="docutils literal"><span class="pre">istate==-1</span></tt>, it indicates that</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">print_roots</span></tt>(jroot,&nbsp;t_current,&nbsp;u_current)</td>
+<td>Roots found at current T for some constraint functions.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsoibt.set_dummy_functions" title="odespy.odepack.Lsoibt.set_dummy_functions"><tt class="xref py py-obj docutils literal"><span class="pre">set_dummy_functions</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_extra_args</span></tt>()</td>
+<td>Setting for extra parameters of user-defined functions.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsoibt.set_iopt" title="odespy.odepack.Lsoibt.set_iopt"><tt class="xref py py-obj docutils literal"><span class="pre">set_iopt</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsoibt.set_iter_method" title="odespy.odepack.Lsoibt.set_iter_method"><tt class="xref py py-obj docutils literal"><span class="pre">set_iter_method</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsoibt.set_iwork_rwork" title="odespy.odepack.Lsoibt.set_iwork_rwork"><tt class="xref py py-obj docutils literal"><span class="pre">set_iwork_rwork</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_jac</span></tt>()</td>
+<td>Set values for Jacobian matrix. In several solvers like Lsode,</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsoibt.set_liw_min" title="odespy.odepack.Lsoibt.set_liw_min"><tt class="xref py py-obj docutils literal"><span class="pre">set_liw_min</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsoibt.set_lrw_min" title="odespy.odepack.Lsoibt.set_lrw_min"><tt class="xref py py-obj docutils literal"><span class="pre">set_lrw_min</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_ydoti</span></tt>()</td>
+<td><tt class="docutils literal"><span class="pre">ydoti</span></tt> is an array used in linearly implicit solvers.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Lsoibt.solve" title="odespy.odepack.Lsoibt.solve"><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt></a>(time_points[,&nbsp;terminate])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">tol_multiply</span></tt>(tolsf)</td>
+<td>This function is used to adjust tolerance parameters for Fortran part.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Lsoibt.validate_data" title="odespy.odepack.Lsoibt.validate_data"><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt></a>()</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="odespy.odepack.Lsoibt.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoibt.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoibt.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odespy.odepack.Lsoibt.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odespy.odepack'</em><a class="headerlink" href="#odespy.odepack.Lsoibt.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoibt.adjust_parameters">
+<tt class="descname">adjust_parameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoibt.adjust_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoibt.adjust_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odespy.odepack.Lsoibt.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'LSOIBIT solver for linearly implicit block tridiag systems'</em><a class="headerlink" href="#odespy.odepack.Lsoibt.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoibt.set_dummy_functions">
+<tt class="descname">set_dummy_functions</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoibt.set_dummy_functions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoibt.set_dummy_functions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoibt.set_iopt">
+<tt class="descname">set_iopt</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoibt.set_iopt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoibt.set_iopt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoibt.set_iter_method">
+<tt class="descname">set_iter_method</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoibt.set_iter_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoibt.set_iter_method" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoibt.set_iwork_rwork">
+<tt class="descname">set_iwork_rwork</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoibt.set_iwork_rwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoibt.set_iwork_rwork" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoibt.set_liw_min">
+<tt class="descname">set_liw_min</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoibt.set_liw_min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoibt.set_liw_min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoibt.set_lrw_min">
+<tt class="descname">set_lrw_min</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoibt.set_lrw_min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoibt.set_lrw_min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoibt.solve">
+<tt class="descname">solve</tt><big>(</big><em>time_points</em>, <em>terminate=None</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoibt.solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoibt.solve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Lsoibt.validate_data">
+<tt class="descname">validate_data</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Lsoibt.validate_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Lsoibt.validate_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="odespy.odepack.Odepack">
+<em class="property">class </em><tt class="descclassname">odespy.odepack.</tt><tt class="descname">Odepack</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="solvers.html#odespy.solvers.Solver" title="odespy.solvers.Solver"><tt class="xref py py-class docutils literal"><span class="pre">odespy.solvers.Solver</span></tt></a></p>
+<p>This is a superclass for wrapping for seven solvers in the Fortran
+package ODEPACK (available at the netlib repository:
+www.netlib.org/odepack).</p>
+<p><em>Solvers for explicitly given systems.</em>
+For each of the following solvers, it is assumed that the ODEs are
+given explicitly, so that the system can be written in the form
+du/dt = f(u,t), where u is a vector of dependent variables, and t
+is a scalar.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Lsode</td>
+<td><p class="first">A wrapper of dlsode, the basic solver in ODEPACK for
+stiff and nonstiff systems of the form u&#8217; = f.</p>
+<p>In the stiff case, it treats the Jacobian matrix df/du as
+either a dense (full) or a banded matrix, and as either
+user-supplied or internally approximated by differences.</p>
+<p class="last">It uses Adams methods (predictor-corrector) in the
+nonstiff case, and Backward Differentiation Formula (BDF)
+methods (the Gear methods) in the stiff case.  The linear
+systems that arise are solved by direct methods (LU
+factorization/backsolve).</p>
+</td>
+</tr>
+<tr class="row-odd"><td>Lsodes</td>
+<td>Solves systems u&#8217; = f, and in the stiff case
+treats Jacobian matrix in general sparse form. It can
+determine the sparsity structure on its own, or optionally
+accepts this information from the user.
+It then uses parts of the Yale Sparse Matrix Package (YSMP)
+to solve the linear systems that arise, by a sparse
+(direct) LU factorization/backsolve method.</td>
+</tr>
+<tr class="row-even"><td>Lsoda</td>
+<td>Solves systems u&#8217; = f, with a dense or banded
+Jacobian when the problem is stiff, but it automatically
+selects between nonstiff (Adams) and stiff (BDF)
+methods. It uses the nonstiff method initially, and
+dynamically monitors data in order to decide which
+method to use.</td>
+</tr>
+<tr class="row-odd"><td>Lsodar</td>
+<td>A variant of Lsoda allowing for constraints.
+It solves u&#8217; = with dense or banded
+Jacobian and automatic method selection, and at the same
+time, it solves g(u,t) = 0. This is often useful for
+finding stopping conditions, or for finding points
+at which a switch is to be made in the function f.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p><em>Solvers for linearly implicit systems.</em>
+The following solvers treat systems in the linearly implicit form:</p>
+<div class="highlight-python"><pre>A(u,t) du/dt = g(u,t),</pre>
+</div>
+<p>where A is a square matrix, i.e., with the derivative
+du/dt implicit, but linearly so.
+These solvers allow A to be singular, in which case the system is a
+differential-algebraic equation (DAE) system.
+In that case, the user must be very careful to supply a well-posed
+problem with consistent initial conditions.</p>
+</div></blockquote>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Lsodi</td>
+<td>Solves linearly implicit systems in which the
+matrices involved (A, dg/du, and d(A u&#8217;)/du) are all
+assumed to be either dense or banded.</td>
+</tr>
+<tr class="row-odd"><td>Lsodibt</td>
+<td>Solves linearly implicit systems in which the matrices
+involved are all assumed to be block-tridiagonal.  Linear
+systems are solved by the LU method.</td>
+</tr>
+<tr class="row-even"><td>Lsodis</td>
+<td>Solves linearly implicit systems in which the
+matrices involved are all assumed to be sparse.
+Either determines the sparsity structure or accepts it from
+the user, and uses parts of the Yale Sparse Matrix Package
+to solve the linear systems that arise, by a direct method.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note</em>: For large ODE systems the user is encouraged that users provide
+an f2py-compiled Fortran subroutine or a multi-line string Fortran code
+to define the ODE. This would help to improve efficiency.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE.</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span>
+<span class="pre">*f_args,</span> <span class="pre">**f_kwargs).</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt>. (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued. (default: False)</td>
+</tr>
+<tr class="row-odd"><td>disk_storage</td>
+<td>Indicates whether u is stored in memory or in
+file. If string, it is the filename; if False or
+&#8220;&#8221;, u is kept in memory; if True, a default
+filename tmp_odspy.dat is used. (default: False)</td>
+</tr>
+<tr class="row-even"><td>verbose</td>
+<td>Integer reflecting output of intermediate
+quantities. (default: 0)</td>
+</tr>
+<tr class="row-odd"><td>u_exact</td>
+<td>Function of t returning exact solution. (default:
+None)</td>
+</tr>
+<tr class="row-even"><td>atol</td>
+<td>Absolute tolerance for solution. (default: 1e-08)</td>
+</tr>
+<tr class="row-odd"><td>rtol</td>
+<td>Relative tolerance for solution. (default: 1e-06)</td>
+</tr>
+<tr class="row-even"><td>adams_or_bdf</td>
+<td>Method in vode or solvers in odepack: &#8220;adams&#8221; or
+&#8220;bdf&#8221;. (default: adams)</td>
+</tr>
+<tr class="row-odd"><td>order</td>
+<td>Maximum order used by the integrator (&lt;= 12 for
+&#8220;adams&#8221;, &lt;= 5 for &#8220;bdf&#8221;). (default: 4)</td>
+</tr>
+<tr class="row-even"><td>nsteps</td>
+<td>Max no of internal solver steps per time step.
+(default: 1000)</td>
+</tr>
+<tr class="row-odd"><td>first_step</td>
+<td>Suggested first time step size for an adaptive
+algorithm.</td>
+</tr>
+<tr class="row-even"><td>min_step</td>
+<td>Minimum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-odd"><td>max_step</td>
+<td>Maximum step size for an adaptive algorithm.</td>
+</tr>
+<tr class="row-even"><td>corrector_iter_method</td>
+<td>Corrector iteration method choice.</td>
+</tr>
+<tr class="row-odd"><td>lrw</td>
+<td>Length of real work array.</td>
+</tr>
+<tr class="row-even"><td>liw</td>
+<td>Length of integer work array, similiar as &lt;lrw&gt;.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Odepack.adjust_atol" title="odespy.odepack.Odepack.adjust_atol"><tt class="xref py py-obj docutils literal"><span class="pre">adjust_atol</span></tt></a>(u_current)</td>
+<td>Error tolerance <tt class="docutils literal"><span class="pre">tol(i)</span></tt> may become zero for some <tt class="docutils literal"><span class="pre">i</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Odepack.adjust_parameters" title="odespy.odepack.Odepack.adjust_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt></a>()</td>
+<td>Special settings for properties of input parameters.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Odepack.advance" title="odespy.odepack.Odepack.advance"><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt></a>()</td>
+<td>This function intends to one step forward for linearly implicit solvers</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Odepack.check_iaja" title="odespy.odepack.Odepack.check_iaja"><tt class="xref py py-obj docutils literal"><span class="pre">check_iaja</span></tt></a>()</td>
+<td><tt class="docutils literal"><span class="pre">ia</span></tt>, <tt class="docutils literal"><span class="pre">ja</span></tt>, <tt class="docutils literal"><span class="pre">ic</span></tt>, <tt class="docutils literal"><span class="pre">jc</span></tt> are optional inputs to describe</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Odepack.check_liwlrw" title="odespy.odepack.Odepack.check_liwlrw"><tt class="xref py py-obj docutils literal"><span class="pre">check_liwlrw</span></tt></a>()</td>
+<td>If the lengths of work arrays are specified by users, check whether</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Odepack.check_pars" title="odespy.odepack.Odepack.check_pars"><tt class="xref py py-obj docutils literal"><span class="pre">check_pars</span></tt></a>()</td>
+<td>Some pairs of parameters should be input simutaneously.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Odepack.check_tol" title="odespy.odepack.Odepack.check_tol"><tt class="xref py py-obj docutils literal"><span class="pre">check_tol</span></tt></a>()</td>
+<td>atol &amp; rtol should be defined as scalars or vectors with length neq.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Odepack.expand_iwork" title="odespy.odepack.Odepack.expand_iwork"><tt class="xref py py-obj docutils literal"><span class="pre">expand_iwork</span></tt></a>(new_liw[,&nbsp;expand])</td>
+<td>Extension module return an actually required length for integer work array when it is too short.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Odepack.expand_rwork" title="odespy.odepack.Odepack.expand_rwork"><tt class="xref py py-obj docutils literal"><span class="pre">expand_rwork</span></tt></a>(new_lrw[,&nbsp;expand])</td>
+<td>Length of real work array is smaller than actually required length.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Odepack.func_wrapper" title="odespy.odepack.Odepack.func_wrapper"><tt class="xref py py-obj docutils literal"><span class="pre">func_wrapper</span></tt></a>()</td>
+<td>This function is defined to wrap user-defined functions with new forms of parameter-list, or wrap the returned values as numpy arrays.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">has_u_t_all</span></tt>()</td>
+<td>Return True if self.u_all and self.t_all, defined in</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Odepack.initialize" title="odespy.odepack.Odepack.initialize"><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt></a>()</td>
+<td>Import extension module _odesolver and check that it exists.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Odepack.initialize_for_solve" title="odespy.odepack.Odepack.initialize_for_solve"><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt></a>()</td>
+<td>In the long parameter-lists for solvers in ODEPACK, quite a few</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Odepack.new_stepnr" title="odespy.odepack.Odepack.new_stepnr"><tt class="xref py py-obj docutils literal"><span class="pre">new_stepnr</span></tt></a>()</td>
+<td>When Fortran code returns a status <tt class="docutils literal"><span class="pre">istate==-1</span></tt>, it indicates that</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Odepack.print_roots" title="odespy.odepack.Odepack.print_roots"><tt class="xref py py-obj docutils literal"><span class="pre">print_roots</span></tt></a>(jroot,&nbsp;t_current,&nbsp;u_current)</td>
+<td>Roots found at current T for some constraint functions.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Odepack.set_dummy_functions" title="odespy.odepack.Odepack.set_dummy_functions"><tt class="xref py py-obj docutils literal"><span class="pre">set_dummy_functions</span></tt></a>()</td>
+<td>Functions have to get dummy values before they are passed to extension</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Odepack.set_extra_args" title="odespy.odepack.Odepack.set_extra_args"><tt class="xref py py-obj docutils literal"><span class="pre">set_extra_args</span></tt></a>()</td>
+<td>Setting for extra parameters of user-defined functions.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Odepack.set_iopt" title="odespy.odepack.Odepack.set_iopt"><tt class="xref py py-obj docutils literal"><span class="pre">set_iopt</span></tt></a>()</td>
+<td>Initialization for &#8220;ipot&#8221;, which is a flag to indicate whether optional</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Odepack.set_iter_method" title="odespy.odepack.Odepack.set_iter_method"><tt class="xref py py-obj docutils literal"><span class="pre">set_iter_method</span></tt></a>()</td>
+<td>Set proper values for method-choices when it is not specified</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Odepack.set_iwork_rwork" title="odespy.odepack.Odepack.set_iwork_rwork"><tt class="xref py py-obj docutils literal"><span class="pre">set_iwork_rwork</span></tt></a>()</td>
+<td>Initialize arrays for optional inputs, and calculate the</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Odepack.set_jac" title="odespy.odepack.Odepack.set_jac"><tt class="xref py py-obj docutils literal"><span class="pre">set_jac</span></tt></a>()</td>
+<td>Set values for Jacobian matrix. In several solvers like Lsode,</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Odepack.set_liw_min" title="odespy.odepack.Odepack.set_liw_min"><tt class="xref py py-obj docutils literal"><span class="pre">set_liw_min</span></tt></a>()</td>
+<td>Calculate the necessary length of integer work arrays when it is not specified explicitly by users.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Odepack.set_lrw_min" title="odespy.odepack.Odepack.set_lrw_min"><tt class="xref py py-obj docutils literal"><span class="pre">set_lrw_min</span></tt></a>()</td>
+<td>Calculate the necessary length of real work arrays for Fortran code.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Odepack.set_ydoti" title="odespy.odepack.Odepack.set_ydoti"><tt class="xref py py-obj docutils literal"><span class="pre">set_ydoti</span></tt></a>()</td>
+<td><tt class="docutils literal"><span class="pre">ydoti</span></tt> is an array used in linearly implicit solvers.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Odepack.solve" title="odespy.odepack.Odepack.solve"><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt></a>(time_points[,&nbsp;terminate])</td>
+<td>This function is involved for non-linearly implicit</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.odepack.Odepack.tol_multiply" title="odespy.odepack.Odepack.tol_multiply"><tt class="xref py py-obj docutils literal"><span class="pre">tol_multiply</span></tt></a>(tolsf)</td>
+<td>This function is used to adjust tolerance parameters for Fortran part.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.odepack.Odepack.validate_data" title="odespy.odepack.Odepack.validate_data"><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt></a>()</td>
+<td>Common validity check in Odepack.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odespy.odepack.Odepack.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odespy.odepack'</em><a class="headerlink" href="#odespy.odepack.Odepack.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.adjust_atol">
+<tt class="descname">adjust_atol</tt><big>(</big><em>u_current</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.adjust_atol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.adjust_atol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Error tolerance <tt class="docutils literal"><span class="pre">tol(i)</span></tt> may become zero for some <tt class="docutils literal"><span class="pre">i</span></tt>
+during integration, where:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">tol</span> <span class="o">=</span> <span class="n">rtol</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="n">atol</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It indicates that pure absolute tolerance (<tt class="docutils literal"><span class="pre">atol(i)=0.0</span></tt>)
+was requested.  In order to avoid possible divide-by-zero
+error, we find the indices of zero items and adjust
+<tt class="docutils literal"><span class="pre">atol</span></tt> to <tt class="docutils literal"><span class="pre">1e-8</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.adjust_parameters">
+<tt class="descname">adjust_parameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.adjust_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.adjust_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special settings for properties of input parameters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.advance">
+<tt class="descname">advance</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.advance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.advance" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function intends to one step forward for linearly implicit solvers
+(Lsodi, Lsodis, Lsoibt) in ODEPACK.</p>
+<p>For these linearly implicit solvers, if extra wrappers are
+added in Fortran code, there are often memory errors. Besides,
+sometimes there are unavoidable errors caused by bugs in the
+Ubuntu/Linux libraries as libc.  To make these solvers more
+reliable on all platforms, this function is used to call
+solvers in ODEPACK (dlsodi, dlsodis, dlsoibt) directly without
+any wrappers in Fortran. However, this would lead to
+efficiency lost with long work arrays as input parameters for
+Fortran code.  In Lsodi, Lsodis and Lsoibt, Solver.solve()
+would be applied to get the desired solution, which will
+direct to this function to step forward.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.check_iaja">
+<tt class="descname">check_iaja</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.check_iaja"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.check_iaja" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">ia</span></tt>, <tt class="docutils literal"><span class="pre">ja</span></tt>, <tt class="docutils literal"><span class="pre">ic</span></tt>, <tt class="docutils literal"><span class="pre">jc</span></tt> are optional inputs to describe
+arbitrary sparse structure of matrix.</p>
+<p><tt class="docutils literal"><span class="pre">ia</span></tt> and <tt class="docutils literal"><span class="pre">ja</span></tt> are used in dlsodes, dlsodis.
+<tt class="docutils literal"><span class="pre">ic</span></tt> and <tt class="docutils literal"><span class="pre">jc</span></tt> are used only in dlsodis.</p>
+<p>There are special requirements for their values:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nb">len</span><span class="p">(</span><span class="n">ia</span><span class="o">/</span><span class="n">ic</span><span class="p">)</span> <span class="o">=</span> <span class="n">neq</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="p">(</span><span class="n">ia</span><span class="o">/</span><span class="n">ic</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="p">(</span><span class="n">ia</span><span class="o">/</span><span class="n">ic</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">ja</span><span class="o">/</span><span class="n">jc</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.check_liwlrw">
+<tt class="descname">check_liwlrw</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.check_liwlrw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.check_liwlrw" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the lengths of work arrays are specified by users, check whether
+they are greater than the required lengths of Fortran solvers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.check_pars">
+<tt class="descname">check_pars</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.check_pars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.check_pars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Some pairs of parameters should be input simutaneously.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.check_tol">
+<tt class="descname">check_tol</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.check_tol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.check_tol" title="Permalink to this definition">¶</a></dt>
+<dd><p>atol &amp; rtol should be defined as scalars or vectors with length neq.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.expand_iwork">
+<tt class="descname">expand_iwork</tt><big>(</big><em>new_liw</em>, <em>expand=False</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.expand_iwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.expand_iwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extension module return an actually required length for
+integer work array when it is too short.
+Then we could expand work array to required length to avoid this error.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.expand_rwork">
+<tt class="descname">expand_rwork</tt><big>(</big><em>new_lrw</em>, <em>expand=False</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.expand_rwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.expand_rwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Length of real work array is smaller than actually required length.
+Then we could expand work array to avoid this error.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.func_wrapper">
+<tt class="descname">func_wrapper</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.func_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.func_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is defined to wrap user-defined functions with new
+forms of parameter-list, or wrap the returned values as numpy arrays.</p>
+<p>Firstly, in odespy, all the user-supplied functions should have a
+parameter list starts with &#8220;u,t,...&#8221;. But in some special subclasses,
+(like solvers in ODEPACK), all the parameter lists of user-defined
+functions start with &#8220;t,u,...&#8221;. So we need this general function to
+wrap all these user-defined functions.</p>
+<p>Secondly, in some user-defined functions, according to the different
+start indices in Fortran and Python, we need to make special wrapping
+for these uncompability. For an example, in user-defined function
+&#8220;jac_column&#8221;, column index is an internally valued parameter in
+Fortran code. In Python, it starts from 0 instead of 1 in Fortran.
+So we need to wrap the parameter list of user-defined &#8220;jac_column&#8221; from
+&#8220;u,t,j&#8221; to &#8220;t,u,j+1&#8221;. That is, define the Jacobian function as
+lambda t,u,j: jac_column(u,t,j-1).</p>
+<p>Furthermore, the return value of user-defined functions need to be
+wrapped to Numpy arrays with great numerical features, e.g.
+vectorization and array slicing. In order to avoid unnecessary array
+copy by F2PY, it is always recommended to explicitly transform all
+Numpy arrays to Fortran order in Python code.</p>
+<p>This functions is not intended for simple solvers. So it is not called
+automatically in current version. But for some complicated solvers as
+ones in ODEPACK, it is very useful and convenient.</p>
+<p>Future developers can call this functions with appropriate locations
+and corresponding property-setting in adjust_parameters().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.initialize">
+<tt class="descname">initialize</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import extension module _odesolver and check that it exists.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.initialize_for_solve">
+<tt class="descname">initialize_for_solve</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.initialize_for_solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.initialize_for_solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>In the long parameter-lists for solvers in ODEPACK, quite a few
+parameters can be set automatically with proper values depending
+on values of other parameters.
+In this function, all the parameters of this kind are initialized
+with proper values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.new_stepnr">
+<tt class="descname">new_stepnr</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.new_stepnr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.new_stepnr" title="Permalink to this definition">¶</a></dt>
+<dd><p>When Fortran code returns a status <tt class="docutils literal"><span class="pre">istate==-1</span></tt>, it indicates that
+there are excessive amount of steps detected.
+Then we could try to increase <tt class="docutils literal"><span class="pre">nsteps</span></tt> to avoid this error.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.print_roots">
+<tt class="descname">print_roots</tt><big>(</big><em>jroot</em>, <em>t_current</em>, <em>u_current</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.print_roots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.print_roots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Roots found at current T for some constraint functions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.set_dummy_functions">
+<tt class="descname">set_dummy_functions</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.set_dummy_functions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.set_dummy_functions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Functions have to get dummy values before they are passed to extension
+module even if they are not involved in current solver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.set_extra_args">
+<tt class="descname">set_extra_args</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.set_extra_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.set_extra_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setting for extra parameters of user-defined functions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.set_iopt">
+<tt class="descname">set_iopt</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.set_iopt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.set_iopt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization for &#8220;ipot&#8221;, which is a flag to indicate whether optional
+parameters are specified in work arrays.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.set_iter_method">
+<tt class="descname">set_iter_method</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.set_iter_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.set_iter_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set proper values for method-choices when it is not specified
+explicitly.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.set_iwork_rwork">
+<tt class="descname">set_iwork_rwork</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.set_iwork_rwork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.set_iwork_rwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize arrays for optional inputs, and calculate the
+required length of work arrays in Fortran code.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.set_jac">
+<tt class="descname">set_jac</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.set_jac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.set_jac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set values for Jacobian matrix. In several solvers like Lsode,
+Jacobian matrix could be supplied either in full form or in banded form.</p>
+<p>This function intends to tell from which kind of Jacobian matrix
+is specified.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.set_liw_min">
+<tt class="descname">set_liw_min</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.set_liw_min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.set_liw_min" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the necessary length of integer work arrays when it is not
+specified explicitly by users.
+Different solvers have different formulas.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.set_lrw_min">
+<tt class="descname">set_lrw_min</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.set_lrw_min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.set_lrw_min" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the necessary length of real work arrays for Fortran code.
+Different solvers have different formulas.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.set_ydoti">
+<tt class="descname">set_ydoti</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.set_ydoti"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.set_ydoti" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">ydoti</span></tt> is an array used in linearly implicit solvers.
+It has to be extended if its length is smaller than neq.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.solve">
+<tt class="descname">solve</tt><big>(</big><em>time_points</em>, <em>terminate=None</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is involved for non-linearly implicit
+solvers in ODEPACK, i.e., Lsode, Lsoda, Lsodar, and Lsodes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.tol_multiply">
+<tt class="descname">tol_multiply</tt><big>(</big><em>tolsf</em><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.tol_multiply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.tol_multiply" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is used to adjust tolerance parameters for Fortran part.
+When extension module returns a status &#8220;istate&#8221; as -2 or -3, it often
+indicates that there are excessive amount of steps detected.
+Then we could try to adjust tolerance settings with suggested factor
+to avoid this error.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.odepack.Odepack.validate_data">
+<tt class="descname">validate_data</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/odepack.html#Odepack.validate_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.odepack.Odepack.validate_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Common validity check in Odepack.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="version.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">odespy.version</span></tt></a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="version.html" title="odespy.version"
+             >previous</a> |</li>
+        <li><a href="index.html">Odespy API 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Liwei Wang and Hans Petter Langtangen.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

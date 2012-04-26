@@ -1,0 +1,286 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>odespy.rkf45 &mdash; Odespy API 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pyramid.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Odespy API 0.2 documentation" href="index.html" />
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+
+  </head>
+  <body>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Odespy API 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-odespy.rkf45">
+<span id="odespy-rkf45"></span><h1><a class="reference internal" href="#module-odespy.rkf45" title="odespy.rkf45"><tt class="xref py py-mod docutils literal"><span class="pre">odespy.rkf45</span></tt></a><a class="headerlink" href="#module-odespy.rkf45" title="Permalink to this headline">¶</a></h1>
+<p>Module for wrapping rkf45.py.</p>
+<dl class="class">
+<dt id="odespy.rkf45.RKF45">
+<em class="property">class </em><tt class="descclassname">odespy.rkf45.</tt><tt class="descname">RKF45</tt><big>(</big><em>f</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/odespy/rkf45.html#RKF45"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.rkf45.RKF45" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="solvers.html#odespy.solvers.Adaptive" title="odespy.solvers.Adaptive"><tt class="xref py py-class docutils literal"><span class="pre">odespy.solvers.Adaptive</span></tt></a></p>
+<p>Wrapper for rkf45.f, a FORTRAN solver designed to solve non-stiff and
+mildly stiff differential equations by the well-known
+Runge-Kutta-Fehlberg (4,5) method.</p>
+<p>The FORTRAN source rkf45.f can be obtained from Netlib.</p>
+<p>Required input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f</td>
+<td>Right-hand side <tt class="docutils literal"><span class="pre">f(u,t)</span></tt> defining the ODE.</td>
+</tr>
+</tbody>
+</table>
+<p>Optional input arguments:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="79%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>f_args</td>
+<td>Extra positional arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs).</span></tt> (default: ())</td>
+</tr>
+<tr class="row-odd"><td>f_kwargs</td>
+<td>Extra keyword arguments to f: <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span>
+<span class="pre">**f_kwargs)</span></tt>. (default: {})</td>
+</tr>
+<tr class="row-even"><td>complex_valued</td>
+<td>True if f is complex valued. (default: False)</td>
+</tr>
+<tr class="row-odd"><td>disk_storage</td>
+<td>Indicates whether u is stored in memory or in file. If
+string, it is the filename; if False or &#8220;&#8221;, u is kept in
+memory; if True, a default filename tmp_odspy.dat is
+used. (default: False)</td>
+</tr>
+<tr class="row-even"><td>verbose</td>
+<td>Integer reflecting output of intermediate quantities.
+(default: 0)</td>
+</tr>
+<tr class="row-odd"><td>u_exact</td>
+<td>Function of t returning exact solution. (default: None)</td>
+</tr>
+<tr class="row-even"><td>rtol</td>
+<td>Relative tolerance for solution. (default: 1e-06)</td>
+</tr>
+<tr class="row-odd"><td>atol</td>
+<td>Absolute tolerance for solution. (default: 1e-08)</td>
+</tr>
+<tr class="row-even"><td>f_f77</td>
+<td><p class="first">Fortran subroutine for f.
+This subroutine has the signature:</p>
+<div class="last highlight-python"><pre>      subroutine f_f77(neq,t,u,udot)
+Cf2py intent(hide)   neq
+Cf2py intent(out)    udot
+      integer neq
+      double precision t,u(neq),udot(neq)
+      udot = ...
+      return
+      end</pre>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.rkf45.RKF45.adjust_parameters" title="odespy.rkf45.RKF45.adjust_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">adjust_parameters</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.rkf45.RKF45.advance" title="odespy.rkf45.RKF45.advance"><tt class="xref py py-obj docutils literal"><span class="pre">advance</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_conditional_parameters</span></tt>()</td>
+<td>This function is used to check whether conditional parameters are provided when specified condition fulfilled.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_extra</span></tt>(**kwargs)</td>
+<td>A parameter may have a keyword <tt class="docutils literal"><span class="pre">extra_check</span></tt> for user-given functions that performs consistency checks on the parameter.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_range</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are in right specified range.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">check_input_types</span></tt>(**kwargs)</td>
+<td>Check whether all existing inputs are of right specified type.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">compile_string_functions</span></tt>(f,&nbsp;**kwargs)</td>
+<td>Compile functions which are supplied as Fortran strings.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">constant_time_step</span></tt>()</td>
+<td>Check if self.t has a uniform partition.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get</span></tt>([parameter_name,&nbsp;print_info])</td>
+<td>Return value of specified input parameters.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_parameter_info</span></tt>([print_info])</td>
+<td>Return a dictionary containing all properties of all legal parameters in current subclass (i.e., the parameters in <tt class="docutils literal"><span class="pre">self._parameters</span></tt>).</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">has_u_t_all</span></tt>()</td>
+<td>Return True if self.u_all and self.t_all, defined in</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#odespy.rkf45.RKF45.initialize" title="odespy.rkf45.RKF45.initialize"><tt class="xref py py-obj docutils literal"><span class="pre">initialize</span></tt></a>()</td>
+<td>Import extension module _rkf45 and check that it exists.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#odespy.rkf45.RKF45.initialize_for_solve" title="odespy.rkf45.RKF45.initialize_for_solve"><tt class="xref py py-obj docutils literal"><span class="pre">initialize_for_solve</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set</span></tt>([strict])</td>
+<td>Assign values to one or more parameters, specified as keyword arguments.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_initial_condition</span></tt>(U0)</td>
+<td>Function set_initial_condition() is used to set initial value of</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">solve</span></tt>(time_points[,&nbsp;terminate])</td>
+<td>Compute discrete solution u of the ODE problem at time points</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">switch_to</span></tt>(solver_target[,&nbsp;print_info])</td>
+<td>Create a new solver instance which switch to another subclass with same values of common attributes.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">validate_data</span></tt>()</td>
+<td>This function is used for extra checking and validating of attributes before the computations start.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="odespy.rkf45.RKF45.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'odespy.rkf45'</em><a class="headerlink" href="#odespy.rkf45.RKF45.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.rkf45.RKF45.adjust_parameters">
+<tt class="descname">adjust_parameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/rkf45.html#RKF45.adjust_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.rkf45.RKF45.adjust_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.rkf45.RKF45.advance">
+<tt class="descname">advance</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/rkf45.html#RKF45.advance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.rkf45.RKF45.advance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="odespy.rkf45.RKF45.initialize">
+<tt class="descname">initialize</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/rkf45.html#RKF45.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.rkf45.RKF45.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import extension module _rkf45 and check that it exists.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="odespy.rkf45.RKF45.initialize_for_solve">
+<tt class="descname">initialize_for_solve</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/odespy/rkf45.html#RKF45.initialize_for_solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#odespy.rkf45.RKF45.initialize_for_solve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="odespy.rkf45.RKF45.quick_description">
+<tt class="descname">quick_description</tt><em class="property"> = 'Adaptive Runge-Kutta-Fehlberg (4,5) method (rkf45.f)'</em><a class="headerlink" href="#odespy.rkf45.RKF45.quick_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Odespy API 0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Liwei Wang and Hans Petter Langtangen.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,232 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>odespy.problems_pde &mdash; Odespy API 0.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/pyramid.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Odespy API 0.2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="../../_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
+
+  </head>
+  <body>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Odespy API 0.2 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for odespy.problems_pde</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">problems</span> <span class="kn">import</span> <span class="n">Problem</span><span class="p">,</span> <span class="n">np</span>
+
+<div class="viewcode-block" id="Diffusion1D"><a class="viewcode-back" href="../../problems_pde.html#odespy.problems_pde.Diffusion1D">[docs]</a><span class="k">class</span> <span class="nc">Diffusion1D</span><span class="p">(</span><span class="n">Problem</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Classical 1D diffusion equation:</span>
+
+<span class="sd">    ..math::</span>
+
+<span class="sd">          \frac{\partial u}{\partial t} = a\frac{\partial^2 u}{\partial x^2}</span>
+
+<span class="sd">    with initial condition :math:`u(x,0)=I(x)` and boundary condtions</span>
+<span class="sd">    :math:`u(0,t)=U_L(t), u(L,t)=U_R(t)`.</span>
+
+<span class="sd">    ..math::</span>
+<span class="sd">             u_0&#39; &amp;= u_1</span>
+<span class="sd">             u_1&#39; &amp;= \mu (1-u_0^2)u_1 - u_0</span>
+
+<span class="sd">    with a Jacobian</span>
+
+<span class="sd">    ..math::</span>
+<span class="sd">             \left(\begin{array}{cc}</span>
+<span class="sd">             0 &amp; 1\\</span>
+<span class="sd">             -2\mu u_0 - 1 &amp; \mu (1-u_0^2)</span>
+<span class="sd">             \end{array}\right)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Diffusion1D.__init__"><a class="viewcode-back" href="../../problems_pde.html#odespy.problems_pde.Diffusion1D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">U_L</span><span class="p">,</span> <span class="n">U_R</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">jac_format</span><span class="o">=</span><span class="s">&#39;banded&#39;</span><span class="p">,</span> <span class="n">f77</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                 <span class="n">I_vectorized</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">I</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U_L</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U_R</span> <span class="o">=</span> <span class="n">I</span><span class="p">,</span> <span class="n">U_L</span><span class="p">,</span> <span class="n">U_R</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">I</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">a</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>  <span class="c"># spatial uniform mesh</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">u</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c"># Set initial condition</span>
+        <span class="k">if</span> <span class="n">I_vectorized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">u_1</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">I</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c"># I(x) is vectorized</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">u_1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">I</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="c"># Compile F77</span>
+        <span class="k">if</span> <span class="n">f77</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f_f77</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">jac_f77_radau5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">jac_f77_lsode</span> <span class="o">=</span> \
+                        <span class="n">compile_f77</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">str_f_f77</span><span class="p">(),</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">str_jac_f77_radau5</span><span class="p">(),</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">str_jac_f77_lsode</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="Diffusion1D.f"><a class="viewcode-back" href="../../problems_pde.html#odespy.problems_pde.Diffusion1D.f">[docs]</a>    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">u_0</span><span class="p">,</span> <span class="n">u_1</span> <span class="o">=</span> <span class="n">u</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">u_1</span><span class="p">,</span> <span class="n">mu</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">u_0</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">u_1</span> <span class="o">-</span> <span class="n">u_0</span><span class="p">]</span>
+</div>
+    <span class="k">def</span> <span class="nf">jac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="Diffusion1D.jac_banded"><a class="viewcode-back" href="../../problems_pde.html#odespy.problems_pde.Diffusion1D.jac_banded">[docs]</a>    <span class="k">def</span> <span class="nf">jac_banded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  - lband : None or int</span>
+<span class="sd"> |  - rband : None or int</span>
+<span class="sd"> |    Jacobian band width, jac[i,j] != 0 for i-lband &lt;= j &lt;= i+rband.</span>
+<span class="sd"> |    Setting these requires your jac routine to return the jacobian</span>
+<span class="sd"> |    in packed format, jac_packed[i-j+lband, j] = jac[i,j].&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Diffusion1D.jac"><a class="viewcode-back" href="../../problems_pde.html#odespy.problems_pde.Diffusion1D.jac">[docs]</a>    <span class="k">def</span> <span class="nf">jac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">u_0</span><span class="p">,</span> <span class="n">u_1</span> <span class="o">=</span> <span class="n">u</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span>
+        <span class="k">return</span> <span class="p">[[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span>
+                <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">mu</span><span class="o">*</span><span class="n">u_0</span><span class="o">*</span><span class="n">u_1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mu</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">u_0</span><span class="o">**</span><span class="mi">2</span><span class="p">)]]</span>
+</div>
+<div class="viewcode-block" id="Diffusion1D.str_f_f77"><a class="viewcode-back" href="../../problems_pde.html#odespy.problems_pde.Diffusion1D.str_f_f77">[docs]</a>    <span class="k">def</span> <span class="nf">str_f_f77</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return f(u,t) as Fortran source code string.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">      subroutine f_f77(neq, t, u, udot)</span>
+<span class="s">Cf2py intent(hide) neq</span>
+<span class="s">Cf2py intent(out) udot</span>
+<span class="s">      integer neq</span>
+<span class="s">      double precision t, u, udot</span>
+<span class="s">      dimension u(neq), udot(neq)</span>
+<span class="s">      udot(1) = u(2)</span>
+<span class="s">      udot(2) = </span><span class="si">%g</span><span class="s">*(1 - u(1)**2)*u(2) - u(1)</span>
+<span class="s">      return</span>
+<span class="s">      end</span>
+<span class="s">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span>
+</div>
+<div class="viewcode-block" id="Diffusion1D.str_jac_f77_fadau5"><a class="viewcode-back" href="../../problems_pde.html#odespy.problems_pde.Diffusion1D.str_jac_f77_fadau5">[docs]</a>    <span class="k">def</span> <span class="nf">str_jac_f77_fadau5</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return f(u,t) as Fortran source code string.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">      subroutine jac_f77_radau5(neq,t,u,dfu,ldfu,rpar,ipar)</span>
+<span class="s">Cf2py intent(hide) neq,rpar,ipar</span>
+<span class="s">Cf2py intent(in)   t,u,ldfu</span>
+<span class="s">Cf2py intent(out) dfu</span>
+<span class="s">      integer neq,ipar,ldfu</span>
+<span class="s">      double precision t,u,dfu,rpar</span>
+<span class="s">      dimension u(neq),dfu(ldfu,neq),rpar(*),ipar(*)</span>
+<span class="s">      dfu(1,1) = 0</span>
+<span class="s">      dfu(1,2) = 1</span>
+<span class="s">      dfu(2,1) = -2*</span><span class="si">%g</span><span class="s">*u(1)*u(2) - 1</span>
+<span class="s">      dfu(2,2) = </span><span class="si">%g</span><span class="s">*(1-u(1)**2)</span>
+<span class="s">      return</span>
+<span class="s">      end</span>
+<span class="s">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Diffusion1D.str_jac_f77_lsode_dense"><a class="viewcode-back" href="../../problems_pde.html#odespy.problems_pde.Diffusion1D.str_jac_f77_lsode_dense">[docs]</a>    <span class="k">def</span> <span class="nf">str_jac_f77_lsode_dense</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return Fortran source for dense Jacobian matrix in LSODE format.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">      subroutine jac_f77(neq, t, u, ml, mu, pd, nrowpd)</span>
+<span class="s">Cf2py intent(hide) neq, ml, mu, nrowpd</span>
+<span class="s">Cf2py intent(out) pd</span>
+<span class="s">      integer neq, ml, mu, nrowpd</span>
+<span class="s">      double precision t, u, pd</span>
+<span class="s">      dimension u(neq), pd(nrowpd,neq)</span>
+<span class="s">      pd(1,1) = 0</span>
+<span class="s">      pd(1,2) = 1</span>
+<span class="s">      pd(2,1) = -2*</span><span class="si">%g</span><span class="s">*u(1)*u(2) - 1</span>
+<span class="s">      pd(2,2) = </span><span class="si">%g</span><span class="s">*(1 - u(1)**2)</span>
+<span class="s">      return</span>
+<span class="s">      end</span>
+<span class="s">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Odespy API 0.2 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Liwei Wang and Hans Petter Langtangen.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>
