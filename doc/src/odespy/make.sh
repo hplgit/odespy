@@ -1,4 +1,9 @@
 #!/bin/sh
+python ~/hg/programs/spellcheck.py -d .dict4spell.txt *.do.txt
+if [ $? -ne 0 ]; then
+   echo "Spelling errors - abort."
+   exit 1
+fi
 
 name=wrap_odespy
 
@@ -6,7 +11,7 @@ doconce format pdflatex $name
 ptex2tex -DMINTED -DLATEX_HEADING=traditional $name
 pdflatex -shell-escape $name
 pdflatex -shell-escape $name
-exit
+
 
 doconce format sphinx $name
 theme=pyramid

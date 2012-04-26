@@ -9,7 +9,7 @@ class Problem:
         self.freq = sqrt(c)
         self.period = 2*pi/self.freq
 
-    def __call__(self, u, t):
+    def f(self, u, t):
         theta, omega = u;  c = self.c
         return [omega, -c*theta]
 
@@ -17,12 +17,12 @@ problem = Problem(c=1, Theta=pi/4)
 
 import odespy
 solvers = [
-    odespy.ThetaRule(problem, theta=0),   # Forward Euler
-    odespy.ThetaRule(problem, theta=0.5), # Midpoint
-    odespy.ThetaRule(problem, theta=1),   # Backward Euler
-    odespy.RK4(problem),
-    odespy.MidpointIter(problem, max_iter=2, eps_iter=0.01),
-    odespy.LeapfrogFiltered(problem),
+    odespy.ThetaRule(problem.f, theta=0),   # Forward Euler
+    odespy.ThetaRule(problem.f, theta=0.5), # Midpoint method
+    odespy.ThetaRule(problem.f, theta=1),   # Backward Euler
+    odespy.RK4(problem.f),
+    odespy.MidpointIter(problem.f, max_iter=2, eps_iter=0.01),
+    odespy.LeapfrogFiltered(problem.f),
     ]
 
 N_per_period = 20
@@ -32,7 +32,7 @@ import matplotlib.pyplot as mpl
 legends = []
 
 for solver in solvers:
-    solver_name = str(solver)
+    solver_name = str(solver)  # short description of solver
     print solver_name
 
     solver.set_initial_condition([problem.Theta, 0])

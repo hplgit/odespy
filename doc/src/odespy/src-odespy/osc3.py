@@ -55,7 +55,7 @@ for solver in solvers:
         theta = u[:,0]
         error = numpy.abs(theta_exact(t) - theta)
         error_L2 = sqrt(numpy.sum(error**2)/N)
-        if not numpy.isnan(error_L2):  # drop nan
+        if not numpy.isnan(error_L2):  # drop nan (overflow)
             results[solver_name]['dt'].append(t[1] - t[0])
             results[solver_name]['error'].append(error_L2)
 

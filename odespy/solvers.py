@@ -471,7 +471,8 @@ def compile_f77(*function_strings, **kwargs):
                 raise SyntaxError(
                     'Could not extract subroutine name from\n%s' % s)
 
-        return [eval('tmp_callback.' + name) for name in routine_names]
+        r = [eval('tmp_callback.' + name) for name in routine_names]
+        return r[0] if len(r) == 1 else t
 
 
 def _format_parameters_table(parameter_names, fixed_width=None):
@@ -2047,11 +2048,13 @@ class Backward2Step(SolverImplicit):
 
 class ThetaRule(SolverImplicit):
     """
-    Theta rule method as a typical weighted method with factor theta::
+    This class implements the implicit theta-rule method for solving
+    ODEs. The method includes a parameter theta used to weight the
+    previous and new time step when evaluating the right-hand side::
 
        u[n+1] = u[n] + dt*(theta*f(u[n+1],t[n+1]) + (1 - theta)*f(u[n],t[n]))
 
-    where theta is a float in [0,1].
+    Here, ``theta`` is a float in [0,1].
 
     The nonlinear system is solved by Picard or Newton iteration.
     """

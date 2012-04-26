@@ -9,8 +9,8 @@ class WhiteNoiseOscillator:
         """Solver is needed for time step number and size."""
         self.solver = solver
 
-    def __call__(self, u, t):
-        if not hasattr(self, 'N'):
+    def f(self, u, t):
+        if not hasattr(self, 'N'):  # is self.N not yet computed?
             # Compute N(t) for all time intervals
             import numpy
             numpy.random.seed(12)
@@ -27,9 +27,9 @@ from numpy import pi, linspace
 from matplotlib.pyplot import *
 import odespy
 
-f = WhiteNoiseOscillator(b=0.1, c=pi**2, sigma=1)
-solvers = [odespy.Heun(f), odespy.RK4(f),
-           odespy.ForwardEuler(f)]
+problem = WhiteNoiseOscillator(b=0.1, c=pi**2, sigma=1)
+solvers = [odespy.Heun(problem.f), odespy.RK4(problem.f),
+           odespy.ForwardEuler(problem.f)]
 for solver in solvers:
     f.connect_solver(solver)
     solver.set_initial_condition([0,0])  # start from rest
@@ -40,7 +40,7 @@ for solver in solvers:
     plot(t, x)
     hold(True)
 
-legend([str(m) for m in solvers])
+legend([str(s) for s in solvers])
 savefig('tmp.png')
 show()
 

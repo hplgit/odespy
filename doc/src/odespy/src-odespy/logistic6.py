@@ -20,10 +20,7 @@ class Logistic:
 
     def terminate(self, u, t, step_no):
         """u[step_no] holds solution at t[step_no]."""
-        if abs(u[step_no] - self.R) < self.tol:
-            return True
-        else:
-            return False
+        return abs(u[step_no] - self.R) < self.tol
 
     def u_exact(self, t):
         a, R, A = self.a, self.R, self.A  # short form
@@ -52,7 +49,11 @@ class Solver:
         mpl.savefig('tmp.png')
         mpl.show()
 
-problem = Logistic(a=2, R=1E+5, A=1, T=20)
-solver = Solver(problem, dt=0.25, method='RK4')
-solver.solve()
-solver.plot()
+def main():
+    problem = Logistic(a=2, R=1E+5, A=1, T=20)
+    solver = Solver(problem, dt=0.25, method='RK4')
+    solver.solve()
+    solver.plot()
+
+if __name__ == '__main__':
+    main()

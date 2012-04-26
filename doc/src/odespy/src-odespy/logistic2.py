@@ -1,3 +1,5 @@
+from numpy import linspace, exp
+
 class Logistic:
     def __init__(self, a, R, A):
         self.a = a
@@ -17,7 +19,6 @@ problem = Logistic(a=2, R=1E+5, A=1)
 solver = odespy.RK4(problem.f)
 solver.set_initial_condition(problem.A)
 
-from numpy import linspace, exp
 T = 10  # end of simulation
 N = 30  # no of time steps
 time_points = linspace(0, T, N+1)

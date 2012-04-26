@@ -33,15 +33,16 @@ class Problem:
 
     See the tutorial for examples on subclasses of ``Problem``.
     '''
-    stiff = False
-    complex_ = False
-    not_suitable_solvers = []
-    short_description = ''
+    stiff = False    # classification of the problem is stiff or not
+    complex_ = False # True if f(u,t) is complex valued
+    not_suitable_solvers = []  # list solvers that should be be used
+    short_description = ''     # one-line problem description
 
     def __init__(self):
         pass
 
     def __contains__(self, attr):
+        """Return True if attr is a method in instance self."""
         return hasattr(self, attr) and callable(getattr(self,attr))
 
     def terminate(self, u, t, step_number):
@@ -410,7 +411,7 @@ class VanDerPolOscillator(Problem):
             self.f_f77, self.jac_f77_radau5, self.jac_f77_lsode = \
                         compile_f77([self.str_f_f77(),
                                      self.str_jac_f77_radau5(),
-                                     self.str_jac_f77_lsode])
+                                     self.str_jac_f77_lsode()])
 
     def f(self, u, t):
         u_0, u_1 = u
@@ -458,7 +459,7 @@ Cf2py intent(out) udot
 """ % self.mu
 
     def str_jac_f77_fadau5(self):
-        """Return f(u,t) as Fortran source code string."""
+        """Return Jacobian Fortran source code string for Radau5."""
         return """
       subroutine jac_f77_radau5(neq,t,u,dfu,ldfu,rpar,ipar)
 Cf2py intent(hide) neq,rpar,ipar

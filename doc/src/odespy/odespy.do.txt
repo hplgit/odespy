@@ -3,6 +3,7 @@ Python and get it solved by a wide variety of different numerical
 methods.
 
 ======= Motivation =======
+label{ode:sec:motivation}
 
 The Odespy package grew out of the desire to have a unified interface
 to lots of different methods and software for ODEs. Consider the
@@ -42,7 +43,7 @@ delivers $f$ as output.
 
 === LSODE ===
 
-Using `LSODE` and other ODEPACK routines requires the
+Application of `LSODE` and other ODEPACK routines requires the
 ODE problem to be specified in FORTRAN and the solver to be called
 from FORTRAN:
 !bc fpro
@@ -64,10 +65,10 @@ C    USE ONLY ABSOLUTE TOLERANCE:
      LIW = 20
 C    NUMBER OF TIME STEPS:
      NOUT = 150
-     T = 0.0D0
 C    FINAL TIME:
      TOUT = 30.0D0
 C    INITIAL CONDITIONS
+     T = 0.0D0
      U(1)= 2.0D0
      U(2) = 0.0D0
      ITASK = 1
@@ -95,7 +96,7 @@ C    CALL ADAPTIVE TIME STEPPING AT EACH OF THE TARGET TIME LEVELS
 === MATLAB ===
 
 The problem can be solved with very compact code in MATLAB. The definition
-of the ODE system, the $f(u,t)$ function, must be placed in
+of the ODE system, the $f(u,t)$ function, is placed in
 a function in a file, say `myode.m`:
 !bc mcod
 function F = myode(t, u);
@@ -115,17 +116,15 @@ In MATLAB we can then solve the problem by
 Calling up the `vode` method from the `scipy` library in Python
 also results in compact code:
 !bc pycod
-from scipy.integrate import ode
-
-u0 = [2.0, 0.0]
-
 def f(t, u):
     return [u[1], 3.*(1. - u[0]*u[0])*u[1] - u[0]]
 
 # integration
+from scipy.integrate import ode
 r = ode(f).set_integrator('vode', method='adams',
                           order=10, rol=0, atol=1e-6,
                           with_jacobian=False)
+u0 = [2.0, 0.0]
 r.set_initial_value(u0, 0)
 T = 30
 dt = T/150.
@@ -135,21 +134,21 @@ while r.successful() and r.t <= T:
     u.append(r.y);  t.append(r.t)
 !ec
 Suppose you want to compare these methods and their implementations.
-This requires three different main programs and (worst) three
+This requires three different main programs and (worse) three
 different implementations of the definition of the mathematical problem.
 Some has the signature $f(u,t)$ while others require $f(t,u)$, and
-this difference between packages is often a cause of errors.
+such differences between packages are often a cause of programming errors.
 
 ===== Odespy's Unified Interface =====
 
 The Odespy package provides a unified interface to all the three
-mentioned types of methods. Therefore, we can easily run all of them
+mentioned types of methods, which makes it easy to run all of them
 in a loop (program "`motivation.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/motivation1.py"):
 
 @@@CODE src-odespy/motivation1.py
 
-Note that the same `f` and the same call syntax can be reused across methods
-and software.
+Note in particular that the same `f` and the same call syntax can be
+reused across methods and the underlying software.
 
 ===== Methods and Implementations Offered by Odespy =====
 
@@ -186,32 +185,88 @@ FORTRAN codes one can also implement the problem in FORTRAN and avoid
 callback to Python.
 
 
+======= Installation =======
+
+The Odespy package is most easily installed by checkout out
+the latest version of the source code:
+!bc sys
+git clone git@github.com:hplgit/odespy.git
+cd odespy
+!ec
+The installation follows the expected standard procedure,
+!bc sys
+sudo python setup.py install
+!ec
+You will at least also need Python v2.7 and the "`numpy`":
+"http://numpy.scipy.org/" package.  The FORTRAN codes `rkc.f`,
+`rkf45.f`, `radau5.f`, and ODEPACK comes with Odespy and are compiled
+and installed by `setup.py`.
+
+The Odespy package depends on several additional packages:
+
+ * "`scipy`": "http://scipy.org/" for running the `Vode` Adams/BDF solver, the
+   Dormand-Prince adaptive methods `Dop853`, and `Dopri5`,
+   and the `scipy` wrapper `odeint` of the FORTRAN code `LSODA`
+   (Odespy features an alternative wrapper of the latter, in class `Lsoda`).
+ * "`sympy`": "http://sympy.org/en/index.html" for running the
+   extremely accurate `odefun_sympy` solver.
+ * "`odelab`": "https://github.com/olivierverdier/odelab"
+   for accessing solvers in that package.
+
+For plotting you will need "`matplotlib`":
+"http://matplotlib.sourceforge.net/" or "`scitools`":
+"http://code.google.com/p/scitools/".
+
+These packages are readily downloaded and installed by the
+standard `setup.py` script, as shown above.
+On Ubuntu and other Debian-based Linux systems the following
+line installs all that Odespy may need:
+!bc sys
+sudo apt-get install python-scipy python-nose python-sympy \
+     python-matplotlib python-scitools python-pip
+!ec
+
+The `odelab` package is installed by either
+!bc sys
+pip install -e git+https://github.com/olivierverdier/odelab#egg=odelab
+!ec
+or downloading the source and running `setup.py`:
+!bc sys
+git clone git://github.com/olivierverdier/odelab.git
+cd odelab
+sudo python setup.py install
+!ec
+
+
 ======= Basic Usage =======
+
+This section explains how to use Odespy. The general principles and
+program steps are first explained and then followed by a series of
+examples with progressive complexity with respect to Python constructs
+and numerical methods.
 
 ===== Overview =====
 
-The typical usage of the tools consists of six steps. These are
+A code using Odespy to solve ODEs consists of six steps. These are
 outlined in generic form below.
 
 === Step 1 ===
 
-Write the ODE problem on the generic form $u' = f(u, t)$,
+*Write the ODE problem in generic form* $u' = f(u, t)$,
 where $u(t)$ is the unknown function to be solved for, or a vector
 of unknown functions of time in case of a system of ODEs.
 
 === Step 2 ===
 
-Implement the right-hand side function $f(u, t)$, which
-defines the ODEs to be solved, as a Python function `f(u, t)`.  The
-argument `u` is either a `float` object (in case of a scalar ODE) or a
-`numpy` array object (in case of a system of ODEs).  Alternatively, a
-class with a `__call__` method can be used instead of a plain
-function.  Some tools in this package also allow implementation of $f$
-in FORTRAN or C for increased efficiency.
+*Implement the right-hand side function* $f(u, t)$ as a Python function
+`f(u, t)`.  The argument `u` is either a `float` object, in case of a
+scalar ODE, or a `numpy` array object, in case of a system of ODEs.
+Some solvers in this package also allow implementation of $f$ in
+FORTRAN for increased efficiency.
 
 === Step 3 ===
 
-Create a solver object
+*Create a solver object*
 !bc pycod
 solver = classname(f)
 !ec
@@ -235,7 +290,7 @@ solver.set(prm4=value4)
 
 === Step 4 ===
 
-Set the initial condition, $u(0)=U_0$,
+*Set the initial condition* $u(0)=U_0$,
 !bc pycod
 solver.set_initial_condition(U0)
 !ec
@@ -244,12 +299,11 @@ where `U0` is either a number, for a scalar ODE, or a sequence (list, tuple,
 
 === Step 5 ===
 
-Solve the ODE problem, which means to compute $u(t)$ at
-some discrete user-specified time points $t_i$, for
-$i=0,1,\ldots,n$|$i=0,1,...,n$.
+*Solve the ODE problem*, which means to compute $u(t)$ at
+some discrete user-specified time points $t_1, t_2, \ldots, t_N$.
 !bc pycod
 T = ...  # end time
-time_points = numpy.linspace(0, T, n+1)
+time_points = numpy.linspace(0, T, N+1)
 u, t = solver.solve(time_points)
 !ec
 In case of a scalar ODE, the returned solution `u` is a one-dimensional
@@ -285,7 +339,7 @@ terminating when the solution reaches an asymptotic (known) value
 def terminate(u, t, step_no):
     # u and t are arrays. Most recent solution is u[step_no].
     tolerance = 1E-6
-    return True if abs(u[step_no] - a) < tolerance else False
+    return abs(u[step_no] - a) < tolerance
 
 u, t = solver.solve(time_points, terminate)
 !ec
@@ -299,7 +353,7 @@ are uncomputed future values.)
 
 === Step 6 ===
 
-Extract solution components for plotting and further analysis.
+*Extract solution components* for plotting and further analysis.
 Since the `u` array returned from `solver.solve` stores all unknown
 functions at all discrete time levels, one usually wants to extract
 individual unknowns as one-dimensional arrays. Here is an example
@@ -368,11 +422,11 @@ lumped together in a class, for instance,
 @@@CODE src-odespy/logistic2.py  fromto: class Logistic@import odespy
 
 Note that introducing local variables like `a` and `R`, instead of
-using `self.a` and `self.A`, makes the code closer to mathematics.
+using `self.a` and `self.A`, makes the code closer to the mathematics.
 This can be convenient when proof reading the implementation of
 complicated ODEs.
 
-The numerical solution is found by
+The numerical solution is computed by
 
 @@@CODE src-odespy/logistic2.py  fromto: import odespy@from matplotlib
 The complete program is available in the file program "`logistic2.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic2.py".
@@ -383,12 +437,12 @@ to `f`, either as positional arguments or as keyword
 arguments. Positional arguments can be sent to `f` via the constructor
 argument `f_args` (a list/tuple of variables), while a dictionary
 `f_kwargs` is used to transfer keyword arguments to `f` via the
-constructor:
+constructor. Here is an example on using keyword arguments:
 
 @@@CODE src-odespy/logistic3.py  fromto: def f@solver\.set_initial
 
-Here we used keyword arguments in `f`, but in general a mix
-of positional and keword arguments can be used:
+In general, a mix
+of positional and keyword arguments can be used in `f`:
 !bc pycod
 def f(u, t, arg1, arg2, arg3, ..., kwarg1=val1, kwarg2=val2, ...):
     ...
@@ -406,7 +460,7 @@ Solvers will call `f` as `f(u, t, *f_args, **f_kwargs)`.
 ===== Continuing a Previous Simulation =====
 
 It is easy to simulate for some time interval $[0, T_1]$,
-the continue with $u(T_1)$ as new initial condition and simulate for
+then continue with $u(T_1)$ as new initial condition and simulate for
 $t$ in $[T_1, T_2]$ and so on. Let us divide the time
 domain into subdomains and compute the solution for
 each subdomain in sequence. The following program performs the steps
@@ -421,7 +475,7 @@ $R$ as $t\rightarrow\infty$|$t becomes large$. Instead of
 using a trial and error process for determining an appropriate
 time integral for integration, the `solver.solve` method accepts
 a user-defined function `terminate` that can be used to implement
-a criterion for terminating the solution.
+a criterion for terminating the solution process.
 Mathematically, the relevant criterion is
 $||u-R||<\hbox{tol}$|$||u - R|| < tol$, where tol is an acceptable
 tolerance, say $100$ in the present case where $R=10^5$.
@@ -431,7 +485,8 @@ and returns true if the criterion is met:
 @@@CODE src-odespy/logistic5.py  fromto: def terminate@u, t =
 
 Note that the simulation is anyway stopped for $t > T$ so $T$
-must be large enough for the termination criterion to be reached.
+must be large enough for the termination criterion to be reached (if not,
+a warning will be issued).
 With a `terminate` function it is also convenient to specify the
 time step `dt` and not the total number of time steps.
 
@@ -439,36 +494,39 @@ A complete program can be as follows ("`logistic5.py`": "https://github.com/hplg
 
 @@@CODE src-odespy/logistic5.py
 
-===== An Class-Based Implementation =====
+===== A Class-Based Implementation =====
 
 The previous code example can be recast into a more class-based
 ("object-oriented programming") example. We lump all data related
 to the problem (the "physics") into a problem class `Logistic`, while
 all data related to the numerical solution and its quality are
 taken care of by class `Solver`. The code below illustrates
-the idea ("`logistic6.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic26py"):
+the ideas ("`logistic6.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic26py"):
 
 @@@CODE src-odespy/logistic6.py
 
 ===== Using Other Symbols =====
 
-The Odespy package applies `u` for the unknown function or
-vector of unknown functions and `t` as the name of the independent
+The Odespy package applies `u` for the unknown function or vector of
+unknown functions and `t` as the name of the independent
 variable. Many problems involve other symbols for functions and
-independent variables. These symbols should be reflected in the code.
-For example, here is a coding example involving the logistic
-equation written as $y'(x)=au(x)(1-u(x)/R(x))$, where now $R=R(x)$
-is considered. Following the setup froom the very first program
-above solving the logistic ODE, we can easily introduce our own
-nomenclature ("`logistic7.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic7.py"):
+independent variables. These symbols should be reflected in the user's
+code.  For example, here is a coding example involving the logistic
+equation written as $y'(x)=au(x)(1-u(x)/R(x))$, where now a variable
+$R=R(x)$ is considered. Following the setup from the very first
+program above solving the logistic ODE, we can easily introduce our
+own nomenclature ("`logistic7.py`":
+"https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic7.py"):
 
 @@@CODE src-odespy/logistic7.py
 
 As shown, we use `y` for `u`, `x` for `t`, and `x_points` instead
 of `time_points`.
 
-===== Example: The Pendulum Equation =====
+===== Example: Solving an ODE System =====
 
+We shall now explain how to solve a system of ODEs using a scalar
+second-order ODE as starting point.
 The angle $\theta$|$theta$ of a pendulum with mass $m$ and length $L$
 is governed by the equation
 (neglecting air resistance for simplicity)
@@ -522,11 +580,13 @@ The initial conditions must be specified as a list:
 
 To specify the time points we here first decide on a number of periods
 (oscillations back and forth) to simulate and then on the time resolution
-of each period. (When $\Theta$|$Theta$ is small we can replace
+of each period. Note that when $\Theta$|$Theta$ is small we can replace
 $\sin\theta$|$sin(theta)$ by $\theta$|$theta$ and find an analytical
 solution
 $\theta (t)=\Theta\cos\left(\sqrt{c}t\right)$|$theta(t) = Theta*cos(sqrt(c)*t)$
-whose period is $2\pi/\sqrt{c}$|$2*pi/sqrt(c)$.)
+whose period is $2\pi/\sqrt{c}$|$2*pi/sqrt(c)$. We use this expression
+as an approximation for the period also when $\Theta$|$Theta$ is not
+small.
 
 @@@CODE src-odespy/osc1a.py  fromto: freq =@theta =
 
@@ -543,25 +603,19 @@ Looking at the plot reveals that the numerical solution has
 an alarming feature: the amplitude grows (indicating increasing
 energy in the system). Changing `T` to 28 periods instead of 10
 makes the numerical solution explode.
+The increasing amplitude is a numerical artifact that some of the simple
+solution methods suffer from.
 
-FIGURE: [figs-odespy/osc1a.png, width=500] Comparison of large-amplitude numerical solution with corresponding analytical solution (derived for small amplitudes).
+FIGURE: [figs-odespy/osc1a.png, width=500] Heun's method used to simulate oscillations of a pendulum.
 
-Changing solution method is a matter of substituting `Heun` by `RK4`,
-for instance:
+Using a more sophisticated method, say the 4-th order Runge-Kutta method,
+is just a matter of substituting `Heun` by `RK4`:
 
 @@@CODE src-odespy/osc1b.py  fromto: solver =@method\.set_initial
-
-The amplitude is now correct, but the numerical solution has a different
-frequency than the inaccurate analytical "solution".
-
-FIGURE: [figs-odespy/osc1b.png, width=500] Switching to a 4-th order Runge-Kutta method improves the numerical solution.
-
-Changing $\Theta$|$Theta$ to a small value, say 0.05, makes the two curves
-coincide. The next section shows how easy it is to run a problem with a set
-of numerical methods.
+The amplitude now becomes constant in time as expected.
 
 
-===== Example: Testing Several Methods =====
+===== Testing Several Methods =====
 
 We shall now make a more advanced solver by
 extending the previous example. More specifically, we shall
@@ -590,7 +644,7 @@ initial conditions _theta(0) = Theta_ and _omega'(0) = 0_.
 Right-hand side functions with parameters can be handled by
 including extra arguments via the `f_args` and `f_kwargs` functionality,
 or by using a class where the parameters are attributes and
-a `__call__` method makes the class instance callable as a function.
+an `f` method defines $f(u,t)$.
 Section ref{ode:sec:exgr:farg} exemplifies the details.
 A minimal class representation of the right-hand side
 function in the present case looks like this:
@@ -599,7 +653,7 @@ class Problem:
     def __init__(self, c, Theta):
         self.c, self.Theta = float(c), float(Theta)
 
-    def __call__(self, u, t):
+    def f(self, u, t):
         theta, omega = u;  c = self.c
         return [omega, -c*theta]
 
@@ -616,50 +670,14 @@ The second extension is to loop over many solvers. All
 solvers can be listed by
 !bc ipy
 >>> import odespy
->>> solvers = list_all_solvers()
->>> for solver in solvers:
-...   print solver
+>>> methods = list_all_solvers()
+>>> for method in methods:
+...   print method
 ...
 AdamsBashMoulton2
 AdamsBashMoulton3
 AdamsBashforth2
-AdamsBashforth3
-AdamsBashforth4
-AdaptiveResidual
-Backward2Step
-BackwardEuler
-BogackiShampine
-CashKarp
-Dop853
-Dopri5
-DormandPrince
-Fehlberg
-Euler
-ForwardEuler
-Heun
-Leapfrog
-LeapfrogFiltered
-Lsoda
-Lsodar
-Lsode
-Lsodes
-Lsodi
-Lsodis
-Lsoibt
-MidpointImplicit
-MidpointIter
-MyRungeKutta
-RKC
-RKF45
-RK2
-RungeKutta2
-RK3
-RungeKutta3
-RK4
-RungeKutta4
-RKFehlberg
-ThetaRule
-Trapezoidal
+...
 Vode
 lsoda_scipy
 odefun_sympy
@@ -674,6 +692,10 @@ This is the list that is usually most relevant.
 For now we explicitly choose a subset of the commonly available solvers:
 
 @@@CODE src-odespy/osc2.py  fromto: import odespy@N_per_period =
+To see what a method is and its arguments to the constructor, invoke
+the doc string of the class, e.g., `help(ThetaRule)` inside a
+Python shell like IPython, or run `pydoc odespy.ThetaRule` in a
+terminal window, or invoke the "Odespy API documentation": "http://hplgit.github.com/odespy/doc/api/".
 
 It will be evident that the `ThetaRule` solver with `theta=0` and
 `theta=1` (Forward and Backward Euler methods) gives growing and
@@ -686,7 +708,7 @@ The loop over the chosen solvers may look like
 @@@CODE src-odespy/osc2.py  fromto: N_per_period =@
 A complete program is available as "`osc2.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py".
 
-FIGURE: [figs-odespy/osc2.png, width=500] Comparison of solutions.
+FIGURE: [figs-odespy/osc2.png, width=500] Comparison of methods for solving the ODE system for a pendulum.
 
 We can extend this program to compute the error in each numerical
 solution for different time step sizes.
@@ -711,10 +733,10 @@ where `dt` is the time step size.
 
 Typical loops over solvers and resolutions look as follows ("`osc3.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc3.py"):
 
-@@@CODE src-odespy/osc3.py  fromto: T = num_periods@\# Print
+@@@CODE src-odespy/osc3.py  fromto: try:@\# Print
 
 Assuming the error to be of the form $C\Delta t^r$, we can estimate
-$C$ and $r$ from two consequtive experiments to obtain a sequence
+$C$ and $r$ from two consecutive experiments to obtain a sequence
 of $r$ values which (hopefully) convergences to a value that we can
 view as the empirical convergence rate of a method.
 Given the sequence of time steps and errors, a function in
@@ -735,7 +757,8 @@ LeapfrogFiltered     r: 0.2, 0.4, 0.6, 0.8 E_min=1.3E-01
 !ec
 The rates of the Forward and Backward Euler methods (1st and 3rd line) have
 not yet converged to unity, as expected, while the 2nd-order
-Runge-Kutta method, Leapfrog, and the $\theta$|$theta$-rule with $\theta =0.5$
+Runge-Kutta method, Leapfrog, and the $\theta$|$theta$ rule with
+$\theta =0.5$|$theta=0.5$
 (`ThetaRule` with default value of `theta`) shows the expected
 $r=2$ value. The 4th-order Runge-Kutta holds the promise of being of 4th
 order, while the filtered Leapfrog method has slow convergence and
@@ -743,7 +766,9 @@ a fairly large error, which is also evident in the previous figure.
 
 Extending the time domain to 20 periods makes many of the
 simplest methods inaccurate and the rates computed on coarse
-time meshes are irrelevnat:
+time meshes are irrelevant. Also in this case, three of the methods
+are useless, while the others deliver their promised convergence
+rates:
 !bc dat
 ThetaRule(theta=0)   r: 10.4, 22.0, 18.2, 10.4 E_min=3.3E+02
 RK2                  r: 51.4, 16.1, 2.3, 2.1 E_min=1.1E-01
@@ -754,7 +779,113 @@ Leapfrog             r: 95.9, 18.0, 1.0, 2.0 E_min=1.1E-01
 LeapfrogFiltered     r: -0.0, 121.2, 0.3, 0.1 E_min=5.2E-01
 !ec
 
-===== Example: Using Adaptive Methods =====
+
+===== Make a Subclass of Problem =====
+
+Odespy features a module `problems` for defining ODE problems.
+There is a superclass `Problem` in this module defining what we
+expect of information about an ODE problem, as well as some
+convenience functions that are inherited in subclasses.
+A rough sketch of class `Problem` is listed here:
+!bc pycod
+class Problem:
+    stiff = False    # classification of the problem is stiff or not
+    complex_ = False # True if f(u,t) is complex valued
+    not_suitable_solvers = []  # list solvers that should be be used
+    short_description = ''     # one-line problem description
+
+    def __init__(self):
+        pass
+
+    def __contains__(self, attr):
+        """Return True if attr is a method in instance self."""
+
+    def terminate(self, u, t, step_number):
+        """Default terminate function, always returning False."""
+        return False
+
+    def default_parameters(self):
+        """
+        Compute suitable time_points, atol/rtol, etc. for the
+        particular problem. Useful for quick generation of test
+        cases, demos, unit tests, etc.
+        """
+        return {}
+
+    def u_exact(self, t):
+        """Implementation of the exact solution."""
+        return None
+!ec
+Subclasses of `Problem` typically implements the constructor, for
+registering parameters in the ODE and the initial condition, and
+a method `f` for defining the right-hand side. For implicit solution method
+we may provide a method `jac` returning the Jacobian of $f(u,t)$ with
+respect to $u$. Some problems may
+also register an analytical solution in `u_exact`. Here is an
+example of implementing the logistic ODE from Section ref{ode:sec:exgr}:
+!bc pycod
+import odespy
+
+class Logistic(odespy.problems.Problem):
+    short_description = "Logistic equation"
+
+    def __init__(self, a, R, A):
+        self.a = a
+        self.R = R
+        self.U0 = A
+
+    def f(self, u, t):
+        a, R = self.a, self.R  # short form
+        return a*u*(1 - u/R)
+
+    def jac(self, u, t):
+        a, R = self.a, self.R  # short form
+        return a*(1 - u/R) + a*u*(1 - 1./R)
+
+    def u_exact(self, t):
+        a, R, U0 = self.a, self.R, self.U0  # short form
+        return R*U0*numpy.exp(a*t)/(R + U0*(numpy.exp(a*t) - 1))
+!ec
+The `stiff`, `complex_`, and `not_suitable_solvers` class variables
+can just be inherited. Note that `u_exact` should work for a vector `t`
+so `numpy` versions of mathematical functions must be used.
+
+The initial condition is by convention stored as the attribute `U0`
+in a subclass of `Problem`, and specified as argument to the constructor.
+
+Here are the typical steps when using such a problem class:
+!bc pycod
+problem = Logistic(a=2, R=1E+5, A=1)
+solver = odespy.RK4(problem.f)
+solver.set_initial_condition(problem.U0)
+u, t = solver.solve(time_points)
+!ec
+
+The problem class may also feature additional methods:
+!bc pycod
+class MyProblem(odespy.problems.Problem)
+    ...
+    def constraints(self, u, t):
+        """Python function for additional constraints: g(u,t)=0."""
+
+    def define_command_line_arguments(self, parser):
+        """
+        Initialize an argparse object for reading command-line
+        option-value pairs. `parser` is an ``argparse`` object.
+        """
+
+    def verify(self, u, t, atol=None, rtol=None):
+        """
+        Return True if u at time points t coincides with an exact
+        solution within the prescribed tolerances. If one of the
+        tolerances is None, return max computed error (infinity
+        norm). Return None if the solution cannot be verified.
+        """
+!ec
+
+The module `odespy.problems` contains many predefined ODE problems.
+
+===== Using Adaptive Methods =====
 
 The solvers used in the previous examples have all employed a constant
 time step $\Delta t$. Many solvers available through the Odespy
@@ -823,7 +954,9 @@ Figure ref{gaussian:fig:RK2:41} is substantial. Increasing the number
 of points by a factor of 10 gives a solution much closer to the
 exact one, and switching to the 4th-order method (`RK4`) makes the
 curves visually coincide. The problem is therefore quite straightforward
-to solve using a sufficient number of points and a higher-order method.
+to solve using a sufficient number of points and a higher-order method
+(for curiosity we can mention that the `ForwardEuler` method produces
+a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points).
 
 FIGURE: [figs-odespy/gaussian1_RK2_41.png, width=500] 2nd-order Runge-Kutta method with 41 points for solving (ref{gaussian:ode:eq}).  label{gaussian:fig:RK2:41}
 
@@ -923,7 +1056,7 @@ maximum value of the solution:
 1.1346  Lsoda
 !ec
 The clearly most accurate method is `DormandPrince`  - the default
-method used by Matlab's `ode45` solver, which probably the world's
+method used by MATLAB's `ode45` solver, which probably the world's
 most popular ODE solver.
 
 The remedy to get all the tested solvers to perform well is to
@@ -1029,9 +1162,211 @@ with different CPU times. We observe that the very simple `RK4` solver
 in pure Python compares favorably with the much more sophisticated
 FORTRAN subroutine `zvode`.
 
-===== Example: Make a Subclass of Problem =====
+===== Avoiding Callbacks to Python =====
 
-subclassing or using problems.py
+The ODE solvers that are implemented in FORTRAN calls, by default,
+the user's Python implementation of $f(u,t)$. Making many calls from
+FORTRAN to Python may introduce significant overhead and slow down the
+solution process. When the algorithm is implemented in FORTRAN we should
+also implement the right-hand side in FORTRAN and call this right-hand
+side subroutine directly. Odespy offers this possibility.
+
+The idea is that the user writes a FORTRAN subroutine defining $f(u,t)$.
+Thereafter, `f2py` is used to make this subroutine callable from Python.
+If we specify the Python interface to this subroutine as an `f_f77`
+argument to the solver's constructor, the Odespy class will make sure
+that no callbacks to the $f(u,t)$ definition go via Python.
+
+=== The Logistic ODE ===
+
+Here is a minimalistic example involving the logistic ODE from
+Section ref{ode:sec:exgr}. The FORTRAN implementation of $f(u,t)$
+is more complicated than the Python counterpart. The subroutine
+has the signature
+!bc fcod
+      subroutine f_f77(neq, t, u, udot)
+Cf2py intent(hide) neq
+Cf2py intent(out) udot
+      integer neq
+      double precision t, u, udot
+      dimension u(neq), udot(neq)
+!ec
+This means that there are two additional arguments: `neq` for the number
+of equations in the ODE system, and `udot` for the array of $f(u,t)$
+that is output from the subroutine.
+
+We write the FORTRAN implementation of $f(u,t)$ in a string:
+!bc pycod
+a = 2
+R = 1E+5
+
+f_f77_str = """
+      subroutine f_f77(neq, t, u, udot)
+Cf2py intent(hide) neq
+Cf2py intent(out) udot
+      integer neq
+      double precision t, u, udot
+      dimension u(neq), udot(neq)
+      udot(1) = %.3f*u(1)*(1 - u(1)/%.1f)
+      return
+      end
+""" % (a, R)
+!ec
+Observe that we can transfer problem parameters to the FORTRAN subroutine
+by writing their values directly into the FORTRAN source code.
+The other alternative would be to transfer the parameters as global
+(COMMON block) variables to the FORTRAN code, which is technically
+much more complicated.
+Also observe that we need to deal with `udot` and `u` as arrays even
+for a scalar ODE.
+
+Using `f2py` to compile the string into a Python module is automated
+by the `odespy.compile_f77` function:
+!bc pycod
+import odespy
+f_f77 = odespy.compile_f77(f_f77_str)
+!ec
+The returned object `f_f77` is a callable object that allows the
+FORTRAN subroutine to be called as `udot = f_f77(t, u)` from Python.
+(However, the Odespy solvers will not use `f_f77` directly, but rather
+its function pointer to the FORTRAN subroutine, and transfer this pointer
+to the FORTRAN solver. The switching between `t, u` and `u, t` arguments
+is taken care of. All necessary steps are automatically done behind
+the scene.)
+
+The solver can be declared as
+!bc pycod
+solver = odespy.Lsode(f=None, f_f77=f_f77)
+!ec
+Several solvers accept FORTRAN definitions of the right-hand side:
+`Lsode`, `Lsoda`, and the other ODEPACK solvers, `RKC`, `RKF45`,
+`Radau5`. Look up the documentation of their `f_f77` parameter to
+see exactly what arguments and conventions that the FORTRAN subroutine
+demand.
+
+The file "`logistic10.py`":
+"https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic10.py" contains a complete program for solving the logistic ODE
+with $f(u,t)$ implemented in Fortran.
+
+=== Implementing the van der Pol Equation in FORTRAN ===
+
+As a slightly more complicated example, also involving a subclass
+of `Problem` and computation of the Jacobian and $f(u,t)$ in
+FORTRAN, we consider the van der Pol equation,
+!bt
+\[ y'' = \mu (1 - y^2) y' - y,\quad y(0)=2,\ y'(0)=1, \]
+!et
+written as a system as shown in Section ref{ode:sec:motivation}.
+We start by implementing a problem class with Python code for
+$f(u,t)$ and its Jacobian:
+!bc pycod
+import odespy
+
+class VanDerPolOscillator(odespy.problems.Problem):
+    short_description = "Van der Pol oscillator"
+
+    def __init__(self, U0=[2, 1], mu=3.):
+        self.U0 = U0
+        self.mu = mu
+
+    def f(self, u, t):
+        u_0, u_1 = u
+        mu = self.mu
+        return [u_1, mu*(1 - u_0**2)*u_1 - u_0]
+
+    def jac(self, u, t):
+        u_0, u_1 = u
+        mu = self.mu
+        return [[0., 1.],
+                [-2*mu*u_0*u_1 - 1, mu*(1 - u_0**2)]]
+!ec
+
+Now, we want to provide `f` and `jac` in FORTRAN as well.
+The FORTRAN code for $f(u,t)$ can be returned from a method:
+!bc pycod
+    def str_f_f77(self):
+        """Return f(u,t) as Fortran source code string."""
+        return """
+      subroutine f_f77(neq, t, u, udot)
+Cf2py intent(hide) neq
+Cf2py intent(out) udot
+      integer neq
+      double precision t, u, udot
+      dimension u(neq), udot(neq)
+      udot(1) = u(2)
+      udot(2) = %g*(1 - u(1)**2)*u(2) - u(1)
+      return
+      end
+""" % self.mu
+!ec
+
+While all FORTRAN solvers supported by Odespy so far employ the same
+signature for the $f(u,t)$ function, different solvers apply different
+signatures for the Jacobian. Here are two versions for ODEPACK and
+`Radau5`, respectively:
+!bc pycod
+    def str_jac_f77_fadau5(self):
+        return """
+      subroutine jac_f77_radau5(neq,t,u,dfu,ldfu,rpar,ipar)
+Cf2py intent(hide) neq,rpar,ipar
+Cf2py intent(in)   t,u,ldfu
+Cf2py intent(out) dfu
+      integer neq,ipar,ldfu
+      double precision t,u,dfu,rpar
+      dimension u(neq),dfu(ldfu,neq),rpar(*),ipar(*)
+      dfu(1,1) = 0
+      dfu(1,2) = 1
+      dfu(2,1) = -2*%g*u(1)*u(2) - 1
+      dfu(2,2) = %g*(1-u(1)**2)
+      return
+      end
+""" % (self.mu, self.mu)
+
+    def str_jac_f77_lsode_dense(self):
+        return """
+      subroutine jac_f77(neq, t, u, ml, mu, pd, nrowpd)
+Cf2py intent(hide) neq, ml, mu, nrowpd
+Cf2py intent(out) pd
+      integer neq, ml, mu, nrowpd
+      double precision t, u, pd
+      dimension u(neq), pd(nrowpd,neq)
+      pd(1,1) = 0
+      pd(1,2) = 1
+      pd(2,1) = -2*%g*u(1)*u(2) - 1
+      pd(2,2) = %g*(1 - u(1)**2)
+      return
+      end
+""" % (self.mu, self.mu)
+!ec
+For the `Lsode` solver we can also provide the Jacobian in banded matrix
+format (this is not yet supported for `Radau5`, but the underlying
+FORTRAN code allows a banded Jacobian).
+
+Having some methods returning FORTRAN code, we need to turn
+the source code into Python modules. This is done by
+`odespy.compile_f77` in the constructor of class `VanDerPolOscillator`:
+!bc pycod
+    def __init__(self, U0=[2, 1], mu=3.):
+        self.U0 = U0
+        self.mu = mu
+
+        # Compile F77 functions
+        self.f_f77, self.jac_f77_radau5, self.jac_f77_lsode = \
+                    compile_f77([self.str_f_f77(),
+                                 self.str_jac_f77_radau5(),
+                                 self.str_jac_f77_lsode()])
+!ec
+
+The application of this problem class goes as follows:
+!bc pycod
+problem = VanDerPolOscillator()
+import odespy
+solver = odespy.Radau5(f=None, f=problem.f_f77,
+                       jac=problem.jac_f77_radau5)
+solver.set_initial_condition(problem.U0)
+u, t = solver.solve(time_points)
+!ec
+
 
 ===== Example: Solving a Stochastic Differential Equation =====
 
@@ -1039,18 +1374,18 @@ We consider an oscillator driven by stochastic white noise:
 !bt
 \[ x''(t) + bx'(t) + cx(t) = N(t),\ x(0)=X,\ x'(0) =0,\]
 !et
-where $N(t)$ is the white noise computed discretely as
+where $N(t)$ is the white noise function computed numerically as
 !bt
 \[ N(t_i) \approx \sigma\frac{\Delta W_i}{\sqrt{t_{i+1}-t_i}},\]
 !et
 where $\Delta W_1,\Delta W_2,\ldots$ are independent normally
 distributed random variables with mean zero and unit standard
-deviation, and $\sigma$ is the strength of the noise.
-The idea is that $N(t)$ provides an excitation containing "all" frequencies,
-but the oscillator is a strong filter: with low damping one of the
-frequencies in $N(t)$ will hit the resonance frequency
-$\sqrt{c}/(2\pi)$ which will
-then dominate the output signal $x(t)$.
+deviation, and $\sigma$ is the strength of the noise.  The physical
+feature of this problem is that $N(t)$ provides an excitation
+containing "all" frequencies, but the oscillator is a strong filter:
+with low damping one of the frequencies in $N(t)$ will hit the
+resonance frequency $\sqrt{c}/(2\pi)$ which will then dominate the
+output signal $x(t)$.
 
 The noise is additive in this stochastic differential equation so
 there is no difference between the Ito and Stratonovich interpretations
@@ -1062,22 +1397,32 @@ since the right-hand side function is assumed to be dependent only
 on the solution and the present time (`f(u,t)`), and additional
 user-defined parameters, but for the present problem the right-hand
 side function needs information about $N(t)$ and hence
-the size of the current time step. We can solve this issue by
-having a reference to the solver in the right-hand side function,
-precomputing $N(t_i)$ for all time intervals $i$, and using the `n`
-attribute in the solver for selecting the right force term (recall
-that some methods will call the right-hand side function many times
-during a time interval - all these calls must use the same value of
-the white noise).
+the size of the current time step.
+
+We can solve this issue by having a reference to the solver in the
+right-hand side function, precomputing $N(t_i)$ for all time intervals
+$i$, and using the `n` attribute in the solver for selecting the right
+force term (recall that some methods will call the right-hand side
+function many times during a time interval - all these calls must use
+the same value of the white noise).
 
 The right-hand side function must do many things so a class is
 appropriate:
 
 @@@CODE src-odespy/sode1.py class WhiteNoise@from numpy
+Note that $N(t)$ is computed on demand the first time the right-hand side
+function is called. We need to wait until the `f` method is called since
+we need access to the solver instance to compute the `self.N` array.
 
-We can easily compare different methods:
+It is easy to compare different methods for solving this stochastic equation:
 
-@@@CODE src-odespy/sode1.py f = White@savefig
+@@@CODE src-odespy/sode1.py problem = White@savefig
+All solutions are also stored in the solver objects
+as attributes `u` and `t`, so we
+may easily extract the solution of `RK4` by
+!bc pycod
+solvers[1].u, solvers[1].t
+!ec
 
 FIGURE: [figs-odespy/sode1.png, width=500] Oscillator driven by white noise.
 
@@ -1115,18 +1460,20 @@ the *solver* that runs the "time loop" and stores results.
 The information about the ODE system is made very simple: the user
 provides 1) an object that can be called as a Python function `f(u,
 t)`, and 2) an array or list with the initial values.  Some users will
-wrap this information in their own data structures, e.g., a class.
+store this information in their own data structures, e.g., a class.
 
-The time-stepping method and the algorthm for calling the time-stepping
+The time-stepping method and the algorithm for calling the time-stepping
 are collected in a solver class. All the solver classes are
 related in a class hierarchy. Each solver class initialized by the right-hand
 side function (`f`) and an optional set of parameters for controlling
 various parts of the solution process. The solver object is also
 used to set the initial condition (`set_initial_condition`) and
 to run the solution process (`solve`). The time-stepping scheme
-is isolated in a method `advance` in the solver classes, but
+is normally isolated in a method `advance` in the solver classes, but
 for some schemes or external software packages the separation of
 doing one step and doing the whole time integration is less feasible.
+In those cases, `solve` will mix the time-stepping loop and the
+numerical scheme.
 
 The package does not interact with visualization tools - the array
 containing the solution is returned to the user and must be further
@@ -1139,7 +1486,8 @@ parameters are registered and initialized.
 label{odes:parameters}
 
 The `solver` module defines a global dictionary `_parameters` holding
-all legal parameters. Other modules imports this `_parameters` dict
+all legal parameters in Odespy classes. These are parameters that
+the user can adjust. Other modules imports this `_parameters` dict
 and updates it with their own additional parameters.
 
 For each parameter the `_parameters` dict stores the parameter name, a
@@ -1160,8 +1508,8 @@ f_kwargs = dict(
     default={}),
 
 theta = dict(
-    help="""Weight in [0,1] used for
-"theta-rule" finite difference approx.""",
+    help='eight in [0,1] used for'\
+         '"theta-rule" finite difference approx.',
     default=0.5,
     type=(int,float),
     range=[0, 1])
@@ -1178,7 +1526,7 @@ optional parameters. The doc strings of the solver classes are
 automatically equipped with tables of required and optional
 parameters.
 
-The optional parameters of a class consists of the optional parameters
+The optional parameters of a class consist of the optional parameters
 of the superclass and those specific to the class. The typical
 initialization of `_optional_parameters` goes like this:
 !bc pycod
@@ -1209,17 +1557,18 @@ construction time or through the `set` function:
 !ec
 The `set` method sets parameters through keyword arguments and can
 take an arbitrary collection of such arguments:
-!bc cod
+!bc pycod
 solver.set(name1=value1, name2=value2, name3=value3, ...)
 !ec
 
 The `get` method returns the parameters and their values as a dictionary.
-(Note that the `'f'` key, which one might expect to appear in the
+We remark that the `'f'` key, which one might expect to appear in the
 returned dictionary of parameters, are omitted because it is always
 a lambda function wrapping the user's `f` function such that the
 returned value is guaranteed to be a `numpy` array. Instead,
 there is an entry `'name of f'` which reflects the name of the
-user-supplied function.)
+user-supplied function. The same comment applies to the `jac` parameter
+for specifying the Jacobian used in implicit methods.
 
 
 ===== Solver Classes =====
@@ -1229,14 +1578,20 @@ Basic, common functionality is inherited from super classes, and the
 actual solver class implements what is specific for the method in question.
 
 
-=== The Super Class ===
+=== The Inherited Superclass Constructor ===
 
-Class `Solver` is the super class of the hierarchy. Its constructor
-requires one mandatory argument: the right-hand side of the ODE,
-$f(u,t)$, coded as a Python function `f(u, t)` or given as a string
-containing code in a compiled language (FORTRAN, for instance)
-implementing the right-hand side.  Additional keyword arguments can be
-provided to set parameters of the solver.
+Class `Solver` is the super class of the hierarchy. Subclasses
+normally just inherit their constructor from class `Solver`. This
+constructor requires one mandatory argument: the right-hand side of
+the ODE, $f(u,t)$, coded as a Python function `f(u, t)`.
+Some solvers implemented in FORTRAN allows `f` to be a wrapper of
+a FORTRAN function defining the right-hand side, but such a wrapper
+is specified through the `f_f77` argument and using `None` for `f`.
+The constructor accepts a range of
+additional keyword arguments for setting
+parameters of the solver. Which keyword arguments that are
+available depends on what the subclass has registered as legal
+parameters in `_optional_parameters` and `_required_parameters`.
 
 The constructor performs a set of tasks that are common to all
 the subclass solvers:
@@ -1245,15 +1600,12 @@ the subclass solvers:
    is loaded into `self._parameters` such that this dictionary
    can be used to look up all parameters of the solver.
 
- o Representation of $f(u, t)$ (or the Jacobian) in a compiled language
-   is compiled into an extension module.
-
  o The solver-specific method `adjust_parameters` is called to allow
    the programmer of a solver to manipulate `self._parameters`.
-   For example, some existing or new parameters may be modified or set
-   according to the value of other parameters.
+   For example, some parameters may be modified or set
+   according to the value of others.
 
- o All key-value pairs in `self._parameters` are mirrored by class
+ o Entries in `self._parameters` are mirrored by class
    attributes. The computations and the `set` and `get` methods will
    make use of the attributes rather than the `self._parameters` dict
    to extract data.  For example, the value of
@@ -1262,13 +1614,14 @@ the subclass solvers:
    `hasattr(self, 'myvar')` test or a `try`-`except` clause (catching
    an `AttributeError`).
 
- o The `set` method is called with all keyword arguments to the
+ o The `set` method is called with all keyword arguments given to the
    constructor, which then modifies the default values of the
-   parameters.
+   parameters and sets the corresponding attributes.
 
  o The `f` function is wrapped in a lambda function such that
    `f(u, t)` is guaranteed to return an array (in case the user
-   returns a list or scalar for convenience).
+   returns a list or scalar for convenience). The same is done with
+   the Jacobian (`jac`) and other user-defined callback functions.
 
  o The `initialize` method is called to finalize the tasks in
    the constructor. The most common use of this method in subclasses
@@ -1277,34 +1630,37 @@ the subclass solvers:
    If they are, the modules are normally stored through an attribute
    of the subclass.
 
- o The `switch_to` method returns a new solver initialized with all
-   parameters of the current solver that are legal in the new solver.
-   The method is useful when trying out a range of solvers for a
-   problem.
+=== Useful Methods ===
 
-Let `solver` some instance of a subclass in the hierarchy. The
-following calls are possible (through inheriting common convenience
-methods in the super class `Solver`):
+Let `solver` be some instance of a subclass in the hierarchy. The
+following methods are sometimes useful:
 
- * `repr(method)`: return the subclass name along with all
+ * `repr(solver)`: return the subclass name along with all
    registered parameters and their values. This string provides
    complete information on the initialization of a solver.
 
- * `str(method)`: return a short pretty print string reflecting
+ * `str(solver)`: return a short pretty print string reflecting
    the name of the method and the value of parameters that
    must be known to uniquely define the numerical method.
    This string is what one would use as legends in a plot or
    as method identifier in a table.
 
- * `solver.get_parameter_info`: return or print all registered
+ * `solver.get_parameter_info()`: return or print all registered
    parameters for the current solver and all properties for
    each parameter.
+
+ o `solver.switch_to(name)`: return a new solver of type `name`,
+   initialized with all
+   parameters of the current solver that are legal in the new solver.
+   The method is useful when trying out a range of solvers for a
+   problem.
+
+=== The Solve Method ===
 
 After the constructor is called, `solver.set_initial_condition` is
 called to set the initial condition, and then `solve` is called.
 The `solve` method features the following steps:
 
- o Convert `time_points` to a `numpy` array.
  o Call `initialize_for_solve` (implemented in subclasses) to
    precompute whatever is needed before the time loop.
    The super class allocates storage for the solution and
@@ -1317,18 +1673,21 @@ The `solve` method features the following steps:
  o Run a loop over all time levels `n` and call `advance` (implemented
    in subclasses) at each level to advance the solution from
    time `t[n]` to `t[n+1]`. Also call `terminate` so that the
-   user code can analyze and work with the solution.
+   user code can analyze, work with the solution, and terminate the
+   solution process.
 
 Some subclasses will override the `solve` method and provide their own,
-but most subclasses just inherits the general one and implement
+but most subclasses just inherits the general one and implements
 the `advance` method.
+
+=== Solver Attributes ===
 
 All classes have a set of attributes:
 
- o `users_f` holding the user's function for $f(u, t)$
-   (implicit solvers will have a corresponding `users_jac` for
-   the user's Jacobian),
- o one attribute for each parameter in the class,
+ o `users_f`: holds the user's function for $f(u, t)$.
+   Implicit solvers may have a corresponding `users_jac` for
+   the user's Jacobian.
+ o One attribute for each parameter in the class.
  o `u`: 1D `numpy` array holding the solution for a scalar ODE and
    a 2D array in case of a system of ODEs. The first index
    denotes the time level.
@@ -1343,13 +1702,15 @@ in Section ref{odes:parameters}.
 === Other Superclasses ===
 
 There are superclasses `SolverImplicit` for implicit methods,
-`Adaptive` for adaptive methods, 'RungeKutta' for general
-Runge-Kutta methods, `Ode_scipy` for interfaces to ODE solvers
+`Adaptive` for adaptive methods, `RungeKutta1level` for general,
+explicit 1-level Runge-Kutta methods, `RungeKutta2level` for
+general, explicit, adaptive 2-level Runge-Kutta methods,
+`ode_scipy` for interfaces to ODE solvers
 in `scipy`, and `Odepack` for interfaces to the ODEPACK family
 of solvers.
 
 
-=== A Very Simple Subclass ===
+===== A Very Simple Subclass =====
 
 To implement a simple explicit scheme for solving a scalar ODE or a system
 of ODEs, you only need to write a subclass of `Solver` with an
@@ -1379,7 +1740,7 @@ class ForwardEuler(Solver):
 !ec
 Remarks:
 
- o The `quick_description` is necessary for the class to appear in the
+ o The `quick_description` string is necessary for the class to appear in the
    automatically generated overview of implemented methods
    (run `pydoc odespy` to see this table).
  o Extracting class attributes in local variables (here `u`, `f`, etc.)
@@ -1387,9 +1748,9 @@ Remarks:
    are as close to the mathematical formulas as possible.
 
 Almost equally simple schemes, like explicit Runge-Kutta methods and Heun's
-method are implemented in the same way (see `ODE.py`).
+method are implemented in the same way (see "`solvers.py`": "https://github.com/hplgit/odespy/tree/master/odespy/odespy/solvers.py").
 
-=== A Subclass with More Code ===
+===== A Subclass with More Code =====
 
 A 2nd-order Adams-Bashforth scheme is a bit more complicated since it
 involves three time levels and therefore needs a separate method for
@@ -1397,16 +1758,16 @@ the first step. We should also avoid unnecessary evaluations of $f(u,t)$.
 The user can specify a parameter `start_method` for the name of the
 solver to be used for the first step. This solver is initialized
 by the `switch_to` method in class `Solver`. Basically,
-!bc cod
+!bc pycod
 new_solver = solver.switch_to(solver_name)
 !ec
 creates a new solver instance `new_solver`, of the class implied by
-`solver_name`, where all relevant parameters from `solver` are coopied
+`solver_name`, where all relevant parameters from `solver` are copied
 to `new_solver`.
 
 An implementation of a subclass for the
 2nd-order Adams-Bashforth scheme can then look as follows.
-!bc cod
+!bc pycod
 class AdamsBashforth2(Solver):
     """
     Second-order Adams-Bashforth method::
@@ -1419,7 +1780,8 @@ class AdamsBashforth2(Solver):
     """
     quick_description = "Explicit 2nd-order Adams-Bashforth method"
 
-    _optional_parameters = Solver._optional_parameters + ['start_method',]
+    _optional_parameters = Solver._optional_parameters + \
+                          ['start_method',]
 
     def initialize_for_solve(self):
         # New solver instance for first step
@@ -1454,23 +1816,23 @@ class AdamsBashforth2(Solver):
 Three features are worth comments: 1) we extend the set of optional
 parameters; 2) we must initialize a separate solver for the first
 step, and this is done in the `initialize_for_solve` method that will
-be called as part of `solve` (before the time stepping); and 3) we
+be called as part of `solve` before the time stepping; and 3) we
 extend `validate_data` to check that the time spacing given by the
 `time_points` argument to `solve` is constant. The utility method
 `constant_time_step` provided in super class `Solver` carries out the
 details of the check.
 
 More advanced implementations of subclasses can be studied
-in the `ODE.py` and `RungeKutta.py` files.
+in the "`solvers.py`": "https://github.com/hplgit/odespy/tree/master/odespy/odespy/solvers.py" and "`RungeKutta.py`": "https://github.com/hplgit/odespy/tree/master/odespy/odespy/RungeKutta.py" files.
 
-=== A Simple Example of an Implicit Method ===
+===== A Simple Example of an Implicit Method =====
 
 Class `SolverImplicit` acts as superclass for the implementation of
 implicit methods. This class provides some basic functionality for
-solving the system of nonlinear equations that normally arise in
+solving the system of nonlinear equations that normally arises in
 implicit methods by Picard or Newton iteration.
 The parameter `nonlinear_solver` can take the values `Picard` or
-`Newton`. The user must provide in case of Newton's method provide
+`Newton`. The user must in case of Newton's method provide
 a `jac` parameter for a function evaluating the Jacobian of $f(u,t)$
 with respect to $u$: $J_{i,j} = \partial f_i/\partial u_j$.
 
@@ -1482,8 +1844,8 @@ on the right-hand side of the discrete equation when only `u[n+1]` is
 on the left-hand side. `Newton` returns the right-hand side and the
 Jacobian of the system to be solved in each Newton iteration.
 
-Here is an example showing how to implement the Backward Euler method.
-!bc
+Here is an example showing the complete code of the Backward Euler method.
+!bc pycod
 class BackwardEuler(SolverImplicit):
     """
     Implicit Backward Euler method::
@@ -1505,50 +1867,6 @@ class BackwardEuler(SolverImplicit):
         F = ukp1 - (u[n] + dt*f(ukp1, t[n+1]))
         J = np.eye(self.neq) - dt*self.jac(ukp1, t[n+1])
         return F, J
-!ec
-
-======= Installation =======
-
-The Odespy package is most easily installed by checkout out
-the latest version of the source code:
-!bc sys
-git clone git@github.com:hplgit/odespy.git
-cd odespy
-!ec
-The installation follows the expected standard procedure,
-!bc sys
-sudo python setup.py install
-!ec
-
-The Odespy package depends on several other packages:
-
- * `scipy` for running the `Vode` Adams/BDF solver, the
-   Dormand-Prince adaptive methods `Dop853`, and `Dopri5`,
-   and the `scipy` wrapper `odeint` of the FORTRAN code `LSODA`
-   (Odespy features an alternative wrapper of the latter).
- * `sympy` for running the extremely accurate `odefun_sympy` solver.
- * `odelab` for accessing all the solvers in that package.
-
-For plotting you will need `matplotlib` or `scitools`.
-
-These packages are readily downloaded and installed by the
-standard `setup.py` script as shown above.
-On Ubuntu and other Debian-based Linux systems the following
-line installs all that Odespy may need:
-!bc sys
-sudo apt-get install python-scipy python-nose python-sympy \
-     python-matplotlib python-scitools python-pip
-!ec
-
-The Odelab package is installed by either
-!bc sys
-pip install -e git+https://github.com/olivierverdier/odelab#egg=odelab
-!ec
-or downloading the source and running `setup.py`:
-!bc sys
-git clone git://github.com/olivierverdier/odelab.git
-cd odelab
-sudo python setup.py install
 !ec
 
 
@@ -1584,7 +1902,7 @@ must be keyword arguments.
    spring force, etc. Given u, get the physical quantity.
    Could be a general base class for Oscillators,
    odespy.Problem.Oscillator.
- * Complete physics example with class Problem, Solver and Viz a la INF1100.
+ * Complete physics example with class Problem, Solver and Viz.
    Adaptive error controlled solution.
  * Solvers for 2nd order eqs where f must be an object and also have a
    method d2ut2(u, dudt, t) for returning u''="f"?

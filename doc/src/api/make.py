@@ -10,10 +10,10 @@ import glob, sys, os, re, shutil, commands
 # modules in the (sub)package. An empty keyword means that
 # there is no package, just a set of modules.
 
-source_file_dirs = [os.path.join(os.pardir, os.pardir, os.pardir, 'odesolvers')]
+source_file_dirs = [os.path.join(os.pardir, os.pardir, os.pardir, 'odespy')]
 # Here we take all modules in source_file_dirs
 modules = glob.glob(os.path.join(source_file_dirs[0], '*.py'))
-packages = {'odesolvers': modules}
+packages = {'odespy': modules}
 
 # Exclude certain types of files
 exclude_files = ['__init__.py', 'PyDSTool.py', 'setup.py']
@@ -29,9 +29,9 @@ for package, module in remove:
 
 source_file_dirs = [os.curdir]  # abs path or relative path to this dir
 docdir = 'api'  # name of subdir to contain generated documentation
-project_name = 'odesolver API'
+project_name = 'Odespy API'
 author = 'Liwei Wang and Hans Petter Langtangen'
-version = '0.1'
+version = '0.2'
 
 
 #--------------------------------------------------------------
@@ -113,11 +113,11 @@ if failure:
 for txtfile in txtfiles:
     shutil.move(txtfile, docdir)
 
-# Copy figs-tut dir from the tutorial
-dest = os.path.join(docdir, 'figs-tut')
+# Copy figs-odespy dir from the tutorial
+dest = os.path.join(docdir, 'figs-odespy')
 if os.path.isdir(dest):
     shutil.rmtree(dest)
-shutil.copytree(os.path.join(os.pardir, 'tutorial', 'figs-tut'), dest)
+shutil.copytree(os.path.join(os.pardir, 'odespy', 'figs-odespy'), dest)
 
 os.chdir(docdir)
 
@@ -180,7 +180,7 @@ html_theme = [
   'epub',
   'nature',
   'scrolls',
-  'traditional'][0]  # standard themes in sphinx"
+  'traditional'][3]  # standard themes in sphinx
 """
 text = text.replace("html_theme = 'default'", themes)
 
@@ -209,7 +209,7 @@ cd doc/sphinxext; sudo python setup.py install
     sys.exit(1)
 
 # Generate HTML documentation
-print '\n\nmake html...'
+print '\n\nmake html.....catching output in tmp.out...'
 failure, output2 = commands.getstatusoutput('make html')
 if 'toctree contains reference' in output2:
     output2 += '\n\nMany warnings "toctree contains reference to nonexisting document" may appear above, but this is not critical.'
@@ -220,7 +220,7 @@ f = open('../tmp.out', 'w')
 f.write(output2)
 f.close()
 if failure:
-    print 'Could not run make html'
+    print 'Failed to run make html successfully!'
     sys.exit(1)
 
 

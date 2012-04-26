@@ -1,7 +1,7 @@
 def f(u, t, a=1, R=1):
     return a*u*(1 - u/R)
 
-A=1
+A = 1
 
 import odespy
 solver = odespy.CashKarp(f, f_kwargs=dict(a=2, R=1E+5),

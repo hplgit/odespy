@@ -1,9 +1,9 @@
 def f(u, t):
     return a*u*(1 - u/R)
 
-a=2
-R=1E+5
-A=1
+a = 2
+R = 1E+5
+A = 1
 
 import odespy
 solver = odespy.RK4(f)
