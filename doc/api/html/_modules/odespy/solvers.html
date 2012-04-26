@@ -65,13 +65,6 @@
 <span class="sd">This module contains the base class ``Solver``</span>
 <span class="sd">package and the implementations of many subclasses.</span>
 
-
-<span class="sd">How to implement a new solver</span>
-<span class="sd">=============================</span>
-
-<span class="sd">Simple explicit solver</span>
-<span class="sd">----------------------</span>
-
 <span class="sd">A new non-adaptive time-stepping scheme can often be implemented by</span>
 <span class="sd">just subclassing ``Solver`` and writing the ``advance`` method</span>
 <span class="sd">to define the time-stepping scheme. Here is how the 4th-order</span>
@@ -94,21 +87,13 @@
 <span class="sd">The ``quick_description`` string is needed for the class to appear</span>
 <span class="sd">in the package&#39;s table of contents.</span>
 
-<span class="sd">Implicit solver</span>
-<span class="sd">---------------</span>
+<span class="sd">Implicit solver: See examples in the ``solver.py`` file,</span>
+<span class="sd">class ``BackwardEuler``, for instance.</span>
 
-<span class="sd">See examples in the ``solver.py`` file, class ``BackwardEuler``,</span>
+<span class="sd">Adaptive solver: See examples in the ``solver.py`` file, class ``RKFehlberg``,</span>
 <span class="sd">for instance.</span>
 
-<span class="sd">Adaptive solver</span>
-<span class="sd">---------------</span>
-
-<span class="sd">See examples in the ``solver.py`` file, class ``RK34``,</span>
-<span class="sd">for instance.</span>
-
-<span class="sd">Wrapping other packages</span>
-<span class="sd">-----------------------</span>
-
+<span class="sd">*Wrapping other packages*.</span>
 <span class="sd">This section is for developers who intend to wrap an existing</span>
 <span class="sd">package and integrate with the present one..</span>
 
@@ -127,9 +112,7 @@
 <span class="sd">initialize()), we can check whether the necessary dependencies are</span>
 <span class="sd">installed properly.</span>
 
-<span class="sd">Definition of parameters and their properties</span>
-<span class="sd">---------------------------------------------</span>
-
+<span class="sd">*Definition of parameters and their properties*.</span>
 <span class="sd">Each solver has a set of specific parameters depending on its</span>
 <span class="sd">underlying method. For example, adaptive solvers will be more</span>
 <span class="sd">likely to apply (many) attributes for step-size control.</span>
@@ -165,9 +148,7 @@
 <span class="sd">solver.</span>
 
 
-<span class="sd">The solve and advance methods</span>
-<span class="sd">-----------------------------</span>
-
+<span class="sd">*The solve and advance methods*.</span>
 <span class="sd">Simple methods can just implement ``advance`` to bring the solution</span>
 <span class="sd">one step forward in time. The existing ``solve`` method derived from</span>
 <span class="sd">the superclass is general enough to administer the whole solution</span>

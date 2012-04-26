@@ -60,10 +60,6 @@
 <span id="odespy-solvers"></span><h1><a class="reference internal" href="#module-odespy.solvers" title="odespy.solvers"><tt class="xref py py-mod docutils literal"><span class="pre">odespy.solvers</span></tt></a><a class="headerlink" href="#module-odespy.solvers" title="Permalink to this headline">¶</a></h1>
 <p>This module contains the base class <tt class="docutils literal"><span class="pre">Solver</span></tt>
 package and the implementations of many subclasses.</p>
-<div class="section" id="how-to-implement-a-new-solver">
-<h2>How to implement a new solver<a class="headerlink" href="#how-to-implement-a-new-solver" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="simple-explicit-solver">
-<h3>Simple explicit solver<a class="headerlink" href="#simple-explicit-solver" title="Permalink to this headline">¶</a></h3>
 <p>A new non-adaptive time-stepping scheme can often be implemented by
 just subclassing <tt class="docutils literal"><span class="pre">Solver</span></tt> and writing the <tt class="docutils literal"><span class="pre">advance</span></tt> method
 to define the time-stepping scheme. Here is how the 4th-order
@@ -85,20 +81,12 @@ Runge-Kutta is implemented:</p>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">quick_description</span></tt> string is needed for the class to appear
 in the package&#8217;s table of contents.</p>
-</div>
-<div class="section" id="implicit-solver">
-<h3>Implicit solver<a class="headerlink" href="#implicit-solver" title="Permalink to this headline">¶</a></h3>
-<p>See examples in the <tt class="docutils literal"><span class="pre">solver.py</span></tt> file, class <tt class="docutils literal"><span class="pre">BackwardEuler</span></tt>,
+<p>Implicit solver: See examples in the <tt class="docutils literal"><span class="pre">solver.py</span></tt> file,
+class <tt class="docutils literal"><span class="pre">BackwardEuler</span></tt>, for instance.</p>
+<p>Adaptive solver: See examples in the <tt class="docutils literal"><span class="pre">solver.py</span></tt> file, class <tt class="docutils literal"><span class="pre">RKFehlberg</span></tt>,
 for instance.</p>
-</div>
-<div class="section" id="adaptive-solver">
-<h3>Adaptive solver<a class="headerlink" href="#adaptive-solver" title="Permalink to this headline">¶</a></h3>
-<p>See examples in the <tt class="docutils literal"><span class="pre">solver.py</span></tt> file, class <tt class="docutils literal"><span class="pre">RK34</span></tt>,
-for instance.</p>
-</div>
-<div class="section" id="wrapping-other-packages">
-<h3>Wrapping other packages<a class="headerlink" href="#wrapping-other-packages" title="Permalink to this headline">¶</a></h3>
-<p>This section is for developers who intend to wrap an existing
+<p><em>Wrapping other packages</em>.
+This section is for developers who intend to wrap an existing
 package and integrate with the present one..</p>
 <p>If the original package is not written in Python language, developers
 need to apply some specific tools (like F2PY, Cython, or SWIG) to create an
@@ -112,10 +100,8 @@ classes <tt class="docutils literal"><span class="pre">odefun_sympy</span></tt> 
 <p>By an attempt to import these necessary modules (often set in method
 initialize()), we can check whether the necessary dependencies are
 installed properly.</p>
-</div>
-<div class="section" id="definition-of-parameters-and-their-properties">
-<h3>Definition of parameters and their properties<a class="headerlink" href="#definition-of-parameters-and-their-properties" title="Permalink to this headline">¶</a></h3>
-<p>Each solver has a set of specific parameters depending on its
+<p><em>Definition of parameters and their properties</em>.
+Each solver has a set of specific parameters depending on its
 underlying method. For example, adaptive solvers will be more
 likely to apply (many) attributes for step-size control.
 When integrating a new method, first search in the <tt class="docutils literal"><span class="pre">_parameters</span></tt>
@@ -145,10 +131,8 @@ between the input data: two input integer arrays <tt class="docutils literal"><s
 must be input simultaneously, <tt class="docutils literal"><span class="pre">len(ia)</span> <span class="pre">==</span> <span class="pre">neq</span> <span class="pre">+</span> <span class="pre">1</span></tt>, and <tt class="docutils literal"><span class="pre">ia[neq]</span> <span class="pre">=</span>
 <span class="pre">len(ja)</span></tt>. These checks are done in Python before calling the Fortran
 solver.</p>
-</div>
-<div class="section" id="the-solve-and-advance-methods">
-<h3>The solve and advance methods<a class="headerlink" href="#the-solve-and-advance-methods" title="Permalink to this headline">¶</a></h3>
-<p>Simple methods can just implement <tt class="docutils literal"><span class="pre">advance</span></tt> to bring the solution
+<p><em>The solve and advance methods</em>.
+Simple methods can just implement <tt class="docutils literal"><span class="pre">advance</span></tt> to bring the solution
 one step forward in time. The existing <tt class="docutils literal"><span class="pre">solve</span></tt> method derived from
 the superclass is general enough to administer the whole solution
 process.</p>
@@ -6049,8 +6033,6 @@ that must and can be provided.</p>
 <dd></dd></dl>
 
 </div>
-</div>
-</div>
 
 
           </div>
@@ -6058,24 +6040,6 @@ that must and can be provided.</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">odespy.solvers</span></tt></a><ul>
-<li><a class="reference internal" href="#how-to-implement-a-new-solver">How to implement a new solver</a><ul>
-<li><a class="reference internal" href="#simple-explicit-solver">Simple explicit solver</a></li>
-<li><a class="reference internal" href="#implicit-solver">Implicit solver</a></li>
-<li><a class="reference internal" href="#adaptive-solver">Adaptive solver</a></li>
-<li><a class="reference internal" href="#wrapping-other-packages">Wrapping other packages</a></li>
-<li><a class="reference internal" href="#definition-of-parameters-and-their-properties">Definition of parameters and their properties</a></li>
-<li><a class="reference internal" href="#the-solve-and-advance-methods">The solve and advance methods</a><ul>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">

@@ -1336,10 +1336,8 @@ Specially, in Dlsodes, ia &amp; ja should be attached to iwork_in.</p>
 <dd><p>Bases: <a class="reference internal" href="#odespy.odepack.Odepack" title="odespy.odepack.Odepack"><tt class="xref py py-class docutils literal"><span class="pre">odespy.odepack.Odepack</span></tt></a></p>
 <p>A Python wrapper of the LSODI subroutine from ODEPACK, targeting
 ODE problems of the form</p>
-<dl class="docutils">
-<dt>..math::</dt>
-<dd>A(u,t) u&#8217; &amp; = g(u,t)</dd>
-</dl>
+<div class="math">
+\[\begin{split}A(u,t) u' &amp; = g(u,t)\end{split}\]</div>
 <p>where <span class="math">\(A(u,t)\)</span> is a square matrix and <span class="math">\(g\)</span> some function.
 If <span class="math">\(A\)</span> is singular, this is a differential-algebraic system.
 The user input is in the form of a residual function

@@ -383,18 +383,18 @@ class VanDerPolOscillator(Problem):
     """
     Classical van der Pool oscillator:
 
-    ..math:: y'' = \mu (1 - y^2) y' - y
+    .. math:: y'' = \mu (1 - y^2) y' - y
 
     with initial conditions :math:`y(0)=2, y'(0)=1`.
     The equation is rewritten as a system
 
-    ..math::
+    .. math::
              u_0' &= u_1
              u_1' &= \mu (1-u_0^2)u_1 - u_0
 
     with a Jacobian
 
-    ..math::
+    .. math::
              \left(\begin{array}{cc}
              0 & 1\\
              -2\mu u_0 - 1 & \mu (1-u_0^2)

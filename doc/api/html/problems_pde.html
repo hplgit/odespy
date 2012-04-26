@@ -64,25 +64,23 @@
 <dd><p>Bases: <a class="reference internal" href="problems.html#odespy.problems.Problem" title="odespy.problems.Problem"><tt class="xref py py-class docutils literal"><span class="pre">odespy.problems.Problem</span></tt></a></p>
 <blockquote>
 <div><p>Classical 1D diffusion equation:</p>
-<p>..math:</p>
+<div class="math">
+</div>
 </div></blockquote>
 <p>rac{partial u}{partial t} = a
 rac{partial^2 u}{partial x^2}</p>
 <blockquote>
 <div><p>with initial condition <span class="math">\(u(x,0)=I(x)\)</span> and boundary condtions
 <span class="math">\(u(0,t)=U_L(t), u(L,t)=U_R(t)\)</span>.</p>
-<dl class="docutils">
-<dt>..math::</dt>
-<dd>u_0&#8217; &amp;= u_1
-u_1&#8217; &amp;= mu (1-u_0^2)u_1 - u_0</dd>
-</dl>
+<div class="math">
+\[\begin{split}u_0' &amp;= u_1
+u_1' &amp;= \mu (1-u_0^2)u_1 - u_0\end{split}\]</div>
 <p>with a Jacobian</p>
-<dl class="docutils">
-<dt>..math::</dt>
-<dd>left(egin{array}{cc}
-0 &amp; 1-2mu u_0 - 1 &amp; mu (1-u_0^2)
-end{array}</dd>
-</dl>
+<div class="math">
+\[\begin{split}\left(egin{array}{cc}
+0 &amp; 1\
+-2\mu u_0 - 1 &amp; \mu (1-u_0^2)
+\end{array}\end{split}\]</div>
 </div></blockquote>
 <p>ight)</p>
 <p class="rubric">Methods</p>

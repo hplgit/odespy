@@ -1670,7 +1670,7 @@ class Lsodi(Odepack):
     A Python wrapper of the LSODI subroutine from ODEPACK, targeting
     ODE problems of the form
 
-    ..math::
+    .. math::
                A(u,t) u' & = g(u,t)
 
     where :math:`A(u,t)` is a square matrix and :math:`g` some function.
