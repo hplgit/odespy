@@ -1194,7 +1194,7 @@ Typical loops over solvers and resolutions look as follows (`osc3.py <https://gi
             solver.set_initial_condition([problem.Theta, 0])
         
             for N_per_period in resolutions:
-                N = N_per_period*problem.period
+                N = N_per_period*num_periods
                 time_points = numpy.linspace(0, T, N+1)
         
                 u, t = solver.solve(time_points)
@@ -1235,13 +1235,14 @@ With 4 periods we get
 
 .. code-block:: python
 
-        ThetaRule(theta=0)   r: 2.9, 1.9, 1.4, 1.2 E_min=1.1E-01
-        RK2                  r: 2.1, 2.0, 2.0, 2.0 E_min=8.4E-04
-        ThetaRule(theta=1)   r: 0.3, 0.5, 0.7, 0.8 E_min=9.0E-02
-        RK4                  r: 4.0, 4.0, 4.0, 4.0 E_min=2.6E-08
-        ThetaRule            r: 2.0, 2.0, 2.0, 2.0 E_min=4.2E-04
-        Leapfrog             r: 2.1, 2.0, 2.0, 2.0 E_min=8.5E-04
-        LeapfrogFiltered     r: 0.2, 0.4, 0.6, 0.8 E_min=1.3E-01
+        ThetaRule(theta=0)   r: 4.2,  2.4, 1.7, 1.3 E_min=1.9E-01
+        LeapfrogFiltered     r: 10.3, 0.3, 0.5, 0.7 E_min=1.8E-01
+        ThetaRule(theta=1)   r: 0.2,  0.4, 0.6, 0.8 E_min=1.3E-01
+        ThetaRule            r: 2.3,  2.0, 2.0, 2.0 E_min=2.1E-03
+        RK4                  r: 4.0,  4.0, 4.0, 4.0 E_min=1.6E-07
+        Leapfrog             r: 2.2,  2.0, 2.0, 2.0 E_min=2.1E-03
+        RK2                  r: 2.3,  2.0, 2.0, 2.0 E_min=2.1E-03
+        MidpointIter         r: 2.0,  1.0, 2.0, 2.0 E_min=2.1E-03
 
 The rates of the Forward and Backward Euler methods (1st and 3rd line) have
 not yet converged to unity, as expected, while the 2nd-order
@@ -1256,17 +1257,18 @@ Extending the time domain to 20 periods makes many of the
 simplest methods inaccurate and the rates computed on coarse
 time meshes are irrelevant. Also in this case, three of the methods
 are useless, while the others deliver their promised convergence
-rates:
+rates (Forward Euler, i.e., ``ThetaRule`` with ``theta=0`` is left
+out because of ridiculous results):
 
 .. code-block:: python
 
-        ThetaRule(theta=0)   r: 10.4, 22.0, 18.2, 10.4 E_min=3.3E+02
-        RK2                  r: 51.4, 16.1, 2.3, 2.1 E_min=1.1E-01
-        ThetaRule(theta=1)   r: 11.2, 0.0, 0.1 E_min=5.0E-01
-        RK4                  r: 1.0, 3.6, 4.0, 4.0 E_min=8.2E-05
-        ThetaRule            r: 87.8, 0.2, 1.7, 2.0 E_min=5.3E-02
-        Leapfrog             r: 95.9, 18.0, 1.0, 2.0 E_min=1.1E-01
-        LeapfrogFiltered     r: -0.0, 121.2, 0.3, 0.1 E_min=5.2E-01
+        LeapfrogFiltered     r: 63.7, 0.0, 0.1, 0.2 E_min=4.3E-01
+        ThetaRule(theta=1)   r: 0.0,  0.1, 0.1, 0.3 E_min=3.8E-01
+        ThetaRule            r: 3.7,  2.1, 2.0, 2.0 E_min=1.0E-02
+        RK4                  r: 4.0,  4.0, 4.0, 4.0 E_min=8.0E-07
+        Leapfrog             r: 0.5,  1.9, 2.0, 2.0 E_min=1.0E-02
+        RK2                  r: 3.7,  2.1, 2.0, 2.0 E_min=1.0E-02
+        MidpointIter         r: 1.8,  0.8, 1.9, 2.0 E_min=1.0E-02
 
 
 
@@ -1467,7 +1469,7 @@ a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points).
 .. figure:: figs-odespy/gaussian1_RK2_41.png
    :width: 500
 
-   *2nd-order Runge-Kutta method with 41 points for solving :eq:`gaussian:ode:eq`*
+   *2nd-order Runge-Kutta method with 41 points*
 
 
 A simple program testing one numerical method goes as follows (`gaussian1.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py>`_).
@@ -1531,7 +1533,7 @@ Figure :ref:`gaussian:fig:Fehlberg:41` shows how ``Fehlberg`` with 40 intervals 
 .. figure:: figs-odespy/gaussian1_Fehlberg_41.png
    :width: 500
 
-   *Adaptive Runge-Kutta-Fehlberg method with 41 points for solving :eq:`gaussian:ode:eq`*
+   *Adaptive Runge-Kutta-Fehlberg method with 41 points*
 
 
 Adaptive algorithms apply an error estimate based on considering a higher-order method as exact, in this case a method of order 5, and a method of lower order (here 4) as the numerically predicted solution. The user can specify an error tolerance. In the program above we just relied to the default tolerance, which can be printed by
@@ -1673,7 +1675,7 @@ results, despite setting ``Vode`` to use a stiff solver of order 4, and
 .. figure:: figs-odespy/gaussian3_41.png
    :width: 500
 
-   *Comparison of adaptive methods for :eq:`gaussian:ode:eq`*
+   *Comparison of adaptive methods with default parameters (tolerance E-6)*
 
 
 
@@ -1682,7 +1684,7 @@ results, despite setting ``Vode`` to use a stiff solver of order 4, and
 .. figure:: figs-odespy/gaussian3e_41.png
    :width: 500
 
-   *Comparison of errors in adaptive methods for :eq:`gaussian:ode:eq`*
+   *Comparison of errors in adaptive methods with default parameters (tolerance E-6)*
 
 
 Numerically, the program writes out the following results for the
@@ -1698,7 +1700,7 @@ maximum value of the solution:
         1.1346  Lsoda
 
 The clearly most accurate method is ``DormandPrince``  - the default
-method used by MATLAB's ``ode45`` solver, which probably the world's
+method used by MATLAB's ``ode45`` solver, which is perhaps the world's
 most popular ODE solver.
 
 The remedy to get all the tested solvers to perform well is to
@@ -1724,7 +1726,7 @@ time points used: 305, 357, and 3999, respectively.
 .. figure:: figs-odespy/gaussian3_41_Em10.png
    :width: 500
 
-   *Comparison of adaptive methods with error tolerance :math:`10^{-10}` for :eq:`gaussian:ode:eq`*
+   *Comparison of adaptive methods with error tolerance E-10*
 
 
 The lesson learned in this example is two-fold: 1) several methods should
@@ -1999,6 +2001,8 @@ The FORTRAN code for :math:`f(u,t)` can be returned from a method:
 
 .. code-block:: python
 
+        class VanDerPolOscillator(odespy.problems.Problem):
+            ...
             def str_f_f77(self):
                 """Return f(u,t) as Fortran source code string."""
                 return """
@@ -2022,6 +2026,8 @@ signatures for the Jacobian. Here are two versions for ODEPACK and
 
 .. code-block:: python
 
+        class VanDerPolOscillator(odespy.problems.Problem):
+            ...
             def str_jac_f77_fadau5(self):
                 return """
               subroutine jac_f77_radau5(neq,t,u,dfu,ldfu,rpar,ipar)
@@ -2065,6 +2071,8 @@ the source code into Python modules. This is done by
 
 .. code-block:: python
 
+        class VanDerPolOscillator(odespy.problems.Problem):
+        
             def __init__(self, U0=[2, 1], mu=3.):
                 self.U0 = U0
                 self.mu = mu
