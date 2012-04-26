@@ -16,7 +16,7 @@ pdflatex -shell-escape $name
 doconce format sphinx $name
 theme=pyramid
 #theme=fenics_minimal
-doconce sphinx_dir dirname=sphinx-rootdir title="A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations" author="Hans Petter Langtangen and Liwei Wang" theme=$theme $name
+doconce sphinx_dir dirname=sphinx-rootdir title="A Tutorial for the Odespy Interface to ODE Solvers" author="Hans Petter Langtangen and Liwei Wang" theme=$theme $name
 
 #doconce subst '\#html_theme_options.+' "html_theme_options = {\n  'headerfont': '\"Abel\", sans-serif',\n  'bodyfont': '\"Cabin\", sans-serif',\n  'headerbg': 'black',\n  'headercolor1': 'black',}" sphinx-rootdir/conf.py
 

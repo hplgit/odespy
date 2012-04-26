@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations &mdash; A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations 1.0 documentation</title>
+    <title>A Tutorial for the Odespy Interface to ODE Solvers &mdash; A Tutorial for the Odespy Interface to ODE Solvers 1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/pyramid.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations 1.0 documentation" href="#" />
-    <link rel="next" title="A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations" href="wrap_odesolvers.html" />
+    <link rel="top" title="A Tutorial for the Odespy Interface to ODE Solvers 1.0 documentation" href="#" />
+    <link rel="next" title="A Tutorial for the Odespy Interface to ODE Solvers" href="wrap_odespy.html" />
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 <!--[if lte IE 6]>
@@ -43,9 +43,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="wrap_odesolvers.html" title="A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations"
+          <a href="wrap_odespy.html" title="A Tutorial for the Odespy Interface to ODE Solvers"
              accesskey="N">next</a> |</li>
-        <li><a href="#">A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations 1.0 documentation</a> &raquo;</li> 
+        <li><a href="#">A Tutorial for the Odespy Interface to ODE Solvers 1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -54,28 +54,45 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="a-tutorial-for-the-odesolvers-package-for-solving-ordinary-differentialequations">
-<h1>A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations<a class="headerlink" href="#a-tutorial-for-the-odesolvers-package-for-solving-ordinary-differentialequations" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="a-tutorial-for-the-odespy-interface-to-ode-solvers">
+<h1>A Tutorial for the Odespy Interface to ODE Solvers<a class="headerlink" href="#a-tutorial-for-the-odespy-interface-to-ode-solvers" title="Permalink to this headline">¶</a></h1>
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="wrap_odesolvers.html">A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="wrap_odesolvers.html#basic-usage">Basic Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="wrap_odesolvers.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wrap_odesolvers.html#example-exponential-growth">Example: Exponential Growth</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wrap_odesolvers.html#example-decay-equation">Example: Decay Equation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wrap_odesolvers.html#example-decay-equation-with-other-symbols">Example: Decay Equation with Other Symbols</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wrap_odesolvers.html#example-the-pendulum-equation">Example: The Pendulum Equation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wrap_odesolvers.html#example-testing-several-methods">Example: Testing Several Methods</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wrap_odesolvers.html#example-solving-a-stochastic-differential-equation">Example: Solving a Stochastic Differential Equation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrap_odespy.html">A Tutorial for the Odespy Interface to ODE Solvers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrap_odespy.html#motivation">Motivation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#traditional-approach">Traditional Approach</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#odespy-s-unified-interface">Odespy&#8217;s Unified Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#methods-and-implementations-offered-by-odespy">Methods and Implementations Offered by Odespy</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="wrap_odesolvers.html#inner-workings-of-the-package">Inner Workings of the Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="wrap_odesolvers.html#solver-parameters">Solver Parameters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="wrap_odesolvers.html#solver-classes">Solver Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrap_odespy.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrap_odespy.html#basic-usage">Basic Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#first-example-logistic-growth">First Example: Logistic Growth</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#parameters-in-the-right-hand-side-function">Parameters in the Right-Hand Side Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#continuing-a-previous-simulation">Continuing a Previous Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#termination-criterion-for-the-simulation">Termination Criterion for the Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#a-class-based-implementation">A Class-Based Implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#using-other-symbols">Using Other Symbols</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#example-solving-an-ode-system">Example: Solving an ODE System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#testing-several-methods">Testing Several Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#make-a-subclass-of-problem">Make a Subclass of Problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#using-adaptive-methods">Using Adaptive Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#example-solving-a-complex-ode-problem">Example: Solving a Complex ODE Problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#avoiding-callbacks-to-python">Avoiding Callbacks to Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#example-solving-a-stochastic-differential-equation">Example: Solving a Stochastic Differential Equation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="wrap_odesolvers.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrap_odespy.html#inner-workings-of-the-package">Inner Workings of the Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#solver-parameters">Solver Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#solver-classes">Solver Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#a-very-simple-subclass">A Very Simple Subclass</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#a-subclass-with-more-code">A Subclass with More Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wrap_odespy.html#a-simple-example-of-an-implicit-method">A Simple Example of an Implicit Method</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wrap_odespy.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 </div>
 </div>
@@ -96,15 +113,15 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations</a><ul>
+<li><a class="reference internal" href="#">A Tutorial for the Odespy Interface to ODE Solvers</a><ul>
 </ul>
 </li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 
   <h4>Next topic</h4>
-  <p class="topless"><a href="wrap_odesolvers.html"
-                        title="next chapter">A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations</a></p>
+  <p class="topless"><a href="wrap_odespy.html"
+                        title="next chapter">A Tutorial for the Odespy Interface to ODE Solvers</a></p>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -129,9 +146,9 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="wrap_odesolvers.html" title="A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations"
+          <a href="wrap_odespy.html" title="A Tutorial for the Odespy Interface to ODE Solvers"
              >next</a> |</li>
-        <li><a href="#">A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations 1.0 documentation</a> &raquo;</li> 
+        <li><a href="#">A Tutorial for the Odespy Interface to ODE Solvers 1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

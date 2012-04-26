@@ -1,15 +1,15 @@
 
 .. Master file automatically created by doconce sphinx_dir
 
-A Tutorial for the Odesolvers Package for Solving Ordinary DifferentialEquations
-================================================================================
+A Tutorial for the Odespy Interface to ODE Solvers
+==================================================
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
-   wrap_odesolvers
+   wrap_odespy
 
 
 Indices and tables
