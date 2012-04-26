@@ -1,9 +1,0 @@
-
-:mod:`odesolvers.RungeKutta`
-============================
-
-.. automodule:: odesolvers.RungeKutta
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:

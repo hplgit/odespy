@@ -1,2 +1,2 @@
 #!/bin/sh
-rm -rf API *~ tmp.out
+rm -rf api *~ tmp.out

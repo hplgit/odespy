@@ -1,9 +1,0 @@
-
-:mod:`odespy.solvers`
-=====================
-
-.. automodule:: odespy.solvers
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:

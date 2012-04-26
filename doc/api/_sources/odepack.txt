@@ -1,9 +1,0 @@
-
-:mod:`odesolvers.odepack`
-=========================
-
-.. automodule:: odesolvers.odepack
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:

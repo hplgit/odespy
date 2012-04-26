@@ -1,9 +1,0 @@
-
-:mod:`odespy.runtests`
-======================
-
-.. automodule:: odespy.runtests
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:

@@ -1,9 +1,0 @@
-
-:mod:`odesolvers.rkc_rkf45`
-===========================
-
-.. automodule:: odesolvers.rkc_rkf45
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:

@@ -1,9 +1,0 @@
-
-:mod:`odespy.odepack`
-=====================
-
-.. automodule:: odespy.odepack
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:

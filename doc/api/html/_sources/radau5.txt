@@ -1,9 +1,0 @@
-
-:mod:`odespy.radau5`
-====================
-
-.. automodule:: odespy.radau5
-   :members:
-   :undoc-members:
-   :special-members:
-   :show-inheritance:
