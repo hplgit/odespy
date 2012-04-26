@@ -1,8 +1,8 @@
 #!/bin/sh
 # Copy the Sphinx API doc
 
-dest=../../API
-cp -r API/_build/html $dest
+dest=../../api
+cp -r api/_build/html $dest
 
 cat > $dest/README <<EOF
 This directory contains the API documentation for the package.

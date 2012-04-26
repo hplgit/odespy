@@ -1,0 +1,9 @@
+
+:mod:`odespy.problems_pde`
+==========================
+
+.. automodule:: odespy.problems_pde
+   :members:
+   :undoc-members:
+   :special-members:
+   :show-inheritance:
