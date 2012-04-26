@@ -10,6 +10,6 @@ EOF
 git add $dest
 git commit -am 'Added new official odespy files in doc/tutorial.'
 
-doconce format rst $name
-cp $name.rst ../../../../odespy.wiki/Tutorial.rest
+doconce format rst wrap_odespy
+cp wrap_odespy.rst ../../../../odespy.wiki/Tutorial.rest
 
