@@ -747,13 +747,14 @@ $r$ values:
 
 With 4 periods we get
 !bc dat
-ThetaRule(theta=0)   r: 2.9, 1.9, 1.4, 1.2 E_min=1.1E-01
-RK2                  r: 2.1, 2.0, 2.0, 2.0 E_min=8.4E-04
-ThetaRule(theta=1)   r: 0.3, 0.5, 0.7, 0.8 E_min=9.0E-02
-RK4                  r: 4.0, 4.0, 4.0, 4.0 E_min=2.6E-08
-ThetaRule            r: 2.0, 2.0, 2.0, 2.0 E_min=4.2E-04
-Leapfrog             r: 2.1, 2.0, 2.0, 2.0 E_min=8.5E-04
-LeapfrogFiltered     r: 0.2, 0.4, 0.6, 0.8 E_min=1.3E-01
+ThetaRule(theta=0)   r: 4.2,  2.4, 1.7, 1.3 E_min=1.9E-01
+LeapfrogFiltered     r: 10.3, 0.3, 0.5, 0.7 E_min=1.8E-01
+ThetaRule(theta=1)   r: 0.2,  0.4, 0.6, 0.8 E_min=1.3E-01
+ThetaRule            r: 2.3,  2.0, 2.0, 2.0 E_min=2.1E-03
+RK4                  r: 4.0,  4.0, 4.0, 4.0 E_min=1.6E-07
+Leapfrog             r: 2.2,  2.0, 2.0, 2.0 E_min=2.1E-03
+RK2                  r: 2.3,  2.0, 2.0, 2.0 E_min=2.1E-03
+MidpointIter         r: 2.0,  1.0, 2.0, 2.0 E_min=2.1E-03
 !ec
 The rates of the Forward and Backward Euler methods (1st and 3rd line) have
 not yet converged to unity, as expected, while the 2nd-order
@@ -768,15 +769,16 @@ Extending the time domain to 20 periods makes many of the
 simplest methods inaccurate and the rates computed on coarse
 time meshes are irrelevant. Also in this case, three of the methods
 are useless, while the others deliver their promised convergence
-rates:
+rates (Forward Euler, i.e., `ThetaRule` with `theta=0` is left
+out because of ridiculous results):
 !bc dat
-ThetaRule(theta=0)   r: 10.4, 22.0, 18.2, 10.4 E_min=3.3E+02
-RK2                  r: 51.4, 16.1, 2.3, 2.1 E_min=1.1E-01
-ThetaRule(theta=1)   r: 11.2, 0.0, 0.1 E_min=5.0E-01
-RK4                  r: 1.0, 3.6, 4.0, 4.0 E_min=8.2E-05
-ThetaRule            r: 87.8, 0.2, 1.7, 2.0 E_min=5.3E-02
-Leapfrog             r: 95.9, 18.0, 1.0, 2.0 E_min=1.1E-01
-LeapfrogFiltered     r: -0.0, 121.2, 0.3, 0.1 E_min=5.2E-01
+LeapfrogFiltered     r: 63.7, 0.0, 0.1, 0.2 E_min=4.3E-01
+ThetaRule(theta=1)   r: 0.0,  0.1, 0.1, 0.3 E_min=3.8E-01
+ThetaRule            r: 3.7,  2.1, 2.0, 2.0 E_min=1.0E-02
+RK4                  r: 4.0,  4.0, 4.0, 4.0 E_min=8.0E-07
+Leapfrog             r: 0.5,  1.9, 2.0, 2.0 E_min=1.0E-02
+RK2                  r: 3.7,  2.1, 2.0, 2.0 E_min=1.0E-02
+MidpointIter         r: 1.8,  0.8, 1.9, 2.0 E_min=1.0E-02
 !ec
 
 
@@ -1284,6 +1286,8 @@ class VanDerPolOscillator(odespy.problems.Problem):
 Now, we want to provide `f` and `jac` in FORTRAN as well.
 The FORTRAN code for $f(u,t)$ can be returned from a method:
 !bc pycod
+class VanDerPolOscillator(odespy.problems.Problem):
+    ...
     def str_f_f77(self):
         """Return f(u,t) as Fortran source code string."""
         return """
@@ -1305,6 +1309,8 @@ signature for the $f(u,t)$ function, different solvers apply different
 signatures for the Jacobian. Here are two versions for ODEPACK and
 `Radau5`, respectively:
 !bc pycod
+class VanDerPolOscillator(odespy.problems.Problem):
+    ...
     def str_jac_f77_fadau5(self):
         return """
       subroutine jac_f77_radau5(neq,t,u,dfu,ldfu,rpar,ipar)
@@ -1346,6 +1352,8 @@ Having some methods returning FORTRAN code, we need to turn
 the source code into Python modules. This is done by
 `odespy.compile_f77` in the constructor of class `VanDerPolOscillator`:
 !bc pycod
+class VanDerPolOscillator(odespy.problems.Problem):
+
     def __init__(self, U0=[2, 1], mu=3.):
         self.U0 = U0
         self.mu = mu

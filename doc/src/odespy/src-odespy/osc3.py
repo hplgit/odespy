@@ -47,7 +47,7 @@ for solver in solvers:
     solver.set_initial_condition([problem.Theta, 0])
 
     for N_per_period in resolutions:
-        N = N_per_period*problem.period
+        N = N_per_period*num_periods
         time_points = numpy.linspace(0, T, N+1)
 
         u, t = solver.solve(time_points)
