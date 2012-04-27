@@ -1071,7 +1071,7 @@ method used by MATLAB's `ode45` solver, which is perhaps the world's
 most popular ODE solver.
 
 The remedy to get all the tested solvers to perform well is to
-choose a much stricter tolerance, asy $10^{-10}$.
+choose a much stricter tolerance, say $10^{-10}$.
 Figure ref{gaussian3:fig2:41} shows
 coinciding curves. Numerically, we now have
 !bc dat

@@ -1568,13 +1568,13 @@ The tolerances involved are of relative and absolute type, i.e.,
 
         estimated_error <= tol = rtol*abs(u) + atol
 
-is the typical test if the solution is accurate enough.
+is the typical test on whether the solution is sufficiently.
 For very small ``u``, ``atol`` comes into play, while for large ``u``, the
 relative tolerance ``rtol`` dominates.
 
 In this particular example, running ``RK4`` with 57 equally spaced points
 yields a maximum value of 1.95, while ``Fehlberg`` with 57 adaptively
-selected points results in 1.98. Note that the tolerances set are
+selected points results in 1.98. Note that the tolerances used are
 :math:`10^{-6}` while the real error is of the order :math:`10^{-2}`.
 
 We can specify stricter tolerances and also control the minimum
@@ -1592,9 +1592,8 @@ the desired error level (`gaussian2.py <https://github.com/hplgit/odespy/blob/ma
                                  min_step=min_step)
 
 
-This adjustment does not improve the accuracy. Setting ``rtol=1E-12`` does:
-the ``Fehlberg`` solver then applies 701 points and achieves a maximum
-value of 2.00005. ``RK4`` with the same number of (equally spaced) points
+The ``Fehlberg`` solver now applies 701 points and achieves a maximum
+value of 2.00005. However, ``RK4`` with the same number of (equally spaced) points
 achieves the same accuracy and is much faster.
 
 Testing More Adaptive Solvers
@@ -1671,7 +1670,7 @@ desired error level :math:`10^{-6}`. Figures :ref:`gaussian3:fig1:41` and
 :ref:`gaussian3:fig1err:41` show that this expected behavior is not the
 case. There is substantial discrepancy between the methods!
 Surprisingly, the well-known FORTRAN codes accessed by the ``Vode``
-(``vode.f``) and ``Lsoda`` (from ODEPACK) methods give really inaccurate
+(``vode.f``) and ``Lsoda`` (from ODEPACK) methods give very inaccurate
 results, despite setting ``Vode`` to use a stiff solver of order 4, and
 ``Lsoda`` should automatically select between nonstiff and stiff solvers
 (of default order 4 in this case).
@@ -1694,8 +1693,8 @@ results, despite setting ``Vode`` to use a stiff solver of order 4, and
    *Comparison of errors in adaptive methods with default parameters (tolerance E-6)*
 
 
-Numerically, the program writes out the following results for the
-maximum value of the solution:
+The program writes out the following results for the
+maximum value of the solution, which should equal 2:
 
 .. code-block:: python
 
@@ -1711,9 +1710,9 @@ method used by MATLAB's ``ode45`` solver, which is perhaps the world's
 most popular ODE solver.
 
 The remedy to get all the tested solvers to perform well is to
-choose a much stricter tolerance: :math:`10^{-10}`.
+choose a much stricter tolerance, say :math:`10^{-10}`.
 Figure :ref:`gaussian3:fig2:41` shows
-the coinciding curves. Numerically, we now have
+coinciding curves. Numerically, we now have
 
 .. code-block:: python
 
@@ -1738,13 +1737,13 @@ time points used: 270, 326, and 3307, respectively.
 
 
 The lesson learned in this example is two-fold: 1) several methods should
-be tested to gain reliability in the results, and Odespy makes such tests
-very straightforward, and 2) strict tolerances, far below
+be tested to gain reliability of the results, and Odespy makes such tests
+easy to conduct, and 2) strict tolerances, far below
 the default values, may be necessary for some methods, here ``Vode`` and
 ``Lsoda`` in particular. We remark that it is the ODE problem that causes
 difficulties: changing the problem to ``odespy.problems.Logistic``
 (see the file `logistic9.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic9.py>`_)
-shows that all the curves cannot be distinguished visually.
+shows that all the curves coincide and cannot be distinguished visually.
 
 The present test problem with a Gaussian function as solution
 can be made increasingly more difficult by
@@ -1850,7 +1849,7 @@ out by the following program.
                    solver.t[-1], solver.u[-1].real,
                    exact - solver.u[-1].real, cpu_time)
 
-Note that the solution and the corresponding time values can always
+We remark that the solution and the corresponding time values can always
 be recovered as ``solver.u`` and ``solver.t``, respectively.
 
 The output from the program may read
@@ -1863,8 +1862,9 @@ The output from the program may read
         RKFehlberg      u(600)=1.000953 (error:  -9.53E-04, cpu: 7.5)
 
 The ``Vode`` solver is a wrapper of the FORTRAN code ``zvode.f`` in
-``scipy.integrate.ode`` and is an adaptive Adams method (as run here),
-``RK4`` is compact and straightforward Runge-Kutta method of order 4 in
+``scipy.integrate.ode`` and is an adaptive Adams method (with default
+settings, as used here),
+``RK4`` is a compact and straightforward Runge-Kutta method of order 4 in
 pure Python with constant step size, and ``RKFehlberg`` is a pure Python
 implementation of the adaptive Runge-Kutta-Fehlberg method of order
 (4,5).  These methods give approximately the same final error, but
