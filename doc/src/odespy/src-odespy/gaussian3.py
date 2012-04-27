@@ -33,7 +33,8 @@ solvers = [eval('odespy.' + method)(
            problem.f, atol=atol, rtol=rtol,
            min_step=min_step)
            for method in methods]
-solvers[1].set(adams_or_bdf='bdf', order=4)  # Vode
+# Run Vode with implicit BDF method of order 5
+solvers[1].set(adams_or_bdf='bdf', order=5, jac=problem.jac)
 
 legend = []
 for solver in solvers:
