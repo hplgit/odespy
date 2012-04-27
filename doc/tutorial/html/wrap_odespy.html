@@ -62,7 +62,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Hans Petter Langtangen, Liwei Wang</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Apr 26, 2012</td>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Apr 27, 2012</td>
 </tr>
 </tbody>
 </table>
@@ -94,11 +94,17 @@ by three well-known routines:</p>
 <p>All of these routines require the ODE problem to be on the form
 <span class="math">\(u'=f(u,t)\)</span>, which means that the
 the second-order differential equation must be
-recast as a system of two ODEs, and we have to identify the two components
+recast as a system of two ODEs,</p>
+<div class="math">
+\[\frac{d}{dt}u^{(0)} = u^{(1)},\quad \frac{d}{dt}u^{(1)} =3(1-{(u^{(0)})}^2) u^{(1)} - u^{(0)},\]</div>
+<p>and we have to identify the two components
 of the <span class="math">\(f(u,t)\)</span> function:</p>
 <div class="math">
-\[\frac{d}{dt}u^{(0)} = u^{(1)},\quad \frac{d}{dt}u^{(1)} =3(1-{(u^{(0)})}^2) u^{(1)} - u^{(0)}\]\[u^{(0)}(0)=2,\quad u^{(1)}(0)=1.\]\[f^{(0)}(u^{(0)}, u^{(1)}, t) = u^{(1)}, \quad
+\[f^{(0)}(u^{(0)}, u^{(1)}, t) = u^{(1)}, \quad
   f^{(1)}(u^{(0)}, u^{(1)}, t) =3(1-{(u^{(0)})}^2)u^{(1)} - u^{(0)}\]</div>
+<p>The corresponding boundary conditions become</p>
+<div class="math">
+\[u^{(0)}(0)=2,\quad u^{(1)}(0)=1.\]</div>
 <p>The mentioned ODE software needs a specification of the <span class="math">\(f(u,t)\)</span>
 through some user-written function that takes <span class="math">\(u\)</span> and <span class="math">\(t\)</span> as input and
 delivers <span class="math">\(f\)</span> as output.</p>
@@ -1236,10 +1242,10 @@ strategy works between the user-specified time points.</p>
 <h3>The Test Problem<a class="headerlink" href="#the-test-problem" title="Permalink to this headline">¶</a></h3>
 <p>We consider the ODE problem for testing adaptive solvers:</p>
 <div class="math" id="equation-gaussian:ode:eq">
-<span class="eqno">(1)</span>\[     u' = -\frac{t-c}{s^2} u\]</div>
+<span class="eqno">(1)</span>\[     u' = -\frac{t-c}{s^2} (u-1)\]</div>
 <p>The exact solution is a Gaussian function,</p>
 <div class="math">
-\[u(t) = \exp{\left(-\frac{1}{2}\left(\frac{t-c}{s}\right)^2\right)}\]</div>
+\[u(t) = 1 + \exp{\left(-\frac{1}{2}\left(\frac{t-c}{s}\right)^2\right)}\]</div>
 <p>centered around <span class="math">\(t=c\)</span> and width characteristic width (&#8220;standard
 deviation&#8221;) <span class="math">\(s\)</span>. The initial condition is taken as the exact <span class="math">\(u\)</span> at <span class="math">\(t=0\)</span>.</p>
 <p>Since the Gaussian function is significantly different from zero only in the
@@ -1258,9 +1264,10 @@ Figure <a class="reference internal" href="#gaussian-fig-rk2-41"><em>2nd-order R
 of points by a factor of 10 gives a solution much closer to the
 exact one, and switching to the 4th-order method (<tt class="docutils literal"><span class="pre">RK4</span></tt>) makes the
 curves visually coincide. The problem is therefore quite straightforward
-to solve using a sufficient number of points and a higher-order method
-(for curiosity we can mention that the <tt class="docutils literal"><span class="pre">ForwardEuler</span></tt> method produces
-a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points).</p>
+to solve using a sufficient number of points (400) and a higher-order method
+such as <tt class="docutils literal"><span class="pre">RK4</span></tt>.
+For curiosity we can mention that the <tt class="docutils literal"><span class="pre">ForwardEuler</span></tt> method produces
+a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.</p>
 <div class="figure" id="gaussian-fig-rk2-41">
 <img alt="_images/gaussian1_RK2_41.png" src="_images/gaussian1_RK2_41.png" style="width: 500px;" />
 <p class="caption"><em>2nd-order Runge-Kutta method with 41 points</em></p>
@@ -1271,12 +1278,12 @@ a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points).</p>
 <span class="n">center_point</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">s</span> <span class="o">=</span> <span class="mf">0.5</span>
 
-<span class="n">problem</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">problems</span><span class="o">.</span><span class="n">Gaussian0</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="n">center_point</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+<span class="n">problem</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">problems</span><span class="o">.</span><span class="n">Gaussian1</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="n">center_point</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
 
 <span class="n">npoints</span> <span class="o">=</span> <span class="mi">41</span>
 <span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">center_point</span><span class="p">,</span> <span class="n">npoints</span><span class="p">)</span>
 
-<span class="n">method</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">RK4</span>
+<span class="n">method</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">RK2</span>
 <span class="n">solver</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">f</span><span class="p">)</span>
 <span class="n">solver</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">U0</span><span class="p">)</span>
 
@@ -1311,7 +1318,7 @@ these,</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">method</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">Fehlberg</span>
 </pre></div>
 </div>
-<p>Figure <a class="reference internal" href="#gaussian-fig-fehlberg-41"><em>Adaptive Runge-Kutta-Fehlberg method with 41 points</em></a> shows how <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (113 adaptively selected points in time).</p>
+<p>Figure <a class="reference internal" href="#gaussian-fig-fehlberg-41"><em>Adaptive Runge-Kutta-Fehlberg method with 41 points</em></a> shows how <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (57 adaptively selected points in time).</p>
 <div class="figure" id="gaussian-fig-fehlberg-41">
 <img alt="_images/gaussian1_Fehlberg_41.png" src="_images/gaussian1_Fehlberg_41.png" style="width: 500px;" />
 <p class="caption"><em>Adaptive Runge-Kutta-Fehlberg method with 41 points</em></p>
@@ -1337,16 +1344,14 @@ these,</p>
 <p>is the typical test if the solution is accurate enough.
 For very small <tt class="docutils literal"><span class="pre">u</span></tt>, <tt class="docutils literal"><span class="pre">atol</span></tt> comes into play, while for large <tt class="docutils literal"><span class="pre">u</span></tt>, the
 relative tolerance <tt class="docutils literal"><span class="pre">rtol</span></tt> dominates.</p>
-<p>In this particular example, running <tt class="docutils literal"><span class="pre">RK4</span></tt> with 113 equally spaced points
-yields a maximum value of 0.9946, while <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> results in 0.9849.
-That is, the much simpler and faster <tt class="docutils literal"><span class="pre">RK4</span></tt> method is also more accurate
-than the all-round, &#8220;reliable&#8221; Runge-Kutta-Fehlberg method with an
-error tolerance of <span class="math">\(10^-6\)</span>. As we see, the actually error is of the
-order <span class="math">\(10^{-2}\)</span> for the latter method.</p>
+<p>In this particular example, running <tt class="docutils literal"><span class="pre">RK4</span></tt> with 57 equally spaced points
+yields a maximum value of 1.95, while <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> with 57 adaptively
+selected points results in 1.98. Note that the tolerances set are
+<span class="math">\(10^{-6}\)</span> while the real error is of the order <span class="math">\(10^{-2}\)</span>.</p>
 <p>We can specify stricter tolerances and also control the minimum
 allowed step size, <tt class="docutils literal"><span class="pre">min_step</span></tt>, which might be too large to achieve
 the desired error level (<a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian2.py">gaussian2.py</a>):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">rtol</span> <span class="o">=</span> <span class="mf">1E-6</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">rtol</span> <span class="o">=</span> <span class="mf">1E-12</span>
 <span class="n">atol</span> <span class="o">=</span> <span class="n">rtol</span>
 <span class="n">min_step</span> <span class="o">=</span> <span class="mf">0.000001</span>
 
@@ -1355,8 +1360,9 @@ the desired error level (<a class="reference external" href="https://github.com/
 </pre></div>
 </div>
 <p>This adjustment does not improve the accuracy. Setting <tt class="docutils literal"><span class="pre">rtol=1E-12</span></tt> does:
-the <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> solver then applies 800 points and achieves a maximum
-value of 1.00004.</p>
+the <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> solver then applies 701 points and achieves a maximum
+value of 2.00005. <tt class="docutils literal"><span class="pre">RK4</span></tt> with the same number of (equally spaced) points
+achieves the same accuracy and is much faster.</p>
 </div>
 <div class="section" id="testing-more-adaptive-solvers">
 <h3>Testing More Adaptive Solvers<a class="headerlink" href="#testing-more-adaptive-solvers" title="Permalink to this headline">¶</a></h3>
@@ -1389,7 +1395,7 @@ widely used methods in the same plot.</p>
 <span class="n">s</span> <span class="o">=</span> <span class="mf">0.5</span>
 <span class="n">npoints</span> <span class="o">=</span> <span class="mi">41</span>
 <span class="n">center_point</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">problem</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">problems</span><span class="o">.</span><span class="n">Gaussian0</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="n">center_point</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+<span class="n">problem</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">problems</span><span class="o">.</span><span class="n">Gaussian1</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="n">center_point</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
 <span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">center_point</span><span class="p">,</span> <span class="n">npoints</span><span class="p">)</span>
 <span class="n">min_step</span> <span class="o">=</span> <span class="mf">0.0001</span>
 
@@ -1423,7 +1429,7 @@ widely used methods in the same plot.</p>
 </div>
 <p>The default discretization applies <span class="math">\(N=40\)</span> equal-sized time intervals,
 but adaptive methods should be able to adjust themselves to the
-desired error level. Figures <a class="reference internal" href="#gaussian3-fig1-41"><em>Comparison of adaptive methods with default parameters (tolerance E-6)</em></a> and
+desired error level <span class="math">\(10^{-6}\)</span>. Figures <a class="reference internal" href="#gaussian3-fig1-41"><em>Comparison of adaptive methods with default parameters (tolerance E-6)</em></a> and
 <a class="reference internal" href="#gaussian3-fig1err-41"><em>Comparison of errors in adaptive methods with default parameters (tolerance E-6)</em></a> show that this expected behavior is not the
 case. There is substantial discrepancy between the methods!
 Surprisingly, the well-known FORTRAN codes accessed by the <tt class="docutils literal"><span class="pre">Vode</span></tt>
@@ -1441,29 +1447,30 @@ results, despite setting <tt class="docutils literal"><span class="pre">Vode</sp
 </div>
 <p>Numerically, the program writes out the following results for the
 maximum value of the solution:</p>
-<div class="highlight-python"><pre>0.9976  DormandPrince
-0.6669  BogackiShampine
-0.9814  RKFehlberg
-0.5413  Vode
-0.9738  RKF45
-1.1346  Lsoda</pre>
+<div class="highlight-python"><pre>1.9976  DormandPrince
+1.6591  BogackiShampine
+1.9812  RKFehlberg
+1.0406  Vode
+1.9734  RKF45
+3.2905  Lsoda</pre>
 </div>
-<p>The clearly most accurate method is <tt class="docutils literal"><span class="pre">DormandPrince</span></tt>  - the default
+<p>The clearly most accurate solver among these is <tt class="docutils literal"><span class="pre">DormandPrince</span></tt>  - the default
 method used by MATLAB&#8217;s <tt class="docutils literal"><span class="pre">ode45</span></tt> solver, which is perhaps the world&#8217;s
 most popular ODE solver.</p>
 <p>The remedy to get all the tested solvers to perform well is to
-choose a much stricter tolerance. Figure <a class="reference internal" href="#gaussian3-fig2-41"><em>Comparison of adaptive methods with error tolerance E-10</em></a> shows
+choose a much stricter tolerance: <span class="math">\(10^{-10}\)</span>.
+Figure <a class="reference internal" href="#gaussian3-fig2-41"><em>Comparison of adaptive methods with error tolerance E-10</em></a> shows
 the coinciding curves. Numerically, we now have</p>
-<div class="highlight-python"><pre>0.9991  DormandPrince
-0.9951  BogackiShampine
-0.9984  RKFehlberg
-1.0051  Vode
-0.9957  RKF45
-1.0039  Lsoda</pre>
+<div class="highlight-python"><pre>1.9991  DormandPrince
+1.9912  BogackiShampine
+1.9942  RKFehlberg
+2.0122  Vode
+1.9916  RKF45
+2.0056  Lsoda</pre>
 </div>
 <p>For the methods <tt class="docutils literal"><span class="pre">DormandPrince</span></tt>,  <tt class="docutils literal"><span class="pre">RKFehlberg</span></tt>, and
 <tt class="docutils literal"><span class="pre">BogackiShampine</span></tt> we have information about the number of adaptive
-time points used: 305, 357, and 3999, respectively.</p>
+time points used: 270, 326, and 3307, respectively.</p>
 <div class="figure" id="gaussian3-fig2-41">
 <img alt="_images/gaussian3_41_Em10.png" src="_images/gaussian3_41_Em10.png" style="width: 500px;" />
 <p class="caption"><em>Comparison of adaptive methods with error tolerance E-10</em></p>

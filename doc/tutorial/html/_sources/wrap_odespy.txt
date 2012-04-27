@@ -6,7 +6,7 @@ A Tutorial for the Odespy Interface to ODE Solvers
 
 :Author: Hans Petter Langtangen, Liwei Wang
 
-:Date: Apr 26, 2012
+:Date: Apr 27, 2012
 
 The Odespy package makes it easy to specify an ODE problem in
 Python and get it solved by a wide variety of different numerical
@@ -43,16 +43,23 @@ by three well-known routines:
 All of these routines require the ODE problem to be on the form
 :math:`u'=f(u,t)`, which means that the
 the second-order differential equation must be
-recast as a system of two ODEs, and we have to identify the two components
+recast as a system of two ODEs,
+
+.. math::
+         \frac{d}{dt}u^{(0)} = u^{(1)},\quad \frac{d}{dt}u^{(1)} =3(1-{(u^{(0)})}^2) u^{(1)} - u^{(0)},
+
+and we have to identify the two components
 of the :math:`f(u,t)` function:
 
 .. math::
-         \frac{d}{dt}u^{(0)} = u^{(1)},\quad \frac{d}{dt}u^{(1)} =3(1-{(u^{(0)})}^2) u^{(1)} - u^{(0)}
-        
-         u^{(0)}(0)=2,\quad u^{(1)}(0)=1. 
-        
          f^{(0)}(u^{(0)}, u^{(1)}, t) = u^{(1)}, \quad
            f^{(1)}(u^{(0)}, u^{(1)}, t) =3(1-{(u^{(0)})}^2)u^{(1)} - u^{(0)}
+
+The corresponding boundary conditions become
+
+.. math::
+         u^{(0)}(0)=2,\quad u^{(1)}(0)=1. 
+
 
 The mentioned ODE software needs a specification of the :math:`f(u,t)`
 through some user-written function that takes :math:`u` and :math:`t` as input and
@@ -1428,7 +1435,7 @@ We consider the ODE problem for testing adaptive solvers:
 .. math::
    :label: gaussian:ode:eq
         
-        u' = -\frac{t-c}{s^2} u
+        u' = -\frac{t-c}{s^2} (u-1)
         
         
 
@@ -1436,7 +1443,7 @@ The exact solution is a Gaussian function,
 
 .. math::
         
-        u(t) = \exp{\left(-\frac{1}{2}\left(\frac{t-c}{s}\right)^2\right)}
+        u(t) = 1 + \exp{\left(-\frac{1}{2}\left(\frac{t-c}{s}\right)^2\right)}
         
 
 centered around :math:`t=c` and width characteristic width ("standard
@@ -1459,9 +1466,10 @@ Figure :ref:`gaussian:fig:RK2:41` is substantial. Increasing the number
 of points by a factor of 10 gives a solution much closer to the
 exact one, and switching to the 4th-order method (``RK4``) makes the
 curves visually coincide. The problem is therefore quite straightforward
-to solve using a sufficient number of points and a higher-order method
-(for curiosity we can mention that the ``ForwardEuler`` method produces
-a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points).
+to solve using a sufficient number of points (400) and a higher-order method
+such as ``RK4``.
+For curiosity we can mention that the ``ForwardEuler`` method produces
+a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.
 
 
 .. _gaussian:fig:RK2:41:
@@ -1482,12 +1490,12 @@ A simple program testing one numerical method goes as follows (`gaussian1.py <ht
         center_point = 3
         s = 0.5
         
-        problem = odespy.problems.Gaussian0(c=center_point, s=s)
+        problem = odespy.problems.Gaussian1(c=center_point, s=s)
         
         npoints = 41
         tp = np.linspace(0, 2*center_point, npoints)
         
-        method = odespy.RK4
+        method = odespy.RK2
         solver = method(problem.f)
         solver.set_initial_condition(problem.U0)
         
@@ -1525,7 +1533,7 @@ these,
 
         method = odespy.Fehlberg
 
-Figure :ref:`gaussian:fig:Fehlberg:41` shows how ``Fehlberg`` with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (113 adaptively selected points in time).
+Figure :ref:`gaussian:fig:Fehlberg:41` shows how ``Fehlberg`` with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (57 adaptively selected points in time).
 
 
 .. _gaussian:fig:Fehlberg:41:
@@ -1564,12 +1572,10 @@ is the typical test if the solution is accurate enough.
 For very small ``u``, ``atol`` comes into play, while for large ``u``, the
 relative tolerance ``rtol`` dominates.
 
-In this particular example, running ``RK4`` with 113 equally spaced points
-yields a maximum value of 0.9946, while ``Fehlberg`` results in 0.9849.
-That is, the much simpler and faster ``RK4`` method is also more accurate
-than the all-round, "reliable" Runge-Kutta-Fehlberg method with an
-error tolerance of :math:`10^-6`. As we see, the actually error is of the
-order :math:`10^{-2}` for the latter method.
+In this particular example, running ``RK4`` with 57 equally spaced points
+yields a maximum value of 1.95, while ``Fehlberg`` with 57 adaptively
+selected points results in 1.98. Note that the tolerances set are
+:math:`10^{-6}` while the real error is of the order :math:`10^{-2}`.
 
 We can specify stricter tolerances and also control the minimum
 allowed step size, ``min_step``, which might be too large to achieve
@@ -1578,7 +1584,7 @@ the desired error level (`gaussian2.py <https://github.com/hplgit/odespy/blob/ma
 
 .. code-block:: python
 
-        rtol = 1E-6
+        rtol = 1E-12
         atol = rtol
         min_step = 0.000001
         
@@ -1587,8 +1593,9 @@ the desired error level (`gaussian2.py <https://github.com/hplgit/odespy/blob/ma
 
 
 This adjustment does not improve the accuracy. Setting ``rtol=1E-12`` does:
-the ``Fehlberg`` solver then applies 800 points and achieves a maximum
-value of 1.00004.
+the ``Fehlberg`` solver then applies 701 points and achieves a maximum
+value of 2.00005. ``RK4`` with the same number of (equally spaced) points
+achieves the same accuracy and is much faster.
 
 Testing More Adaptive Solvers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1626,7 +1633,7 @@ widely used methods in the same plot.
         s = 0.5
         npoints = 41
         center_point = 3
-        problem = odespy.problems.Gaussian0(c=center_point, s=s)
+        problem = odespy.problems.Gaussian1(c=center_point, s=s)
         tp = np.linspace(0, 2*center_point, npoints)
         min_step = 0.0001
         
@@ -1660,7 +1667,7 @@ widely used methods in the same plot.
 
 The default discretization applies :math:`N=40` equal-sized time intervals,
 but adaptive methods should be able to adjust themselves to the
-desired error level. Figures :ref:`gaussian3:fig1:41` and
+desired error level :math:`10^{-6}`. Figures :ref:`gaussian3:fig1:41` and
 :ref:`gaussian3:fig1err:41` show that this expected behavior is not the
 case. There is substantial discrepancy between the methods!
 Surprisingly, the well-known FORTRAN codes accessed by the ``Vode``
@@ -1692,33 +1699,34 @@ maximum value of the solution:
 
 .. code-block:: python
 
-        0.9976  DormandPrince
-        0.6669  BogackiShampine
-        0.9814  RKFehlberg
-        0.5413  Vode
-        0.9738  RKF45
-        1.1346  Lsoda
+        1.9976  DormandPrince
+        1.6591  BogackiShampine
+        1.9812  RKFehlberg
+        1.0406  Vode
+        1.9734  RKF45
+        3.2905  Lsoda
 
-The clearly most accurate method is ``DormandPrince``  - the default
+The clearly most accurate solver among these is ``DormandPrince``  - the default
 method used by MATLAB's ``ode45`` solver, which is perhaps the world's
 most popular ODE solver.
 
 The remedy to get all the tested solvers to perform well is to
-choose a much stricter tolerance. Figure :ref:`gaussian3:fig2:41` shows
+choose a much stricter tolerance: :math:`10^{-10}`.
+Figure :ref:`gaussian3:fig2:41` shows
 the coinciding curves. Numerically, we now have
 
 .. code-block:: python
 
-        0.9991  DormandPrince
-        0.9951  BogackiShampine
-        0.9984  RKFehlberg
-        1.0051  Vode
-        0.9957  RKF45
-        1.0039  Lsoda
+        1.9991  DormandPrince
+        1.9912  BogackiShampine
+        1.9942  RKFehlberg
+        2.0122  Vode
+        1.9916  RKF45
+        2.0056  Lsoda
 
 For the methods ``DormandPrince``,  ``RKFehlberg``, and
 ``BogackiShampine`` we have information about the number of adaptive
-time points used: 305, 357, and 3999, respectively.
+time points used: 270, 326, and 3307, respectively.
 
 
 .. _gaussian3:fig2:41:

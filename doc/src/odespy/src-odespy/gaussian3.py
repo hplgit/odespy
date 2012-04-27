@@ -23,7 +23,7 @@ atol = rtol
 s = 0.5
 npoints = 41
 center_point = 3
-problem = odespy.problems.Gaussian0(c=center_point, s=s)
+problem = odespy.problems.Gaussian1(c=center_point, s=s)
 tp = np.linspace(0, 2*center_point, npoints)
 min_step = 0.0001
 

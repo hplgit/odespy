@@ -3,12 +3,12 @@ import odespy, numpy as np, matplotlib.pyplot as plt
 center_point = 3
 s = 0.5
 
-problem = odespy.problems.Gaussian0(c=center_point, s=s)
+problem = odespy.problems.Gaussian1(c=center_point, s=s)
 
 npoints = 41
 tp = np.linspace(0, 2*center_point, npoints)
 
-method = odespy.RK4
+method = odespy.RK2
 solver = method(problem.f)
 solver.set_initial_condition(problem.U0)
 

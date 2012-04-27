@@ -3,12 +3,12 @@ import odespy, numpy as np, matplotlib.pyplot as plt
 center_point = 3
 s = 0.5
 
-problem = odespy.problems.Gaussian0(c=center_point, s=s)
+problem = odespy.problems.Gaussian1(c=center_point, s=s)
 
 npoints = 41
 tp = np.linspace(0, 2*center_point, npoints)
 
-rtol = 1E-6
+rtol = 1E-12
 atol = rtol
 min_step = 0.000001
 
@@ -22,7 +22,8 @@ method = solver.__class__.__name__
 print '%.8f  %s' % (u.max(), method)
 
 if solver.has_u_t_all():
-    plt.plot(solver.t_all, solver.u_all, tp, problem.u_exact(tp))
+    plt.plot(solver.t_all, solver.u_all, 'bo',
+             tp, problem.u_exact(tp), 'g-')
     print '%s used %d steps (%d specified)' % \
           (method, len(solver.u_all), len(tp))
 else:
