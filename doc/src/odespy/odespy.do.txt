@@ -1013,13 +1013,13 @@ The tolerances involved are of relative and absolute type, i.e.,
 !bc pycod
 estimated_error <= tol = rtol*abs(u) + atol
 !ec
-is the typical test if the solution is accurate enough.
+is the typical test on whether the solution is sufficiently.
 For very small `u`, `atol` comes into play, while for large `u`, the
 relative tolerance `rtol` dominates.
 
 In this particular example, running `RK4` with 57 equally spaced points
 yields a maximum value of 1.95, while `Fehlberg` with 57 adaptively
-selected points results in 1.98. Note that the tolerances set are
+selected points results in 1.98. Note that the tolerances used are
 $10^{-6}$ while the real error is of the order $10^{-2}$.
 
 We can specify stricter tolerances and also control the minimum
@@ -1028,9 +1028,8 @@ the desired error level ("`gaussian2.py`": "https://github.com/hplgit/odespy/blo
 
 @@@CODE src-odespy/gaussian2.py fromto: rtol = @solver\.set_initial_
 
-This adjustment does not improve the accuracy. Setting `rtol=1E-12` does:
-the `Fehlberg` solver then applies 701 points and achieves a maximum
-value of 2.00005. `RK4` with the same number of (equally spaced) points
+The `Fehlberg` solver now applies 701 points and achieves a maximum
+value of 2.00005. However, `RK4` with the same number of (equally spaced) points
 achieves the same accuracy and is much faster.
 
 === Testing More Adaptive Solvers ===
@@ -1048,7 +1047,7 @@ desired error level $10^{-6}$. Figures ref{gaussian3:fig1:41} and
 ref{gaussian3:fig1err:41} show that this expected behavior is not the
 case. There is substantial discrepancy between the methods!
 Surprisingly, the well-known FORTRAN codes accessed by the `Vode`
-(`vode.f`) and `Lsoda` (from ODEPACK) methods give really inaccurate
+(`vode.f`) and `Lsoda` (from ODEPACK) methods give very inaccurate
 results, despite setting `Vode` to use a stiff solver of order 4, and
 `Lsoda` should automatically select between nonstiff and stiff solvers
 (of default order 4 in this case).
@@ -1057,8 +1056,8 @@ FIGURE: [figs-odespy/gaussian3_41.png, width=500] Comparison of adaptive methods
 
 FIGURE: [figs-odespy/gaussian3e_41.png, width=500] Comparison of errors in adaptive methods with default parameters (tolerance E-6).  label{gaussian3:fig1err:41}
 
-Numerically, the program writes out the following results for the
-maximum value of the solution:
+The program writes out the following results for the
+maximum value of the solution, which should equal 2:
 !bc dat
 1.9976  DormandPrince
 1.6591  BogackiShampine
@@ -1072,9 +1071,9 @@ method used by MATLAB's `ode45` solver, which is perhaps the world's
 most popular ODE solver.
 
 The remedy to get all the tested solvers to perform well is to
-choose a much stricter tolerance: $10^{-10}$.
+choose a much stricter tolerance, asy $10^{-10}$.
 Figure ref{gaussian3:fig2:41} shows
-the coinciding curves. Numerically, we now have
+coinciding curves. Numerically, we now have
 !bc dat
 1.9991  DormandPrince
 1.9912  BogackiShampine
@@ -1090,14 +1089,14 @@ time points used: 270, 326, and 3307, respectively.
 FIGURE: [figs-odespy/gaussian3_41_Em10.png, width=500] Comparison of adaptive methods with error tolerance E-10.  label{gaussian3:fig2:41}
 
 The lesson learned in this example is two-fold: 1) several methods should
-be tested to gain reliability in the results, and Odespy makes such tests
-very straightforward, and 2) strict tolerances, far below
+be tested to gain reliability of the results, and Odespy makes such tests
+easy to conduct, and 2) strict tolerances, far below
 the default values, may be necessary for some methods, here `Vode` and
 `Lsoda` in particular. We remark that it is the ODE problem that causes
 difficulties: changing the problem to `odespy.problems.Logistic`
 (see the file "`logistic9.py`":
 "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic9.py")
-shows that all the curves cannot be distinguished visually.
+shows that all the curves coincide and cannot be distinguished visually.
 
 The present test problem with a Gaussian function as solution
 can be made increasingly more difficult by

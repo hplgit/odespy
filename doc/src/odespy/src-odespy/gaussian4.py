@@ -7,7 +7,7 @@ min_step = 0.0001
 
 results = []
 for center_point in center_points:
-    problem = odespy.problems.Gaussian0(c=center_point, s=s)
+    problem = odespy.problems.Gaussian1(c=center_point, s=s)
     tp = np.linspace(0, 2*center_point, npoints)
     for tol in (1E-4, 1E-6, 1E-10, 1E-12):
         atol = rtol = tol
