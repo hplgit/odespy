@@ -1154,7 +1154,7 @@ final error for a very long time integration of 600 periods is carried
 out by the following program.
 
 @@@CODE src-odespy/complex2.py fromto: def f@
-Note that the solution and the corresponding time values can always
+We remark that the solution and the corresponding time values can always
 be recovered as `solver.u` and `solver.t`, respectively.
 
 The output from the program may read
@@ -1165,8 +1165,9 @@ RK4             u(600)=0.997328 (error:   2.67E-03, cpu: 1.3)
 RKFehlberg      u(600)=1.000953 (error:  -9.53E-04, cpu: 7.5)
 !ec
 The `Vode` solver is a wrapper of the FORTRAN code `zvode.f` in
-`scipy.integrate.ode` and is an adaptive Adams method (as run here),
-`RK4` is compact and straightforward Runge-Kutta method of order 4 in
+`scipy.integrate.ode` and is an adaptive Adams method (with default
+settings, as used here),
+`RK4` is a compact and straightforward Runge-Kutta method of order 4 in
 pure Python with constant step size, and `RKFehlberg` is a pure Python
 implementation of the adaptive Runge-Kutta-Fehlberg method of order
 (4,5).  These methods give approximately the same final error, but
