@@ -1048,7 +1048,7 @@ ref{gaussian3:fig1err:41} show that this expected behavior is not the
 case. There is substantial discrepancy between the methods!
 Surprisingly, the well-known FORTRAN codes accessed by the `Vode`
 (`vode.f`) and `Lsoda` (from ODEPACK) methods give very inaccurate
-results, despite setting `Vode` to use a stiff solver of order 4, and
+results, despite setting `Vode` to use a stiff BDF solver of order 5, and
 `Lsoda` should automatically select between nonstiff and stiff solvers
 (of default order 4 in this case).
 
