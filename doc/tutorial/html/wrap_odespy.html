@@ -68,7 +68,7 @@
 </table>
 <p>The Odespy package makes it easy to specify an ODE problem in
 Python and get it solved by a wide variety of different numerical
-methods.</p>
+methods and software.</p>
 </div>
 <div class="section" id="motivation">
 <span id="ode-sec-motivation"></span><h1>Motivation<a class="headerlink" href="#motivation" title="Permalink to this headline">¶</a></h1>
@@ -105,9 +105,9 @@ of the <span class="math">\(f(u,t)\)</span> function:</p>
 <p>The corresponding boundary conditions become</p>
 <div class="math">
 \[u^{(0)}(0)=2,\quad u^{(1)}(0)=1.\]</div>
-<p>The mentioned ODE software needs a specification of the <span class="math">\(f(u,t)\)</span>
+<p>The mentioned ODE software needs a specification of the <span class="math">\(f(u,t)\)</span> formulas
 through some user-written function that takes <span class="math">\(u\)</span> and <span class="math">\(t\)</span> as input and
-delivers <span class="math">\(f\)</span> as output.</p>
+delivers the vector <span class="math">\(f\)</span> as output.</p>
 <div class="section" id="lsode">
 <h3>LSODE<a class="headerlink" href="#lsode" title="Permalink to this headline">¶</a></h3>
 <p>Application of <tt class="docutils literal"><span class="pre">LSODE</span></tt> and other ODEPACK routines requires the
@@ -179,11 +179,10 @@ a function in a file, say <tt class="docutils literal"><span class="pre">myode.m
 <div class="section" id="python">
 <h3>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h3>
 <p>Calling up the <tt class="docutils literal"><span class="pre">vode</span></tt> method from the <tt class="docutils literal"><span class="pre">scipy</span></tt> library in Python
-also results in compact code:</p>
+also results in fairly compact code:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">3.</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
 
-<span class="c"># integration</span>
 <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">ode</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">ode</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">set_integrator</span><span class="p">(</span><span class="s">&#39;vode&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">&#39;adams&#39;</span><span class="p">,</span>
                           <span class="n">order</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">rol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
@@ -200,9 +199,10 @@ also results in compact code:</p>
 </div>
 <p>Suppose you want to compare these methods and their implementations.
 This requires three different main programs and (worse) three
-different implementations of the definition of the mathematical problem.
-Some has the signature <span class="math">\(f(u,t)\)</span> while others require <span class="math">\(f(t,u)\)</span>, and
-such differences between packages are often a cause of programming errors.</p>
+different implementations of the definition of the mathematical
+problem.  Some specifications of <span class="math">\(f\)</span> has the signature <span class="math">\(f(u,t)\)</span> while
+others require <span class="math">\(f(t,u)\)</span>, and such differences between packages are
+often a cause of programming errors.</p>
 </div>
 </div>
 <div class="section" id="odespy-s-unified-interface">
@@ -238,22 +238,22 @@ numerical methods and implementations:</p>
 the Forward Euler method (also called Euler);
 Runge-Kutta methods of 2nd, 3rd, and 4th order; Heun&#8217;s method;
 Adams-Bashforth methods of 2nd, 3rd, and 4th order;
-Adams-Bashforth-Moulton methods of 2nd and 3rd order;</li>
+Adams-Bashforth-Moulton methods of 2nd and 3rd order.</li>
 <li>Pure Python implementations of classical implicit schemes such as
 Backward Euler; 2-step backward scheme; the <span class="math">\(\theta\)</span> rule;
-the Midpoint (or Trapezoidal) method;</li>
+the Midpoint (or Trapezoidal) method.</li>
 <li>Pure Python implementations of adaptive explicit Runge-Kutta
 methods of type Runge-Kutta-Fehlberg of order (4,5), Dormand-Prince
 of order (4,5), Cash-Karp of order (4,5), Bogacki-Shampine of order (2,3).</li>
-<li>Wrappers for all FORTRAN solvers in ODEPACK.</li>
+<li>Wrappers for all FORTRAN solvers in <a class="reference external" href="http://www.netlib.org/odepack/">ODEPACK</a>.</li>
 <li>Wrappers for the wrappers of FORTRAN solvers in <a class="reference external" href="http://www.scipy.org">scipy</a>:
 <tt class="docutils literal"><span class="pre">vode</span></tt> and <tt class="docutils literal"><span class="pre">zvode</span></tt> (adaptive Adams or BDF from <a class="reference external" href="http://www.netlib.org/ode/vode.f">vode.f</a>);
 <tt class="docutils literal"><span class="pre">dopri5</span></tt> (adaptive Dormand-Prince method of order (4,5));
 <tt class="docutils literal"><span class="pre">dop853</span></tt> (adaptive Dormand-Prince method of order 8(5,3));
-<tt class="docutils literal"><span class="pre">odeint</span></tt> (adaptive Adams or BDF, basically the same as <tt class="docutils literal"><span class="pre">vode</span></tt>, but in the implementation <tt class="docutils literal"><span class="pre">lsoda</span></tt> from <a class="reference external" href="http://www.netlib.org/odepack/">ODEPACK</a>).</li>
+<tt class="docutils literal"><span class="pre">odeint</span></tt> (adaptive switching between Adams or BDF from the implementation <tt class="docutils literal"><span class="pre">LSODA</span></tt> in <a class="reference external" href="http://www.netlib.org/odepack/">ODEPACK</a>).</li>
 <li>Wrapper for the Runge-Kutta-Chebyshev formulas of order 2 as
 offered by the well-known FORTRAN code <a class="reference external" href="http://www.netlib.org/ode/rkc.f">rkc.f</a>.</li>
-<li>Wrapper for a of the Runge-Kutta-Fehlberg method of
+<li>Wrapper for the Runge-Kutta-Fehlberg method of
 order (4,5) as provided by the well-known FORTRAN code <a class="reference external" href="http://www.netlib.org/ode/rkf45.f">rkf45.f</a>.</li>
 <li>Wrapper for the Radau5 method as provided by the well-known FORTRAN code
 <a class="reference external" href="http://www.unige.ch/~hairer/prog/stiff/radau5.f">radau5.f</a>.</li>
@@ -267,13 +267,13 @@ callback to Python.</p>
 </div>
 <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>The Odespy package is most easily installed by checkout out
+<p>The Odespy package is most easily installed by checking out
 the latest version of the source code:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="go">git clone git@github.com:hplgit/odespy.git</span>
 <span class="go">cd odespy</span>
 </pre></div>
 </div>
-<p>The installation follows the expected standard procedure,</p>
+<p>The installation follows the standard procedure,</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="go">sudo python setup.py install</span>
 </pre></div>
 </div>
@@ -316,7 +316,7 @@ line installs all that Odespy may need:</p>
 <div class="section" id="basic-usage">
 <h1>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h1>
 <p>This section explains how to use Odespy. The general principles and
-program steps are first explained and then followed by a series of
+program steps are first explained. Thereafter, we present a series of
 examples with progressive complexity with respect to Python constructs
 and numerical methods.</p>
 <div class="section" id="overview">
