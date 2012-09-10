@@ -469,9 +469,12 @@ solvers._parameters.update(_parameters_Odepack)
 
 class Odepack(Solver):
     """
-    This is a superclass for wrapping for seven solvers in the Fortran
-    package ODEPACK (available at the netlib repository:
-    www.netlib.org/odepack).
+    This is a superclass for wrapping seven solvers in the Fortran
+    package ODEPACK, available in the Netlib repository
+    `<http://www.netlib.org/odepack>`_.
+
+    For a quick intro to ODEPACK and its relation to other packages.
+    see `<https://computation.llnl.gov/casc/odepack/odepack_home.html>`_.
 
     *Solvers for explicitly given systems.*
     For each of the following solvers, it is assumed that the ODEs are

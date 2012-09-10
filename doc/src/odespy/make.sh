@@ -1,11 +1,11 @@
 #!/bin/sh
-python ~/hg/programs/spellcheck.py -d .dict4spell.txt *.do.txt
+doconce spellcheck -d .dict4spell.txt *.do.txt
 if [ $? -ne 0 ]; then
    echo "Spelling errors - abort."
    exit 1
 fi
 
-name=wrap_odespy
+name=main_odespy
 
 doconce format pdflatex $name
 ptex2tex -DMINTED -DLATEX_HEADING=traditional $name
@@ -19,8 +19,15 @@ doconce sphinx_dir dirname=sphinx-rootdir title="A Tutorial for the Odespy Inter
 
 #doconce subst '\#html_theme_options.+' "html_theme_options = {\n  'headerfont': '\"Abel\", sans-serif',\n  'bodyfont': '\"Cabin\", sans-serif',\n  'headerbg': 'black',\n  'headercolor1': 'black',}" sphinx-rootdir/conf.py
 
-python automake-sphinx.py
+python automake_sphinx.py
 
+doconce format html $name
 
-
+# Copy to tutorial
+cp -r sphinx-rootdir/_build/html ../../tutorial/
+cp $name.pdf ../../tutorial/odespy.pdf
+cp -r fig-odespy ../../tutorial/
+cp $name.html ../../tutorial/odespy.html
+doconce format html $name --html-solarized
+cp $name.html ../../tutorial/odespy-solarized.html
 

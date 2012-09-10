@@ -9,7 +9,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   wrap_odespy
+   main_odespy
 
 
 Indices and tables

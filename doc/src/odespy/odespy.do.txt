@@ -25,7 +25,7 @@ by three well-known routines:
   o `vode` from Python (adaptive Adams and BDF methods)
 
 All of these routines require the ODE problem to be on the form
-$u'=f(u,t)$, which means that the
+$u'=f(u,t)$, which means that
 the second-order differential equation must be
 recast as a system of two ODEs,
 # #if FORMAT in ("latex", "pdflatex", "sphinx")
@@ -114,7 +114,7 @@ F(1,1) = u(2)
 F(2,1) = 3*(1 - u(1)*u(1))*u(2) - u(1)
 !ec
 In MATLAB we can then solve the problem by
-!bc python
+!bc ipy
 >> options = odeset('RelTol',0.0,'AbsTol',1e-6);
 >> tspan = [0 30];
 >> u0 = [2; 0]
@@ -415,7 +415,7 @@ solution (which is known for this equation):
 
 @@@CODE src-odespy/logistic1.py  fromto: def u_exact@
 
-FIGURE: [figs-odespy/logistic1.png, width=400] Solution of the logistic equation with the 4-th order Runge-Kutta method (solid line) and comparison with the exact solution (dots).
+FIGURE: [fig-odespy/logistic1.png, width=400] Solution of the logistic equation with the 4-th order Runge-Kutta method (solid line) and comparison with the exact solution (dots).
 
 All the examples in this tutorial are found in the GitHub directory
 URL:"https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/".
@@ -616,7 +616,7 @@ makes the numerical solution explode.
 The increasing amplitude is a numerical artifact that some of the simple
 solution methods suffer from.
 
-FIGURE: [figs-odespy/osc1a.png, width=500] Heun's method used to simulate oscillations of a pendulum.
+FIGURE: [fig-odespy/osc1a.png, width=500] Heun's method used to simulate oscillations of a pendulum.
 
 Using a more sophisticated method, say the 4-th order Runge-Kutta method,
 is just a matter of substituting `Heun` by `RK4`:
@@ -718,7 +718,7 @@ The loop over the chosen solvers may look like
 @@@CODE src-odespy/osc2.py  fromto: N_per_period =@
 A complete program is available as "`osc2.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py".
 
-FIGURE: [figs-odespy/osc2.png, width=500] Comparison of methods for solving the ODE system for a pendulum.
+FIGURE: [fig-odespy/osc2.png, width=500] Comparison of methods for solving the ODE system for a pendulum.
 
 We can extend this program to compute the error in each numerical
 solution for different time step sizes.
@@ -971,7 +971,7 @@ such as `RK4`.
 For curiosity we can mention that the `ForwardEuler` method produces
 a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.
 
-FIGURE: [figs-odespy/gaussian1_RK2_41.png, width=500] 2nd-order Runge-Kutta method with 41 points.  label{gaussian:fig:RK2:41}
+FIGURE: [fig-odespy/gaussian1_RK2_41.png, width=500] 2nd-order Runge-Kutta method with 41 points.  label{gaussian:fig:RK2:41}
 
 A simple program testing one numerical method goes as follows ("`gaussian1.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py").
 
@@ -993,7 +993,7 @@ method = odespy.Fehlberg
 !ec
 Figure ref{gaussian:fig:Fehlberg:41} shows how `Fehlberg` with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (57 adaptively selected points in time).
 
-FIGURE: [figs-odespy/gaussian1_Fehlberg_41.png, width=500] Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41).  label{gaussian:fig:Fehlberg:41}
+FIGURE: [fig-odespy/gaussian1_Fehlberg_41.png, width=500] Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41).  label{gaussian:fig:Fehlberg:41}
 
 Adaptive algorithms apply an error estimate based on considering a higher-order method as exact, in this case a method of order 5, and a method of lower order (here 4) as the numerically predicted solution. The user can specify an error tolerance. In the program above we just relied to the default tolerance, which can be printed by
 !bc pycod
@@ -1052,9 +1052,9 @@ results, despite setting `Vode` to use a stiff BDF solver of order 5, and
 `Lsoda` should automatically select between nonstiff and stiff solvers
 (of default order 4 in this case).
 
-FIGURE: [figs-odespy/gaussian3_41.png, width=500] Comparison of adaptive methods with default parameters (tolerance E-6).  label{gaussian3:fig1:41}
+FIGURE: [fig-odespy/gaussian3_41.png, width=500] Comparison of adaptive methods with default parameters (tolerance `E-6`).  label{gaussian3:fig1:41}
 
-FIGURE: [figs-odespy/gaussian3e_41.png, width=500] Comparison of errors in adaptive methods with default parameters (tolerance E-6).  label{gaussian3:fig1err:41}
+FIGURE: [fig-odespy/gaussian3e_41.png, width=500] Comparison of errors in adaptive methods with default parameters (tolerance `E-6`).  label{gaussian3:fig1err:41}
 
 The program writes out the following results for the
 maximum value of the solution, which should equal 2:
@@ -1086,7 +1086,7 @@ For the methods `DormandPrince`,  `RKFehlberg`, and
 `BogackiShampine` we have information about the number of adaptive
 time points used: 270, 326, and 3307, respectively.
 
-FIGURE: [figs-odespy/gaussian3_41_Em10.png, width=500] Comparison of adaptive methods with error tolerance E-10.  label{gaussian3:fig2:41}
+FIGURE: [fig-odespy/gaussian3_41_Em10.png, width=500] Comparison of adaptive methods with error tolerance `E-10`.  label{gaussian3:fig2:41}
 
 The lesson learned in this example is two-fold: 1) several methods should
 be tested to gain reliability of the results, and Odespy makes such tests
@@ -1443,7 +1443,7 @@ may easily extract the solution of `RK4` by
 solvers[1].u, solvers[1].t
 !ec
 
-FIGURE: [figs-odespy/sode1.png, width=500] Oscillator driven by white noise.
+FIGURE: [fig-odespy/sode1.png, width=500] Oscillator driven by white noise.
 
 The `Heun` and `RK2` methods give coinciding solutions while
 the `ForwardEuler` method gives too large amplitudes.

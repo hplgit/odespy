@@ -199,7 +199,7 @@ _parameters = dict(
 
     max_iter = dict(
         help='Max no of iterations in nonlinear solver',
-        default=25,
+        default=50,
         type=int),
 
     g = dict(
@@ -783,16 +783,23 @@ class Solver:
             #(Ex: types = (callable,int)
             if not isinstance(types, (list, tuple)):
                 types = [types]  # make a type list
-            checked_type = False
+            ok_type = False
             for tp in types:
-                if tp == callable and callable(value):
-                    # value should be a callable object
-                    checked_type = True
+                if tp == callable:
+                    if callable(value):
+                        # value should be a callable object
+                        ok_type = True
                 else:
                     if isinstance(value, tp):
-                        checked_type = True
-            if not checked_type:
-                raise TypeError('set: %s is %s, not %s' % \
+                        ok_type = True
+            if not ok_type:
+                # make types more read-friendly in error message if
+                # it contains callable as a type
+                include_callable = callable in types
+                if include_callable:
+                    types = [tp for tp in types if tp != callable]
+                    types.append('callable function')
+                raise TypeError('%s is %s, must be %s' % \
                                 (name, type(value), types))
         return True
 
@@ -907,7 +914,8 @@ class Solver:
         Skip f= if *with_f* is *False*.
         If *default* is False, skip param1= if the value equals
         the default value.
-        (Helper method used by __str__ and __repr__.)
+
+        (This is a helper method used by __str__ and __repr__.)
         """
         s = self.__class__.__name__
         args = []
@@ -919,18 +927,11 @@ class Solver:
 	        if f_name == '<lambda>':   # lambda function
 	  	    f_name = 'lambda u, t: ...'
             args.append('f=%s' % f_name)
-        if with_f and hasattr(self, 'users_jac'):
-            if not hasattr(self.users_jac, '__name__'):     # class instance?
-                f_name = self.users_jac.__class__.__name__
-	    else:    # Ordinary functions
-                f_name = self.users_jac.__name__
-	        if f_name == '<lambda>':   # lambda function
-	  	    f_name = 'lambda u, t: ...'
-            args.append('jac=%s' % f_name)
 
         # form all parameters
         for name in self._parameters:
-            if name != 'f' and name != 'jac' and hasattr(self, name):
+            if name not in ('f', 'jac', 'first_step', 'min_step', 'max_step') \
+                   and hasattr(self, name):
                 value = getattr(self, name)
                 value_specified = True \
                     if 'default' not in self._parameters[name] \
@@ -946,8 +947,21 @@ class Solver:
                     else:
                         args.append('%s=%s' % (name, value))
 
+        # add in jac at the end, if present
+        if hasattr(self, 'users_jac'):
+            if hasattr(self.users_jac, '__name__'):     # plain function?
+                f_name = self.users_jac.__name__
+	        if f_name == '<lambda>':   # lambda function
+	  	    #f_name = 'lambda u, t: ...'
+	  	    f_name = 'lambda'
+	    else:                                       # class instance
+                f_name = self.users_jac.__class__.__name__
+            args.append('jac=%s' % f_name)
+
+
         args = ', '.join(args)
-        s += '(%s)' % args
+        if args:
+            s += '(%s)' % args
         return s
 
     def __repr__(self):
@@ -975,7 +989,7 @@ class Solver:
             self.neq = len(U0)
             U0 = np.asarray(U0)          # (assume U0 is sequence)
         except TypeError:
-            # U0 has no __len__ method, assume as a scalar
+            # U0 has no __len__ method, assume it is a scalar
             self.neq = 1
             if isinstance(U0, int):
                 U0 = float(U0)           # avoid integer division
@@ -1021,7 +1035,7 @@ class Solver:
             self.n = n
             self.u[n+1] = self.advance()   # new value
 
-            if self.verbose > 1:
+            if self.verbose > 2:
                 print '%s, step %d, t=%g' % \
                       (self.__class__.__name__, n+1, self.t[n+1])
             if terminate(self.u, self.t, n+1):
@@ -1054,16 +1068,22 @@ class Solver:
         """
 
         # Detect whether data type is in complex type or not.
+        # Try to call f, or use the initial condition.
         if hasattr(self, 'f'):
             try:
+                if self.verbose > 0:
+                    print 'Calling f(U0, %g) to determine data type' % self.t[0]
                 value = np.array(self.f(self.U0, self.t[0]))
             except IndexError:
                 raise ValueError('time_points array is empty - bug in its construction')
         else:
             value = np.asarray(self.U0)
+
         if value.dtype in (np.int32, np.int64, np.int):
+            # Real-valued, but set it to complex if the user has indicated so
             self.dtype = np.complex if self.complex_valued else np.float
         else:
+            # Rely on what asarray/array found out of the data type
             self.dtype = value.dtype
 
         # Check that consistent self.complex_valued is given
@@ -1537,11 +1557,11 @@ class AdamsBashforth2(Solver):
     """
     Second-order Adams-Bashforth method::
 
-        u[n+1] = u[n] + dt/2.*(3*f(u[n], t[n]) - f(u[n-1], t[n-1]))
+        u[n+1] = u[n] + dt/2*(3*f(u[n], t[n]) - f(u[n-1], t[n-1]))
 
     for constant time step dt.
 
-    RK2 is used as default solver in first step.
+    RK2 is used as default solver in the first step.
     """
     quick_description = "Explicit 2nd-order Adams-Bashforth method"
 
@@ -1755,7 +1775,7 @@ class AdamsBashMoulton3(Solver):
 
     for constant time step dt.
 
-    RK2 is used as default solver for first steps.
+    RK2 is used as default solver for the first steps.
     """
     quick_description = "Explicit 3rd-order Adams-Bashforth-Moulton method"
 
@@ -1846,7 +1866,7 @@ class MidpointIter(Solver):
         return u_new
 
 
-def approximate_Jacobian(f, u0, t0, h):
+def approx_Jacobian(f, u0, t0, h):
     """
     Compute approximate Jacobian of fucntion f at current point (u0,t0).
     Method: forward finite difference approximation with step
@@ -1855,13 +1875,18 @@ def approximate_Jacobian(f, u0, t0, h):
     """
     u0 = np.asarray(u0)
     f0 = np.asarray(f(u0, t0))
-    neq = len(u0)
-    J = np.zeros((neq, neq), float)
-    for i in range(neq):
-        u_new = u0.copy()
-        u_new[i] += h
-        J[i] = (np.asarray(f(u_new, t0)) - f0)/h
-    return J.transpose()
+    neq = u0.size
+    if neq == 1:
+        u_ph = u0 + h
+        J = (f(u_ph, t0) - f(u0, t0))/h
+        return J
+    else:
+        J = np.zeros((neq, neq), float)
+        for i in range(neq):
+            u_ph = u0.copy()
+            u_ph[i] += h
+            J[i] = (np.asarray(f(u_ph, t0)) - f0)/h
+        return J.transpose()
 
 
 class odefun_sympy(Solver):
@@ -1917,6 +1942,12 @@ class SolverImplicit(Solver):
     """
     Super class for implicit methods for ODEs.
     Existing solvers are: BackwardEuler, Backward2Step, ThetaRule
+
+    Both a Picard iteration and a Newton iteration (with user-provided
+    Jacobian or a finite difference-based Jacobian) are implemented.
+    Note that the Forward Euler scheme is used to make the first guess,
+    so if that method is unstable for the chosen time step and problem,
+    the iterations may easily diverge.
     """
 
     _optional_parameters = Solver._optional_parameters + \
@@ -1924,13 +1955,14 @@ class SolverImplicit(Solver):
          'nonlinear_solver', 'max_iter', 'eps_iter', 'relaxation']
 
     def initialize_for_solve(self):
+        self.num_iterations_total = 0
         # Set appropriate value of nonlinear_solver if undefined
         if getattr(self, 'jac', None) is None:   # no jac provided
             if getattr(self, 'nonlinear_solver', None) is None:
                 self.nonlinear_solver = 'Picard'  # default if no jac provided
             elif getattr(self, 'nonlinear_solver') == 'Newton':
                  # Approximate jacobian with finite difference approx
-                self.users_jac = approximate_Jacobian
+                self.users_jac = approx_Jacobian
                 self.jac = lambda u, t: \
                     self.users_jac(self.f, u, t, self.h_in_fd_jac)
         else:
@@ -1950,31 +1982,40 @@ class SolverImplicit(Solver):
         dt = t_new - tn
 
         # General solver routine with Newton or Picard
-        # Newton with Finite-Differential or exact Jac
+        # Newton with Finite Difference or exact Jac
         i, error = 1, 1E+30
         # Forward Euler step for initial guess for nonlinear solver
         u_new = un + (t_new-tn)*f(un,tn)
         # control by number of intern steps and error tolerance
+        if self.verbose > 1:
+            print '%s.advance w/%s: t=%g, n=%d: ' % \
+                  (self.__class__.__name__, self.nonlinear_solver, t_new, n+1)
+
         while i <= self.max_iter and error > self.eps_iter:
             if self.nonlinear_solver == 'Picard':
-                u_new = self.Picard_update(u_new)
+                u_new_ = self.Picard_update(u_new)
             elif self.nonlinear_solver == 'Newton':
                 F, Jac = self.Newton_system(u_new)
                 du = F/Jac if self.neq == 1 else np.linalg.solve(Jac, F)
-                u_new = u_new - du
-            elif self.nonlinear_solver == 'FixedPoint':
-                u_new = un + dt*f(u_new,tn)
-            error = np.abs(u_new - u_new).max()
-            r = self.relaxation    # Relax factor
-            u_new = r*u_new + (1-r)*un
+                u_new_ = u_new - du
+            error = np.abs(u_new_ - u_new).max()
+            r = self.relaxation    # relaxation factor
+            u_new = r*u_new_ + (1-r)*un
+            if self.verbose > 2:
+                print '    u_%02d=%g (err=%g)' % (i, u_new, error)
             i += 1
+        self.num_iterations_total += i-1
+        if self.verbose > 1:
+            print 'u=%g in %d iterations' % (u_new, i-1)
+        if error > self.eps_iter:
+            raise ValueError('%s w/%s not converged:\n   u_diff=%g > eps_iter=%g after %s iterations.' % (self.__class__.__name__, self.nonlinear_solver, error, self.eps_iter, self.max_iter))
         return u_new
 
 class BackwardEuler(SolverImplicit):
     """
     Implicit Backward Euler method::
 
-       u[n+1] = u[n] + dt*f(t[n+1], u[n+1])
+       u[n+1] = u[n] + dt*f(u[n+1], t[n+1])
 
     The nonlinear system is solved by Newton or Picard iteration.
     """
@@ -1997,7 +2038,7 @@ class Backward2Step(SolverImplicit):
     """
     Implicit Backward Euler method with 2 steps::
 
-         u[n+1] = u[n]*4/3 - u[n-1]/3 + (t[n+1-t[n-1]])*f(t[n+1], u[n+1])/3
+         u[n+1] = u[n]*4/3 - u[n-1]/3 + (t[n+1-t[n-1]])*f(u[n+1], t[n+1])/3
 
     The 1st-order Backward Euler method is used for the first step.
     """
@@ -2074,11 +2115,11 @@ class MidpointImplicit(SolverImplicit):
     def Newton_system(self, ukp1):
         u, f, n, t = self.u, self.f, self.n, self.t
         dt = t[n+1] - t[n]
-        F = ukp1 -  u[n] + dt*f((ukp1 + u[n])/2., t[n] + dt/2.)
-        J = np.eye(self.neq) - dt*self.jac(ukp1, t[n+1])
+        F = ukp1 - (u[n] + dt*f((ukp1 + u[n])/2., t[n] + dt/2.))
+        J = np.eye(self.neq) - dt*self.jac((ukp1 + u[n])/2., t[n] + dt/2.)
         return F, J
 
-
+CrankNicolson = MidpointImplicit  # alias
 
 class Adaptive(Solver):
     """Superclass for adaptive solvers."""

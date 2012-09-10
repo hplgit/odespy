@@ -1,14 +1,16 @@
 #!/usr/bin/env python
-# Make API documentation of Python modules using Sphinx.
+"""
+This 'make.py' script automates generation of API documentation
+of Python modules, using the tool Sphinx.
 
+The dictionary 'packages', to be defined below, holds the name of all
+Python modules and packages that are to be included in the
+documentation.  Keywords are package names (use . to separate names,
+as in the import statement), while the values are the list of modules
+in the (sub)package. An empty keyword means that there is no package,
+just a set of modules.
+"""
 import glob, sys, os, re, shutil, commands
-
-# The dict packages holds the name of all Python modules
-# and packages that are to be included in the documentation.
-# Keywords are package names (use . to separate names, as in
-# the import statement), while the values are the list of
-# modules in the (sub)package. An empty keyword means that
-# there is no package, just a set of modules.
 
 source_file_dirs = [os.path.join(os.pardir, os.pardir, os.pardir, 'odespy')]
 # Here we take all modules in source_file_dirs
