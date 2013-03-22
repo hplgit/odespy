@@ -329,7 +329,7 @@ _parameters = dict(
 
     ode_method = dict(
         help='solver type: "adams" or "bdf"',
-        alias='method',   # Different name in scipy.ode.vode
+        alias='method',
         type=str, default='adams',
         range=('adams','bdf')),
 
@@ -1070,12 +1070,11 @@ class Solver:
         # Detect whether data type is in complex type or not.
         # Try to call f, or use the initial condition.
         if hasattr(self, 'f'):
-            try:
-                if self.verbose > 0:
-                    print 'Calling f(U0, %g) to determine data type' % self.t[0]
-                value = np.array(self.f(self.U0, self.t[0]))
-            except IndexError:
-                raise ValueError('time_points array is empty - bug in its construction')
+            if len(self.t) < 2:
+                raise ValueError('time_points array %s must have at least two elements' % repr(self.t))
+            if self.verbose > 0:
+                print 'Calling f(U0, %g) to determine data type' % self.t[0]
+            value = np.array(self.f(self.U0, self.t[0]))
         else:
             value = np.asarray(self.U0)
 
@@ -2537,7 +2536,7 @@ class ode_scipy(Adaptive):
 
 class Vode(ode_scipy):
     '''
-    Wrapper for scipy.integrate.ode.vode, which is a wrapper for vode.f,
+    Wrapper for scipy.integrate.ode, which is a wrapper for vode.f,
     which intends to solve initial value problems of stiff or nonstiff
     type. The well-known vode.f solver applies backward differential
     formulae for iteration.
