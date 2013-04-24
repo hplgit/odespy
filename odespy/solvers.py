@@ -329,7 +329,7 @@ _parameters = dict(
 
     ode_method = dict(
         help='solver type: "adams" or "bdf"',
-        alias='method',   # Different name in scipy.ode.vode
+        alias='method',
         type=str, default='adams',
         range=('adams','bdf')),
 
@@ -628,7 +628,7 @@ class Solver:
             if 'default' in self._parameters[name]:
                 setattr(self, name, self._parameters[name]['default'])
 
-        nones = [name for name in kwargs.keys() if kwargs[name] is None]
+        nones = [name for name in kwargs if kwargs[name] is None]
         for name in nones:
             del kwargs[name]
 
@@ -1070,12 +1070,11 @@ class Solver:
         # Detect whether data type is in complex type or not.
         # Try to call f, or use the initial condition.
         if hasattr(self, 'f'):
-            try:
-                if self.verbose > 0:
-                    print 'Calling f(U0, %g) to determine data type' % self.t[0]
-                value = np.array(self.f(self.U0, self.t[0]))
-            except IndexError:
-                raise ValueError('time_points array is empty - bug in its construction')
+            if len(self.t) < 2:
+                raise ValueError('time_points array %s must have at least two elements' % repr(self.t))
+            if self.verbose > 0:
+                print 'Calling f(U0, %g) to determine data type' % self.t[0]
+            value = np.array(self.f(self.U0, self.t[0]))
         else:
             value = np.asarray(self.U0)
 
@@ -1905,7 +1904,8 @@ class odefun_sympy(Solver):
 
     def initialize_for_solve(self):
         # sympy.odefun requires f(t, u), not f(u, t, *args, **kwargs)
-        self.f4odefun = lambda t, u: self.f(u, t, *self.f_args, **self.f_kwargs)
+        # (self.f already handles f_args, f_kwargs)
+        self.f4odefun = lambda t, u: self.f(u, t)
         Solver.initialize_for_solve(self)
 
     def solve(self, time_points, terminate=None):
@@ -2537,7 +2537,7 @@ class ode_scipy(Adaptive):
 
 class Vode(ode_scipy):
     '''
-    Wrapper for scipy.integrate.ode.vode, which is a wrapper for vode.f,
+    Wrapper for scipy.integrate.ode, which is a wrapper for vode.f,
     which intends to solve initial value problems of stiff or nonstiff
     type. The well-known vode.f solver applies backward differential
     formulae for iteration.
@@ -2749,7 +2749,7 @@ class odelab(Adaptive):
     def initialize_for_solve(self):
         # odelab requires f(t, u), not f(u, t, *args, **kwargs)
         # self.f4odelab(t, u) is what we pass on to odelab
-        self.f4odelab = lambda t, u: self.f(u, t, *self.f_args, **self.f_kwargs)
+        self.f4odelab = lambda t, u: self.f(u, t)
         Solver.initialize_for_solve(self)
 
         #if self.odelab_solver not in odelab.solvers:
@@ -2825,7 +2825,7 @@ def list_all_solvers():
 
     exclude = ('Solver','Adaptive', 'PyDS', 'ode_scipy', 'Odepack',
                'RungeKutta1level', 'RungeKutta2level', 'SolverImplicit',
-               'MyRungeKutta', 'MySolver')
+               'MyRungeKutta', 'MySolver', 'AdaptiveResidual')
     import odespy
     classes = inspect.getmembers(odespy, inspect.isclass)
     solvers = [solver[0] for solver in classes
