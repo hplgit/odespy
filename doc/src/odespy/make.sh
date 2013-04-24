@@ -28,6 +28,6 @@ cp -r sphinx-rootdir/_build/html ../../tutorial/
 cp $name.pdf ../../tutorial/odespy.pdf
 cp -r fig-odespy ../../tutorial/
 cp $name.html ../../tutorial/odespy.html
-doconce format html $name --html-solarized
+doconce format html $name --html_style=solarized
 cp $name.html ../../tutorial/odespy-solarized.html
 
