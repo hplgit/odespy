@@ -1,4 +1,4 @@
-"""As exos2.py, but testing several solvers."""
+"""As osc2.py, but testing several solvers."""
 
 from math import pi, sqrt
 

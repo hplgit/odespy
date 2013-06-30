@@ -1066,6 +1066,8 @@ class Solver:
 
         In subclasses, this function can be extended when required.
         """
+        if not hasattr(self, 'U0'):
+            raise AttributeError('Cannot solve because set_initial_condition has not been called!')
 
         # Detect whether data type is in complex type or not.
         # Try to call f, or use the initial condition.
@@ -2480,7 +2482,7 @@ class ode_scipy(Adaptive):
 
     def initialize(self):
         try:
-            import scipy.integrate.ode
+            import scipy.integrate
             self.scipy_ode = scipy.integrate.ode
         except ImportError:
             raise ImportError('The scipy package must be installed '\
@@ -2529,7 +2531,7 @@ class ode_scipy(Adaptive):
         u, f, n, t = self.u, self.f, self.n, self.t
         u_new = self.integrator.integrate(t[n+1])
         if not self.integrator.successful():
-            print 'Warning: %s call to scipy.integrate.ode.method.integrate was not successful' % self.__class__.__name__
+            print 'Warning: %s call to ode.method.integrate in scipy.integrate was not successful' % self.__class__.__name__
         if len(u_new) == 1:
             return u_new[0]
         else:
@@ -2537,7 +2539,7 @@ class ode_scipy(Adaptive):
 
 class Vode(ode_scipy):
     '''
-    Wrapper for scipy.integrate.ode, which is a wrapper for vode.f,
+    Wrapper for ode scipy.integrate, which again is a wrapper for vode.f,
     which intends to solve initial value problems of stiff or nonstiff
     type. The well-known vode.f solver applies backward differential
     formulae for iteration.
@@ -2559,7 +2561,7 @@ class Vode(ode_scipy):
 
 class Dopri5(ode_scipy):
     """
-    Wrapper for scipy.integrate.ode.dopri5, which applies the
+    Wrapper for dopri5 in scipy.integrate.ode, which applies the
     Dormand&Prince method of order 5(4), based on the Fortran
     implementation by Hairer and Wanner.
     See http://www.unige.ch/~hairer/software.html.
@@ -2575,7 +2577,7 @@ class Dopri5(ode_scipy):
 
 class Dop853(ode_scipy):
     """
-    Wrapper for scipy.integrate.ode.dop853, which applies the
+    Wrapper for dop853 in scipy.integrate.ode, which applies the
     Dormand&Prince method of order 8(5,3), based on the Fortran
     implementation by Hairer and Wanner.
     See http://www.unige.ch/~hairer/software.html.
@@ -2592,8 +2594,9 @@ class Dop853(ode_scipy):
 
 class lsoda_scipy(Adaptive):
     """
-    Wrapper of the scipy.integrate.odeint solver so that it can be
-    called from the *odespy* user interface.
+    Wrapper of the lsoda interface provided by scipy.integrate.odeint
+    solver so that lsoda can be called this way from the *odespy*
+    user interface.
     """
     quick_description = "Wrapper of lsoda (scipy.integrate.odeint)"
 

@@ -1,4 +1,4 @@
-"""As exos1.py, but testing several solvers and setting sin(theta) to theta."""
+"""As osc1.py, but testing several solvers and setting sin(theta) to theta."""
 
 from math import pi, sqrt
 

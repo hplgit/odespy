@@ -1,4 +1,4 @@
-"""As exos3.py, but testing many more solvers for a fixed resolution."""
+"""As osc3.py, but testing many more solvers for a fixed resolution."""
 
 from math import pi, sqrt
 
