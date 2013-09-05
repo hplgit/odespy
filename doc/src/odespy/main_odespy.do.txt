@@ -6,5 +6,5 @@ DATE: today
 # #include "odespy.do.txt"
 
 __Remark.__ This document was written with aid of the
-"Doconce": "http://code.google.com/p/doconce" tool, which allows
+"Doconce": "https://github.com/hplgit/doconce" tool, which allows
 output in many different formats.
