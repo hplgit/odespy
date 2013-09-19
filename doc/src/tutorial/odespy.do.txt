@@ -1,3 +1,7 @@
+<%
+src_odespy = "https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy"
+%>
+
 The Odespy package makes it easy to specify an ODE problem in
 Python and get it solved by a wide variety of different numerical
 methods and software.
@@ -143,7 +147,7 @@ while r.successful() and r.t <= T:
     u.append(r.y);  t.append(r.t)
 !ec
 Suppose you want to compare these methods and their implementations.
-This requires three different main programs and (worse) three
+This requires three different main programs, but even worse: three
 different implementations of the definition of the mathematical
 problem.  Some specifications of $f$ has the signature $f(u,t)$ while
 others require $f(t,u)$, and such differences between packages are
@@ -153,7 +157,7 @@ often a cause of programming errors.
 
 The Odespy package provides a unified interface to all the three
 mentioned types of methods, which makes it easy to run all of them
-in a loop (program "`motivation.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/motivation1.py"):
+in a loop (program "`motivation.py`": "${src_odespy}/motivation1.py"):
 
 @@@CODE src-odespy/motivation1.py
 
@@ -400,7 +404,7 @@ maximum number of individuals that the environment allows (the so-called
 Using a standard
 Runge-Kutta method of order four, the code for solving the problem in
 the time interval $[0,10]$ with $N=30$ time steps, looks like this
-(program "`logistic1.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic1.py"):
+(program "`logistic1.py`": "${src_odespy}/logistic1.py"):
 
 @@@CODE src-odespy/logistic1.py  fromto: def f@def u_exact
 
@@ -418,7 +422,7 @@ solution (which is known for this equation):
 FIGURE: [fig-odespy/logistic1.png, width=400] Solution of the logistic equation with the 4-th order Runge-Kutta method (solid line) and comparison with the exact solution (dots).
 
 All the examples in this tutorial are found in the GitHub directory
-URL:"https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/".
+URL:"${src_odespy}/".
 If you download the tarball or clone the GitHub repository, the examples
 reside in the directory `doc/src/odespy/src-odespy`.
 
@@ -1456,8 +1460,7 @@ generator is used for all methods, so that the time evolution of
 the force is always the same - otherwise the solutions will be
 different.
 
-The complete code is available in "sode.py":
-"https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/sode1.py".
+The complete code is available in "sode.py": "${src_odespy}/sode1.py".
 
 # #ifdef EXTRA
   * Using adaptive methods: planet orbit or Gaussian

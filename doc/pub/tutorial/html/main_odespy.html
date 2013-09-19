@@ -207,7 +207,7 @@ also results in fairly compact code:</p>
 </pre></div>
 </div>
 <p>Suppose you want to compare these methods and their implementations.
-This requires three different main programs and (worse) three
+This requires three different main programs, but even worse: three
 different implementations of the definition of the mathematical
 problem.  Some specifications of <span class="math">\(f\)</span> has the signature <span class="math">\(f(u,t)\)</span> while
 others require <span class="math">\(f(t,u)\)</span>, and such differences between packages are
@@ -218,7 +218,7 @@ often a cause of programming errors.</p>
 <h2>Odespy&#8217;s Unified Interface<a class="headerlink" href="#odespy-s-unified-interface" title="Permalink to this headline">¶</a></h2>
 <p>The Odespy package provides a unified interface to all the three
 mentioned types of methods, which makes it easy to run all of them
-in a loop (program <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/motivation1.py">motivation.py</a>):</p>
+in a loop (program <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/motivation1.py">motivation.py</a>):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">3.</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
 
@@ -459,7 +459,7 @@ maximum number of individuals that the environment allows (the so-called
 <p>Using a standard
 Runge-Kutta method of order four, the code for solving the problem in
 the time interval <span class="math">\([0,10]\)</span> with <span class="math">\(N=30\)</span> time steps, looks like this
-(program <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic1.py">logistic1.py</a>):</p>
+(program <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/logistic1.py">logistic1.py</a>):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">a</span><span class="o">*</span><span class="n">u</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">u</span><span class="o">/</span><span class="n">R</span><span class="p">)</span>
 
@@ -492,7 +492,7 @@ solution (which is known for this equation):</p>
 
 <span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="s">&#39;r-&#39;</span><span class="p">,</span>
      <span class="n">t</span><span class="p">,</span> <span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="s">&#39;bo&#39;</span><span class="p">)</span>
-<span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.png&#39;</span><span class="p">)</span>
+<span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmppng&#39;</span><span class="p">);</span> <span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.pdf&#39;</span><span class="p">)</span>
 <span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -501,7 +501,7 @@ solution (which is known for this equation):</p>
 <p class="caption">Solution of the logistic equation with the 4-th order Runge-Kutta method (solid line) and comparison with the exact solution (dots)</p>
 </div>
 <p>All the examples in this tutorial are found in the GitHub directory
-<a class="reference external" href="https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/">https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/</a>.
+<a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/">https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/</a>.
 If you download the tarball or clone the GitHub repository, the examples
 reside in the directory <tt class="docutils literal"><span class="pre">doc/src/odespy/src-odespy</span></tt>.</p>
 </div>
@@ -618,7 +618,7 @@ each subdomain in sequence. The following program performs the steps
 <span class="n">axis</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mf">0.1E+5</span><span class="p">,</span> <span class="mf">1.1E+5</span><span class="p">])</span>
 <span class="c"># Can concatenate all the elements of u and t, if desired</span>
 <span class="n">u</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">u</span><span class="p">);</span>  <span class="n">t</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-<span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.png&#39;</span><span class="p">)</span>
+<span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmppng&#39;</span><span class="p">);</span> <span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.pdf&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -673,7 +673,7 @@ time step <tt class="docutils literal"><span class="pre">dt</span></tt> and not 
 
 <span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="s">&#39;r-&#39;</span><span class="p">)</span>
-<span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.png&#39;</span><span class="p">)</span>
+<span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmppng&#39;</span><span class="p">);</span> <span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.pdf&#39;</span><span class="p">)</span>
 <span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -687,7 +687,7 @@ all data related to the numerical solution and its quality are
 taken care of by class <tt class="docutils literal"><span class="pre">Solver</span></tt>. The code below illustrates
 the ideas (<a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic26py">logistic6.py</a>):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">odespy</span>
 
 <span class="k">class</span> <span class="nc">Logistic</span><span class="p">:</span>
@@ -731,11 +731,11 @@ the ideas (<a class="reference external" href="https://github.com/hplgit/odespy/
         <span class="k">print</span> <span class="s">&#39;Final u(t=</span><span class="si">%g</span><span class="s">)=</span><span class="si">%g</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">mpl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="s">&#39;r-&#39;</span><span class="p">,</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="s">&#39;r-&#39;</span><span class="p">,</span>
                  <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">),</span> <span class="s">&#39;bo&#39;</span><span class="p">)</span>
-        <span class="n">mpl</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s">&#39;numerical&#39;</span><span class="p">,</span> <span class="s">&#39;exact&#39;</span><span class="p">])</span>
-        <span class="n">mpl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.png&#39;</span><span class="p">)</span>
-        <span class="n">mpl</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s">&#39;numerical&#39;</span><span class="p">,</span> <span class="s">&#39;exact&#39;</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.png&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.pdf&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">problem</span> <span class="o">=</span> <span class="n">Logistic</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">1E+5</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
@@ -850,7 +850,7 @@ components in individual arrays:</p>
 
 <span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="s">&#39;r-&#39;</span><span class="p">)</span>
-<span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.png&#39;</span><span class="p">)</span>
+<span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmppng&#39;</span><span class="p">);</span> <span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.pdf&#39;</span><span class="p">)</span>
 <span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -883,7 +883,7 @@ is just a matter of substituting <tt class="docutils literal"><span class="pre">
 
 <span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="s">&#39;r-&#39;</span><span class="p">)</span>
-<span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.png&#39;</span><span class="p">)</span>
+<span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmppng&#39;</span><span class="p">);</span> <span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.pdf&#39;</span><span class="p">)</span>
 <span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -990,7 +990,7 @@ in the current mathematical model.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">N_per_period</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="n">T</span> <span class="o">=</span> <span class="mi">3</span><span class="o">*</span><span class="n">problem</span><span class="o">.</span><span class="n">period</span>   <span class="c"># final time</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="n">legends</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="k">for</span> <span class="n">solver</span> <span class="ow">in</span> <span class="n">solvers</span><span class="p">:</span>
@@ -1005,11 +1005,12 @@ in the current mathematical model.</p>
 
     <span class="n">theta</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">legends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">solver_name</span><span class="p">)</span>
-    <span class="n">mpl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
-    <span class="n">mpl</span><span class="o">.</span><span class="n">hold</span><span class="p">(</span><span class="s">&#39;on&#39;</span><span class="p">)</span>
-<span class="n">mpl</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legends</span><span class="p">)</span>
-<span class="n">mpl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">__file__</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;.png&#39;</span><span class="p">)</span>
-<span class="n">mpl</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">hold</span><span class="p">(</span><span class="s">&#39;on&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legends</span><span class="p">)</span>
+<span class="n">plotfile</span> <span class="o">=</span> <span class="n">__file__</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">plotfile</span> <span class="o">+</span> <span class="s">&#39;.png&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">plotfile</span> <span class="o">+</span> <span class="s">&#39;.pdf&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>A complete program is available as <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py">osc2.py</a>.</p>
@@ -1314,7 +1315,7 @@ a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.</p>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">tp</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">method</span><span class="p">,</span> <span class="s">&#39;exact&#39;</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.png&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmppng&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.pdf&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1907,7 +1908,7 @@ for each method, it is crucial that the same seed of the random
 generator is used for all methods, so that the time evolution of
 the force is always the same - otherwise the solutions will be
 different.</p>
-<p>The complete code is available in <a class="reference external" href="https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/sode1.py">sode.py</a>.</p>
+<p>The complete code is available in <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/sode1.py">sode.py</a>.</p>
 </div>
 </div>
 <div class="section" id="inner-workings-of-the-package">

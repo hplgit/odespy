@@ -165,7 +165,7 @@ also results in fairly compact code:
             u.append(r.y);  t.append(r.t)
 
 Suppose you want to compare these methods and their implementations.
-This requires three different main programs and (worse) three
+This requires three different main programs, but even worse: three
 different implementations of the definition of the mathematical
 problem.  Some specifications of :math:`f` has the signature :math:`f(u,t)` while
 others require :math:`f(t,u)`, and such differences between packages are
@@ -176,7 +176,7 @@ Odespy's Unified Interface
 
 The Odespy package provides a unified interface to all the three
 mentioned types of methods, which makes it easy to run all of them
-in a loop (program `motivation.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/motivation1.py>`_):
+in a loop (program `motivation.py <https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/motivation1.py>`_):
 
 
 .. code-block:: python
@@ -286,7 +286,7 @@ line installs all that Odespy may need:
 
 .. code-block:: console
 
-        sudo apt-get install python-scipy python-nose python-sympy \
+        sudo apt-get install python-scipy python-nose python-sympy \ 
              python-matplotlib python-scitools python-pip
 
 
@@ -481,7 +481,7 @@ maximum number of individuals that the environment allows (the so-called
 Using a standard
 Runge-Kutta method of order four, the code for solving the problem in
 the time interval :math:`[0,10]` with :math:`N=30` time steps, looks like this
-(program `logistic1.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic1.py>`_):
+(program `logistic1.py <https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/logistic1.py>`_):
 
 
 .. code-block:: python
@@ -523,7 +523,7 @@ solution (which is known for this equation):
         
         plot(t, u, 'r-',
              t, u_exact(t), 'bo')
-        savefig('tmp.png')
+        savefig('tmppng'); savefig('tmp.pdf')
         show()
 
 
@@ -535,7 +535,7 @@ solution (which is known for this equation):
 
 
 All the examples in this tutorial are found in the GitHub directory
-`<https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/>`_.
+`<https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/>`_.
 If you download the tarball or clone the GitHub repository, the examples
 reside in the directory ``doc/src/odespy/src-odespy``.
 
@@ -676,7 +676,7 @@ each subdomain in sequence. The following program performs the steps
         axis([0, T[-1], -0.1E+5, 1.1E+5])
         # Can concatenate all the elements of u and t, if desired
         u = numpy.concatenate(u);  t = numpy.concatenate(t)
-        savefig('tmp.png')
+        savefig('tmppng'); savefig('tmp.pdf')
 
 
 Termination Criterion for the Simulation
@@ -740,7 +740,7 @@ A complete program can be as follows (`logistic5.py <https://github.com/hplgit/o
         
         from matplotlib.pyplot import *
         plot(t, u, 'r-')
-        savefig('tmp.png')
+        savefig('tmppng'); savefig('tmp.pdf')
         show()
 
 
@@ -758,7 +758,7 @@ the ideas (`logistic6.py <https://github.com/hplgit/odespy/blob/master/doc/src/o
 .. code-block:: python
 
         import numpy as np
-        import matplotlib.pyplot as mpl
+        import matplotlib.pyplot as plt
         import odespy
         
         class Logistic:
@@ -802,11 +802,11 @@ the ideas (`logistic6.py <https://github.com/hplgit/odespy/blob/master/doc/src/o
                 print 'Final u(t=%g)=%g' % (t[-1], u[-1])
         
             def plot(self):
-                mpl.plot(self.t, self.u, 'r-',
+                plt.plot(self.t, self.u, 'r-',
                          self.t, self.u_exact(self.t), 'bo')
-                mpl.legend(['numerical', 'exact'])
-                mpl.savefig('tmp.png')
-                mpl.show()
+                plt.legend(['numerical', 'exact'])
+                plt.savefig('tmp.png'); plt.savefig('tmp.pdf')
+                plt.show()
         
         def main():
             problem = Logistic(a=2, R=1E+5, A=1, T=20)
@@ -868,7 +868,7 @@ is governed by the equation
 
 .. math::
         
-        mL\ddot\theta + mg\sin\theta = 0,\quad \theta (0)=\Theta,\
+        mL\ddot\theta + mg\sin\theta = 0,\quad \theta (0)=\Theta,\ 
         \dot\theta (0)=0 .
         
 
@@ -882,7 +882,7 @@ unknown, we get the system
 
 .. math::
         
-        \dot\theta &= \omega,\\
+        \dot\theta &= \omega,\\ 
         \dot\omega &= -c\sin\theta,
         
 
@@ -952,7 +952,7 @@ components in individual arrays:
         
         from matplotlib.pyplot import *
         plot(t, theta, 'r-')
-        savefig('tmp.png')
+        savefig('tmppng'); savefig('tmp.pdf')
         show()
 
 The complete program is available in the file `osc1a.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc1a.py>`_.
@@ -993,7 +993,7 @@ is just a matter of substituting ``Heun`` by ``RK4``:
         
         from matplotlib.pyplot import *
         plot(t, theta, 'r-')
-        savefig('tmp.png')
+        savefig('tmppng'); savefig('tmp.pdf')
         show()
 
 The amplitude now becomes constant in time as expected.
@@ -1018,7 +1018,7 @@ Approximating :math:`\sin(\theta)` by :math:`\theta`
 
 .. math::
         
-        \dot\theta &= \omega,\\
+        \dot\theta &= \omega,\\ 
         \dot\omega &= -c\theta,
         
 
@@ -1123,7 +1123,7 @@ The loop over the chosen solvers may look like
         N_per_period = 20
         T = 3*problem.period   # final time
         import numpy
-        import matplotlib.pyplot as mpl
+        import matplotlib.pyplot as plt
         legends = []
         
         for solver in solvers:
@@ -1138,11 +1138,12 @@ The loop over the chosen solvers may look like
         
             theta = u[:,0]
             legends.append(solver_name)
-            mpl.plot(t, theta)
-            mpl.hold('on')
-        mpl.legend(legends)
-        mpl.savefig(__file__[:-3] + '.png')
-        mpl.show()
+            plt.plot(t, theta)
+            plt.hold('on')
+        plt.legend(legends)
+        plotfile = __file__[:-3]
+        plt.savefig(plotfile + '.png'); plt.savefig(plotfile + '.pdf')
+        plt.show()
 
 A complete program is available as `osc2.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py>`_.
 
@@ -1511,7 +1512,7 @@ A simple program testing one numerical method goes as follows (`gaussian1.py <ht
         else:
             plt.plot(tp, solver.u, tp, problem.u_exact(tp))
         plt.legend([method, 'exact'])
-        plt.savefig('tmp.png')
+        plt.savefig('tmppng'); plt.savefig('tmp.pdf')
         plt.show()
 
 
@@ -2086,7 +2087,7 @@ the source code into Python modules. This is done by
                 self.mu = mu
         
                 # Compile F77 functions
-                self.f_f77, self.jac_f77_radau5, self.jac_f77_lsode = \
+                self.f_f77, self.jac_f77_radau5, self.jac_f77_lsode = \ 
                             compile_f77([self.str_f_f77(),
                                          self.str_jac_f77_radau5(),
                                          self.str_jac_f77_lsode()])
@@ -2225,7 +2226,7 @@ generator is used for all methods, so that the time evolution of
 the force is always the same - otherwise the solutions will be
 different.
 
-The complete code is available in `sode.py <https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/sode1.py>`_.
+The complete code is available in `sode.py <https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/sode1.py>`_.
 
 
 
@@ -2293,7 +2294,7 @@ is
             default={}),
         
         theta = dict(
-            help='eight in [0,1] used for'\
+            help='eight in [0,1] used for'\ 
                  '"theta-rule" finite difference approx.',
             default=0.5,
             type=(int,float),
@@ -2318,7 +2319,7 @@ initialization of ``_optional_parameters`` goes like this:
 .. code-block:: python
 
         class SomeMethod(ParentMethod):
-            _optional_parameters = ParentMethod._optional_parameters + \
+            _optional_parameters = ParentMethod._optional_parameters + \ 
                                    ['prm1', 'prm2', ...]
 
 where ``prm1``, ``prm2``, etc. are names registered in the global
@@ -2594,7 +2595,7 @@ An implementation of a subclass for the
             """
             quick_description = "Explicit 2nd-order Adams-Bashforth method"
         
-            _optional_parameters = Solver._optional_parameters + \
+            _optional_parameters = Solver._optional_parameters + \ 
                                   ['start_method',]
         
             def initialize_for_solve(self):

@@ -339,7 +339,7 @@ u = [];  t = []
 </pre></div>
 <p>
 Suppose you want to compare these methods and their implementations.
-This requires three different main programs and (worse) three
+This requires three different main programs, but even worse: three
 different implementations of the definition of the mathematical
 problem.  Some specifications of \( f \) has the signature \( f(u,t) \) while
 others require \( f(t,u) \), and such differences between packages are
@@ -350,7 +350,7 @@ often a cause of programming errors.
 <p>
 The Odespy package provides a unified interface to all the three
 mentioned types of methods, which makes it easy to run all of them
-in a loop (program <a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/motivation1.py"><tt>motivation.py</tt></a>):
+in a loop (program <a href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/motivation1.py"><tt>motivation.py</tt></a>):
 
 <p>
 
@@ -461,7 +461,7 @@ line installs all that Odespy may need:
 <p>
 
 <!-- code=bash (from !bc sys) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">sudo apt-get install python-scipy python-nose python-sympy <span style="color: #CD5555">\</span>
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">sudo apt-get install python-scipy python-nose python-sympy <span style="color: #CD5555">\ </span>
      python-matplotlib python-scitools python-pip
 </pre></div>
 <p>
@@ -659,7 +659,7 @@ maximum number of individuals that the environment allows (the so-called
 Using a standard
 Runge-Kutta method of order four, the code for solving the problem in
 the time interval \( [0,10] \) with \( N=30 \) time steps, looks like this
-(program <a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic1.py"><tt>logistic1.py</tt></a>):
+(program <a href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/logistic1.py"><tt>logistic1.py</tt></a>):
 
 <p>
 
@@ -702,7 +702,7 @@ solution (which is known for this equation):
 
 plot(t, u, <span style="color: #CD5555">&#39;r-&#39;</span>,
      t, u_exact(t), <span style="color: #CD5555">&#39;bo&#39;</span>)
-savefig(<span style="color: #CD5555">&#39;tmp.png&#39;</span>)
+savefig(<span style="color: #CD5555">&#39;tmppng&#39;</span>); savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
 show()
 </pre></div>
 <p>
@@ -714,7 +714,7 @@ show()
 
 <p>
 All the examples in this tutorial are found in the GitHub directory
-<a href="https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/"><tt>https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/</tt></a>.
+<a href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/"><tt>https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/</tt></a>.
 If you download the tarball or clone the GitHub repository, the examples
 reside in the directory <code>doc/src/odespy/src-odespy</code>.
 
@@ -856,7 +856,7 @@ u = []; t = []           <span style="color: #228B22"># collectors for u and t i
 axis([<span style="color: #B452CD">0</span>, T[-<span style="color: #B452CD">1</span>], -<span style="color: #B452CD">0.1E+5</span>, <span style="color: #B452CD">1.1E+5</span>])
 <span style="color: #228B22"># Can concatenate all the elements of u and t, if desired</span>
 u = numpy.concatenate(u);  t = numpy.concatenate(t)
-savefig(<span style="color: #CD5555">&#39;tmp.png&#39;</span>)
+savefig(<span style="color: #CD5555">&#39;tmppng&#39;</span>); savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
 </pre></div>
 
 <h3>Termination Criterion for the Simulation  <a name="___sec19"></a></h3>
@@ -921,7 +921,7 @@ u, t = solver.solve(time_points, terminate)
 
 <span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">import</span> *
 plot(t, u, <span style="color: #CD5555">&#39;r-&#39;</span>)
-savefig(<span style="color: #CD5555">&#39;tmp.png&#39;</span>)
+savefig(<span style="color: #CD5555">&#39;tmppng&#39;</span>); savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
 show()
 </pre></div>
 
@@ -939,7 +939,7 @@ the ideas (<a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/
 
 <!-- code=python (from !bc pypro) typeset with pygments style "perldoc" -->
 <div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">mpl</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
 <span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>
 
 <span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">Logistic</span>:
@@ -983,11 +983,11 @@ the ideas (<a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/
         <span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&#39;Final u(t=%g)=%g&#39;</span> % (t[-<span style="color: #B452CD">1</span>], u[-<span style="color: #B452CD">1</span>])
 
     <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">plot</span>(<span style="color: #658b00">self</span>):
-        mpl.plot(<span style="color: #658b00">self</span>.t, <span style="color: #658b00">self</span>.u, <span style="color: #CD5555">&#39;r-&#39;</span>,
+        plt.plot(<span style="color: #658b00">self</span>.t, <span style="color: #658b00">self</span>.u, <span style="color: #CD5555">&#39;r-&#39;</span>,
                  <span style="color: #658b00">self</span>.t, <span style="color: #658b00">self</span>.u_exact(<span style="color: #658b00">self</span>.t), <span style="color: #CD5555">&#39;bo&#39;</span>)
-        mpl.legend([<span style="color: #CD5555">&#39;numerical&#39;</span>, <span style="color: #CD5555">&#39;exact&#39;</span>])
-        mpl.savefig(<span style="color: #CD5555">&#39;tmp.png&#39;</span>)
-        mpl.show()
+        plt.legend([<span style="color: #CD5555">&#39;numerical&#39;</span>, <span style="color: #CD5555">&#39;exact&#39;</span>])
+        plt.savefig(<span style="color: #CD5555">&#39;tmp.png&#39;</span>); plt.savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
+        plt.show()
 
 <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">main</span>():
     problem = Logistic(a=<span style="color: #B452CD">2</span>, R=<span style="color: #B452CD">1E+5</span>, A=<span style="color: #B452CD">1</span>, T=<span style="color: #B452CD">20</span>)
@@ -1120,7 +1120,7 @@ omega = u[:,<span style="color: #B452CD">1</span>]
 
 <span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">import</span> *
 plot(t, theta, <span style="color: #CD5555">&#39;r-&#39;</span>)
-savefig(<span style="color: #CD5555">&#39;tmp.png&#39;</span>)
+savefig(<span style="color: #CD5555">&#39;tmppng&#39;</span>); savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
 show()
 </pre></div>
 <p>
@@ -1164,7 +1164,7 @@ omega = u[:,<span style="color: #B452CD">1</span>]
 
 <span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">import</span> *
 plot(t, theta, <span style="color: #CD5555">&#39;r-&#39;</span>)
-savefig(<span style="color: #CD5555">&#39;tmp.png&#39;</span>)
+savefig(<span style="color: #CD5555">&#39;tmppng&#39;</span>); savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
 show()
 </pre></div>
 <p>
@@ -1298,7 +1298,7 @@ The loop over the chosen solvers may look like
 <div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">N_per_period = <span style="color: #B452CD">20</span>
 T = <span style="color: #B452CD">3</span>*problem.period   <span style="color: #228B22"># final time</span>
 <span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span>
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">mpl</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
 legends = []
 
 <span style="color: #8B008B; font-weight: bold">for</span> solver <span style="color: #8B008B">in</span> solvers:
@@ -1313,11 +1313,12 @@ legends = []
 
     theta = u[:,<span style="color: #B452CD">0</span>]
     legends.append(solver_name)
-    mpl.plot(t, theta)
-    mpl.hold(<span style="color: #CD5555">&#39;on&#39;</span>)
-mpl.legend(legends)
-mpl.savefig(__file__[:-<span style="color: #B452CD">3</span>] + <span style="color: #CD5555">&#39;.png&#39;</span>)
-mpl.show()
+    plt.plot(t, theta)
+    plt.hold(<span style="color: #CD5555">&#39;on&#39;</span>)
+plt.legend(legends)
+plotfile = __file__[:-<span style="color: #B452CD">3</span>]
+plt.savefig(plotfile + <span style="color: #CD5555">&#39;.png&#39;</span>); plt.savefig(plotfile + <span style="color: #CD5555">&#39;.pdf&#39;</span>)
+plt.show()
 </pre></div>
 <p>
 A complete program is available as <a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py"><tt>osc2.py</tt></a>.
@@ -1690,7 +1691,7 @@ method = solver.__class__.__name__
 <span style="color: #8B008B; font-weight: bold">else</span>:
     plt.plot(tp, solver.u, tp, problem.u_exact(tp))
 plt.legend([method, <span style="color: #CD5555">&#39;exact&#39;</span>])
-plt.savefig(<span style="color: #CD5555">&#39;tmp.png&#39;</span>)
+plt.savefig(<span style="color: #CD5555">&#39;tmppng&#39;</span>); plt.savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
 plt.show()
 </pre></div>
 
@@ -2278,7 +2279,7 @@ the source code into Python modules. This is done by
         <span style="color: #658b00">self</span>.mu = mu
 
         <span style="color: #228B22"># Compile F77 functions</span>
-        <span style="color: #658b00">self</span>.f_f77, <span style="color: #658b00">self</span>.jac_f77_radau5, <span style="color: #658b00">self</span>.jac_f77_lsode = \
+        <span style="color: #658b00">self</span>.f_f77, <span style="color: #658b00">self</span>.jac_f77_radau5, <span style="color: #658b00">self</span>.jac_f77_lsode = \ 
                     compile_f77([<span style="color: #658b00">self</span>.str_f_f77(),
                                  <span style="color: #658b00">self</span>.str_jac_f77_radau5(),
                                  <span style="color: #658b00">self</span>.str_jac_f77_lsode()])
@@ -2421,7 +2422,7 @@ the force is always the same - otherwise the solutions will be
 different.
 
 <p>
-The complete code is available in <a href="https://github.com/hplgit/odespy/tree/master/doc/src/odespy/src-odespy/sode1.py">sode.py</a>.
+The complete code is available in <a href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/sode1.py">sode.py</a>.
 
 <h2>Inner Workings of the Package  <a name="___sec38"></a></h2>
 
@@ -2488,7 +2489,7 @@ f_kwargs = dict(
     default={}),
 
 theta = dict(
-    help=&#39;eight in [0,1] used for&#39;\
+    help=&#39;eight in [0,1] used for&#39;\ 
          &#39;&quot;theta-rule&quot; finite difference approx.&#39;,
     default=0.5,
     type=(int,float),
@@ -2514,7 +2515,7 @@ initialization of <code>_optional_parameters</code> goes like this:
 
 <!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
 <div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">SomeMethod</span>(ParentMethod):
-    _optional_parameters = ParentMethod._optional_parameters + \
+    _optional_parameters = ParentMethod._optional_parameters + \ 
                            [<span style="color: #CD5555">&#39;prm1&#39;</span>, <span style="color: #CD5555">&#39;prm2&#39;</span>, ...]
 </pre></div>
 <p>
@@ -2796,7 +2797,7 @@ An implementation of a subclass for the
 <span style="color: #CD5555">    &quot;&quot;&quot;</span>
     quick_description = <span style="color: #CD5555">&quot;Explicit 2nd-order Adams-Bashforth method&quot;</span>
 
-    _optional_parameters = Solver._optional_parameters + \
+    _optional_parameters = Solver._optional_parameters + \ 
                           [<span style="color: #CD5555">&#39;start_method&#39;</span>,]
 
     <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">initialize_for_solve</span>(<span style="color: #658b00">self</span>):
