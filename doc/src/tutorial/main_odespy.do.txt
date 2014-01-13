@@ -1,0 +1,10 @@
+TITLE: A Tutorial for the Odespy Interface to ODE Solvers
+AUTHOR: Hans Petter Langtangen at Center for Biomedical Computing, Simula Research Laboratory & Department of Informatics, University of Oslo
+AUTHOR: Liwei Wang at Department of Informatics, University of Oslo
+DATE: today
+
+# #include "odespy.do.txt"
+
+__Remark.__ This document was written with aid of the
+"Doconce": "https://github.com/hplgit/doconce" tool, which allows
+output in many different formats.

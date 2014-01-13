@@ -1,0 +1,2917 @@
+<!DOCTYPE html>
+<!--
+Automatically generated HTML file from Doconce source
+(https://github.com/hplgit/doconce/)
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Doconce: https://github.com/hplgit/doconce/" />
+<meta name="description" content="A Tutorial for the Odespy Interface to ODE Solvers">
+
+
+
+<style type="text/css">
+    /* solarized style */
+    body {
+      margin:5;
+      padding:0;
+      border:0;	/* Remove the border around the viewport in old versions of IE */
+      width:100%;
+      background: #fdf6e3;
+      min-width:600px;	/* Minimum width of layout - remove if not required */
+      font-family: Verdana, Helvetica, Arial, sans-serif;
+      font-size: 1.0em;
+      line-height: 1.3em;
+      color: #657b83;
+    }
+    a { color: #657b83; text-decoration:none; }
+    a:hover { color: #b58900; background: #eee8d5; text-decoration:none; }
+    h1, h2, h3 { margin:.8em 0 .2em 0; padding:0; line-height: 125%; }
+    h2 { font-variant: small-caps; }
+    pre {
+      background: #fdf6e3;
+      -webkit-box-shadow: inset 0 0 2px #000000;
+      -moz-box-shadow: inset 0 0 2px #000000;
+      box-shadow: inset 0 0 2px #000000;
+      color: #586e75;
+      margin-left: 0px;
+      font-family: 'Droid Sans Mono', monospace;
+      padding: 2px;
+      -webkit-border-radius: 4px;
+      -moz-border-radius: 4px;
+      border-radius: 4px;
+      -moz-background-clip: padding;
+      -webkit-background-clip: padding-box;
+      background-clip: padding-box;
+    }
+    tt { font-family: "Courier New", Courier; }
+    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+    p { text-indent: 0px; }
+    p.caption { width: 80%; font-style: normal; text-align: left; }
+    hr.figure { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+
+</style>
+
+</head>
+
+<!-- tocinfo
+{'highest level': 1,
+ 'sections': [(' Motivation ', 1, 'ode:sec:motivation', 'ode:sec:motivation'),
+              (' Traditional Approach ', 2, None, '___sec1'),
+              (' LSODE ', 3, None, '___sec2'),
+              (' MATLAB ', 3, None, '___sec3'),
+              (' Python ', 3, None, '___sec4'),
+              (" Odespy's Unified Interface ", 2, None, '___sec5'),
+              (' Methods and Implementations Offered by Odespy ',
+               2,
+               None,
+               '___sec6'),
+              (' Installation ', 1, None, '___sec7'),
+              (' Basic Usage ', 1, None, '___sec8'),
+              (' Overview ', 2, None, '___sec9'),
+              (' Step 1 ', 3, None, '___sec10'),
+              (' Step 2 ', 3, None, '___sec11'),
+              (' Step 3 ', 3, None, '___sec12'),
+              (' Step 4 ', 3, None, '___sec13'),
+              (' Step 5 ', 3, None, '___sec14'),
+              (' Step 6 ', 3, None, '___sec15'),
+              (' First Example: Logistic Growth ',
+               2,
+               'ode:sec:exgr',
+               'ode:sec:exgr'),
+              (' Parameters in the Right-Hand Side Function ',
+               2,
+               'ode:sec:exgr:farg',
+               'ode:sec:exgr:farg'),
+              (' Continuing a Previous Simulation ', 2, None, '___sec18'),
+              (' Termination Criterion for the Simulation ',
+               2,
+               None,
+               '___sec19'),
+              (' A Class-Based Implementation ', 2, None, '___sec20'),
+              (' Using Other Symbols ', 2, None, '___sec21'),
+              (' Example: Solving an ODE System ', 2, None, '___sec22'),
+              (' Testing Several Methods ', 2, None, '___sec23'),
+              (' Make a Subclass of Problem ', 2, None, '___sec24'),
+              (' Using Adaptive Methods ', 2, None, '___sec25'),
+              (' The Test Problem ', 3, None, '___sec26'),
+              (' Running Simple Methods ', 3, None, '___sec27'),
+              (' Running the Runge-Kutta-Fehlberg Method ',
+               3,
+               None,
+               '___sec28'),
+              (' Testing More Adaptive Solvers ', 3, None, '___sec29'),
+              (' Extensive Testing ', 3, None, '___sec30'),
+              (' Example: Solving a Complex ODE Problem ',
+               2,
+               None,
+               '___sec31'),
+              (' Quick Implementation ', 3, None, '___sec32'),
+              (' Comparison of Methods ', 3, None, '___sec33'),
+              (' Avoiding Callbacks to Python ', 2, None, '___sec34'),
+              (' The Logistic ODE ', 3, None, '___sec35'),
+              (' Implementing the van der Pol Equation in FORTRAN ',
+               3,
+               None,
+               '___sec36'),
+              (' Example: Solving a Stochastic Differential Equation ',
+               2,
+               None,
+               '___sec37'),
+              (' Inner Workings of the Package ', 1, None, '___sec38'),
+              (' Solver Parameters ',
+               2,
+               'odes:parameters',
+               'odes:parameters'),
+              (' Solver Classes ', 2, None, '___sec40'),
+              (' The Inherited Superclass Constructor ', 3, None, '___sec41'),
+              (' Useful Methods ', 3, None, '___sec42'),
+              (' The Solve Method ', 3, None, '___sec43'),
+              (' Solver Attributes ', 3, None, '___sec44'),
+              (' Other Superclasses ', 3, None, '___sec45'),
+              (' A Very Simple Subclass ', 2, None, '___sec46'),
+              (' A Subclass with More Code ', 2, None, '___sec47'),
+              (' A Simple Example of an Implicit Method ',
+               2,
+               None,
+               '___sec48'),
+              (' Troubleshooting ', 1, None, '___sec49'),
+              (' Constructor takes exactly two arguments, 5 given ',
+               3,
+               None,
+               '___sec50')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "AMS"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js"]
+  }
+});
+</script>
+<script type="text/javascript"
+ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- Fix slow MathJax rendering in IE8 -->
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+
+
+
+
+    
+<!-- ------------------- main content ---------------------- -->
+
+
+<title>A Tutorial for the Odespy Interface to ODE Solvers</title>
+
+<center><h1>A Tutorial for the Odespy Interface to ODE Solvers</h1></center>  <!-- document title -->
+
+<p>
+<!-- author(s): Hans Petter Langtangen, and Liwei Wang -->
+
+<center>
+<b>Hans Petter Langtangen</b> [1, 2]
+</center>
+
+<center>
+<b>Liwei Wang</b> [2]
+</center>
+
+
+<p>
+<!-- institution(s) -->
+
+<center>[1] <b>Center for Biomedical Computing, Simula Research Laboratory</b></center>
+<center>[2] <b>Department of Informatics, University of Oslo</b></center>
+<p>
+<center><h4>Sep 19, 2013</h4></center> <!-- date -->
+<p>
+The Odespy package makes it easy to specify an ODE problem in
+Python and get it solved by a wide variety of different numerical
+methods and software.
+
+<h2>Motivation <a name="ode:sec:motivation"></a></h2>
+
+<p>
+The Odespy package grew out of the desire to have a unified interface
+to lots of different methods and software for ODEs. Consider the
+ODE problem
+$$ y'' = 3 (1 - y^2) y' - y,\quad y(0)=2,\ y'(0)=1, $$
+
+known as the van der Pool oscillator. The solution is
+desired at 150 equally spaced time levels in
+the interval <code>[0, 30]</code>.
+
+<h3>Traditional Approach  <a name="___sec1"></a></h3>
+
+<p>
+We want to solve this problem
+by three well-known routines:
+
+<p>
+
+<ol>
+ <li> <code>LSODE</code> from ODEPACK (adaptive Adams and BDF methods)</li>
+ <li> <code>ode45</code> from MATLAB (adaptive Runge-Kutta 4-5-th order)</li>
+ <li> <code>vode</code> from Python (adaptive Adams and BDF methods)</li>
+</ol>
+
+All of these routines require the ODE problem to be on the form
+\( u'=f(u,t) \), which means that
+the second-order differential equation must be
+recast as a system of two ODEs,
+and we have to identify the vector of right-hand sides and the vector
+for the initial condition.
+
+<p>
+The mentioned ODE software needs a specification of the \( f(u,t) \) formulas
+through some user-written function that takes \( u \) and \( t \) as input and
+delivers the vector \( f \) as output.
+
+<h4>LSODE  <a name="___sec2"></a></h4>
+
+<p>
+Application of <code>LSODE</code> and other ODEPACK routines requires the
+ODE problem to be specified in FORTRAN and the solver to be called
+from FORTRAN:
+<p>
+
+<!-- code=fortran (from !bc fpro) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">     <span style="color: #8B008B; font-weight: bold">PROGRAM </span><span style="color: #00688B">MAIN</span>
+     <span style="color: #8B008B; font-weight: bold">EXTERNAL </span><span style="color: #00688B">F</span>
+     <span style="color: #a7a7a7; font-weight: bold">INTEGER </span><span style="color: #00688B">I</span>, <span style="color: #00688B">IOPT</span>, <span style="color: #00688B">IOUT</span>, <span style="color: #00688B">ISTATE</span>, <span style="color: #00688B">ITASK</span>, <span style="color: #00688B">ITOL</span>, <span style="color: #00688B">IWORK</span>,
+    <span style="color: #B452CD">1</span>   <span style="color: #00688B">LRW</span>, <span style="color: #00688B">LIW</span>, <span style="color: #00688B">MF</span>, <span style="color: #00688B">NEQ</span>, <span style="color: #00688B">NOUT</span>
+     <span style="color: #a7a7a7; font-weight: bold">DOUBLE PRECISION </span><span style="color: #00688B">ATOL</span>, <span style="color: #00688B">T</span>, <span style="color: #00688B">TOUT</span>, <span style="color: #00688B">RTOL</span>, <span style="color: #00688B">RWORK</span>, <span style="color: #00688B">U</span>, <span style="color: #00688B">URR</span>
+     <span style="color: #8B008B; font-weight: bold">DIMENSION </span><span style="color: #00688B">U</span>(<span style="color: #B452CD">2</span>), <span style="color: #00688B">RWORK</span>(<span style="color: #B452CD">52</span>), <span style="color: #00688B">IWORK</span>(<span style="color: #B452CD">20</span>), <span style="color: #00688B">U1</span>(<span style="color: #B452CD">5</span>), <span style="color: #00688B">U2</span>(<span style="color: #B452CD">5</span>)
+     <span style="color: #00688B">NEQ</span> = <span style="color: #B452CD">2</span>
+<span style="color: #00688B">C</span>    <span style="color: #00688B">SET</span> <span style="color: #00688B">ADAMS</span> <span style="color: #00688B">METHOD</span>:
+     <span style="color: #00688B">MF</span> = <span style="color: #B452CD">10</span>
+<span style="color: #00688B">C</span>    <span style="color: #00688B">LET</span> <span style="color: #00688B">TOLERANCES</span> <span style="color: #00688B">BE</span> <span style="color: #00688B">SCALARS</span> (<span style="color: #658b00">NOT </span><span style="color: #00688B">ARRAYS</span>):
+     <span style="color: #00688B">ITOL</span> = <span style="color: #B452CD">1</span>
+<span style="color: #00688B">C</span>    <span style="color: #8B008B; font-weight: bold">USE </span><span style="color: #00688B">ONLY</span> <span style="color: #00688B">ABSOLUTE</span> <span style="color: #00688B">TOLERANCE</span>:
+     <span style="color: #00688B">RTOL</span> = <span style="color: #B452CD">0.0</span><span style="color: #00688B">D0</span>
+     <span style="color: #00688B">ATOL</span> = <span style="color: #B452CD">1.0</span><span style="color: #00688B">D</span>-<span style="color: #B452CD">6</span>
+     <span style="color: #00688B">LRW</span> = <span style="color: #B452CD">52</span>
+     <span style="color: #00688B">LIW</span> = <span style="color: #B452CD">20</span>
+<span style="color: #00688B">C</span>    <span style="color: #00688B">NUMBER</span> <span style="color: #00688B">OF</span> <span style="color: #658b00">TIME </span><span style="color: #00688B">STEPS</span>:
+     <span style="color: #00688B">NOUT</span> = <span style="color: #B452CD">150</span>
+<span style="color: #00688B">C</span>    <span style="color: #8B008B; font-weight: bold">FINAL </span><span style="color: #658b00">TIME</span>:
+     <span style="color: #00688B">TOUT</span> = <span style="color: #B452CD">30.0</span><span style="color: #00688B">D0</span>
+<span style="color: #00688B">C</span>    <span style="color: #00688B">INITIAL</span> <span style="color: #00688B">CONDITIONS</span>
+     <span style="color: #00688B">T</span> = <span style="color: #B452CD">0.0</span><span style="color: #00688B">D0</span>
+     <span style="color: #00688B">U</span>(<span style="color: #B452CD">1</span>)= <span style="color: #B452CD">2.0</span><span style="color: #00688B">D0</span>
+     <span style="color: #00688B">U</span>(<span style="color: #B452CD">2</span>) = <span style="color: #B452CD">0.0</span><span style="color: #00688B">D0</span>
+     <span style="color: #00688B">ITASK</span> = <span style="color: #B452CD">1</span>
+     <span style="color: #00688B">ISTATE</span> = <span style="color: #B452CD">1</span>
+<span style="color: #00688B">C</span>    <span style="color: #8B008B; font-weight: bold">CALL </span><span style="color: #00688B">ADAPTIVE</span> <span style="color: #658b00">TIME </span><span style="color: #00688B">STEPPING</span> <span style="color: #00688B">AT</span> <span style="color: #00688B">EACH</span> <span style="color: #00688B">OF</span> <span style="color: #00688B">THE</span> <span style="color: #8B008B; font-weight: bold">TARGET </span><span style="color: #658b00">TIME </span><span style="color: #00688B">LEVELS</span>
+     <span style="color: #8B008B; font-weight: bold">DO </span><span style="color: #B452CD">100</span> <span style="color: #00688B">IOUT</span> = <span style="color: #B452CD">1</span>, <span style="color: #00688B">NOUT</span>
+       <span style="color: #8B008B; font-weight: bold">CALL </span><span style="color: #00688B">DLSODE</span>(<span style="color: #00688B">F</span>,<span style="color: #00688B">NEQ</span>,<span style="color: #00688B">U</span>,<span style="color: #00688B">T</span>,<span style="color: #00688B">TOUT</span>,<span style="color: #00688B">ITOL</span>,<span style="color: #00688B">RTOL</span>,<span style="color: #00688B">ATOL</span>,<span style="color: #00688B">ITASK</span>,
+    <span style="color: #B452CD">1</span>     <span style="color: #00688B">ISTATE</span>,<span style="color: #00688B">IOPT</span>,<span style="color: #00688B">RWORK</span>,<span style="color: #00688B">LRW</span>,<span style="color: #00688B">IWORK</span>,<span style="color: #00688B">LIW</span>,<span style="color: #00688B">JAC</span>,<span style="color: #00688B">MF</span>)
+       <span style="color: #00688B">U1</span>(<span style="color: #00688B">IOUT</span>) = <span style="color: #00688B">U</span>(<span style="color: #B452CD">1</span>)
+       <span style="color: #00688B">U2</span>(<span style="color: #00688B">IOUT</span>) = <span style="color: #00688B">U</span>(<span style="color: #B452CD">2</span>)
+       <span style="color: #00688B">TOUT</span> = <span style="color: #00688B">TOUT</span> + <span style="color: #B452CD">2.0</span><span style="color: #00688B">D</span>-<span style="color: #B452CD">1</span>
+ <span style="color: #B452CD">100</span> <span style="color: #8B008B; font-weight: bold">CONTINUE</span>
+<span style="color: #8B008B; font-weight: bold">     END</span>
+
+<span style="color: #8B008B; font-weight: bold">     SUBROUTINE </span><span style="color: #00688B">F</span>(<span style="color: #00688B">NEQ</span>, <span style="color: #00688B">T</span>, <span style="color: #00688B">U</span>, <span style="color: #00688B">UDOT</span>)
+     <span style="color: #a7a7a7; font-weight: bold">INTEGER </span><span style="color: #00688B">NEQ</span>
+     <span style="color: #a7a7a7; font-weight: bold">DOUBLE PRECISION </span><span style="color: #00688B">T</span>, <span style="color: #00688B">U</span>, <span style="color: #00688B">UDOT</span>
+     <span style="color: #8B008B; font-weight: bold">DIMENSION </span><span style="color: #00688B">U</span>(<span style="color: #B452CD">2</span>), <span style="color: #00688B">UDOT</span>(<span style="color: #B452CD">2</span>)
+     <span style="color: #00688B">UDOT</span>(<span style="color: #B452CD">1</span>) = <span style="color: #00688B">U</span>(<span style="color: #B452CD">2</span>)
+     <span style="color: #00688B">UDOT</span>(<span style="color: #B452CD">2</span>) = <span style="color: #B452CD">3.0</span><span style="color: #00688B">D0</span>*(<span style="color: #B452CD">1.0</span><span style="color: #00688B">D0</span> - <span style="color: #00688B">U</span>(<span style="color: #B452CD">1</span>)*<span style="color: #00688B">U</span>(<span style="color: #B452CD">1</span>))*<span style="color: #00688B">U</span>(<span style="color: #B452CD">2</span>) - <span style="color: #00688B">U</span>(<span style="color: #B452CD">1</span>)
+     <span style="color: #8B008B; font-weight: bold">RETURN</span>
+<span style="color: #8B008B; font-weight: bold">     END</span>
+</pre></div>
+
+<h4>MATLAB  <a name="___sec3"></a></h4>
+
+<p>
+The problem can be solved with very compact code in MATLAB. The definition
+of the ODE system, the \( f(u,t) \) function, is placed in
+a function in a file, say <code>myode.m</code>:
+<p>
+
+<!-- code=matlab (from !bc mcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">function</span><span style="color: #bbbbbb"> </span>F =<span style="color: #bbbbbb"> </span><span style="color: #008b45">myode</span>(t, u);
+F(<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>) = u(<span style="color: #B452CD">2</span>)
+F(<span style="color: #B452CD">2</span>,<span style="color: #B452CD">1</span>) = <span style="color: #B452CD">3</span>*(<span style="color: #B452CD">1</span> - u(<span style="color: #B452CD">1</span>)*u(<span style="color: #B452CD">1</span>))*u(<span style="color: #B452CD">2</span>) - u(<span style="color: #B452CD">1</span>)
+</pre></div>
+<p>
+In MATLAB we can then solve the problem by
+<p>
+
+<!-- code=text (from !bc ipy) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">&gt;&gt; options = odeset(&#39;RelTol&#39;,0.0,&#39;AbsTol&#39;,1e-6);
+&gt;&gt; tspan = [0 30];
+&gt;&gt; u0 = [2; 0]
+&gt;&gt; [t, u] = ode45(&#39;myode&#39;, tspan, u0, options]);
+</pre></div>
+
+<h4>Python  <a name="___sec4"></a></h4>
+
+<p>
+Calling up the <code>vode</code> method from the <code>scipy</code> library in Python
+also results in fairly compact code:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(t, u):
+    <span style="color: #8B008B; font-weight: bold">return</span> [u[<span style="color: #B452CD">1</span>], <span style="color: #B452CD">3.</span>*(<span style="color: #B452CD">1.</span> - u[<span style="color: #B452CD">0</span>]*u[<span style="color: #B452CD">0</span>])*u[<span style="color: #B452CD">1</span>] - u[<span style="color: #B452CD">0</span>]]
+
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">scipy.integrate</span> <span style="color: #8B008B; font-weight: bold">import</span> ode
+r = ode(f).set_integrator(<span style="color: #CD5555">&#39;vode&#39;</span>, method=<span style="color: #CD5555">&#39;adams&#39;</span>,
+                          order=<span style="color: #B452CD">10</span>, rol=<span style="color: #B452CD">0</span>, atol=<span style="color: #B452CD">1e-6</span>,
+                          with_jacobian=<span style="color: #658b00">False</span>)
+u0 = [<span style="color: #B452CD">2.0</span>, <span style="color: #B452CD">0.0</span>]
+r.set_initial_value(u0, <span style="color: #B452CD">0</span>)
+T = <span style="color: #B452CD">30</span>
+dt = T/<span style="color: #B452CD">150.</span>
+u = [];  t = []
+<span style="color: #8B008B; font-weight: bold">while</span> r.successful() <span style="color: #8B008B">and</span> r.t &lt;= T:
+    r.integrate(r.t + dt)
+    u.append(r.y);  t.append(r.t)
+</pre></div>
+<p>
+Suppose you want to compare these methods and their implementations.
+This requires three different main programs, but even worse: three
+different implementations of the definition of the mathematical
+problem.  Some specifications of \( f \) has the signature \( f(u,t) \) while
+others require \( f(t,u) \), and such differences between packages are
+often a cause of programming errors.
+
+<h3>Odespy's Unified Interface  <a name="___sec5"></a></h3>
+
+<p>
+The Odespy package provides a unified interface to all the three
+mentioned types of methods, which makes it easy to run all of them
+in a loop (program <a href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/motivation1.py"><tt>motivation.py</tt></a>):
+
+<p>
+
+<!-- code=python (from !bc pypro) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(u, t):
+    <span style="color: #8B008B; font-weight: bold">return</span> [u[<span style="color: #B452CD">1</span>], <span style="color: #B452CD">3.</span>*(<span style="color: #B452CD">1.</span> - u[<span style="color: #B452CD">0</span>]*u[<span style="color: #B452CD">0</span>])*u[<span style="color: #B452CD">1</span>] - u[<span style="color: #B452CD">0</span>]]
+
+u0 = [<span style="color: #B452CD">2.0</span>, <span style="color: #B452CD">0.0</span>]
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>, <span style="color: #008b45; text-decoration: underline">numpy</span>
+
+<span style="color: #8B008B; font-weight: bold">for</span> method <span style="color: #8B008B">in</span> odespy.Lsode, odespy.DormandPrince, odespy.Vode:
+
+    solver = method(f, rtol=<span style="color: #B452CD">0.0</span>, atol=<span style="color: #B452CD">1e-6</span>,
+                    adams_or_bdf=<span style="color: #CD5555">&#39;adams&#39;</span>, order=<span style="color: #B452CD">10</span>)
+    solver.set_initial_condition(u0)
+    t_points = numpy.linspace(<span style="color: #B452CD">0</span>, <span style="color: #B452CD">30</span>, <span style="color: #B452CD">150</span>)
+    u, t = solver.solve(t_points)
+</pre></div>
+<p>
+Note in particular that the same <code>f</code> and the same call syntax can be
+reused across methods and the underlying software.
+
+<h3>Methods and Implementations Offered by Odespy  <a name="___sec6"></a></h3>
+
+<p>
+Odespy features a unified interface to the following collection of
+numerical methods and implementations:
+
+<p>
+
+<ul>
+  <li> Pure Python implementations of classical explicit schemes such as
+    the Forward Euler method (also called Euler);
+    Runge-Kutta methods of 2nd, 3rd, and 4th order; Heun's method;
+    Adams-Bashforth methods of 2nd, 3rd, and 4th order;
+    Adams-Bashforth-Moulton methods of 2nd and 3rd order.</li>
+  <li> Pure Python implementations of classical implicit schemes such as
+    Backward Euler; 2-step backward scheme; the \( \theta \) rule;
+    the Midpoint (or Trapezoidal) method.</li>
+  <li> Pure Python implementations of adaptive explicit Runge-Kutta
+    methods of type Runge-Kutta-Fehlberg of order (4,5), Dormand-Prince
+    of order (4,5), Cash-Karp of order (4,5), Bogacki-Shampine of order (2,3).</li>
+  <li> Wrappers for all FORTRAN solvers in <a href="http://www.netlib.org/odepack/">ODEPACK</a>.</li>
+  <li> Wrappers for the wrappers of FORTRAN solvers in <a href="http://www.scipy.org"><tt>scipy</tt></a>:
+    <code>vode</code> and <code>zvode</code> (adaptive Adams or BDF from <a href="http://www.netlib.org/ode/vode.f">vode.f</a>);
+    <code>dopri5</code> (adaptive Dormand-Prince method of order (4,5));
+    <code>dop853</code> (adaptive Dormand-Prince method of order 8(5,3));
+    <code>odeint</code> (adaptive switching between Adams or BDF from the implementation <code>LSODA</code> in <a href="http://www.netlib.org/odepack/">ODEPACK</a>).</li>
+  <li> Wrapper for the Runge-Kutta-Chebyshev formulas of order 2 as
+    offered by the well-known FORTRAN code <a href="http://www.netlib.org/ode/rkc.f"><tt>rkc.f</tt></a>.</li>
+  <li> Wrapper for the Runge-Kutta-Fehlberg method of
+    order (4,5) as provided by the well-known FORTRAN code <a href="http://www.netlib.org/ode/rkf45.f"><tt>rkf45.f</tt></a>.</li>
+  <li> Wrapper for the Radau5 method as provided by the well-known FORTRAN code
+    <a href="http://www.unige.ch/~hairer/prog/stiff/radau5.f"><tt>radau5.f</tt></a>.</li>
+  <li> Wrapper for some solvers in the <a href="https://github.com/olivierverdier/odelab"><tt>odelab</tt></a> package.</li>
+</ul>
+
+The ODE problem can always be specified in Python, but for wrappers of
+FORTRAN codes one can also implement the problem in FORTRAN and avoid
+callback to Python.
+
+<h2>Installation  <a name="___sec7"></a></h2>
+
+<p>
+The Odespy package is most easily installed by checking out
+the latest version of the source code:
+<p>
+
+<!-- code=bash (from !bc sys) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">git clone git@github.com:hplgit/odespy.git
+<span style="color: #658b00">cd </span>odespy
+</pre></div>
+<p>
+The installation follows the standard procedure,
+<p>
+
+<!-- code=bash (from !bc sys) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">sudo python setup.py install
+</pre></div>
+<p>
+You will at least also need Python v2.7 and the <a href="http://numpy.scipy.org/"><tt>numpy</tt></a> package.  The FORTRAN codes <code>rkc.f</code>,
+<code>rkf45.f</code>, <code>radau5.f</code>, and ODEPACK comes with Odespy and are compiled
+and installed by <code>setup.py</code>.
+
+<p>
+The Odespy package depends on several additional packages:
+
+<p>
+
+<ul>
+ <li> <a href="http://scipy.org/"><tt>scipy</tt></a> for running the <code>Vode</code> Adams/BDF solver, the
+   Dormand-Prince adaptive methods <code>Dop853</code>, and <code>Dopri5</code>,
+   and the <code>scipy</code> wrapper <code>odeint</code> of the FORTRAN code <code>LSODA</code>
+   (Odespy features an alternative wrapper of the latter, in class <code>Lsoda</code>).</li>
+ <li> <a href="http://sympy.org/en/index.html"><tt>sympy</tt></a> for running the
+   extremely accurate <code>odefun_sympy</code> solver.</li>
+ <li> <a href="https://github.com/olivierverdier/odelab"><tt>odelab</tt></a>
+   for accessing solvers in that package.</li>
+</ul>
+
+For plotting you will need <a href="http://matplotlib.sourceforge.net/"><tt>matplotlib</tt></a> or <a href="http://code.google.com/p/scitools/"><tt>scitools</tt></a>.
+
+<p>
+These packages are readily downloaded and installed by the
+standard <code>setup.py</code> script, as shown above.
+On Ubuntu and other Debian-based Linux systems the following
+line installs all that Odespy may need:
+<p>
+
+<!-- code=bash (from !bc sys) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">sudo apt-get install python-scipy python-nose python-sympy <span style="color: #CD5555">\ </span>
+     python-matplotlib python-scitools python-pip
+</pre></div>
+<p>
+The <code>odelab</code> package is installed by either
+<p>
+
+<!-- code=bash (from !bc sys) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">pip install -e git+https://github.com/olivierverdier/odelab#egg=odelab
+</pre></div>
+<p>
+or downloading the source and running <code>setup.py</code>:
+<p>
+
+<!-- code=bash (from !bc sys) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">git clone git://github.com/olivierverdier/odelab.git
+<span style="color: #658b00">cd </span>odelab
+sudo python setup.py install
+</pre></div>
+
+<h2>Basic Usage  <a name="___sec8"></a></h2>
+
+<p>
+This section explains how to use Odespy. The general principles and
+program steps are first explained. Thereafter, we present a series of
+examples with progressive complexity with respect to Python constructs
+and numerical methods.
+
+<h3>Overview  <a name="___sec9"></a></h3>
+
+<p>
+A code using Odespy to solve ODEs consists of six steps. These are
+outlined in generic form below.
+
+<h4>Step 1  <a name="___sec10"></a></h4>
+
+<p>
+<em>Write the ODE problem in generic form</em> \( u' = f(u, t) \),
+where \( u(t) \) is the unknown function to be solved for, or a vector
+of unknown functions of time in case of a system of ODEs.
+
+<h4>Step 2  <a name="___sec11"></a></h4>
+
+<p>
+<em>Implement the right-hand side function</em> \( f(u, t) \) as a Python function
+<code>f(u, t)</code>.  The argument <code>u</code> is either a <code>float</code> object, in case of a
+scalar ODE, or a <code>numpy</code> array object, in case of a system of ODEs.
+Some solvers in this package also allow implementation of \( f \) in
+FORTRAN for increased efficiency.
+
+<h4>Step 3  <a name="___sec12"></a></h4>
+
+<p>
+<em>Create a solver object</em>
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">solver = classname(f)
+</pre></div>
+<p>
+where <code>classname</code> is the name of a class in this package implementing
+the desired numerical method.
+
+<p>
+Many solver classes has a range of parameters that the user can set to
+control various parts of the solution process. The parameters are
+documented in the doc string of the class (<code>pydoc classname</code> will list
+the documentation in a terminal window). One can either specify parameters
+at construction time, via extra keyword arguments to the constructor,
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">solver = classname(f, prm1=value1, prm2=value2, ...)
+</pre></div>
+<p>
+or at any time using the <code>set</code> method:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">solver.set(prm1=value1, prm2=value2, prm3=value3)
+...
+solver.set(prm4=value4)
+</pre></div>
+
+<h4>Step 4  <a name="___sec13"></a></h4>
+
+<p>
+<em>Set the initial condition</em> \( u(0)=U_0 \),
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">solver.set_initial_condition(U0)
+</pre></div>
+<p>
+where <code>U0</code> is either a number, for a scalar ODE, or a sequence (list, tuple,
+<code>numpy</code> array), for a system of ODEs.
+
+<h4>Step 5  <a name="___sec14"></a></h4>
+
+<p>
+<em>Solve the ODE problem</em>, which means to compute \( u(t) \) at
+some discrete user-specified time points \( t_1, t_2, \ldots, t_N \).
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">T = ...  <span style="color: #228B22"># end time</span>
+time_points = numpy.linspace(<span style="color: #B452CD">0</span>, T, N+<span style="color: #B452CD">1</span>)
+u, t = solver.solve(time_points)
+</pre></div>
+<p>
+In case of a scalar ODE, the returned solution <code>u</code> is a one-dimensional
+<code>numpy</code> array where <code>u[i]</code> holds the solution at time point <code>t[i]</code>.
+For a system of ODEs, the returned <code>u</code> is a two-dimensional <code>numpy</code>
+array where <code>u[i,j]</code> holds the solution of the \( j \)-th unknown
+function at the \( i \)-th time point <code>t[i]</code> (\( u_j(t_i) \) in mathematics
+notation).
+
+<p>
+By giving the parameter <code>disk_storage=True</code> to the solver's constructor,
+the returned <code>u</code> array is memory mapped (i.e., of type <code>numpy.memmap</code>)
+such that all the data are stored on file, but parts of the array can
+be efficiently accessed.
+
+<p>
+The <code>time_points</code> array specifies the time points where we want the
+solution to be computed. The returned array <code>t</code> is the same as
+<code>time_points</code>.  The simplest numerical methods in the Odespy
+package apply the <code>time_points</code> array directly for the time stepping.
+That is, the time steps used are given by
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">time_points[i] - time_points[i-<span style="color: #B452CD">1</span>]  <span style="color: #228B22">#  i=0,1,...,len(time_points)-1</span>
+</pre></div>
+<p>
+The adaptive schemes typically compute between each time point in
+the <code>time_points</code> array, making this array a specification where
+values of the unknowns are desired.
+
+<p>
+The <code>solve</code> method in solver classes also allows a second argument,
+<code>terminate</code>, which is a user-implemented Python function specifying
+when the solution process is to be terminated. For example,
+terminating when the solution reaches an asymptotic (known) value
+<code>a</code> can be done by
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">terminate</span>(u, t, step_no):
+    <span style="color: #228B22"># u and t are arrays. Most recent solution is u[step_no].</span>
+    tolerance = <span style="color: #B452CD">1E-6</span>
+    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #658b00">abs</span>(u[step_no] - a) &lt; tolerance
+
+u, t = solver.solve(time_points, terminate)
+</pre></div>
+<p>
+The arguments transferred to the <code>terminate</code> function are the
+solution array <code>u</code>, the corresponding time points <code>t</code>, and
+an integer <code>step_no</code> reflecting the most recently computed <code>u</code>
+value. That is, <code>u[step_no]</code> is most recently computed value of \( u \).
+(The array data <code>u[step_no+1:]</code> will typically be zero as these
+are uncomputed future values.)
+
+<h4>Step 6  <a name="___sec15"></a></h4>
+
+<p>
+<em>Extract solution components</em> for plotting and further analysis.
+Since the <code>u</code> array returned from <code>solver.solve</code> stores all unknown
+functions at all discrete time levels, one usually wants to extract
+individual unknowns as one-dimensional arrays. Here is an example
+where unknown number \( 0 \) and \( k \) are extracted in individual arrays
+and plotted:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">u_0 = u[:,<span style="color: #B452CD">0</span>]
+u_k = u[:,k]
+
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">import</span> plot, show
+plot(t, u_0, t, u_k)
+show()
+</pre></div>
+
+<h3>First Example: Logistic Growth <a name="ode:sec:exgr"></a></h3>
+
+<p>
+Our first example concerns the simple scalar ODE problem
+\( u'=au(1-u/R) \), \( u(0)=A \),
+where \( A>0 \), \( a>0 \), and \( R>0 \) are known constants. This is
+a common model for population dynamics in ecology where \( u \) is the
+number of individuals, \( a \) the initial growth rate, \( R \) is the
+maximum number of individuals that the environment allows (the so-called
+<em>carrying capacity</em> of the environment).
+
+<p>
+Using a standard
+Runge-Kutta method of order four, the code for solving the problem in
+the time interval \( [0,10] \) with \( N=30 \) time steps, looks like this
+(program <a href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/logistic1.py"><tt>logistic1.py</tt></a>):
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(u, t):
+    <span style="color: #8B008B; font-weight: bold">return</span> a*u*(<span style="color: #B452CD">1</span> - u/R)
+
+a = <span style="color: #B452CD">2</span>
+R = <span style="color: #B452CD">1E+5</span>
+A = <span style="color: #B452CD">1</span>
+
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>
+solver = odespy.RK4(f)
+solver.set_initial_condition(A)
+
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> linspace, exp
+T = <span style="color: #B452CD">10</span>  <span style="color: #228B22"># end of simulation</span>
+N = <span style="color: #B452CD">30</span>  <span style="color: #228B22"># no of time steps</span>
+time_points = linspace(<span style="color: #B452CD">0</span>, T, N+<span style="color: #B452CD">1</span>)
+u, t = solver.solve(time_points)
+</pre></div>
+<p>
+With the <code>RK4</code> method and other non-adaptive methods
+the time steps are dictated by the <code>time_points</code> array.
+A constant time step of size is implied in the present example.
+Running an alternative numerical method just means replacing <code>RK4</code> by, e.g.,
+<code>RK2</code>, <code>ForwardEuler</code>, <code>BackwardEuler</code>, <code>AdamsBashforth2</code>, etc.
+
+<p>
+We can easily plot the numerical solution and compare with the exact
+solution (which is known for this equation):
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">u_exact</span>(t):
+    <span style="color: #8B008B; font-weight: bold">return</span> R*A*exp(a*t)/(R + A*(exp(a*t) - <span style="color: #B452CD">1</span>))
+
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">import</span> *
+
+plot(t, u, <span style="color: #CD5555">&#39;r-&#39;</span>,
+     t, u_exact(t), <span style="color: #CD5555">&#39;bo&#39;</span>)
+savefig(<span style="color: #CD5555">&#39;tmppng&#39;</span>); savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
+show()
+</pre></div>
+<p>
+<center> <!-- figure -->
+<hr class="figure">
+<center><p class="caption">Figure 1:  Solution of the logistic equation with the 4-th order Runge-Kutta method (solid line) and comparison with the exact solution (dots). </p></center>
+<p><img src="fig-odespy/logistic1.png" align="bottom" width=400></p>
+</center>
+
+<p>
+All the examples in this tutorial are found in the GitHub directory
+<a href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/"><tt>https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/</tt></a>.
+If you download the tarball or clone the GitHub repository, the examples
+reside in the directory <code>doc/src/odespy/src-odespy</code>.
+
+<h3>Parameters in the Right-Hand Side Function <a name="ode:sec:exgr:farg"></a></h3>
+
+<p>
+The right-hand side function and all physical parameters are often
+lumped together in a class, for instance,
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">Logistic</span>:
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">__init__</span>(<span style="color: #658b00">self</span>, a, R, A):
+        <span style="color: #658b00">self</span>.a = a
+        <span style="color: #658b00">self</span>.R = R
+        <span style="color: #658b00">self</span>.A = A
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(<span style="color: #658b00">self</span>, u, t):
+        a, R = <span style="color: #658b00">self</span>.a, <span style="color: #658b00">self</span>.R  <span style="color: #228B22"># short form</span>
+        <span style="color: #8B008B; font-weight: bold">return</span> a*u*(<span style="color: #B452CD">1</span> - u/R)
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">u_exact</span>(<span style="color: #658b00">self</span>, t):
+        a, R, A = <span style="color: #658b00">self</span>.a, <span style="color: #658b00">self</span>.R, <span style="color: #658b00">self</span>.A  <span style="color: #228B22"># short form</span>
+        <span style="color: #8B008B; font-weight: bold">return</span> R*A*exp(a*t)/(R + A*(exp(a*t) - <span style="color: #B452CD">1</span>))
+</pre></div>
+<p>
+Note that introducing local variables like <code>a</code> and <code>R</code>, instead of
+using <code>self.a</code> and <code>self.A</code>, makes the code closer to the mathematics.
+This can be convenient when proof reading the implementation of
+complicated ODEs.
+
+<p>
+The numerical solution is computed by
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>
+problem = Logistic(a=<span style="color: #B452CD">2</span>, R=<span style="color: #B452CD">1E+5</span>, A=<span style="color: #B452CD">1</span>)
+solver = odespy.RK4(problem.f)
+solver.set_initial_condition(problem.A)
+
+T = <span style="color: #B452CD">10</span>  <span style="color: #228B22"># end of simulation</span>
+N = <span style="color: #B452CD">30</span>  <span style="color: #228B22"># no of time steps</span>
+time_points = linspace(<span style="color: #B452CD">0</span>, T, N+<span style="color: #B452CD">1</span>)
+u, t = solver.solve(time_points)
+</pre></div>
+<p>
+The complete program is available in the file program <a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic2.py"><tt>logistic2.py</tt></a>.
+
+<p>
+Instead of having the problem parameters <code>a</code> and <code>R</code> in the ODE as
+global variables or in a class, we may include them as extra arguments
+to <code>f</code>, either as positional arguments or as keyword
+arguments. Positional arguments can be sent to <code>f</code> via the constructor
+argument <code>f_args</code> (a list/tuple of variables), while a dictionary
+<code>f_kwargs</code> is used to transfer keyword arguments to <code>f</code> via the
+constructor. Here is an example on using keyword arguments:
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(u, t, a=<span style="color: #B452CD">1</span>, R=<span style="color: #B452CD">1</span>):
+    <span style="color: #8B008B; font-weight: bold">return</span> a*u*(<span style="color: #B452CD">1</span> - u/R)
+
+A = <span style="color: #B452CD">1</span>
+
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>
+solver = odespy.RK4(f, f_kwargs=<span style="color: #658b00">dict</span>(a=<span style="color: #B452CD">2</span>, R=<span style="color: #B452CD">1E+5</span>))
+</pre></div>
+<p>
+In general, a mix
+of positional and keyword arguments can be used in <code>f</code>:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(u, t, arg1, arg2, arg3, ..., kwarg1=val1, kwarg2=val2, ...):
+    ...
+
+solver = odespy.classname(f,
+                    f_args=[arg1, arg2, arg3, ...],
+                    f_kwargs=<span style="color: #658b00">dict</span>(kwarg1=val1, kwarg2=val2, ...))
+
+<span style="color: #228B22"># Alternative setting of f_args and f_kwargs</span>
+solver.set(f_args=[arg1, arg2, arg3, ...],
+           f_kwargs=<span style="color: #658b00">dict</span>(kwarg1=val1, kwarg2=val2, ...))
+</pre></div>
+<p>
+Solvers will call <code>f</code> as <code>f(u, t, *f_args, **f_kwargs)</code>.
+
+<h3>Continuing a Previous Simulation  <a name="___sec18"></a></h3>
+
+<p>
+It is easy to simulate for some time interval \( [0, T_1] \),
+then continue with \( u(T_1) \) as new initial condition and simulate for
+\( t \) in \( [T_1, T_2] \) and so on. Let us divide the time
+domain into subdomains and compute the solution for
+each subdomain in sequence. The following program performs the steps
+(<a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic4.py"><tt>logistic4.py</tt></a>).
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(u, t, a=<span style="color: #B452CD">1</span>, R=<span style="color: #B452CD">1</span>):
+    <span style="color: #8B008B; font-weight: bold">return</span> a*u*(<span style="color: #B452CD">1</span> - u/R)
+
+A = <span style="color: #B452CD">1</span>
+
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>, <span style="color: #008b45; text-decoration: underline">numpy</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">import</span> plot, hold, show, axis
+
+solver = odespy.RK4(f, f_kwargs=<span style="color: #658b00">dict</span>(a=<span style="color: #B452CD">2</span>, R=<span style="color: #B452CD">1E+5</span>))
+
+<span style="color: #228B22"># Split time domain into subdomains and</span>
+<span style="color: #228B22"># integrate the ODE in each subdomain</span>
+T = [<span style="color: #B452CD">0</span>, <span style="color: #B452CD">1</span>, <span style="color: #B452CD">4</span>, <span style="color: #B452CD">8</span>, <span style="color: #B452CD">12</span>]     <span style="color: #228B22"># subdomain boundaries</span>
+
+N_tot = <span style="color: #B452CD">30</span>               <span style="color: #228B22"># total no of time steps</span>
+dt = <span style="color: #658b00">float</span>(T[-<span style="color: #B452CD">1</span>])/N_tot  <span style="color: #228B22"># time step, kept fixed</span>
+u = []; t = []           <span style="color: #228B22"># collectors for u and t in each domain</span>
+
+<span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(<span style="color: #658b00">len</span>(T)-<span style="color: #B452CD">1</span>):
+    T_interval = T[i+<span style="color: #B452CD">1</span>] - T[i]
+    N = <span style="color: #658b00">int</span>(<span style="color: #658b00">round</span>(T_interval/dt))
+    time_points = numpy.linspace(T[i], T[i+<span style="color: #B452CD">1</span>], N+<span style="color: #B452CD">1</span>)
+
+    solver.set_initial_condition(A)  <span style="color: #228B22"># at time_points[0]</span>
+    <span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&#39;Solving in [%s, %s] with %d intervals&#39;</span> % \ 
+          (T[i], T[i+<span style="color: #B452CD">1</span>], N)
+    ui, ti = solver.solve(time_points)
+    A = ui[-<span style="color: #B452CD">1</span>]  <span style="color: #228B22"># newest ui value is next initial condition</span>
+
+    plot(ti, ui)
+    hold(<span style="color: #CD5555">&#39;on&#39;</span>)
+
+    u.append(ui);  t.append(ti)
+
+axis([<span style="color: #B452CD">0</span>, T[-<span style="color: #B452CD">1</span>], -<span style="color: #B452CD">0.1E+5</span>, <span style="color: #B452CD">1.1E+5</span>])
+<span style="color: #228B22"># Can concatenate all the elements of u and t, if desired</span>
+u = numpy.concatenate(u);  t = numpy.concatenate(t)
+savefig(<span style="color: #CD5555">&#39;tmppng&#39;</span>); savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
+</pre></div>
+
+<h3>Termination Criterion for the Simulation  <a name="___sec19"></a></h3>
+
+<p>
+We know that the solution \( u \) of the logistic equation approaches
+\( R \) as \( t\rightarrow\infty \). Instead of
+using a trial and error process for determining an appropriate
+time integral for integration, the <code>solver.solve</code> method accepts
+a user-defined function <code>terminate</code> that can be used to implement
+a criterion for terminating the solution process.
+Mathematically, the relevant criterion is
+\( ||u-R||<\hbox{tol} \), where tol is an acceptable
+tolerance, say \( 100 \) in the present case where \( R=10^5 \).
+The <code>terminate</code> function implements the criterion
+and returns true if the criterion is met:
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">terminate</span>(u, t, step_no):
+    <span style="color: #CD5555">&quot;&quot;&quot;u[step_no] holds (the most recent) solution at t[step_no].&quot;&quot;&quot;</span>
+    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #658b00">abs</span>(u[step_no] - R) &lt; tol:
+</pre></div>
+<p>
+Note that the simulation is anyway stopped for \( t > T \) so \( T \)
+must be large enough for the termination criterion to be reached (if not,
+a warning will be issued).
+With a <code>terminate</code> function it is also convenient to specify the
+time step <code>dt</code> and not the total number of time steps.
+
+<p>
+A complete program can be as follows (<a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic5.py"><tt>logistic5.py</tt></a>):
+
+<p>
+
+<!-- code=python (from !bc pypro) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(u, t):
+    <span style="color: #8B008B; font-weight: bold">return</span> a*u*(<span style="color: #B452CD">1</span> - u/R)
+
+a = <span style="color: #B452CD">2</span>
+R = <span style="color: #B452CD">1E+5</span>
+A = <span style="color: #B452CD">1</span>
+
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>, <span style="color: #008b45; text-decoration: underline">numpy</span>
+solver = odespy.RK4(f)
+solver.set_initial_condition(A)
+
+T = <span style="color: #B452CD">20</span>  <span style="color: #228B22"># end of simulation</span>
+dt = <span style="color: #B452CD">0.25</span>
+N = <span style="color: #658b00">int</span>(<span style="color: #658b00">round</span>(T/dt))
+time_points = numpy.linspace(<span style="color: #B452CD">0</span>, T, N+<span style="color: #B452CD">1</span>)
+
+tol = <span style="color: #B452CD">100</span>   <span style="color: #228B22"># tolerance for termination criterion</span>
+
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">terminate</span>(u, t, step_no):
+    <span style="color: #CD5555">&quot;&quot;&quot;u[step_no] holds (the most recent) solution at t[step_no].&quot;&quot;&quot;</span>
+    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #658b00">abs</span>(u[step_no] - R) &lt; tol:
+
+u, t = solver.solve(time_points, terminate)
+<span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&#39;Final u(t=%g)=%g&#39;</span> % (t[-<span style="color: #B452CD">1</span>], u[-<span style="color: #B452CD">1</span>])
+
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">import</span> *
+plot(t, u, <span style="color: #CD5555">&#39;r-&#39;</span>)
+savefig(<span style="color: #CD5555">&#39;tmppng&#39;</span>); savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
+show()
+</pre></div>
+
+<h3>A Class-Based Implementation  <a name="___sec20"></a></h3>
+
+<p>
+The previous code example can be recast into a more class-based
+("object-oriented programming") example. We lump all data related
+to the problem (the "physics") into a problem class <code>Logistic</code>, while
+all data related to the numerical solution and its quality are
+taken care of by class <code>Solver</code>. The code below illustrates
+the ideas (<a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic26py"><tt>logistic6.py</tt></a>):
+
+<p>
+
+<!-- code=python (from !bc pypro) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>
+
+<span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">Logistic</span>:
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">__init__</span>(<span style="color: #658b00">self</span>, a, R, A, T):
+        <span style="color: #CD5555">&quot;&quot;&quot;</span>
+<span style="color: #CD5555">        `a` is (initial growth rate), `R` the carrying capacity,</span>
+<span style="color: #CD5555">        `A` the initial amount of u, and `T` is some (very) total</span>
+<span style="color: #CD5555">        simulation time when `u` is very close to the asymptotic</span>
+<span style="color: #CD5555">        value `R`.</span>
+<span style="color: #CD5555">        &quot;&quot;&quot;</span>
+        <span style="color: #658b00">self</span>.a, <span style="color: #658b00">self</span>.R, <span style="color: #658b00">self</span>.A = a, R, A
+        <span style="color: #658b00">self</span>.tol = <span style="color: #B452CD">0.01</span>*R <span style="color: #228B22"># tolerance for termination criterion</span>
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(<span style="color: #658b00">self</span>, u, t):
+        <span style="color: #CD5555">&quot;&quot;&quot;Right-hand side of the ODE.&quot;&quot;&quot;</span>
+        a, R = <span style="color: #658b00">self</span>.a, <span style="color: #658b00">self</span>.R  <span style="color: #228B22"># short form</span>
+        <span style="color: #8B008B; font-weight: bold">return</span> a*u*(<span style="color: #B452CD">1</span> - u/R)
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">terminate</span>(<span style="color: #658b00">self</span>, u, t, step_no):
+        <span style="color: #CD5555">&quot;&quot;&quot;u[step_no] holds solution at t[step_no].&quot;&quot;&quot;</span>
+        <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #658b00">abs</span>(u[step_no] - <span style="color: #658b00">self</span>.R) &lt; <span style="color: #658b00">self</span>.tol
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">u_exact</span>(<span style="color: #658b00">self</span>, t):
+        a, R, A = <span style="color: #658b00">self</span>.a, <span style="color: #658b00">self</span>.R, <span style="color: #658b00">self</span>.A  <span style="color: #228B22"># short form</span>
+        <span style="color: #8B008B; font-weight: bold">return</span> R*A*np.exp(a*t)/(R + A*(np.exp(a*t) - <span style="color: #B452CD">1</span>))
+
+
+<span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">Solver</span>:
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">__init__</span>(<span style="color: #658b00">self</span>, problem, dt, method=<span style="color: #CD5555">&#39;RK4&#39;</span>):
+        <span style="color: #658b00">self</span>.problem = problem
+        <span style="color: #658b00">self</span>.dt = dt
+        <span style="color: #658b00">self</span>.method_class = <span style="color: #658b00">eval</span>(<span style="color: #CD5555">&#39;odespy.&#39;</span> + method)
+        <span style="color: #658b00">self</span>.N = <span style="color: #658b00">int</span>(<span style="color: #658b00">round</span>(T/dt))
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">solve</span>(<span style="color: #658b00">self</span>):
+        <span style="color: #658b00">self</span>.solver = <span style="color: #658b00">self</span>.method_class(<span style="color: #658b00">self</span>.problem.f)
+        <span style="color: #658b00">self</span>.solver.set_initial_condition(<span style="color: #658b00">self</span>.problem.A)
+        time_points = np.linspace(<span style="color: #B452CD">0</span>, <span style="color: #658b00">self</span>.problem.T, <span style="color: #658b00">self</span>.N+<span style="color: #B452CD">1</span>)
+        <span style="color: #658b00">self</span>.u, <span style="color: #658b00">self</span>.t = <span style="color: #658b00">self</span>.solver.solve(
+            time_points, <span style="color: #658b00">self</span>.problem.terminate)
+        <span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&#39;Final u(t=%g)=%g&#39;</span> % (t[-<span style="color: #B452CD">1</span>], u[-<span style="color: #B452CD">1</span>])
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">plot</span>(<span style="color: #658b00">self</span>):
+        plt.plot(<span style="color: #658b00">self</span>.t, <span style="color: #658b00">self</span>.u, <span style="color: #CD5555">&#39;r-&#39;</span>,
+                 <span style="color: #658b00">self</span>.t, <span style="color: #658b00">self</span>.u_exact(<span style="color: #658b00">self</span>.t), <span style="color: #CD5555">&#39;bo&#39;</span>)
+        plt.legend([<span style="color: #CD5555">&#39;numerical&#39;</span>, <span style="color: #CD5555">&#39;exact&#39;</span>])
+        plt.savefig(<span style="color: #CD5555">&#39;tmp.png&#39;</span>); plt.savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
+        plt.show()
+
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">main</span>():
+    problem = Logistic(a=<span style="color: #B452CD">2</span>, R=<span style="color: #B452CD">1E+5</span>, A=<span style="color: #B452CD">1</span>, T=<span style="color: #B452CD">20</span>)
+    solver = Solver(problem, dt=<span style="color: #B452CD">0.25</span>, method=<span style="color: #CD5555">&#39;RK4&#39;</span>)
+    solver.solve()
+    solver.plot()
+
+<span style="color: #8B008B; font-weight: bold">if</span> __name__ == <span style="color: #CD5555">&#39;__main__&#39;</span>:
+    main()
+</pre></div>
+
+<h3>Using Other Symbols  <a name="___sec21"></a></h3>
+
+<p>
+The Odespy package applies <code>u</code> for the unknown function or vector of
+unknown functions and <code>t</code> as the name of the independent
+variable. Many problems involve other symbols for functions and
+independent variables. These symbols should be reflected in the user's
+code.  For example, here is a coding example involving the logistic
+equation written as \( y'(x)=au(x)(1-u(x)/R(x)) \), where now a variable
+\( R=R(x) \) is considered. Following the setup from the very first
+program above solving the logistic ODE, we can easily introduce our
+own nomenclature (<a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic7.py"><tt>logistic7.py</tt></a>):
+
+<p>
+
+<!-- code=python (from !bc pypro) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(y, x):
+    <span style="color: #8B008B; font-weight: bold">return</span> a*y*(<span style="color: #B452CD">1</span> - y/R)
+
+a = <span style="color: #B452CD">2</span>;  R = <span style="color: #B452CD">1E+5</span>;  A = <span style="color: #B452CD">1</span>
+
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>, <span style="color: #008b45; text-decoration: underline">numpy</span>
+solver = odespy.RK4(f)
+solver.set_initial_condition(A)
+
+L = <span style="color: #B452CD">10</span>  <span style="color: #228B22"># end of x domain</span>
+N = <span style="color: #B452CD">30</span>  <span style="color: #228B22"># no of time steps</span>
+x_points = numpy.linspace(<span style="color: #B452CD">0</span>, L, N+<span style="color: #B452CD">1</span>)
+y, x = solver.solve(x_points)
+
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">import</span> *
+plot(x, y, <span style="color: #CD5555">&#39;r-&#39;</span>)
+xlabel(<span style="color: #CD5555">&#39;x&#39;</span>); ylabel(<span style="color: #CD5555">&#39;y&#39;</span>)
+show()
+</pre></div>
+<p>
+As shown, we use <code>y</code> for <code>u</code>, <code>x</code> for <code>t</code>, and <code>x_points</code> instead
+of <code>time_points</code>.
+
+<h3>Example: Solving an ODE System  <a name="___sec22"></a></h3>
+
+<p>
+We shall now explain how to solve a system of ODEs using a scalar
+second-order ODE as starting point.
+The angle \( \theta \) of a pendulum with mass \( m \) and length \( L \)
+is governed by the equation
+(neglecting air resistance for simplicity)
+<!-- pure ASCII -->
+<b>theta'' + c*sin(theta) = 0</b>, with <b>theta(0) = Theta</b> and <b>theta'(0) = 0</b>.
+This problem must be expressed as a first-order ODE system if it is
+going to be solved by the tools in the Odespy package.
+Introducing omega as theta', we get the first equation as
+<b>theta' = omega</b> and the second as <b>omega' = -c*sin(theta)</b>.
+The initial conditions are <b>theta(0) = Theta</b> and <b>omega'(0) = 0</b>.
+
+<p>
+Now the <code>f</code> function must return a list or array with the two
+right-hand side functions:
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(u, t):
+    theta, omega = u
+    <span style="color: #8B008B; font-weight: bold">return</span> [omega, -c*sin(theta)]
+</pre></div>
+<p>
+Note that when we have a system of ODEs with <code>n</code> components, the <code>u</code>
+object sent to the <code>f</code> function is an array of length <code>n</code>,
+representing the value of all components in the ODE system at time <code>t</code>.
+Here we extract the two components of <code>u</code> in separate local variables
+with names equal to what is used in the mathematical description of
+the current problem.
+
+<p>
+The initial conditions must be specified as a list:
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">solver = odespy.Heun(f)
+solver.set_initial_condition([Theta, <span style="color: #B452CD">0</span>])
+</pre></div>
+<p>
+To specify the time points we here first decide on a number of periods
+(oscillations back and forth) to simulate and then on the time resolution
+of each period. Note that when \( \Theta \) is small we can replace
+\( \sin\theta \) by \( \theta \) and find an analytical
+solution
+\( \theta (t)=\Theta\cos\left(\sqrt{c}t\right) \)
+whose period is \( 2\pi/\sqrt{c} \). We use this expression
+as an approximation for the period also when \( \Theta \) is not
+small.
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">freq = sqrt(c)      <span style="color: #228B22"># frequency of oscillations when Theta is small</span>
+period = <span style="color: #B452CD">2</span>*pi/freq  <span style="color: #228B22"># the period of the oscillations</span>
+T = <span style="color: #B452CD">10</span>*period       <span style="color: #228B22"># final time</span>
+N_per_period = <span style="color: #B452CD">20</span>   <span style="color: #228B22"># resolution of one period</span>
+N = N_per_period*period
+time_points = numpy.linspace(<span style="color: #B452CD">0</span>, T, N+<span style="color: #B452CD">1</span>)
+
+u, t = solver.solve(time_points)
+</pre></div>
+<p>
+The <code>u</code> returned from <code>solver.solve</code> is a two-dimensional array, where the
+columns hold the various solution functions of the ODE system. That is,
+the first column holds \( \theta \) and the second column holds
+\( \omega \). For convenience we extract the individual solution
+components in individual arrays:
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">theta = u[:,<span style="color: #B452CD">0</span>]
+omega = u[:,<span style="color: #B452CD">1</span>]
+
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">import</span> *
+plot(t, theta, <span style="color: #CD5555">&#39;r-&#39;</span>)
+savefig(<span style="color: #CD5555">&#39;tmppng&#39;</span>); savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
+show()
+</pre></div>
+<p>
+The complete program is available in the file <a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc1a.py"><tt>osc1a.py</tt></a>.
+
+<p>
+Looking at the plot reveals that the numerical solution has
+an alarming feature: the amplitude grows (indicating increasing
+energy in the system). Changing <code>T</code> to 28 periods instead of 10
+makes the numerical solution explode.
+The increasing amplitude is a numerical artifact that some of the simple
+solution methods suffer from.
+
+<p>
+<center> <!-- figure -->
+<hr class="figure">
+<center><p class="caption">Figure 2:  Heun's method used to simulate oscillations of a pendulum. </p></center>
+<p><img src="fig-odespy/osc1a.png" align="bottom" width=500></p>
+</center>
+
+<p>
+Using a more sophisticated method, say the 4-th order Runge-Kutta method,
+is just a matter of substituting <code>Heun</code> by <code>RK4</code>:
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">solver = odespy.RK4(f)
+solver.set_initial_condition([Theta, <span style="color: #B452CD">0</span>])
+freq = sqrt(c)      <span style="color: #228B22"># frequency of oscillations when Theta is small</span>
+period = <span style="color: #B452CD">2</span>*pi/freq  <span style="color: #228B22"># the period of the oscillations</span>
+T = <span style="color: #B452CD">10</span>*period       <span style="color: #228B22"># final time</span>
+N_per_period = <span style="color: #B452CD">20</span>   <span style="color: #228B22"># resolution of one period</span>
+N = N_per_period*period
+time_points = numpy.linspace(<span style="color: #B452CD">0</span>, T, N+<span style="color: #B452CD">1</span>)
+
+u, t = solver.solve(time_points)
+
+theta = u[:,<span style="color: #B452CD">0</span>]
+omega = u[:,<span style="color: #B452CD">1</span>]
+
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">import</span> *
+plot(t, theta, <span style="color: #CD5555">&#39;r-&#39;</span>)
+savefig(<span style="color: #CD5555">&#39;tmppng&#39;</span>); savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
+show()
+</pre></div>
+<p>
+The amplitude now becomes constant in time as expected.
+
+<h3>Testing Several Methods  <a name="___sec23"></a></h3>
+
+<p>
+We shall now make a more advanced solver by
+extending the previous example. More specifically, we shall
+
+<p>
+
+<ul>
+  <li> represent the right-hand side function as class,</li>
+  <li> compare several different solvers,</li>
+  <li> compute error of numerical solutions.</li>
+</ul>
+
+Since we want to compare numerical errors in the various
+solvers we need a test problem where the exact solution is known.
+Approximating \( \sin(\theta) \) by \( \theta \)
+(valid for small \( \theta \)), gives the ODE system
+<b>theta' = omega</b> and <b>omega' = -c*theta</b> with
+initial conditions <b>theta(0) = Theta</b> and <b>omega'(0) = 0</b>.
+
+<p>
+Right-hand side functions with parameters can be handled by
+including extra arguments via the <code>f_args</code> and <code>f_kwargs</code> functionality,
+or by using a class where the parameters are attributes and
+an <code>f</code> method defines \( f(u,t) \). The section <a href="#ode:sec:exgr:farg">Parameters in the Right-Hand Side Function</a> exemplifies the details.
+A minimal class representation of the right-hand side
+function in the present case looks like this:
+<p>
+
+<!-- code=text typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">class Problem:
+    def __init__(self, c, Theta):
+        self.c, self.Theta = float(c), float(Theta)
+
+    def f(self, u, t):
+        theta, omega = u;  c = self.c
+        return [omega, -c*theta]
+
+problem = Problem(c=1, Theta=pi/4)
+</pre></div>
+<p>
+It would be convenient to add an attribute <code>period</code> which holds
+an estimate of the period of oscillations as we need this for
+deciding on the complete time interval for solving the differential
+equations. An appropriate extension of class <code>Problem</code> is therefore
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">Problem</span>:
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">__init__</span>(<span style="color: #658b00">self</span>, c, Theta):
+        <span style="color: #658b00">self</span>.c, <span style="color: #658b00">self</span>.Theta = <span style="color: #658b00">float</span>(c), <span style="color: #658b00">float</span>(Theta)
+
+        <span style="color: #658b00">self</span>.freq = sqrt(c)
+        <span style="color: #658b00">self</span>.period = <span style="color: #B452CD">2</span>*pi/<span style="color: #658b00">self</span>.freq
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(<span style="color: #658b00">self</span>, u, t):
+        theta, omega = u;  c = <span style="color: #658b00">self</span>.c
+        <span style="color: #8B008B; font-weight: bold">return</span> [omega, -c*theta]
+
+problem = Problem(c=<span style="color: #B452CD">1</span>, Theta=pi/<span style="color: #B452CD">4</span>)
+</pre></div>
+<p>
+The second extension is to loop over many solvers. All
+solvers can be listed by
+<p>
+
+<!-- code=text (from !bc ipy) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">&gt;&gt;&gt; import odespy
+&gt;&gt;&gt; methods = list_all_solvers()
+&gt;&gt;&gt; for method in methods:
+...   print method
+...
+AdamsBashMoulton2
+AdamsBashMoulton3
+AdamsBashforth2
+...
+Vode
+lsoda_scipy
+odefun_sympy
+odelab
+</pre></div>
+<p>
+A similar function, <code>list_available_solvers</code>, returns a list of the
+names of the solvers that are available in the current installation
+(e.g., the <code>Vode</code> solver is only available if the comprehensive
+<code>scipy</code> package is installed).
+This is the list that is usually most relevant.
+
+<p>
+For now we explicitly choose a subset of the commonly available solvers:
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>
+solvers = [
+    odespy.ThetaRule(problem.f, theta=<span style="color: #B452CD">0</span>),   <span style="color: #228B22"># Forward Euler</span>
+    odespy.ThetaRule(problem.f, theta=<span style="color: #B452CD">0.5</span>), <span style="color: #228B22"># Midpoint method</span>
+    odespy.ThetaRule(problem.f, theta=<span style="color: #B452CD">1</span>),   <span style="color: #228B22"># Backward Euler</span>
+    odespy.RK4(problem.f),
+    odespy.MidpointIter(problem.f, max_iter=<span style="color: #B452CD">2</span>, eps_iter=<span style="color: #B452CD">0.01</span>),
+    odespy.LeapfrogFiltered(problem.f),
+    ]
+</pre></div>
+<p>
+To see what a method is and its arguments to the constructor, invoke
+the doc string of the class, e.g., <code>help(ThetaRule)</code> inside a
+Python shell like IPython, or run <code>pydoc odespy.ThetaRule</code> in a
+terminal window, or invoke the <a href="http://hplgit.github.com/odespy/doc/api/">Odespy API documentation</a>.
+
+<p>
+It will be evident that the <code>ThetaRule</code> solver with <code>theta=0</code> and
+<code>theta=1</code> (Forward and Backward Euler methods) gives growing and
+decaying amplitudes, respectively, while the other solvers are
+capable of reproducing the constant amplitude of the oscillations of
+in the current mathematical model.
+
+<p>
+The loop over the chosen solvers may look like
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">N_per_period = <span style="color: #B452CD">20</span>
+T = <span style="color: #B452CD">3</span>*problem.period   <span style="color: #228B22"># final time</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+legends = []
+
+<span style="color: #8B008B; font-weight: bold">for</span> solver <span style="color: #8B008B">in</span> solvers:
+    solver_name = <span style="color: #658b00">str</span>(solver)  <span style="color: #228B22"># short description of solver</span>
+    <span style="color: #8B008B; font-weight: bold">print</span> solver_name
+
+    solver.set_initial_condition([problem.Theta, <span style="color: #B452CD">0</span>])
+    N = N_per_period*problem.period
+    time_points = numpy.linspace(<span style="color: #B452CD">0</span>, T, N+<span style="color: #B452CD">1</span>)
+
+    u, t = solver.solve(time_points)
+
+    theta = u[:,<span style="color: #B452CD">0</span>]
+    legends.append(solver_name)
+    plt.plot(t, theta)
+    plt.hold(<span style="color: #CD5555">&#39;on&#39;</span>)
+plt.legend(legends)
+plotfile = __file__[:-<span style="color: #B452CD">3</span>]
+plt.savefig(plotfile + <span style="color: #CD5555">&#39;.png&#39;</span>); plt.savefig(plotfile + <span style="color: #CD5555">&#39;.pdf&#39;</span>)
+plt.show()
+</pre></div>
+<p>
+A complete program is available as <a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py"><tt>osc2.py</tt></a>.
+
+<p>
+<center> <!-- figure -->
+<hr class="figure">
+<center><p class="caption">Figure 3:  Comparison of methods for solving the ODE system for a pendulum. </p></center>
+<p><img src="fig-odespy/osc2.png" align="bottom" width=500></p>
+</center>
+
+<p>
+We can extend this program to compute the error in each numerical
+solution for different time step sizes.
+Let <code>results</code> be a dictionary with the method name as
+key, containing two sub dictionaries <code>dt</code> and <code>error</code>, which hold
+a sequence of time steps and a sequence of corresponding
+errors, respectively. The errors are computed by subtracting
+the numerical solution from the exact solution,
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">theta_exact = <span style="color: #8B008B; font-weight: bold">lambda</span> t: problem.Theta*numpy.cos(sqrt(problem.c)*t)
+u, t = solver.solve(time_points)
+theta = u[:,<span style="color: #B452CD">0</span>]
+error = numpy.abs(theta_exact(t) - theta)
+</pre></div>
+<p>
+The so-called L2 norm of the <code>error</code> array is a suitable
+scalar error measure (square root of total error squared and integrated,
+here numerically):
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">error_L2 = sqrt(numpy.sum(error**<span style="color: #B452CD">2</span>)/dt)
+</pre></div>
+<p>
+where <code>dt</code> is the time step size.
+
+<p>
+Typical loops over solvers and resolutions look as follows (<a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc3.py"><tt>osc3.py</tt></a>):
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">try</span>:
+    num_periods = <span style="color: #658b00">int</span>(sys.argv[<span style="color: #B452CD">1</span>])
+<span style="color: #8B008B; font-weight: bold">except</span> <span style="color: #008b45; font-weight: bold">IndexError</span>:
+    num_periods = <span style="color: #B452CD">8</span>  <span style="color: #228B22"># default</span>
+
+T = num_periods*problem.period       <span style="color: #228B22"># final time</span>
+results = {}
+resolutions = [<span style="color: #B452CD">10</span>, <span style="color: #B452CD">20</span>, <span style="color: #B452CD">40</span>, <span style="color: #B452CD">80</span>, <span style="color: #B452CD">160</span>]  <span style="color: #228B22"># intervals per period</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span>
+
+<span style="color: #8B008B; font-weight: bold">for</span> solver <span style="color: #8B008B">in</span> solvers:
+    solver_name = <span style="color: #658b00">str</span>(solver)
+    results[solver_name] = {<span style="color: #CD5555">&#39;dt&#39;</span>: [], <span style="color: #CD5555">&#39;error&#39;</span>: []}
+
+    solver.set_initial_condition([problem.Theta, <span style="color: #B452CD">0</span>])
+
+    <span style="color: #8B008B; font-weight: bold">for</span> N_per_period <span style="color: #8B008B">in</span> resolutions:
+        N = N_per_period*num_periods
+        time_points = numpy.linspace(<span style="color: #B452CD">0</span>, T, N+<span style="color: #B452CD">1</span>)
+
+        u, t = solver.solve(time_points)
+
+        theta = u[:,<span style="color: #B452CD">0</span>]
+        error = numpy.abs(theta_exact(t) - theta)
+        error_L2 = sqrt(numpy.sum(error**<span style="color: #B452CD">2</span>)/N)
+        <span style="color: #8B008B; font-weight: bold">if</span> <span style="color: #8B008B">not</span> numpy.isnan(error_L2):  <span style="color: #228B22"># drop nan (overflow)</span>
+            results[solver_name][<span style="color: #CD5555">&#39;dt&#39;</span>].append(t[<span style="color: #B452CD">1</span>] - t[<span style="color: #B452CD">0</span>])
+            results[solver_name][<span style="color: #CD5555">&#39;error&#39;</span>].append(error_L2)
+</pre></div>
+<p>
+Assuming the error to be of the form \( C\Delta t^r \), we can estimate
+\( C \) and \( r \) from two consecutive experiments to obtain a sequence
+of \( r \) values which (hopefully) convergences to a value that we can
+view as the empirical convergence rate of a method.
+Given the sequence of time steps and errors, a function in
+the <code>scitools</code> package automatically computes the sequence of
+\( r \) values:
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #228B22"># Analyze convergence</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">scitools.convergencerate</span> <span style="color: #8B008B; font-weight: bold">import</span> OneDiscretizationPrm
+pairwise_rates = OneDiscretizationPrm.pairwise_rates  <span style="color: #228B22"># short form</span>
+
+<span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&#39;\n\nConvergence results for %d periods&#39;</span> % num_periods
+<span style="color: #8B008B; font-weight: bold">for</span> solver_name <span style="color: #8B008B">in</span> results:
+    rates, C = pairwise_rates(results[solver_name][<span style="color: #CD5555">&#39;dt&#39;</span>],
+                              results[solver_name][<span style="color: #CD5555">&#39;error&#39;</span>])
+    rates = <span style="color: #CD5555">&#39;, &#39;</span>.join([<span style="color: #CD5555">&#39;%.1f&#39;</span> % rate <span style="color: #8B008B; font-weight: bold">for</span> rate <span style="color: #8B008B">in</span> rates])
+    <span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&#39;%-20s r: %s E_min=%.1E&#39;</span> % \ 
+          (solver_name, rates, <span style="color: #658b00">min</span>(results[solver_name][<span style="color: #CD5555">&#39;error&#39;</span>]))
+</pre></div>
+<p>
+With 4 periods we get
+<p>
+
+<!-- code=text (from !bc dat) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">ThetaRule(theta=0)   r: 4.2,  2.4, 1.7, 1.3 E_min=1.9E-01
+LeapfrogFiltered     r: 10.3, 0.3, 0.5, 0.7 E_min=1.8E-01
+ThetaRule(theta=1)   r: 0.2,  0.4, 0.6, 0.8 E_min=1.3E-01
+ThetaRule            r: 2.3,  2.0, 2.0, 2.0 E_min=2.1E-03
+RK4                  r: 4.0,  4.0, 4.0, 4.0 E_min=1.6E-07
+Leapfrog             r: 2.2,  2.0, 2.0, 2.0 E_min=2.1E-03
+RK2                  r: 2.3,  2.0, 2.0, 2.0 E_min=2.1E-03
+MidpointIter         r: 2.0,  1.0, 2.0, 2.0 E_min=2.1E-03
+</pre></div>
+<p>
+The rates of the Forward and Backward Euler methods (1st and 3rd line) have
+not yet converged to unity, as expected, while the 2nd-order
+Runge-Kutta method, Leapfrog, and the \( \theta \) rule with
+\( \theta =0.5 \)
+(<code>ThetaRule</code> with default value of <code>theta</code>) shows the expected
+\( r=2 \) value. The 4th-order Runge-Kutta holds the promise of being of 4th
+order, while the filtered Leapfrog method has slow convergence and
+a fairly large error, which is also evident in the previous figure.
+
+<p>
+Extending the time domain to 20 periods makes many of the
+simplest methods inaccurate and the rates computed on coarse
+time meshes are irrelevant. Also in this case, three of the methods
+are useless, while the others deliver their promised convergence
+rates (Forward Euler, i.e., <code>ThetaRule</code> with <code>theta=0</code> is left
+out because of ridiculous results):
+<p>
+
+<!-- code=text (from !bc dat) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">LeapfrogFiltered     r: 63.7, 0.0, 0.1, 0.2 E_min=4.3E-01
+ThetaRule(theta=1)   r: 0.0,  0.1, 0.1, 0.3 E_min=3.8E-01
+ThetaRule            r: 3.7,  2.1, 2.0, 2.0 E_min=1.0E-02
+RK4                  r: 4.0,  4.0, 4.0, 4.0 E_min=8.0E-07
+Leapfrog             r: 0.5,  1.9, 2.0, 2.0 E_min=1.0E-02
+RK2                  r: 3.7,  2.1, 2.0, 2.0 E_min=1.0E-02
+MidpointIter         r: 1.8,  0.8, 1.9, 2.0 E_min=1.0E-02
+</pre></div>
+
+<h3>Make a Subclass of Problem  <a name="___sec24"></a></h3>
+
+<p>
+Odespy features a module <code>problems</code> for defining ODE problems.
+There is a superclass <code>Problem</code> in this module defining what we
+expect of information about an ODE problem, as well as some
+convenience functions that are inherited in subclasses.
+A rough sketch of class <code>Problem</code> is listed here:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">Problem</span>:
+    stiff = <span style="color: #658b00">False</span>    <span style="color: #228B22"># classification of the problem is stiff or not</span>
+    complex_ = <span style="color: #658b00">False</span> <span style="color: #228B22"># True if f(u,t) is complex valued</span>
+    not_suitable_solvers = []  <span style="color: #228B22"># list solvers that should be be used</span>
+    short_description = <span style="color: #CD5555">&#39;&#39;</span>     <span style="color: #228B22"># one-line problem description</span>
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">__init__</span>(<span style="color: #658b00">self</span>):
+        <span style="color: #8B008B; font-weight: bold">pass</span>
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">__contains__</span>(<span style="color: #658b00">self</span>, attr):
+        <span style="color: #CD5555">&quot;&quot;&quot;Return True if attr is a method in instance self.&quot;&quot;&quot;</span>
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">terminate</span>(<span style="color: #658b00">self</span>, u, t, step_number):
+        <span style="color: #CD5555">&quot;&quot;&quot;Default terminate function, always returning False.&quot;&quot;&quot;</span>
+        <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #658b00">False</span>
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">default_parameters</span>(<span style="color: #658b00">self</span>):
+        <span style="color: #CD5555">&quot;&quot;&quot;</span>
+<span style="color: #CD5555">        Compute suitable time_points, atol/rtol, etc. for the</span>
+<span style="color: #CD5555">        particular problem. Useful for quick generation of test</span>
+<span style="color: #CD5555">        cases, demos, unit tests, etc.</span>
+<span style="color: #CD5555">        &quot;&quot;&quot;</span>
+        <span style="color: #8B008B; font-weight: bold">return</span> {}
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">u_exact</span>(<span style="color: #658b00">self</span>, t):
+        <span style="color: #CD5555">&quot;&quot;&quot;Implementation of the exact solution.&quot;&quot;&quot;</span>
+        <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #658b00">None</span>
+</pre></div>
+<p>
+Subclasses of <code>Problem</code> typically implements the constructor, for
+registering parameters in the ODE and the initial condition, and
+a method <code>f</code> for defining the right-hand side. For implicit solution method
+we may provide a method <code>jac</code> returning the Jacobian of \( f(u,t) \) with
+respect to \( u \). Some problems may
+also register an analytical solution in <code>u_exact</code>. Here is an
+example of implementing the logistic ODE from the section <a href="#ode:sec:exgr">First Example: Logistic Growth</a>:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>
+
+<span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">Logistic</span>(odespy.problems.Problem):
+    short_description = <span style="color: #CD5555">&quot;Logistic equation&quot;</span>
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">__init__</span>(<span style="color: #658b00">self</span>, a, R, A):
+        <span style="color: #658b00">self</span>.a = a
+        <span style="color: #658b00">self</span>.R = R
+        <span style="color: #658b00">self</span>.U0 = A
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(<span style="color: #658b00">self</span>, u, t):
+        a, R = <span style="color: #658b00">self</span>.a, <span style="color: #658b00">self</span>.R  <span style="color: #228B22"># short form</span>
+        <span style="color: #8B008B; font-weight: bold">return</span> a*u*(<span style="color: #B452CD">1</span> - u/R)
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">jac</span>(<span style="color: #658b00">self</span>, u, t):
+        a, R = <span style="color: #658b00">self</span>.a, <span style="color: #658b00">self</span>.R  <span style="color: #228B22"># short form</span>
+        <span style="color: #8B008B; font-weight: bold">return</span> a*(<span style="color: #B452CD">1</span> - u/R) + a*u*(<span style="color: #B452CD">1</span> - <span style="color: #B452CD">1.</span>/R)
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">u_exact</span>(<span style="color: #658b00">self</span>, t):
+        a, R, U0 = <span style="color: #658b00">self</span>.a, <span style="color: #658b00">self</span>.R, <span style="color: #658b00">self</span>.U0  <span style="color: #228B22"># short form</span>
+        <span style="color: #8B008B; font-weight: bold">return</span> R*U0*numpy.exp(a*t)/(R + U0*(numpy.exp(a*t) - <span style="color: #B452CD">1</span>))
+</pre></div>
+<p>
+The <code>stiff</code>, <code>complex_</code>, and <code>not_suitable_solvers</code> class variables
+can just be inherited. Note that <code>u_exact</code> should work for a vector <code>t</code>
+so <code>numpy</code> versions of mathematical functions must be used.
+
+<p>
+The initial condition is by convention stored as the attribute <code>U0</code>
+in a subclass of <code>Problem</code>, and specified as argument to the constructor.
+
+<p>
+Here are the typical steps when using such a problem class:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">problem = Logistic(a=<span style="color: #B452CD">2</span>, R=<span style="color: #B452CD">1E+5</span>, A=<span style="color: #B452CD">1</span>)
+solver = odespy.RK4(problem.f)
+solver.set_initial_condition(problem.U0)
+u, t = solver.solve(time_points)
+</pre></div>
+<p>
+The problem class may also feature additional methods:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">MyProblem</span>(odespy.problems.Problem)
+    ...
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">constraints</span>(<span style="color: #658b00">self</span>, u, t):
+        <span style="color: #CD5555">&quot;&quot;&quot;Python function for additional constraints: g(u,t)=0.&quot;&quot;&quot;</span>
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">define_command_line_arguments</span>(<span style="color: #658b00">self</span>, parser):
+        <span style="color: #CD5555">&quot;&quot;&quot;</span>
+<span style="color: #CD5555">        Initialize an argparse object for reading command-line</span>
+<span style="color: #CD5555">        option-value pairs. `parser` is an ``argparse`` object.</span>
+<span style="color: #CD5555">        &quot;&quot;&quot;</span>
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">verify</span>(<span style="color: #658b00">self</span>, u, t, atol=<span style="color: #658b00">None</span>, rtol=<span style="color: #658b00">None</span>):
+        <span style="color: #CD5555">&quot;&quot;&quot;</span>
+<span style="color: #CD5555">        Return True if u at time points t coincides with an exact</span>
+<span style="color: #CD5555">        solution within the prescribed tolerances. If one of the</span>
+<span style="color: #CD5555">        tolerances is None, return max computed error (infinity</span>
+<span style="color: #CD5555">        norm). Return None if the solution cannot be verified.</span>
+<span style="color: #CD5555">        &quot;&quot;&quot;</span>
+</pre></div>
+<p>
+The module <code>odespy.problems</code> contains many predefined ODE problems.
+
+<h3>Using Adaptive Methods  <a name="___sec25"></a></h3>
+
+<p>
+The solvers used in the previous examples have all employed a constant
+time step \( \Delta t \). Many solvers available through the Odespy
+interface are adaptive in the sense that \( \Delta t \) is adjusted
+throughout the solution process to meet a prescribed tolerance for
+the estimated error.
+
+<p>
+Simple methods such as <code>RK4</code> apply time steps
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">dt = time_points[k+<span style="color: #B452CD">1</span>] - time_points[k]
+</pre></div>
+<p>
+while adaptive methods will use several (smaller) time steps than <code>dt</code>
+in each <code>dt</code> interval to ensure that the estimated numerical error is
+smaller than some prescribed tolerance. The estimated numerical error
+may be a rather crude quantitative measure of the true numerical
+error (which we do not know since the exact solution of the problem is
+in general not known).
+
+<p>
+Some adaptive solvers record the intermediate solutions in each <code>dt</code>
+interval in arrays <code>self.u_all</code> and <code>self.t_all</code>.  Examples include
+<code>RKFehlberg</code>, <code>Fehlberg</code>, <code>DormandPrince</code>, <code>CashKarp</code>, and
+<code>BogackiShampine</code>. Other adaptive solvers (<code>Vode</code>, <code>Lsode</code>, <code>Lsoda</code>,
+<code>RKC</code>, <code>RKF45</code>, etc.)  do not give access to intermediate solution
+steps between the user-given time points, specified in the
+<code>solver.solve</code> call, and then we only have access to the solution at
+the user-given time points as returned by this call. One can run <code>if
+solver.has_u_t_all()</code> to test if the <code>solver.u_all</code> and <code>solver.t_all</code>
+arrays are available.  These are of interest to see how the adaptive
+strategy works between the user-specified time points.
+
+<h4>The Test Problem  <a name="___sec26"></a></h4>
+
+<p>
+We consider the ODE problem for testing adaptive solvers:
+\( u' = -(u-1)(t-c)/s^2 \).
+The exact solution is a Gaussian function,
+$$
+u(t) = 1 + \exp{\left(-\frac{1}{2}\left(\frac{t-c}{s}\right)^2\right)}
+$$
+
+centered around \( t=c \) and width characteristic width ("standard
+deviation") \( s \). The initial condition is taken as the exact \( u \) at \( t=0 \).
+
+<p>
+Since the Gaussian function is significantly different from zero only in the
+interval \( [c-3s, c+3s] \), one may expect that adaptive methods will
+efficiently take larger steps when \( u \) is almost constant and increase
+the resolution when \( u \) changes substantially in the vicinity
+of \( t=c \). We can test if this is the case with several solvers.
+
+<h4>Running Simple Methods  <a name="___sec27"></a></h4>
+
+<p>
+Let us first use a simple standard method like the 2nd- and 4th-order
+Runge-Kutta methods with constant step size. With the former method
+(<code>RK2</code>), \( c=3 \), \( s=0.5 \), and \( 41 \) uniformly distributed points,
+the discrepancy between the numerical and exact solution in
+Figure <a href="#gaussian:fig:RK2:41">4</a> is substantial. Increasing the number
+of points by a factor of 10 gives a solution much closer to the
+exact one, and switching to the 4th-order method (<code>RK4</code>) makes the
+curves visually coincide. The problem is therefore quite straightforward
+to solve using a sufficient number of points (400) and a higher-order method
+such as <code>RK4</code>.
+For curiosity we can mention that the <code>ForwardEuler</code> method produces
+a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.
+
+<p>
+<center> <!-- figure -->
+<hr class="figure">
+<center><p class="caption">Figure 4:  2nd-order Runge-Kutta method with 41 points.  <a name="gaussian:fig:RK2:41"></a> </p></center>
+<p><img src="fig-odespy/gaussian1_RK2_41.png" align="bottom" width=500></p>
+</center>
+
+<p>
+A simple program testing one numerical method goes as follows (<a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py"><tt>gaussian1.py</tt></a>).
+
+<p>
+
+<!-- code=python (from !bc pypro) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>, <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>, <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+
+center_point = <span style="color: #B452CD">3</span>
+s = <span style="color: #B452CD">0.5</span>
+
+problem = odespy.problems.Gaussian1(c=center_point, s=s)
+
+npoints = <span style="color: #B452CD">41</span>
+tp = np.linspace(<span style="color: #B452CD">0</span>, <span style="color: #B452CD">2</span>*center_point, npoints)
+
+method = odespy.RK2
+solver = method(problem.f)
+solver.set_initial_condition(problem.U0)
+
+u, t = solver.solve(tp)
+
+method = solver.__class__.__name__
+<span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&#39;%.4f  %s&#39;</span> % (u.max(), method)
+
+<span style="color: #8B008B; font-weight: bold">if</span> solver.has_u_t_all():
+    plt.plot(solver.t_all, solver.u_all, <span style="color: #CD5555">&#39;bo&#39;</span>,
+             tp, problem.u_exact(tp))
+    <span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&#39;%s used %d steps (%d specified)&#39;</span> % \
+          (method, <span style="color: #658b00">len</span>(solver.u_all), <span style="color: #658b00">len</span>(tp))
+<span style="color: #8B008B; font-weight: bold">else</span>:
+    plt.plot(tp, solver.u, tp, problem.u_exact(tp))
+plt.legend([method, <span style="color: #CD5555">&#39;exact&#39;</span>])
+plt.savefig(<span style="color: #CD5555">&#39;tmppng&#39;</span>); plt.savefig(<span style="color: #CD5555">&#39;tmp.pdf&#39;</span>)
+plt.show()
+</pre></div>
+
+<h4>Running the Runge-Kutta-Fehlberg Method  <a name="___sec28"></a></h4>
+
+<p>
+One of the most widely used general-purpose, adaptive methods for
+ODE problems is the
+Runge-Kutta-Fehlberg method of order (4,5). This method is available
+in three alternative implementations in Odespy: a direct Python
+version (<code>RKFehlberg</code>), a specialization of a generalized
+implementation of explicit adaptive Runge-Kutta methods
+(<code>Fehlberg</code>), and as a FORTRAN code (<code>RKF45</code>). We can try one of
+these,
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">method = odespy.Fehlberg
+</pre></div>
+<p>
+Figure <a href="#gaussian:fig:Fehlberg:41">5</a> shows how <code>Fehlberg</code> with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (57 adaptively selected points in time).
+
+<p>
+<center> <!-- figure -->
+<hr class="figure">
+<center><p class="caption">Figure 5:  Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41).  <a name="gaussian:fig:Fehlberg:41"></a> </p></center>
+<p><img src="fig-odespy/gaussian1_Fehlberg_41.png" align="bottom" width=500></p>
+</center>
+
+<p>
+Adaptive algorithms apply an error estimate based on considering a higher-order method as exact, in this case a method of order 5, and a method of lower order (here 4) as the numerically predicted solution. The user can specify an error tolerance. In the program above we just relied to the default tolerance, which can be printed by
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">print</span> solver.get()
+</pre></div>
+<p>
+yielding a list of all optional parameters:
+<p>
+
+<!-- code=text (from !bc dat) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">{&#39;f_kwargs&#39;: {}, &#39;f_args&#39;: (),
+ &#39;max_step&#39;: 1.5000000000000036, &#39;verbose&#39;: 0,
+ &#39;min_step&#39;: 0.0014999999999999946,
+ &#39;first_step&#39;: 0.14999999999999999,
+ &#39;rtol&#39;: 1e-06, &#39;atol&#39;: 1e-08,
+ &#39;name of f&#39;: &#39;f&#39;, &#39;complex_valued&#39;: False,
+ &#39;disk_storage&#39;: False, &#39;u_exact&#39;: None}
+</pre></div>
+<p>
+The tolerances involved are of relative and absolute type, i.e.,
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">estimated_error &lt;= tol = rtol*<span style="color: #658b00">abs</span>(u) + atol
+</pre></div>
+<p>
+is the typical test on whether the solution is sufficiently.
+For very small <code>u</code>, <code>atol</code> comes into play, while for large <code>u</code>, the
+relative tolerance <code>rtol</code> dominates.
+
+<p>
+In this particular example, running <code>RK4</code> with 57 equally spaced points
+yields a maximum value of 1.95, while <code>Fehlberg</code> with 57 adaptively
+selected points results in 1.98. Note that the tolerances used are
+\( 10^{-6} \) while the real error is of the order \( 10^{-2} \).
+
+<p>
+We can specify stricter tolerances and also control the minimum
+allowed step size, <code>min_step</code>, which might be too large to achieve
+the desired error level (<a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian2.py"><tt>gaussian2.py</tt></a>):
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">rtol = <span style="color: #B452CD">1E-12</span>
+atol = rtol
+min_step = <span style="color: #B452CD">0.000001</span>
+
+solver = odespy.Fehlberg(problem.f, atol=atol, rtol=rtol,
+                         min_step=min_step)
+</pre></div>
+<p>
+The <code>Fehlberg</code> solver now applies 701 points and achieves a maximum
+value of 2.00005. However, <code>RK4</code> with the same number of (equally spaced) points
+achieves the same accuracy and is much faster.
+
+<h4>Testing More Adaptive Solvers  <a name="___sec29"></a></h4>
+
+<p>
+We have already solved \eqref{gaussian:ode:eq} with sufficient accuracy, but
+let us see how other methods perform, as this will most likely result in
+a surprise. Below is a program (<a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian3.py"><tt>gaussian3.py</tt></a>) that compares several famous and
+widely used methods in the same plot.
+
+<p>
+
+<!-- code=python (from !bc pypro) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>, <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>, <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">run</span>(problem, tp, solver):
+    method = solver.__class__.__name__
+
+    solver.set_initial_condition(problem.U0)
+
+    u, t = solver.solve(tp)
+    solver.u_max = u.max()
+    <span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&#39;%.4f  %s&#39;</span> % (solver.u_max, method)
+
+    <span style="color: #8B008B; font-weight: bold">if</span> solver.has_u_t_all():
+        plt.plot(solver.t_all, solver.u_all)
+        <span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&#39;%s used %d steps (%d specified)&#39;</span> % \
+              (method, <span style="color: #658b00">len</span>(solver.u_all), <span style="color: #658b00">len</span>(tp))
+    <span style="color: #8B008B; font-weight: bold">else</span>:
+        plt.plot(solver.t, solver.u)
+    legend.append(method)
+    plt.hold(<span style="color: #CD5555">&#39;on&#39;</span>)
+
+rtol = <span style="color: #B452CD">1E-6</span>
+atol = rtol
+s = <span style="color: #B452CD">0.5</span>
+npoints = <span style="color: #B452CD">41</span>
+center_point = <span style="color: #B452CD">3</span>
+problem = odespy.problems.Gaussian1(c=center_point, s=s)
+tp = np.linspace(<span style="color: #B452CD">0</span>, <span style="color: #B452CD">2</span>*center_point, npoints)
+min_step = <span style="color: #B452CD">0.0001</span>
+
+methods = [<span style="color: #CD5555">&#39;DormandPrince&#39;</span>, <span style="color: #CD5555">&#39;BogackiShampine&#39;</span>,
+           <span style="color: #CD5555">&#39;RKFehlberg&#39;</span>, <span style="color: #CD5555">&#39;Vode&#39;</span>, <span style="color: #CD5555">&#39;RKF45&#39;</span>, <span style="color: #CD5555">&#39;Lsoda&#39;</span>]
+solvers = [<span style="color: #658b00">eval</span>(<span style="color: #CD5555">&#39;odespy.&#39;</span> + method)(
+           problem.f, atol=atol, rtol=rtol,
+           min_step=min_step)
+           <span style="color: #8B008B; font-weight: bold">for</span> method <span style="color: #8B008B">in</span> methods]
+<span style="color: #228B22"># Run Vode with implicit BDF method of order 5</span>
+solvers[<span style="color: #B452CD">1</span>].set(adams_or_bdf=<span style="color: #CD5555">&#39;bdf&#39;</span>, order=<span style="color: #B452CD">5</span>, jac=problem.jac)
+
+legend = []
+<span style="color: #8B008B; font-weight: bold">for</span> solver <span style="color: #8B008B">in</span> solvers:
+    run(problem, tp, solver)
+
+plt.plot(tp, problem.u_exact(tp))
+legend.append(<span style="color: #CD5555">&#39;exact&#39;</span>)
+plt.legend(legend)
+plt.savefig(<span style="color: #CD5555">&#39;tmp1.png&#39;</span>)
+
+<span style="color: #228B22"># Plot errors</span>
+plt.figure()
+exact = problem.u_exact(tp)
+<span style="color: #8B008B; font-weight: bold">for</span> solver <span style="color: #8B008B">in</span> solvers:
+    plt.plot(tp, exact - solver.u)
+    plt.hold(<span style="color: #CD5555">&#39;on&#39;</span>)
+plt.legend(legend)
+plt.savefig(<span style="color: #CD5555">&#39;tmp2.png&#39;</span>)
+plt.show()
+</pre></div>
+<p>
+The default discretization applies \( N=40 \) equal-sized time intervals,
+but adaptive methods should be able to adjust themselves to the
+desired error level \( 10^{-6} \). Figures <a href="#gaussian3:fig1:41">6</a> and
+<a href="#gaussian3:fig1err:41">7</a> show that this expected behavior is not the
+case. There is substantial discrepancy between the methods!
+Surprisingly, the well-known FORTRAN codes accessed by the <code>Vode</code>
+(<code>vode.f</code>) and <code>Lsoda</code> (from ODEPACK) methods give very inaccurate
+results, despite setting <code>Vode</code> to use a stiff BDF solver of order 5, and
+<code>Lsoda</code> should automatically select between nonstiff and stiff solvers
+(of default order 4 in this case).
+
+<p>
+<center> <!-- figure -->
+<hr class="figure">
+<center><p class="caption">Figure 6:  Comparison of adaptive methods with default parameters (tolerance <code>E-6</code>).  <a name="gaussian3:fig1:41"></a> </p></center>
+<p><img src="fig-odespy/gaussian3_41.png" align="bottom" width=500></p>
+</center>
+
+<p>
+<center> <!-- figure -->
+<hr class="figure">
+<center><p class="caption">Figure 7:  Comparison of errors in adaptive methods with default parameters (tolerance <code>E-6</code>).  <a name="gaussian3:fig1err:41"></a> </p></center>
+<p><img src="fig-odespy/gaussian3e_41.png" align="bottom" width=500></p>
+</center>
+
+<p>
+The program writes out the following results for the
+maximum value of the solution, which should equal 2:
+<p>
+
+<!-- code=text (from !bc dat) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">1.9976  DormandPrince
+1.6591  BogackiShampine
+1.9812  RKFehlberg
+1.0406  Vode
+1.9734  RKF45
+3.2905  Lsoda
+</pre></div>
+<p>
+The clearly most accurate solver among these is <code>DormandPrince</code>  - the default
+method used by MATLAB's <code>ode45</code> solver, which is perhaps the world's
+most popular ODE solver.
+
+<p>
+The remedy to get all the tested solvers to perform well is to
+choose a much stricter tolerance, say \( 10^{-10} \).
+Figure <a href="#gaussian3:fig2:41">8</a> shows
+coinciding curves. Numerically, we now have
+<p>
+
+<!-- code=text (from !bc dat) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">1.9991  DormandPrince
+1.9912  BogackiShampine
+1.9942  RKFehlberg
+2.0122  Vode
+1.9916  RKF45
+2.0056  Lsoda
+</pre></div>
+<p>
+For the methods <code>DormandPrince</code>,  <code>RKFehlberg</code>, and
+<code>BogackiShampine</code> we have information about the number of adaptive
+time points used: 270, 326, and 3307, respectively.
+
+<p>
+<center> <!-- figure -->
+<hr class="figure">
+<center><p class="caption">Figure 8:  Comparison of adaptive methods with error tolerance <code>E-10</code>.  <a name="gaussian3:fig2:41"></a> </p></center>
+<p><img src="fig-odespy/gaussian3_41_Em10.png" align="bottom" width=500></p>
+</center>
+
+<p>
+The lesson learned in this example is two-fold: 1) several methods should
+be tested to gain reliability of the results, and Odespy makes such tests
+easy to conduct, and 2) strict tolerances, far below
+the default values, may be necessary for some methods, here <code>Vode</code> and
+<code>Lsoda</code> in particular. We remark that it is the ODE problem that causes
+difficulties: changing the problem to <code>odespy.problems.Logistic</code>
+(see the file <a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic9.py"><tt>logistic9.py</tt></a>)
+shows that all the curves coincide and cannot be distinguished visually.
+
+<p>
+The present test problem with a Gaussian function as solution
+can be made increasingly more difficult by
+increasing the value of \( c/s \), i.e., a more peaked function moved to
+the right.
+
+<h4>Extensive Testing  <a name="___sec30"></a></h4>
+
+<p>
+The program <a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian4.py"><tt>gaussian4.py</tt></a>
+sets up an extensive experiments involving a lot of solvers, several
+\( c/s \) values, and several error tolerances.  The experiments clearly
+demonstrate how challenging this ODE problem is for many adaptive
+solvers unless \( c/s \) is moderate and a strict tolerance (much lower
+than the real accuracy level) is used. One can especially see the
+fundamental difficulties that <code>Vode</code>, <code>Lsode</code>, and <code>Lsoda</code> (all stiff
+and nonstiff versions) face when \( c/s\geq 8 \): these solvers do not
+manage to pick up any variation in \( u \). Nevertheless, for less
+demanding ODEs these solvers may perform very well, but it is highly
+recommended to always use the power of the unified Odespy interface
+to test several different adaptive methods.
+
+<h3>Example: Solving a Complex ODE Problem  <a name="___sec31"></a></h3>
+
+<p>
+Many of the solvers offered by Odespy can deal with complex-valued
+ODE problems. Consider
+\( u' = iwu \), with \( u(0)=1 \),
+where \( i=\sqrt{-1} \) is the imaginary unit.
+The right-hand side is implemented as <code>1j*w*u</code> in Python since
+Python applies <code>j</code> as the imaginary unit in complex numbers.
+
+<h4>Quick Implementation  <a name="___sec32"></a></h4>
+
+<p>
+For complex-valued ODEs, i.e., complex-valued right-hand side functions
+or initial conditions, the argument <code>complex_valued=True</code> must be
+supplied to the constructor. A complete program reads
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(u, t):
+    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">1j</span>*w*u
+
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>, <span style="color: #008b45; text-decoration: underline">numpy</span>
+
+w = <span style="color: #B452CD">2</span>*numpy.pi
+solver = odespy.RK4(f, complex_valued=<span style="color: #658b00">True</span>)
+solver.set_initial_condition(<span style="color: #B452CD">1</span>+<span style="color: #B452CD">0j</span>)
+u, t = solver.solve(numpy.linspace(<span style="color: #B452CD">0</span>, <span style="color: #B452CD">6</span>, <span style="color: #B452CD">101</span>))
+</pre></div>
+<p>
+The function <code>odespy.list_not_suitable_complex_solvers()</code>
+returns a list of all the classes in Odespy that are not suitable
+for complex-valued ODE problems.
+
+<h4>Comparison of Methods  <a name="___sec33"></a></h4>
+
+<p>
+We can try three classes that do work for complex-valued ODEs: <code>Vode</code>,
+<code>RK4</code>, and <code>RKFehlberg</code>. Comparing these with respect to CPU time and
+final error for a very long time integration of 600 periods is carried
+out by the following program.
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(u, t):
+    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">1j</span>*w*u
+
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>, <span style="color: #008b45; text-decoration: underline">numpy</span>, <span style="color: #008b45; text-decoration: underline">time</span>
+
+w = <span style="color: #B452CD">2</span>*numpy.pi
+n = <span style="color: #B452CD">600</span>  <span style="color: #228B22"># no of periods</span>
+r = <span style="color: #B452CD">40</span>   <span style="color: #228B22"># resolution of each period</span>
+tp = numpy.linspace(<span style="color: #B452CD">0</span>, n, n*r+<span style="color: #B452CD">1</span>)
+
+solvers = [odespy.Vode(f, complex_valued=<span style="color: #658b00">True</span>,
+                       atol=<span style="color: #B452CD">1E-7</span>, rtol=<span style="color: #B452CD">1E-6</span>,
+                       adams_or_bdf=<span style="color: #CD5555">&#39;adams&#39;</span>),
+           odespy.RK4(f, complex_valued=<span style="color: #658b00">True</span>),
+           odespy.RKFehlberg(f, complex_valued=<span style="color: #658b00">True</span>,
+                             atol=<span style="color: #B452CD">1E-7</span>, rtol=<span style="color: #B452CD">1E-6</span>)]
+cpu = []
+<span style="color: #8B008B; font-weight: bold">for</span> solver <span style="color: #8B008B">in</span> solvers:
+    solver.set_initial_condition(<span style="color: #B452CD">1</span>+<span style="color: #B452CD">0j</span>)
+    t0 = time.clock()
+    solver.solve(tp)
+    t1 = time.clock()
+    cpu.append(t1-t0)
+
+<span style="color: #228B22"># Compare solutions at the end point:</span>
+exact = numpy.exp(<span style="color: #B452CD">1j</span>*w*tp).real[-<span style="color: #B452CD">1</span>]
+min_cpu = <span style="color: #658b00">min</span>(cpu); cpu = [c/min_cpu <span style="color: #8B008B; font-weight: bold">for</span> c <span style="color: #8B008B">in</span> cpu]  <span style="color: #228B22"># normalize</span>
+<span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&#39;Exact: u(%g)=%g&#39;</span> % (tp[-<span style="color: #B452CD">1</span>], exact)
+<span style="color: #8B008B; font-weight: bold">for</span> solver, cpu_time <span style="color: #8B008B">in</span> <span style="color: #658b00">zip</span>(solvers, cpu):
+    <span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&#39;%-15s u(%g)=%.6f (error: %10.2E, cpu: %.1f)&#39;</span> % \ 
+          (solver.__class__.__name__,
+           solver.t[-<span style="color: #B452CD">1</span>], solver.u[-<span style="color: #B452CD">1</span>].real,
+           exact - solver.u[-<span style="color: #B452CD">1</span>].real, cpu_time)
+</pre></div>
+<p>
+We remark that the solution and the corresponding time values can always
+be recovered as <code>solver.u</code> and <code>solver.t</code>, respectively.
+
+<p>
+The output from the program may read
+<p>
+
+<!-- code=text (from !bc dat) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">Exact: u(600)=1
+Vode            u(600)=1.001587 (error:  -1.59E-03, cpu: 1.0)
+RK4             u(600)=0.997328 (error:   2.67E-03, cpu: 1.3)
+RKFehlberg      u(600)=1.000953 (error:  -9.53E-04, cpu: 7.5)
+</pre></div>
+<p>
+The <code>Vode</code> solver is a wrapper of the FORTRAN code <code>zvode.f</code> in
+<code>scipy.integrate.ode</code> and is an adaptive Adams method (with default
+settings, as used here),
+<code>RK4</code> is a compact and straightforward Runge-Kutta method of order 4 in
+pure Python with constant step size, and <code>RKFehlberg</code> is a pure Python
+implementation of the adaptive Runge-Kutta-Fehlberg method of order
+(4,5).  These methods give approximately the same final error, but
+with different CPU times. We observe that the very simple <code>RK4</code> solver
+in pure Python compares favorably with the much more sophisticated
+FORTRAN subroutine <code>zvode</code>.
+
+<h3>Avoiding Callbacks to Python  <a name="___sec34"></a></h3>
+
+<p>
+The ODE solvers that are implemented in FORTRAN calls, by default,
+the user's Python implementation of \( f(u,t) \). Making many calls from
+FORTRAN to Python may introduce significant overhead and slow down the
+solution process. When the algorithm is implemented in FORTRAN we should
+also implement the right-hand side in FORTRAN and call this right-hand
+side subroutine directly. Odespy offers this possibility.
+
+<p>
+The idea is that the user writes a FORTRAN subroutine defining \( f(u,t) \).
+Thereafter, <code>f2py</code> is used to make this subroutine callable from Python.
+If we specify the Python interface to this subroutine as an <code>f_f77</code>
+argument to the solver's constructor, the Odespy class will make sure
+that no callbacks to the \( f(u,t) \) definition go via Python.
+
+<h4>The Logistic ODE  <a name="___sec35"></a></h4>
+
+<p>
+Here is a minimalistic example involving the logistic ODE from
+the section <a href="#ode:sec:exgr">First Example: Logistic Growth</a>. The FORTRAN implementation of \( f(u,t) \)
+is more complicated than the Python counterpart. The subroutine
+has the signature
+<p>
+
+<!-- code=fortran (from !bc fcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">      <span style="color: #8B008B; font-weight: bold">subroutine </span><span style="color: #00688B">f_f77</span>(<span style="color: #00688B">neq</span>, <span style="color: #00688B">t</span>, <span style="color: #00688B">u</span>, <span style="color: #00688B">udot</span>)
+<span style="color: #00688B">Cf2py</span> <span style="color: #8B008B; font-weight: bold">intent</span>(<span style="color: #00688B">hide</span>) <span style="color: #00688B">neq</span>
+<span style="color: #00688B">Cf2py</span> <span style="color: #8B008B; font-weight: bold">intent</span>(<span style="color: #00688B">out</span>) <span style="color: #00688B">udot</span>
+      <span style="color: #a7a7a7; font-weight: bold">integer </span><span style="color: #00688B">neq</span>
+      <span style="color: #a7a7a7; font-weight: bold">double precision </span><span style="color: #00688B">t</span>, <span style="color: #00688B">u</span>, <span style="color: #00688B">udot</span>
+      <span style="color: #8B008B; font-weight: bold">dimension </span><span style="color: #00688B">u</span>(<span style="color: #00688B">neq</span>), <span style="color: #00688B">udot</span>(<span style="color: #00688B">neq</span>)
+</pre></div>
+<p>
+This means that there are two additional arguments: <code>neq</code> for the number
+of equations in the ODE system, and <code>udot</code> for the array of \( f(u,t) \)
+that is output from the subroutine.
+
+<p>
+We write the FORTRAN implementation of \( f(u,t) \) in a string:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">a = <span style="color: #B452CD">2</span>
+R = <span style="color: #B452CD">1E+5</span>
+
+f_f77_str = <span style="color: #CD5555">&quot;&quot;&quot;</span>
+<span style="color: #CD5555">      subroutine f_f77(neq, t, u, udot)</span>
+<span style="color: #CD5555">Cf2py intent(hide) neq</span>
+<span style="color: #CD5555">Cf2py intent(out) udot</span>
+<span style="color: #CD5555">      integer neq</span>
+<span style="color: #CD5555">      double precision t, u, udot</span>
+<span style="color: #CD5555">      dimension u(neq), udot(neq)</span>
+<span style="color: #CD5555">      udot(1) = %.3f*u(1)*(1 - u(1)/%.1f)</span>
+<span style="color: #CD5555">      return</span>
+<span style="color: #CD5555">      end</span>
+<span style="color: #CD5555">&quot;&quot;&quot;</span> % (a, R)
+</pre></div>
+<p>
+Observe that we can transfer problem parameters to the FORTRAN subroutine
+by writing their values directly into the FORTRAN source code.
+The other alternative would be to transfer the parameters as global
+(COMMON block) variables to the FORTRAN code, which is technically
+much more complicated.
+Also observe that we need to deal with <code>udot</code> and <code>u</code> as arrays even
+for a scalar ODE.
+
+<p>
+Using <code>f2py</code> to compile the string into a Python module is automated
+by the <code>odespy.compile_f77</code> function:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>
+f_f77 = odespy.compile_f77(f_f77_str)
+</pre></div>
+<p>
+The returned object <code>f_f77</code> is a callable object that allows the
+FORTRAN subroutine to be called as <code>udot = f_f77(t, u)</code> from Python.
+(However, the Odespy solvers will not use <code>f_f77</code> directly, but rather
+its function pointer to the FORTRAN subroutine, and transfer this pointer
+to the FORTRAN solver. The switching between <code>t, u</code> and <code>u, t</code> arguments
+is taken care of. All necessary steps are automatically done behind
+the scene.)
+
+<p>
+The solver can be declared as
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">solver = odespy.Lsode(f=<span style="color: #658b00">None</span>, f_f77=f_f77)
+</pre></div>
+<p>
+Several solvers accept FORTRAN definitions of the right-hand side:
+<code>Lsode</code>, <code>Lsoda</code>, and the other ODEPACK solvers, <code>RKC</code>, <code>RKF45</code>,
+<code>Radau5</code>. Look up the documentation of their <code>f_f77</code> parameter to
+see exactly what arguments and conventions that the FORTRAN subroutine
+demand.
+
+<p>
+The file <a href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic10.py"><tt>logistic10.py</tt></a> contains a complete program for solving the logistic ODE
+with \( f(u,t) \) implemented in Fortran.
+
+<h4>Implementing the van der Pol Equation in FORTRAN  <a name="___sec36"></a></h4>
+
+<p>
+As a slightly more complicated example, also involving a subclass
+of <code>Problem</code> and computation of the Jacobian and \( f(u,t) \) in
+FORTRAN, we consider the van der Pol equation,
+$$ y'' = \mu (1 - y^2) y' - y,\quad y(0)=2,\ y'(0)=1, $$
+
+written as a system as shown in the section <a href="#ode:sec:motivation">Motivation</a>.
+We start by implementing a problem class with Python code for
+\( f(u,t) \) and its Jacobian:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>
+
+<span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">VanDerPolOscillator</span>(odespy.problems.Problem):
+    short_description = <span style="color: #CD5555">&quot;Van der Pol oscillator&quot;</span>
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">__init__</span>(<span style="color: #658b00">self</span>, U0=[<span style="color: #B452CD">2</span>, <span style="color: #B452CD">1</span>], mu=<span style="color: #B452CD">3.</span>):
+        <span style="color: #658b00">self</span>.U0 = U0
+        <span style="color: #658b00">self</span>.mu = mu
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(<span style="color: #658b00">self</span>, u, t):
+        u_0, u_1 = u
+        mu = <span style="color: #658b00">self</span>.mu
+        <span style="color: #8B008B; font-weight: bold">return</span> [u_1, mu*(<span style="color: #B452CD">1</span> - u_0**<span style="color: #B452CD">2</span>)*u_1 - u_0]
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">jac</span>(<span style="color: #658b00">self</span>, u, t):
+        u_0, u_1 = u
+        mu = <span style="color: #658b00">self</span>.mu
+        <span style="color: #8B008B; font-weight: bold">return</span> [[<span style="color: #B452CD">0.</span>, <span style="color: #B452CD">1.</span>],
+                [-<span style="color: #B452CD">2</span>*mu*u_0*u_1 - <span style="color: #B452CD">1</span>, mu*(<span style="color: #B452CD">1</span> - u_0**<span style="color: #B452CD">2</span>)]]
+</pre></div>
+<p>
+Now, we want to provide <code>f</code> and <code>jac</code> in FORTRAN as well.
+The FORTRAN code for \( f(u,t) \) can be returned from a method:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">VanDerPolOscillator</span>(odespy.problems.Problem):
+    ...
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">str_f_f77</span>(<span style="color: #658b00">self</span>):
+        <span style="color: #CD5555">&quot;&quot;&quot;Return f(u,t) as Fortran source code string.&quot;&quot;&quot;</span>
+        <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #CD5555">&quot;&quot;&quot;</span>
+<span style="color: #CD5555">      subroutine f_f77(neq, t, u, udot)</span>
+<span style="color: #CD5555">Cf2py intent(hide) neq</span>
+<span style="color: #CD5555">Cf2py intent(out) udot</span>
+<span style="color: #CD5555">      integer neq</span>
+<span style="color: #CD5555">      double precision t, u, udot</span>
+<span style="color: #CD5555">      dimension u(neq), udot(neq)</span>
+<span style="color: #CD5555">      udot(1) = u(2)</span>
+<span style="color: #CD5555">      udot(2) = %g*(1 - u(1)**2)*u(2) - u(1)</span>
+<span style="color: #CD5555">      return</span>
+<span style="color: #CD5555">      end</span>
+<span style="color: #CD5555">&quot;&quot;&quot;</span> % <span style="color: #658b00">self</span>.mu
+</pre></div>
+<p>
+While all FORTRAN solvers supported by Odespy so far employ the same
+signature for the \( f(u,t) \) function, different solvers apply different
+signatures for the Jacobian. Here are two versions for ODEPACK and
+<code>Radau5</code>, respectively:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">VanDerPolOscillator</span>(odespy.problems.Problem):
+    ...
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">str_jac_f77_fadau5</span>(<span style="color: #658b00">self</span>):
+        <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #CD5555">&quot;&quot;&quot;</span>
+<span style="color: #CD5555">      subroutine jac_f77_radau5(neq,t,u,dfu,ldfu,rpar,ipar)</span>
+<span style="color: #CD5555">Cf2py intent(hide) neq,rpar,ipar</span>
+<span style="color: #CD5555">Cf2py intent(in)   t,u,ldfu</span>
+<span style="color: #CD5555">Cf2py intent(out) dfu</span>
+<span style="color: #CD5555">      integer neq,ipar,ldfu</span>
+<span style="color: #CD5555">      double precision t,u,dfu,rpar</span>
+<span style="color: #CD5555">      dimension u(neq),dfu(ldfu,neq),rpar(*),ipar(*)</span>
+<span style="color: #CD5555">      dfu(1,1) = 0</span>
+<span style="color: #CD5555">      dfu(1,2) = 1</span>
+<span style="color: #CD5555">      dfu(2,1) = -2*%g*u(1)*u(2) - 1</span>
+<span style="color: #CD5555">      dfu(2,2) = %g*(1-u(1)**2)</span>
+<span style="color: #CD5555">      return</span>
+<span style="color: #CD5555">      end</span>
+<span style="color: #CD5555">&quot;&quot;&quot;</span> % (<span style="color: #658b00">self</span>.mu, <span style="color: #658b00">self</span>.mu)
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">str_jac_f77_lsode_dense</span>(<span style="color: #658b00">self</span>):
+        <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #CD5555">&quot;&quot;&quot;</span>
+<span style="color: #CD5555">      subroutine jac_f77(neq, t, u, ml, mu, pd, nrowpd)</span>
+<span style="color: #CD5555">Cf2py intent(hide) neq, ml, mu, nrowpd</span>
+<span style="color: #CD5555">Cf2py intent(out) pd</span>
+<span style="color: #CD5555">      integer neq, ml, mu, nrowpd</span>
+<span style="color: #CD5555">      double precision t, u, pd</span>
+<span style="color: #CD5555">      dimension u(neq), pd(nrowpd,neq)</span>
+<span style="color: #CD5555">      pd(1,1) = 0</span>
+<span style="color: #CD5555">      pd(1,2) = 1</span>
+<span style="color: #CD5555">      pd(2,1) = -2*%g*u(1)*u(2) - 1</span>
+<span style="color: #CD5555">      pd(2,2) = %g*(1 - u(1)**2)</span>
+<span style="color: #CD5555">      return</span>
+<span style="color: #CD5555">      end</span>
+<span style="color: #CD5555">&quot;&quot;&quot;</span> % (<span style="color: #658b00">self</span>.mu, <span style="color: #658b00">self</span>.mu)
+</pre></div>
+<p>
+For the <code>Lsode</code> solver we can also provide the Jacobian in banded matrix
+format (this is not yet supported for <code>Radau5</code>, but the underlying
+FORTRAN code allows a banded Jacobian).
+
+<p>
+Having some methods returning FORTRAN code, we need to turn
+the source code into Python modules. This is done by
+<code>odespy.compile_f77</code> in the constructor of class <code>VanDerPolOscillator</code>:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">VanDerPolOscillator</span>(odespy.problems.Problem):
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">__init__</span>(<span style="color: #658b00">self</span>, U0=[<span style="color: #B452CD">2</span>, <span style="color: #B452CD">1</span>], mu=<span style="color: #B452CD">3.</span>):
+        <span style="color: #658b00">self</span>.U0 = U0
+        <span style="color: #658b00">self</span>.mu = mu
+
+        <span style="color: #228B22"># Compile F77 functions</span>
+        <span style="color: #658b00">self</span>.f_f77, <span style="color: #658b00">self</span>.jac_f77_radau5, <span style="color: #658b00">self</span>.jac_f77_lsode = \ 
+                    compile_f77([<span style="color: #658b00">self</span>.str_f_f77(),
+                                 <span style="color: #658b00">self</span>.str_jac_f77_radau5(),
+                                 <span style="color: #658b00">self</span>.str_jac_f77_lsode()])
+</pre></div>
+<p>
+The application of this problem class goes as follows:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">problem = VanDerPolOscillator()
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">odespy</span>
+solver = odespy.Radau5(f=<span style="color: #658b00">None</span>, f=problem.f_f77,
+                       jac=problem.jac_f77_radau5)
+solver.set_initial_condition(problem.U0)
+u, t = solver.solve(time_points)
+</pre></div>
+
+<h3>Example: Solving a Stochastic Differential Equation  <a name="___sec37"></a></h3>
+
+<p>
+We consider an oscillator driven by stochastic white noise:
+$$ x''(t) + bx'(t) + cx(t) = N(t),\ x(0)=X,\ x'(0) =0,$$
+
+where \( N(t) \) is the white noise function computed numerically as
+$$ N(t_i) \approx \sigma\frac{\Delta W_i}{\sqrt{t_{i+1}-t_i}},$$
+
+where \( \Delta W_1,\Delta W_2,\ldots \) are independent normally
+distributed random variables with mean zero and unit standard
+deviation, and \( \sigma \) is the strength of the noise.  The physical
+feature of this problem is that \( N(t) \) provides an excitation
+containing "all" frequencies, but the oscillator is a strong filter:
+with low damping one of the frequencies in \( N(t) \) will hit the
+resonance frequency \( \sqrt{c}/(2\pi) \) which will then dominate the
+output signal \( x(t) \).
+
+<p>
+The noise is additive in this stochastic differential equation so
+there is no difference between the Ito and Stratonovich interpretations
+of the equation.
+
+<p>
+The challenge with this model problem is that stochastic differential
+equations do not fit with the user interface offered by Odespy,
+since the right-hand side function is assumed to be dependent only
+on the solution and the present time (<code>f(u,t)</code>), and additional
+user-defined parameters, but for the present problem the right-hand
+side function needs information about \( N(t) \) and hence
+the size of the current time step.
+
+<p>
+We can solve this issue by having a reference to the solver in the
+right-hand side function, precomputing \( N(t_i) \) for all time intervals
+\( i \), and using the <code>n</code> attribute in the solver for selecting the right
+force term (recall that some methods will call the right-hand side
+function many times during a time interval - all these calls must use
+the same value of the white noise).
+
+<p>
+The right-hand side function must do many things so a class is
+appropriate:
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">WhiteNoiseOscillator</span>:
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">__init__</span>(<span style="color: #658b00">self</span>, b, c, sigma=<span style="color: #B452CD">1</span>):
+        <span style="color: #658b00">self</span>.b, <span style="color: #658b00">self</span>.c, <span style="color: #658b00">self</span>.sigma = b, c, sigma
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">connect_solver</span>(<span style="color: #658b00">self</span>, solver):
+        <span style="color: #CD5555">&quot;&quot;&quot;Solver is needed for time step number and size.&quot;&quot;&quot;</span>
+        <span style="color: #658b00">self</span>.solver = solver
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(<span style="color: #658b00">self</span>, u, t):
+        <span style="color: #8B008B; font-weight: bold">if</span> <span style="color: #8B008B">not</span> <span style="color: #658b00">hasattr</span>(<span style="color: #658b00">self</span>, <span style="color: #CD5555">&#39;N&#39;</span>):  <span style="color: #228B22"># is self.N not yet computed?</span>
+            <span style="color: #228B22"># Compute N(t) for all time intervals</span>
+            <span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span>
+            numpy.random.seed(<span style="color: #B452CD">12</span>)
+            t = <span style="color: #658b00">self</span>.solver.t
+            dW = numpy.random.normal(loc=<span style="color: #B452CD">0</span>, scale=<span style="color: #B452CD">1</span>, size=<span style="color: #658b00">len</span>(t)-<span style="color: #B452CD">1</span>)
+            dt = t[<span style="color: #B452CD">1</span>:] - t[:-<span style="color: #B452CD">1</span>]
+            <span style="color: #658b00">self</span>.N = <span style="color: #658b00">self</span>.sigma*dW/numpy.sqrt(dt)
+
+        x, v = u
+        N = <span style="color: #658b00">self</span>.N[<span style="color: #658b00">self</span>.solver.n]
+        <span style="color: #8B008B; font-weight: bold">return</span> [v, N -<span style="color: #658b00">self</span>.b*v -<span style="color: #658b00">self</span>.c*x]
+</pre></div>
+<p>
+Note that \( N(t) \) is computed on demand the first time the right-hand side
+function is called. We need to wait until the <code>f</code> method is called since
+we need access to the solver instance to compute the <code>self.N</code> array.
+
+<p>
+It is easy to compare different methods for solving this stochastic equation:
+
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">problem = WhiteNoiseOscillator(b=<span style="color: #B452CD">0.1</span>, c=pi**<span style="color: #B452CD">2</span>, sigma=<span style="color: #B452CD">1</span>)
+solvers = [odespy.Heun(problem.f), odespy.RK4(problem.f),
+           odespy.ForwardEuler(problem.f)]
+<span style="color: #8B008B; font-weight: bold">for</span> solver <span style="color: #8B008B">in</span> solvers:
+    f.connect_solver(solver)
+    solver.set_initial_condition([<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>])  <span style="color: #228B22"># start from rest</span>
+    T = <span style="color: #B452CD">60</span>   <span style="color: #228B22"># with c=pi**2, the period is 1</span>
+    u, t = solver.solve(linspace(<span style="color: #B452CD">0</span>, T, <span style="color: #B452CD">10001</span>))
+
+    x = u[:,<span style="color: #B452CD">0</span>]
+    plot(t, x)
+    hold(<span style="color: #658b00">True</span>)
+
+legend([<span style="color: #658b00">str</span>(s) <span style="color: #8B008B; font-weight: bold">for</span> s <span style="color: #8B008B">in</span> solvers])
+</pre></div>
+<p>
+All solutions are also stored in the solver objects
+as attributes <code>u</code> and <code>t</code>, so we
+may easily extract the solution of <code>RK4</code> by
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">solvers[<span style="color: #B452CD">1</span>].u, solvers[<span style="color: #B452CD">1</span>].t
+</pre></div>
+<p>
+<center> <!-- figure -->
+<hr class="figure">
+<center><p class="caption">Figure 9:  Oscillator driven by white noise. </p></center>
+<p><img src="fig-odespy/sode1.png" align="bottom" width=500></p>
+</center>
+
+<p>
+The <code>Heun</code> and <code>RK2</code> methods give coinciding solutions while
+the <code>ForwardEuler</code> method gives too large amplitudes.
+The frequency is 0.5 (period 2) as expected.
+
+<p>
+In this example the white noise force is computed only once since
+the <code>f</code> instance is reused in all methods. If a new <code>f</code> is created
+for each method, it is crucial that the same seed of the random
+generator is used for all methods, so that the time evolution of
+the force is always the same - otherwise the solutions will be
+different.
+
+<p>
+The complete code is available in <a href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/sode1.py">sode.py</a>.
+
+<h2>Inner Workings of the Package  <a name="___sec38"></a></h2>
+
+<p>
+There are three basic entities when solving ODEs numerically: the
+definition of the <em>ODE system</em>, the <em>time-stepping method</em>, and
+the <em>solver</em> that runs the "time loop" and stores results.
+
+<p>
+The information about the ODE system is made very simple: the user
+provides 1) an object that can be called as a Python function <code>f(u,
+t)</code>, and 2) an array or list with the initial values.  Some users will
+store this information in their own data structures, e.g., a class.
+
+<p>
+The time-stepping method and the algorithm for calling the time-stepping
+are collected in a solver class. All the solver classes are
+related in a class hierarchy. Each solver class initialized by the right-hand
+side function (<code>f</code>) and an optional set of parameters for controlling
+various parts of the solution process. The solver object is also
+used to set the initial condition (<code>set_initial_condition</code>) and
+to run the solution process (<code>solve</code>). The time-stepping scheme
+is normally isolated in a method <code>advance</code> in the solver classes, but
+for some schemes or external software packages the separation of
+doing one step and doing the whole time integration is less feasible.
+In those cases, <code>solve</code> will mix the time-stepping loop and the
+numerical scheme.
+
+<p>
+The package does not interact with visualization tools - the array
+containing the solution is returned to the user and must be further
+processed and visualized in the user's code.
+
+<p>
+Below we describe how the classes in the solver hierarchy work and how
+parameters are registered and initialized.
+
+<h3>Solver Parameters <a name="odes:parameters"></a></h3>
+
+<p>
+The <code>solver</code> module defines a global dictionary <code>_parameters</code> holding
+all legal parameters in Odespy classes. These are parameters that
+the user can adjust. Other modules imports this <code>_parameters</code> dict
+and updates it with their own additional parameters.
+
+<p>
+For each parameter the <code>_parameters</code> dict stores the parameter name, a
+default value, a description, the legal object type for the value of
+the parameter, and other quantities if needed. A typical example
+is
+<p>
+
+<!-- code=text typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">_parameters = dict(
+...
+
+f = dict(
+    help=&#39;Right-hand side f(u,t) defining the ODE&#39;,
+    type=callable),
+
+f_kwargs = dict(
+    help=&#39;Extra keyword arguments to f: f(u, t, *f_args, **f_kwargs)&#39;,
+    type=dict,
+    default={}),
+
+theta = dict(
+    help=&#39;eight in [0,1] used for&#39;\ 
+         &#39;&quot;theta-rule&quot; finite difference approx.&#39;,
+    default=0.5,
+    type=(int,float),
+    range=[0, 1])
+
+...
+}
+</pre></div>
+<p>
+Each solver class defines a (static) class variable
+<code>_required_parameters</code> for holding the names of all required
+parameters (in a list). In addition, each solver class defines another
+class variable <code>_optional_parameters</code> holding the names of all the
+optional parameters. The doc strings of the solver classes are
+automatically equipped with tables of required and optional
+parameters.
+
+<p>
+The optional parameters of a class consist of the optional parameters
+of the superclass and those specific to the class. The typical
+initialization of <code>_optional_parameters</code> goes like this:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">SomeMethod</span>(ParentMethod):
+    _optional_parameters = ParentMethod._optional_parameters + \ 
+                           [<span style="color: #CD5555">&#39;prm1&#39;</span>, <span style="color: #CD5555">&#39;prm2&#39;</span>, ...]
+</pre></div>
+<p>
+where <code>prm1</code>, <code>prm2</code>, etc. are names registered in the global
+<code>_parameters</code> dictionary.
+
+<p>
+From a user's point of view, the parameters are set either at
+construction time or through the <code>set</code> function:
+<p>
+
+<!-- code=python (from !bc py) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">&gt;&gt;&gt; <span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">odespy</span> <span style="color: #8B008B; font-weight: bold">import</span> RK2
+&gt;&gt;&gt; <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(u, t, a, b=<span style="color: #B452CD">0</span>):
+...   <span style="color: #8B008B; font-weight: bold">return</span> a*u + b
+...
+&gt;&gt;&gt; solver = RK2(f, f_kwargs=<span style="color: #658b00">dict</span>(b=<span style="color: #B452CD">1</span>))
+&gt;&gt;&gt; solver.f_kwargs
+{<span style="color: #CD5555">&#39;b&#39;</span>: <span style="color: #B452CD">1</span>}
+&gt;&gt;&gt; solver.set(f_args=(<span style="color: #B452CD">3</span>,))
+&gt;&gt;&gt; solver.f_args
+(<span style="color: #B452CD">3</span>,)
+&gt;&gt;&gt; <span style="color: #228B22"># Get all registered parameters in the method instance</span>
+&gt;&gt;&gt; solver.get()
+{<span style="color: #CD5555">&#39;f_kwargs&#39;</span>: {<span style="color: #CD5555">&#39;b&#39;</span>: <span style="color: #B452CD">1</span>}, <span style="color: #CD5555">&#39;f_args&#39;</span>: (<span style="color: #B452CD">3</span>,), <span style="color: #CD5555">&#39;complex_valued&#39;</span>: <span style="color: #658b00">False</span>,
+<span style="color: #CD5555">&#39;name of f&#39;</span>: <span style="color: #CD5555">&#39;f&#39;</span>}
+</pre></div>
+<p>
+The <code>set</code> method sets parameters through keyword arguments and can
+take an arbitrary collection of such arguments:
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">solver.set(name1=value1, name2=value2, name3=value3, ...)
+</pre></div>
+<p>
+The <code>get</code> method returns the parameters and their values as a dictionary.
+We remark that the <code>'f'</code> key, which one might expect to appear in the
+returned dictionary of parameters, are omitted because it is always
+a lambda function wrapping the user's <code>f</code> function such that the
+returned value is guaranteed to be a <code>numpy</code> array. Instead,
+there is an entry <code>'name of f'</code> which reflects the name of the
+user-supplied function. The same comment applies to the <code>jac</code> parameter
+for specifying the Jacobian used in implicit methods.
+
+<h3>Solver Classes  <a name="___sec40"></a></h3>
+
+<p>
+Each solver in this package is implemented as a class in a class hierarchy.
+Basic, common functionality is inherited from super classes, and the
+actual solver class implements what is specific for the method in question.
+
+<h4>The Inherited Superclass Constructor  <a name="___sec41"></a></h4>
+
+<p>
+Class <code>Solver</code> is the super class of the hierarchy. Subclasses
+normally just inherit their constructor from class <code>Solver</code>. This
+constructor requires one mandatory argument: the right-hand side of
+the ODE, \( f(u,t) \), coded as a Python function <code>f(u, t)</code>.
+Some solvers implemented in FORTRAN allows <code>f</code> to be a wrapper of
+a FORTRAN function defining the right-hand side, but such a wrapper
+is specified through the <code>f_f77</code> argument and using <code>None</code> for <code>f</code>.
+The constructor accepts a range of
+additional keyword arguments for setting
+parameters of the solver. Which keyword arguments that are
+available depends on what the subclass has registered as legal
+parameters in <code>_optional_parameters</code> and <code>_required_parameters</code>.
+
+<p>
+The constructor performs a set of tasks that are common to all
+the subclass solvers:
+
+<p>
+
+<ol>
+<li> The set of optional and required parameters of a particular solver
+   is loaded into <code>self._parameters</code> such that this dictionary
+   can be used to look up all parameters of the solver.</li>
+<li> The solver-specific method <code>adjust_parameters</code> is called to allow
+   the programmer of a solver to manipulate <code>self._parameters</code>.
+   For example, some parameters may be modified or set
+   according to the value of others.</li>
+<li> Entries in <code>self._parameters</code> are mirrored by class
+   attributes. The computations and the <code>set</code> and <code>get</code> methods will
+   make use of the attributes rather than the <code>self._parameters</code> dict
+   to extract data.  For example, the value of
+   <code>self._parameters['myvar']</code> becomes available as <code>self.myvar</code> and
+   in the algorithms we use <code>self.myvar</code>, perhaps with a test
+   <code>hasattr(self, 'myvar')</code> test or a <code>try</code>-`except` clause (catching
+   an <code>AttributeError</code>).</li>
+<li> The <code>set</code> method is called with all keyword arguments given to the
+   constructor, which then modifies the default values of the
+   parameters and sets the corresponding attributes.</li>
+<li> The <code>f</code> function is wrapped in a lambda function such that
+   <code>f(u, t)</code> is guaranteed to return an array (in case the user
+   returns a list or scalar for convenience). The same is done with
+   the Jacobian (<code>jac</code>) and other user-defined callback functions.</li>
+<li> The <code>initialize</code> method is called to finalize the tasks in
+   the constructor. The most common use of this method in subclasses
+   is to import extension modules that the solver depends on and
+   provide an error message if the extension modules are not available.
+   If they are, the modules are normally stored through an attribute
+   of the subclass.</li>
+</ol>
+
+<h4>Useful Methods  <a name="___sec42"></a></h4>
+
+<p>
+Let <code>solver</code> be some instance of a subclass in the hierarchy. The
+following methods are sometimes useful:
+
+<p>
+
+<ul>
+ <li> <code>repr(solver)</code>: return the subclass name along with all
+   registered parameters and their values. This string provides
+   complete information on the initialization of a solver.</li>
+ <li> <code>str(solver)</code>: return a short pretty print string reflecting
+   the name of the method and the value of parameters that
+   must be known to uniquely define the numerical method.
+   This string is what one would use as legends in a plot or
+   as method identifier in a table.</li>
+ <li> <code>solver.get_parameter_info()</code>: return or print all registered
+   parameters for the current solver and all properties for
+   each parameter.</li>
+<li> <code>solver.switch_to(name)</code>: return a new solver of type <code>name</code>,
+   initialized with all
+   parameters of the current solver that are legal in the new solver.
+   The method is useful when trying out a range of solvers for a
+   problem.</li>
+</ul>
+
+<h4>The Solve Method  <a name="___sec43"></a></h4>
+
+<p>
+After the constructor is called, <code>solver.set_initial_condition</code> is
+called to set the initial condition, and then <code>solve</code> is called.
+The <code>solve</code> method features the following steps:
+
+<p>
+
+<ol>
+<li> Call <code>initialize_for_solve</code> (implemented in subclasses) to
+   precompute whatever is needed before the time loop.
+   The super class allocates storage for the solution and
+   loads the initial condition into that data structure.
+   Any subclass implementation of <code>initialize_for_solve</code> must therefore
+   also call this method in its super class.</li>
+<li> Call <code>validate_data</code> to check if the data structures are consistent
+   before starting the computations. Subclass implementations of
+   this method must call the super class' version of the method.</li>
+<li> Run a loop over all time levels <code>n</code> and call <code>advance</code> (implemented
+   in subclasses) at each level to advance the solution from
+   time <code>t[n]</code> to <code>t[n+1]</code>. Also call <code>terminate</code> so that the
+   user code can analyze, work with the solution, and terminate the
+   solution process.</li>
+</ol>
+
+Some subclasses will override the <code>solve</code> method and provide their own,
+but most subclasses just inherits the general one and implements
+the <code>advance</code> method.
+
+<h4>Solver Attributes  <a name="___sec44"></a></h4>
+
+<p>
+All classes have a set of attributes:
+
+<p>
+
+<ol>
+<li> <code>users_f</code>: holds the user's function for \( f(u, t) \).
+   Implicit solvers may have a corresponding <code>users_jac</code> for
+   the user's Jacobian.</li>
+<li> One attribute for each parameter in the class.</li>
+<li> <code>u</code>: 1D <code>numpy</code> array holding the solution for a scalar ODE and
+   a 2D array in case of a system of ODEs. The first index
+   denotes the time level.</li>
+<li> <code>t</code>: the time levels corresponding to the first index in the <code>u</code> array.</li>
+<li> <code>quick_description</code>: a short one-line description of the method (this
+   variable is static in the class, i.e., declared outside any method).</li>
+</ol>
+
+Most classes will also define two additional static variables,
+<code>_required_parameters</code> and <code>_optional_parameters</code> as explained
+in the section <a href="#odes:parameters">Solver Parameters</a>.
+
+<h4>Other Superclasses  <a name="___sec45"></a></h4>
+
+<p>
+There are superclasses <code>SolverImplicit</code> for implicit methods,
+<code>Adaptive</code> for adaptive methods, <code>RungeKutta1level</code> for general,
+explicit 1-level Runge-Kutta methods, <code>RungeKutta2level</code> for
+general, explicit, adaptive 2-level Runge-Kutta methods,
+<code>ode_scipy</code> for interfaces to ODE solvers
+in <code>scipy</code>, and <code>Odepack</code> for interfaces to the ODEPACK family
+of solvers.
+
+<h3>A Very Simple Subclass  <a name="___sec46"></a></h3>
+
+<p>
+To implement a simple explicit scheme for solving a scalar ODE or a system
+of ODEs, you only need to write a subclass of <code>Solver</code> with an
+<code>advance</code> method containing the formula that updates the solution from
+one time level to the next. For example, the Forward Euler scheme
+reads
+$$ u_{n+1} = u_n + \Delta t f(u_n, t_n),$$
+
+where subscript \( n \) denotes the time level, and \( \Delta t = t_{n+1}-t_n \) is
+the current time step.
+The implementation goes like
+<p>
+
+<!-- code=text (from !bc cod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">class ForwardEuler(Solver):
+    &quot;&quot;&quot;
+    Forward Euler scheme::
+
+        u[n+1] = u[n] + dt*f(u[n], t[n])
+    &quot;&quot;&quot;
+    quick_description = &#39;The simple explicit (forward) Euler scheme&#39;
+
+    def advance(self):
+        u, f, n, t = self.u, self.f, self.n, self.t
+        dt = t[n+1] - t[n]
+        unew = u[n] + dt*f(u[n], t[n])
+        return unew
+</pre></div>
+<p>
+Remarks:
+
+<p>
+
+<ol>
+<li> The <code>quick_description</code> string is necessary for the class to appear in the
+   automatically generated overview of implemented methods
+   (run <code>pydoc odespy</code> to see this table).</li>
+<li> Extracting class attributes in local variables (here <code>u</code>, <code>f</code>, etc.)
+   avoids the need for the <code>self</code> prefix so that the implemented formulas
+   are as close to the mathematical formulas as possible.</li>
+</ol>
+
+Almost equally simple schemes, like explicit Runge-Kutta methods and Heun's
+method are implemented in the same way (see <a href="https://github.com/hplgit/odespy/tree/master/odespy/odespy/solvers.py"><tt>solvers.py</tt></a>).
+
+<h3>A Subclass with More Code  <a name="___sec47"></a></h3>
+
+<p>
+A 2nd-order Adams-Bashforth scheme is a bit more complicated since it
+involves three time levels and therefore needs a separate method for
+the first step. We should also avoid unnecessary evaluations of \( f(u,t) \).
+The user can specify a parameter <code>start_method</code> for the name of the
+solver to be used for the first step. This solver is initialized
+by the <code>switch_to</code> method in class <code>Solver</code>. Basically,
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">new_solver = solver.switch_to(solver_name)
+</pre></div>
+<p>
+creates a new solver instance <code>new_solver</code>, of the class implied by
+<code>solver_name</code>, where all relevant parameters from <code>solver</code> are copied
+to <code>new_solver</code>.
+
+<p>
+An implementation of a subclass for the
+2nd-order Adams-Bashforth scheme can then look as follows.
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">AdamsBashforth2</span>(Solver):
+    <span style="color: #CD5555">&quot;&quot;&quot;</span>
+<span style="color: #CD5555">    Second-order Adams-Bashforth method::</span>
+
+<span style="color: #CD5555">        u[n+1] = u[n] + dt/2.*(3*f(u[n], t[n]) - f(u[n-1], t[n-1]))</span>
+
+<span style="color: #CD5555">    for constant time step dt.</span>
+
+<span style="color: #CD5555">    RK2 is used as default solver in first step.</span>
+<span style="color: #CD5555">    &quot;&quot;&quot;</span>
+    quick_description = <span style="color: #CD5555">&quot;Explicit 2nd-order Adams-Bashforth method&quot;</span>
+
+    _optional_parameters = Solver._optional_parameters + \ 
+                          [<span style="color: #CD5555">&#39;start_method&#39;</span>,]
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">initialize_for_solve</span>(<span style="color: #658b00">self</span>):
+        <span style="color: #228B22"># New solver instance for first step</span>
+        <span style="color: #658b00">self</span>.starter = <span style="color: #658b00">self</span>.switch_to(<span style="color: #658b00">self</span>.start_method)
+        Solver.initialize_for_solve(<span style="color: #658b00">self</span>)
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">validate_data</span>(<span style="color: #658b00">self</span>):
+        <span style="color: #8B008B; font-weight: bold">if</span> <span style="color: #8B008B">not</span> <span style="color: #658b00">self</span>.constant_time_step():
+            <span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&#39;%s must have constant time step&#39;</span> % <span style="color: #658b00">self</span>.__name__
+            <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #658b00">False</span>
+        <span style="color: #8B008B; font-weight: bold">else</span>:
+            <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #658b00">True</span>
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">advance</span>(<span style="color: #658b00">self</span>):
+        u, f, n, t = <span style="color: #658b00">self</span>.u, <span style="color: #658b00">self</span>.f, <span style="color: #658b00">self</span>.n, <span style="color: #658b00">self</span>.t
+
+        <span style="color: #8B008B; font-weight: bold">if</span> n &gt;= <span style="color: #B452CD">1</span>:
+            dt = t[n+<span style="color: #B452CD">1</span>] - t[n]  <span style="color: #228B22"># must be constant</span>
+            <span style="color: #658b00">self</span>.f_n = f(u[n], t[n])
+            unew = u[n] + dt/<span style="color: #B452CD">2.</span>*(<span style="color: #B452CD">3</span>*<span style="color: #658b00">self</span>.f_n - <span style="color: #658b00">self</span>.f_n_1)
+            <span style="color: #658b00">self</span>.f_n_1 = <span style="color: #658b00">self</span>.f_n
+        <span style="color: #8B008B; font-weight: bold">else</span>:
+            <span style="color: #228B22"># User-specified method for the first step</span>
+            <span style="color: #658b00">self</span>.starter.set_initial_condition(u[n])
+            time_points = [t[n], t[n+<span style="color: #B452CD">1</span>]]
+            u_starter, t_starter = <span style="color: #658b00">self</span>.starter.solve(time_points)
+            unew = u_starter[-<span style="color: #B452CD">1</span>]
+            <span style="color: #658b00">self</span>.f_n_1 = f(u[<span style="color: #B452CD">0</span>], t[<span style="color: #B452CD">0</span>])
+
+        <span style="color: #8B008B; font-weight: bold">return</span> unew
+</pre></div>
+<p>
+Three features are worth comments: 1) we extend the set of optional
+parameters; 2) we must initialize a separate solver for the first
+step, and this is done in the <code>initialize_for_solve</code> method that will
+be called as part of <code>solve</code> before the time stepping; and 3) we
+extend <code>validate_data</code> to check that the time spacing given by the
+<code>time_points</code> argument to <code>solve</code> is constant. The utility method
+<code>constant_time_step</code> provided in super class <code>Solver</code> carries out the
+details of the check.
+
+<p>
+More advanced implementations of subclasses can be studied
+in the <a href="https://github.com/hplgit/odespy/tree/master/odespy/odespy/solvers.py"><tt>solvers.py</tt></a> and <a href="https://github.com/hplgit/odespy/tree/master/odespy/odespy/RungeKutta.py"><tt>RungeKutta.py</tt></a> files.
+
+<h3>A Simple Example of an Implicit Method  <a name="___sec48"></a></h3>
+
+<p>
+Class <code>SolverImplicit</code> acts as superclass for the implementation of
+implicit methods. This class provides some basic functionality for
+solving the system of nonlinear equations that normally arises in
+implicit methods by Picard or Newton iteration.
+The parameter <code>nonlinear_solver</code> can take the values <code>Picard</code> or
+<code>Newton</code>. The user must in case of Newton's method provide
+a <code>jac</code> parameter for a function evaluating the Jacobian of \( f(u,t) \)
+with respect to \( u \): \( J_{i,j} = \partial f_i/\partial u_j \).
+
+<p>
+Instead of implementing an <code>advance</code> method in subclasses, one provides
+a method <code>Picard</code> and/or <code>Newton</code> to define key quantities in these
+methods. The superclass implements <code>advance</code>, which will run a Picard
+or Newton iteration. The <code>Picard</code> method returns all the terms
+on the right-hand side of the discrete equation when only <code>u[n+1]</code> is
+on the left-hand side. <code>Newton</code> returns the right-hand side and the
+Jacobian of the system to be solved in each Newton iteration.
+
+<p>
+Here is an example showing the complete code of the Backward Euler method.
+<p>
+
+<!-- code=python (from !bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">BackwardEuler</span>(SolverImplicit):
+    <span style="color: #CD5555">&quot;&quot;&quot;</span>
+<span style="color: #CD5555">    Implicit Backward Euler method::</span>
+
+<span style="color: #CD5555">       u[n+1] = u[n] + dt*f(t[n+1], u[n+1])</span>
+
+<span style="color: #CD5555">    The nonlinear system is solved by Newton or Picard iteration.</span>
+<span style="color: #CD5555">    &quot;&quot;&quot;</span>
+    quick_description = <span style="color: #CD5555">&quot;Implicit 1st-order Backward Euler method&quot;</span>
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">Picard_update</span>(<span style="color: #658b00">self</span>, ukp1):
+        u, f, n, t = <span style="color: #658b00">self</span>.u, <span style="color: #658b00">self</span>.f, <span style="color: #658b00">self</span>.n, <span style="color: #658b00">self</span>.t
+        dt = t[n+<span style="color: #B452CD">1</span>] - t[n]
+        <span style="color: #8B008B; font-weight: bold">return</span> u[n] + dt*f(ukp1, t[n+<span style="color: #B452CD">1</span>])
+
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">Newton_system</span>(<span style="color: #658b00">self</span>, ukp1):
+        u, f, n, t = <span style="color: #658b00">self</span>.u, <span style="color: #658b00">self</span>.f, <span style="color: #658b00">self</span>.n, <span style="color: #658b00">self</span>.t
+        dt = t[n+<span style="color: #B452CD">1</span>] - t[n]
+        F = ukp1 - (u[n] + dt*f(ukp1, t[n+<span style="color: #B452CD">1</span>]))
+        J = np.eye(<span style="color: #658b00">self</span>.neq) - dt*<span style="color: #658b00">self</span>.jac(ukp1, t[n+<span style="color: #B452CD">1</span>])
+        <span style="color: #8B008B; font-weight: bold">return</span> F, J
+</pre></div>
+
+<h2>Troubleshooting  <a name="___sec49"></a></h2>
+
+<h4>Constructor takes exactly two arguments, 5 given  <a name="___sec50"></a></h4>
+
+<p>
+Constructors in the <code>Solver</code> hierarchy take only the <code>f</code> function
+as positional argument. All other parameters to the constructor
+must be keyword arguments.
+
+<p>
+<b>Remark.</b>
+This document was written with aid of the
+<a href="https://github.com/hplgit/doconce">Doconce</a> tool, which allows
+output in many different formats.
+
+<!-- ------------------- end of main content --------------- -->
+
+
+</body>
+</html>
+    
+
