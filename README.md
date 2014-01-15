@@ -5,6 +5,23 @@ a large collection of software for solving systems of ordinary
 differential equations (ODEs). There is also some support for
 Differential Algebraic Equations (DAEs).
 
+### How do I install Odespy?
+
+The complete package:
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.Bash}
+Terminal> sudo python setup.py install
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you face problems with compiling the Fortran parts of Odespy,
+try skipping all Fortran code:
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.Bash}
+Terminal> sudo python setup.py install --no-fortran
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 ### Contents of Odespy
 
 Odespy features the following collection of numerical methods and
