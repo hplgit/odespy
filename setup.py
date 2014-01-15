@@ -12,12 +12,19 @@ def configuration(parent_package='',top_path=None):
                        delegate_options_to_subpackages=True,
                        quiet=True)
 
-    config.add_subpackage('odespy')
+    if fortran:
+        config.add_subpackage('odespy')
     config.get_version(join('odespy', 'version.py'))
 
     return config
 
 if __name__ == '__main__':
+    import sys
+    if '--no-fortran' in sys.argv:
+        sys.argv.remove('--no-fortran') # interfers with distutils cmlargs
+        fortran = False
+    else:
+        fortran = True
 
     from numpy.distutils.core import setup
     #setup(**configuration(top_path='').todict())
