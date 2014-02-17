@@ -8,7 +8,7 @@ fi
 name=main_odespy
 
 doconce format pdflatex $name
-ptex2tex -DMINTED -DLATEX_HEADING=traditional $name
+ptex2tex -DMINTED $name
 pdflatex -shell-escape $name
 pdflatex -shell-escape $name
 
