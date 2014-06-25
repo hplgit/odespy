@@ -2,7 +2,7 @@ BDF
 Bashforth
 Bogacki
 Chebyshev
-Doconce
+DocOnce
 Dormand
 Fehlberg
 GitHub
