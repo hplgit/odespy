@@ -1,11 +1,11 @@
-.. Automatically generated reST file from Doconce source
+.. Automatically generated Sphinx-extended reStructuredText file from Doconce source
    (https://github.com/hplgit/doconce/)
 
 A Tutorial for the Odespy Interface to ODE Solvers
 ==================================================
 
 :Author: Hans Petter Langtangen, Liwei Wang
-:Date: Sep 19, 2013
+:Date: Jul 9, 2014
 
 The Odespy package makes it easy to specify an ODE problem in
 Python and get it solved by a wide variety of different numerical
@@ -58,7 +58,6 @@ The corresponding boundary conditions become
 
 .. math::
          u^{(0)}(0)=2,\quad u^{(1)}(0)=1. 
-
 
 The mentioned ODE software needs a specification of the :math:`f(u,t)` formulas
 through some user-written function that takes :math:`u` and :math:`t` as input and
@@ -118,7 +117,6 @@ from FORTRAN:
              RETURN
              END
 
-
 MATLAB
 ~~~~~~
 
@@ -134,11 +132,12 @@ a function in a file, say ``myode.m``:
 
 In MATLAB we can then solve the problem by
 
+.. code-block:: python
+
         >> options = odeset('RelTol',0.0,'AbsTol',1e-6);
         >> tspan = [0 30];
         >> u0 = [2; 0]
         >> [t, u] = ode45('myode', tspan, u0, options]);
-
 
 Python
 ~~~~~~
@@ -178,7 +177,6 @@ The Odespy package provides a unified interface to all the three
 mentioned types of methods, which makes it easy to run all of them
 in a loop (program `motivation.py <https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/motivation1.py>`_):
 
-
 .. code-block:: python
 
         def f(u, t):
@@ -194,7 +192,6 @@ in a loop (program `motivation.py <https://github.com/hplgit/odespy/blob/master/
             solver.set_initial_condition(u0)
             t_points = numpy.linspace(0, 30, 150)
             u, t = solver.solve(t_points)
-
 
 Note in particular that the same ``f`` and the same call syntax can be
 reused across methods and the underlying software.
@@ -242,21 +239,20 @@ The ODE problem can always be specified in Python, but for wrappers of
 FORTRAN codes one can also implement the problem in FORTRAN and avoid
 callback to Python.
 
-
 Installation
 ============
 
 The Odespy package is most easily installed by checking out
 the latest version of the source code:
 
-.. code-block:: console
+.. code-block:: text
 
         git clone git@github.com:hplgit/odespy.git
         cd odespy
 
 The installation follows the standard procedure,
 
-.. code-block:: console
+.. code-block:: text
 
         sudo python setup.py install
 
@@ -284,27 +280,24 @@ standard ``setup.py`` script, as shown above.
 On Ubuntu and other Debian-based Linux systems the following
 line installs all that Odespy may need:
 
-.. code-block:: console
+.. code-block:: text
 
         sudo apt-get install python-scipy python-nose python-sympy \ 
              python-matplotlib python-scitools python-pip
 
-
 The ``odelab`` package is installed by either
 
-.. code-block:: console
+.. code-block:: text
 
         pip install -e git+https://github.com/olivierverdier/odelab#egg=odelab
 
 or downloading the source and running ``setup.py``:
 
-.. code-block:: console
+.. code-block:: text
 
         git clone git://github.com/olivierverdier/odelab.git
         cd odelab
         sudo python setup.py install
-
-
 
 Basic Usage
 ===========
@@ -365,7 +358,6 @@ or at any time using the ``set`` method:
         solver.set(prm1=value1, prm2=value2, prm3=value3)
         ...
         solver.set(prm4=value4)
-
 
 Step 4
 ~~~~~~
@@ -439,7 +431,6 @@ value. That is, ``u[step_no]`` is most recently computed value of :math:`u`.
 (The array data ``u[step_no+1:]`` will typically be zero as these
 are uncomputed future values.)
 
-
 Step 6
 ~~~~~~
 
@@ -458,7 +449,6 @@ and plotted:
         from matplotlib.pyplot import plot, show
         plot(t, u_0, t, u_k)
         show()
-
 
 .. _ode:sec:exgr:
 
@@ -483,7 +473,6 @@ Runge-Kutta method of order four, the code for solving the problem in
 the time interval :math:`[0,10]` with :math:`N=30` time steps, looks like this
 (program `logistic1.py <https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/logistic1.py>`_):
 
-
 .. code-block:: python
 
         def f(u, t):
@@ -503,7 +492,6 @@ the time interval :math:`[0,10]` with :math:`N=30` time steps, looks like this
         time_points = linspace(0, T, N+1)
         u, t = solver.solve(time_points)
 
-
 With the ``RK4`` method and other non-adaptive methods
 the time steps are dictated by the ``time_points`` array.
 A constant time step of size is implied in the present example.
@@ -512,7 +500,6 @@ Running an alternative numerical method just means replacing ``RK4`` by, e.g.,
 
 We can easily plot the numerical solution and compare with the exact
 solution (which is known for this equation):
-
 
 .. code-block:: python
 
@@ -526,19 +513,15 @@ solution (which is known for this equation):
         savefig('tmppng'); savefig('tmp.pdf')
         show()
 
-
-
 .. figure:: logistic1.png
    :width: 400
 
    Solution of the logistic equation with the 4-th order Runge-Kutta method (solid line) and comparison with the exact solution (dots)
 
-
 All the examples in this tutorial are found in the GitHub directory
 `<https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/>`_.
 If you download the tarball or clone the GitHub repository, the examples
 reside in the directory ``doc/src/odespy/src-odespy``.
-
 
 .. _ode:sec:exgr:farg:
 
@@ -547,7 +530,6 @@ Parameters in the Right-Hand Side Function
 
 The right-hand side function and all physical parameters are often
 lumped together in a class, for instance,
-
 
 .. code-block:: python
 
@@ -565,14 +547,12 @@ lumped together in a class, for instance,
                 a, R, A = self.a, self.R, self.A  # short form
                 return R*A*exp(a*t)/(R + A*(exp(a*t) - 1))
 
-
 Note that introducing local variables like ``a`` and ``R``, instead of
 using ``self.a`` and ``self.A``, makes the code closer to the mathematics.
 This can be convenient when proof reading the implementation of
 complicated ODEs.
 
 The numerical solution is computed by
-
 
 .. code-block:: python
 
@@ -596,7 +576,6 @@ argument ``f_args`` (a list/tuple of variables), while a dictionary
 ``f_kwargs`` is used to transfer keyword arguments to ``f`` via the
 constructor. Here is an example on using keyword arguments:
 
-
 .. code-block:: python
 
         def f(u, t, a=1, R=1):
@@ -606,7 +585,6 @@ constructor. Here is an example on using keyword arguments:
         
         import odespy
         solver = odespy.RK4(f, f_kwargs=dict(a=2, R=1E+5))
-
 
 In general, a mix
 of positional and keyword arguments can be used in ``f``:
@@ -635,7 +613,6 @@ then continue with :math:`u(T_1)` as new initial condition and simulate for
 domain into subdomains and compute the solution for
 each subdomain in sequence. The following program performs the steps
 (`logistic4.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic4.py>`_).
-
 
 .. code-block:: python
 
@@ -678,7 +655,6 @@ each subdomain in sequence. The following program performs the steps
         u = numpy.concatenate(u);  t = numpy.concatenate(t)
         savefig('tmppng'); savefig('tmp.pdf')
 
-
 Termination Criterion for the Simulation
 ----------------------------------------
 
@@ -694,13 +670,11 @@ tolerance, say :math:`100` in the present case where :math:`R=10^5`.
 The ``terminate`` function implements the criterion
 and returns true if the criterion is met:
 
-
 .. code-block:: python
 
         def terminate(u, t, step_no):
             """u[step_no] holds (the most recent) solution at t[step_no]."""
             return abs(u[step_no] - R) < tol:
-
 
 Note that the simulation is anyway stopped for :math:`t > T` so :math:`T`
 must be large enough for the termination criterion to be reached (if not,
@@ -709,7 +683,6 @@ With a ``terminate`` function it is also convenient to specify the
 time step ``dt`` and not the total number of time steps.
 
 A complete program can be as follows (`logistic5.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic5.py>`_):
-
 
 .. code-block:: python
 
@@ -743,7 +716,6 @@ A complete program can be as follows (`logistic5.py <https://github.com/hplgit/o
         savefig('tmppng'); savefig('tmp.pdf')
         show()
 
-
 A Class-Based Implementation
 ----------------------------
 
@@ -753,7 +725,6 @@ to the problem (the "physics") into a problem class ``Logistic``, while
 all data related to the numerical solution and its quality are
 taken care of by class ``Solver``. The code below illustrates
 the ideas (`logistic6.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic26py>`_):
-
 
 .. code-block:: python
 
@@ -817,7 +788,6 @@ the ideas (`logistic6.py <https://github.com/hplgit/odespy/blob/master/doc/src/o
         if __name__ == '__main__':
             main()
 
-
 Using Other Symbols
 -------------------
 
@@ -830,7 +800,6 @@ equation written as :math:`y'(x)=au(x)(1-u(x)/R(x))`, where now a variable
 :math:`R=R(x)` is considered. Following the setup from the very first
 program above solving the logistic ODE, we can easily introduce our
 own nomenclature (`logistic7.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic7.py>`_):
-
 
 .. code-block:: python
 
@@ -853,9 +822,10 @@ own nomenclature (`logistic7.py <https://github.com/hplgit/odespy/blob/master/do
         xlabel('x'); ylabel('y')
         show()
 
-
 As shown, we use ``y`` for ``u``, ``x`` for ``t``, and ``x_points`` instead
 of ``time_points``.
+
+.. _ode:sec:ex:osc:
 
 Example: Solving an ODE System
 ------------------------------
@@ -875,6 +845,7 @@ is governed by the equation
 A dot over :math:`\theta` implies differentiation with respect to time.
 The ODE can be written as :math:`\ddot\theta + c\sin\theta=0` by
 introducing :math:`c = g/L`.
+
 This problem must be expressed as a first-order ODE system if it is
 going to be solved by the tools in the Odespy package.
 Introducing :math:`\omega = \dot\theta` (the angular velocity) as auxiliary
@@ -891,13 +862,11 @@ with :math:`\theta(0)=\Theta` and :math:`\omega(0)=0`.
 Now the ``f`` function must return a list or array with the two
 right-hand side functions:
 
-
 .. code-block:: python
 
         def f(u, t):
             theta, omega = u
             return [omega, -c*sin(theta)]
-
 
 Note that when we have a system of ODEs with ``n`` components, the ``u``
 object sent to the ``f`` function is an array of length ``n``,
@@ -908,12 +877,10 @@ the current problem.
 
 The initial conditions must be specified as a list:
 
-
 .. code-block:: python
 
         solver = odespy.Heun(f)
         solver.set_initial_condition([Theta, 0])
-
 
 To specify the time points we here first decide on a number of periods
 (oscillations back and forth) to simulate and then on the time resolution
@@ -924,7 +891,6 @@ solution
 whose period is :math:`2\pi/\sqrt{c}`. We use this expression
 as an approximation for the period also when :math:`\Theta` is not
 small.
-
 
 .. code-block:: python
 
@@ -937,13 +903,11 @@ small.
         
         u, t = solver.solve(time_points)
 
-
 The ``u`` returned from ``solver.solve`` is a two-dimensional array, where the
 columns hold the various solution functions of the ODE system. That is,
 the first column holds :math:`\theta` and the second column holds
 :math:`\omega`. For convenience we extract the individual solution
 components in individual arrays:
-
 
 .. code-block:: python
 
@@ -964,16 +928,13 @@ makes the numerical solution explode.
 The increasing amplitude is a numerical artifact that some of the simple
 solution methods suffer from.
 
-
 .. figure:: osc1a.png
    :width: 500
 
    Heun's method used to simulate oscillations of a pendulum
 
-
 Using a more sophisticated method, say the 4-th order Runge-Kutta method,
 is just a matter of substituting ``Heun`` by ``RK4``:
-
 
 .. code-block:: python
 
@@ -998,12 +959,156 @@ is just a matter of substituting ``Heun`` by ``RK4``:
 
 The amplitude now becomes constant in time as expected.
 
+The EulerCromer Method
+----------------------
+
+Physicists will solve the model problem in the section :ref:`ode:sec:ex:osc` by
+the Euler-Cromer method. For a single degree of freedom system,
+
+.. math::
+         \ddot x + f(x, \dot x, t) = 0,
+
+typically modeling an oscillatory system, the Euler-Cromer method
+writes the system as two ODEs,
+
+.. math::
+        
+        \dot v &= -g(x, v, t),\\ 
+        \dot x &= v\thinspace .
+        
+
+A Forward Euler scheme is used for the first equation, while a Backward
+Euler scheme is used for the second:
+
+.. math::
+        
+        v^{n+1} &= v^ - \Delta t\, g(x^n, v^n, n\Delta t),\\ 
+        x^{n+1} &= x^n + \Delta t\,v^{n+1}\thinspace .
+        
+
+For general multi degree of freedom systems, we have some vector ODE
+arising from, typically, Newton's second law of motion,
+
+.. math::
+         \ddot{\boldsymbol{r}} + \boldsymbol{g}(\boldsymbol{r},\dot{\boldsymbol{r}},t) = 0\thinspace .
+
+This is rewritten as
+
+.. math::
+        
+        \dot{\boldsymbol{v}} &= -\boldsymbol{g}(\boldsymbol{r}, \boldsymbol{v}, t),\\ 
+        \dot{\boldsymbol{r}} &= \boldsymbol{v},
+        
+
+and discretized as
+
+.. math::
+        
+        \boldsymbol{v}^{n+1} &= \boldsymbol{v}^n -\Delta t\,\boldsymbol{g}(\boldsymbol{r}^n, \boldsymbol{v}^n, t),\\ 
+        \boldsymbol{r}^{n+1} &= \boldsymbol{r}^n + \Delta t\,\boldsymbol{v}^{n+1}\thinspace .
+        
+
+The convention in Odespy is to group all the unknowns as velocity and position
+for each degree of freedom. That is, if
+
+.. math::
+         \boldsymbol{r} = (r^{(0)}, r^{(0)}, \ldots, r^{(N)}),
+        \quad \boldsymbol{v} = (v^{(0)}, v^{(0)}, \ldots, v^{(N)}),
+        
+
+the :math:`u` vector of all unknowns in the Euler-Cromer method in Odespy
+must be
+
+.. math::
+         u=(v^{(0)}, r^{(0)}, v^{(1)}, r^{(1)}, \ldots,v^{(N)}, r^{(N)})\thinspace .
+
+The corresponding set of ODEs are
+
+.. math::
+        
+        \dot v^{(0)} &= -g^{(0)}(\boldsymbol{r}, \boldsymbol{v}, t),\\ 
+        \dot r^{(0)} &= v^{(0)},\\ 
+        \dot v^{(1)} &= -g^{(1)}(\boldsymbol{r}, \boldsymbol{v}, t),\\ 
+        \dot r^{(1)} &= v^{(1)},\\ 
+        &\cdots\\ 
+        \dot v^{(N)} &= -g^{(N)}(\boldsymbol{r}, \boldsymbol{v}, t),\\ 
+        \dot r^{(N)} &= v^{(N)}\thinspace .
+        
+
+For a pendulum we write our system as
+
+.. math::
+        
+        \dot\omega &= -c\sin\theta,\\ 
+        \dot\theta &= \omega,
+        
+
+and let :math:`u=(\omega, \theta)`. The relevant right-hand side function becomes
+
+.. code-block:: python
+
+        def f(u, t):
+            omega, theta = u
+            return [-c*sin(theta), omega]
+
+With some imports,
+
+.. code-block:: python
+
+        import odespy
+        from numpy import *
+        from matplotlib.pyplot import *
+
+we can write the rest of the program in a standard fashion:
+
+.. code-block:: python
+
+        c = 1
+        Theta0_degrees = 30
+        
+        solver = odespy.EulerCromer(f)
+        Theta0 = Theta0_degrees*pi/180
+        solver.set_initial_condition([0, Theta0])
+        # Solve for num_periods periods using formulas for small theta
+        freq = sqrt(c)          # frequency of oscillations
+        period = 2*pi/freq      # one period
+        N = 40                  # intervals per period
+        dt = period/N           # time step
+        num_periods = 10
+        T = num_periods*period  # total simulation time
+        
+        time_points = linspace(0, T, num_periods*N+1)
+        u, t = solver.solve(time_points)
+        
+        # Extract components and plot theta
+        theta = u[:,1]
+        omega = u[:,0]
+        theta_linear = lambda t: Theta0*cos(sqrt(c)*t)
+        plot(t, theta, t, theta_linear(t))
+        legend(['Euler-Cromer', 'Linearized problem'], loc='lower left')
+
+With :math:`\Theta_0` as 30 degrees, the fully nonlinear solution is
+slightly out of phase with the solution of the linearized
+problem :math:`\ddot\theta + c\theta =0`, see Figure :ref:`ode:sec:EC:fig1`.
+As :math:`\Theta_0\rightarrow 0`, the two curves approach each other.
+The Euler-Cromer method is significantly better than Heun's method
+used in the previous section and preserves the amplitude in very
+long time integrations.
+
+.. _ode:sec:EC:fig1:
+
+.. figure:: osc_EC_30.png
+   :width: 500
+
+   *Euler-Cromer method applied to the pendulum problem*
 
 Testing Several Methods
 -----------------------
 
+(**hpl 1**: After Euler-Cromer, change the order of the ODEs and unknowns!)
+
 We shall now make a more advanced solver by
-extending the previous example. More specifically, we shall
+extending the pendulum example. More specifically, we shall
 
   * represent the right-hand side function as class,
 
@@ -1033,7 +1138,6 @@ function in the present case looks like this:
 
 .. code-block:: text
 
-
         class Problem:
             def __init__(self, c, Theta):
                 self.c, self.Theta = float(c), float(Theta)
@@ -1048,7 +1152,6 @@ It would be convenient to add an attribute ``period`` which holds
 an estimate of the period of oscillations as we need this for
 deciding on the complete time interval for solving the differential
 equations. An appropriate extension of class ``Problem`` is therefore
-
 
 .. code-block:: python
 
@@ -1065,9 +1168,10 @@ equations. An appropriate extension of class ``Problem`` is therefore
         
         problem = Problem(c=1, Theta=pi/4)
 
-
 The second extension is to loop over many solvers. All
 solvers can be listed by
+
+.. code-block:: python
 
         >>> import odespy
         >>> methods = list_all_solvers()
@@ -1090,7 +1194,6 @@ names of the solvers that are available in the current installation
 This is the list that is usually most relevant.
 
 For now we explicitly choose a subset of the commonly available solvers:
-
 
 .. code-block:: python
 
@@ -1116,7 +1219,6 @@ capable of reproducing the constant amplitude of the oscillations of
 in the current mathematical model.
 
 The loop over the chosen solvers may look like
-
 
 .. code-block:: python
 
@@ -1147,12 +1249,10 @@ The loop over the chosen solvers may look like
 
 A complete program is available as `osc2.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py>`_.
 
-
 .. figure:: osc2.png
    :width: 500
 
    Comparison of methods for solving the ODE system for a pendulum
-
 
 We can extend this program to compute the error in each numerical
 solution for different time step sizes.
@@ -1180,7 +1280,6 @@ here numerically):
 where ``dt`` is the time step size.
 
 Typical loops over solvers and resolutions look as follows (`osc3.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc3.py>`_):
-
 
 .. code-block:: python
 
@@ -1213,7 +1312,6 @@ Typical loops over solvers and resolutions look as follows (`osc3.py <https://gi
                     results[solver_name]['dt'].append(t[1] - t[0])
                     results[solver_name]['error'].append(error_L2)
 
-
 Assuming the error to be of the form :math:`C\Delta t^r`, we can estimate
 :math:`C` and :math:`r` from two consecutive experiments to obtain a sequence
 of :math:`r` values which (hopefully) convergences to a value that we can
@@ -1221,7 +1319,6 @@ view as the empirical convergence rate of a method.
 Given the sequence of time steps and errors, a function in
 the ``scitools`` package automatically computes the sequence of
 :math:`r` values:
-
 
 .. code-block:: python
 
@@ -1237,10 +1334,9 @@ the ``scitools`` package automatically computes the sequence of
             print '%-20s r: %s E_min=%.1E' % \ 
                   (solver_name, rates, min(results[solver_name]['error']))
 
-
 With 4 periods we get
 
-.. code-block:: python
+.. code-block:: text
 
         ThetaRule(theta=0)   r: 4.2,  2.4, 1.7, 1.3 E_min=1.9E-01
         LeapfrogFiltered     r: 10.3, 0.3, 0.5, 0.7 E_min=1.8E-01
@@ -1267,7 +1363,7 @@ are useless, while the others deliver their promised convergence
 rates (Forward Euler, i.e., ``ThetaRule`` with ``theta=0`` is left
 out because of ridiculous results):
 
-.. code-block:: python
+.. code-block:: text
 
         LeapfrogFiltered     r: 63.7, 0.0, 0.1, 0.2 E_min=4.3E-01
         ThetaRule(theta=1)   r: 0.0,  0.1, 0.1, 0.3 E_min=3.8E-01
@@ -1276,8 +1372,6 @@ out because of ridiculous results):
         Leapfrog             r: 0.5,  1.9, 2.0, 2.0 E_min=1.0E-02
         RK2                  r: 3.7,  2.1, 2.0, 2.0 E_min=1.0E-02
         MidpointIter         r: 1.8,  0.8, 1.9, 2.0 E_min=1.0E-02
-
-
 
 Make a Subclass of Problem
 --------------------------
@@ -1366,7 +1460,6 @@ Here are the typical steps when using such a problem class:
         solver.set_initial_condition(problem.U0)
         u, t = solver.solve(time_points)
 
-
 The problem class may also feature additional methods:
 
 .. code-block:: python
@@ -1389,7 +1482,6 @@ The problem class may also feature additional methods:
                 tolerances is None, return max computed error (infinity
                 norm). Return None if the solution cannot be verified.
                 """
-
 
 The module ``odespy.problems`` contains many predefined ODE problems.
 
@@ -1471,7 +1563,6 @@ such as ``RK4``.
 For curiosity we can mention that the ``ForwardEuler`` method produces
 a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.
 
-
 .. _gaussian:fig:RK2:41:
 
 .. figure:: gaussian1_RK2_41.png
@@ -1479,9 +1570,7 @@ a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.
 
    *2nd-order Runge-Kutta method with 41 points*
 
-
 A simple program testing one numerical method goes as follows (`gaussian1.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py>`_).
-
 
 .. code-block:: python
 
@@ -1515,8 +1604,6 @@ A simple program testing one numerical method goes as follows (`gaussian1.py <ht
         plt.savefig('tmppng'); plt.savefig('tmp.pdf')
         plt.show()
 
-
-
 Running the Runge-Kutta-Fehlberg Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1535,14 +1622,12 @@ these,
 
 Figure :ref:`gaussian:fig:Fehlberg:41` shows how ``Fehlberg`` with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (57 adaptively selected points in time).
 
-
 .. _gaussian:fig:Fehlberg:41:
 
 .. figure:: gaussian1_Fehlberg_41.png
    :width: 500
 
    *Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41)*
-
 
 Adaptive algorithms apply an error estimate based on considering a higher-order method as exact, in this case a method of order 5, and a method of lower order (here 4) as the numerically predicted solution. The user can specify an error tolerance. In the program above we just relied to the default tolerance, which can be printed by
 
@@ -1552,7 +1637,7 @@ Adaptive algorithms apply an error estimate based on considering a higher-order 
 
 yielding a list of all optional parameters:
 
-.. code-block:: python
+.. code-block:: text
 
         {'f_kwargs': {}, 'f_args': (),
          'max_step': 1.5000000000000036, 'verbose': 0,
@@ -1581,7 +1666,6 @@ We can specify stricter tolerances and also control the minimum
 allowed step size, ``min_step``, which might be too large to achieve
 the desired error level (`gaussian2.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian2.py>`_):
 
-
 .. code-block:: python
 
         rtol = 1E-12
@@ -1590,7 +1674,6 @@ the desired error level (`gaussian2.py <https://github.com/hplgit/odespy/blob/ma
         
         solver = odespy.Fehlberg(problem.f, atol=atol, rtol=rtol,
                                  min_step=min_step)
-
 
 The ``Fehlberg`` solver now applies 701 points and achieves a maximum
 value of 2.00005. However, ``RK4`` with the same number of (equally spaced) points
@@ -1603,7 +1686,6 @@ We have already solved :eq:`gaussian:ode:eq` with sufficient accuracy, but
 let us see how other methods perform, as this will most likely result in
 a surprise. Below is a program (`gaussian3.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian3.py>`_) that compares several famous and
 widely used methods in the same plot.
-
 
 .. code-block:: python
 
@@ -1664,7 +1746,6 @@ widely used methods in the same plot.
         plt.savefig('tmp2.png')
         plt.show()
 
-
 The default discretization applies :math:`N=40` equal-sized time intervals,
 but adaptive methods should be able to adjust themselves to the
 desired error level :math:`10^{-6}`. Figures :ref:`gaussian3:fig1:41` and
@@ -1676,15 +1757,12 @@ results, despite setting ``Vode`` to use a stiff BDF solver of order 5, and
 ``Lsoda`` should automatically select between nonstiff and stiff solvers
 (of default order 4 in this case).
 
-
 .. _gaussian3:fig1:41:
 
 .. figure:: gaussian3_41.png
    :width: 500
 
    *Comparison of adaptive methods with default parameters (tolerance ``E-6``)*
-
-
 
 .. _gaussian3:fig1err:41:
 
@@ -1693,11 +1771,10 @@ results, despite setting ``Vode`` to use a stiff BDF solver of order 5, and
 
    *Comparison of errors in adaptive methods with default parameters (tolerance ``E-6``)*
 
-
 The program writes out the following results for the
 maximum value of the solution, which should equal 2:
 
-.. code-block:: python
+.. code-block:: text
 
         1.9976  DormandPrince
         1.6591  BogackiShampine
@@ -1715,7 +1792,7 @@ choose a much stricter tolerance, say :math:`10^{-10}`.
 Figure :ref:`gaussian3:fig2:41` shows
 coinciding curves. Numerically, we now have
 
-.. code-block:: python
+.. code-block:: text
 
         1.9991  DormandPrince
         1.9912  BogackiShampine
@@ -1728,14 +1805,12 @@ For the methods ``DormandPrince``,  ``RKFehlberg``, and
 ``BogackiShampine`` we have information about the number of adaptive
 time points used: 270, 326, and 3307, respectively.
 
-
 .. _gaussian3:fig2:41:
 
 .. figure:: gaussian3_41_Em10.png
    :width: 500
 
    *Comparison of adaptive methods with error tolerance `E-10`*
-
 
 The lesson learned in this example is two-fold: 1) several methods should
 be tested to gain reliability of the results, and Odespy makes such tests
@@ -1787,7 +1862,6 @@ For complex-valued ODEs, i.e., complex-valued right-hand side functions
 or initial conditions, the argument ``complex_valued=True`` must be
 supplied to the constructor. A complete program reads
 
-
 .. code-block:: python
 
         def f(u, t):
@@ -1800,7 +1874,6 @@ supplied to the constructor. A complete program reads
         solver.set_initial_condition(1+0j)
         u, t = solver.solve(numpy.linspace(0, 6, 101))
 
-
 The function ``odespy.list_not_suitable_complex_solvers()``
 returns a list of all the classes in Odespy that are not suitable
 for complex-valued ODE problems.
@@ -1812,7 +1885,6 @@ We can try three classes that do work for complex-valued ODEs: ``Vode``,
 ``RK4``, and ``RKFehlberg``. Comparing these with respect to CPU time and
 final error for a very long time integration of 600 periods is carried
 out by the following program.
-
 
 .. code-block:: python
 
@@ -1855,7 +1927,7 @@ be recovered as ``solver.u`` and ``solver.t``, respectively.
 
 The output from the program may read
 
-.. code-block:: python
+.. code-block:: text
 
         Exact: u(600)=1
         Vode            u(600)=1.001587 (error:  -1.59E-03, cpu: 1.0)
@@ -2004,7 +2076,6 @@ We start by implementing a problem class with Python code for
                 return [[0., 1.],
                         [-2*mu*u_0*u_1 - 1, mu*(1 - u_0**2)]]
 
-
 Now, we want to provide ``f`` and ``jac`` in FORTRAN as well.
 The FORTRAN code for :math:`f(u,t)` can be returned from a method:
 
@@ -2026,7 +2097,6 @@ The FORTRAN code for :math:`f(u,t)` can be returned from a method:
               return
               end
         """ % self.mu
-
 
 While all FORTRAN solvers supported by Odespy so far employ the same
 signature for the :math:`f(u,t)` function, different solvers apply different
@@ -2092,7 +2162,6 @@ the source code into Python modules. This is done by
                                          self.str_jac_f77_radau5(),
                                          self.str_jac_f77_lsode()])
 
-
 The application of this problem class goes as follows:
 
 .. code-block:: python
@@ -2103,8 +2172,6 @@ The application of this problem class goes as follows:
                                jac=problem.jac_f77_radau5)
         solver.set_initial_condition(problem.U0)
         u, t = solver.solve(time_points)
-
-
 
 Example: Solving a Stochastic Differential Equation
 ---------------------------------------------------
@@ -2150,7 +2217,6 @@ the same value of the white noise).
 The right-hand side function must do many things so a class is
 appropriate:
 
-
 .. code-block:: python
 
         class WhiteNoiseOscillator:
@@ -2181,7 +2247,6 @@ we need access to the solver instance to compute the ``self.N`` array.
 
 It is easy to compare different methods for solving this stochastic equation:
 
-
 .. code-block:: python
 
         problem = WhiteNoiseOscillator(b=0.1, c=pi**2, sigma=1)
@@ -2207,13 +2272,10 @@ may easily extract the solution of ``RK4`` by
 
         solvers[1].u, solvers[1].t
 
-
-
 .. figure:: sode1.png
    :width: 500
 
    Oscillator driven by white noise
-
 
 The ``Heun`` and ``RK2`` methods give coinciding solutions while
 the ``ForwardEuler`` method gives too large amplitudes.
@@ -2227,9 +2289,6 @@ the force is always the same - otherwise the solutions will be
 different.
 
 The complete code is available in `sode.py <https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/sode1.py>`_.
-
-
-
 
 Inner Workings of the Package
 =============================
@@ -2280,7 +2339,6 @@ is
 
 .. code-block:: text
 
-
         _parameters = dict(
         ...
         
@@ -2302,7 +2360,6 @@ is
         
         ...
         }
-
 
 Each solver class defines a (static) class variable
 ``_required_parameters`` for holding the names of all required
@@ -2330,7 +2387,6 @@ construction time or through the ``set`` function:
 
 .. code-block:: text
 
-
         >>> from odespy import RK2
         >>> def f(u, t, a, b=0):
         ...   return a*u + b
@@ -2353,7 +2409,6 @@ take an arbitrary collection of such arguments:
 
         solver.set(name1=value1, name2=value2, name3=value3, ...)
 
-
 The ``get`` method returns the parameters and their values as a dictionary.
 We remark that the ``'f'`` key, which one might expect to appear in the
 returned dictionary of parameters, are omitted because it is always
@@ -2363,14 +2418,12 @@ there is an entry ``'name of f'`` which reflects the name of the
 user-supplied function. The same comment applies to the ``jac`` parameter
 for specifying the Jacobian used in implicit methods.
 
-
 Solver Classes
 --------------
 
 Each solver in this package is implemented as a class in a class hierarchy.
 Basic, common functionality is inherited from super classes, and the
 actual solver class implements what is specific for the method in question.
-
 
 The Inherited Superclass Constructor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2406,7 +2459,7 @@ the subclass solvers:
    to extract data.  For example, the value of
    ``self._parameters['myvar']`` becomes available as ``self.myvar`` and
    in the algorithms we use ``self.myvar``, perhaps with a test
-   ``hasattr(self, 'myvar')`` test or a ``try``-`except` clause (catching
+   ``hasattr(self, 'myvar')`` test or a ``try-except`` clause (catching
    an ``AttributeError``).
 
 4. The ``set`` method is called with all keyword arguments given to the
@@ -2513,7 +2566,6 @@ general, explicit, adaptive 2-level Runge-Kutta methods,
 ``ode_scipy`` for interfaces to ODE solvers
 in ``scipy``, and ``Odepack`` for interfaces to the ODEPACK family
 of solvers.
-
 
 A Very Simple Subclass
 ----------------------
@@ -2686,8 +2738,6 @@ Here is an example showing the complete code of the Backward Euler method.
                 J = np.eye(self.neq) - dt*self.jac(ukp1, t[n+1])
                 return F, J
 
-
-
 Troubleshooting
 ===============
 
@@ -2698,8 +2748,7 @@ Constructors in the ``Solver`` hierarchy take only the ``f`` function
 as positional argument. All other parameters to the constructor
 must be keyword arguments.
 
-
-
-*Remark.* This document was written with aid of the
-`Doconce <https://github.com/hplgit/doconce>`_ tool, which allows
+**Remark.**
+This document was written with aid of the
+`DocOnce <https://github.com/hplgit/doconce>`_ tool, which allows
 output in many different formats.

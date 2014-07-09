@@ -32,12 +32,13 @@ All of these routines require the ODE problem to be on the form
 $u'=f(u,t)$, which means that
 the second-order differential equation must be
 recast as a system of two ODEs,
-# #if FORMAT in ("latex", "pdflatex", "sphinx")
+
 !bt
 \[ \frac{d}{dt}u^{(0)} = u^{(1)},\quad \frac{d}{dt}u^{(1)} =3(1-{(u^{(0)})}^2) u^{(1)} - u^{(0)},\]
 !et
 and we have to identify the two components
 of the $f(u,t)$ function:
+
 !bt
 \[ f^{(0)}(u^{(0)}, u^{(1)}, t) = u^{(1)}, \quad
    f^{(1)}(u^{(0)}, u^{(1)}, t) =3(1-{(u^{(0)})}^2)u^{(1)} - u^{(0)}\]
@@ -46,10 +47,6 @@ The corresponding boundary conditions become
 !bt
 \[ u^{(0)}(0)=2,\quad u^{(1)}(0)=1. \]
 !et
-# #else
-and we have to identify the vector of right-hand sides and the vector
-for the initial condition.
-# #endif
 
 The mentioned ODE software needs a specification of the $f(u,t)$ formulas
 through some user-written function that takes $u$ and $t$ as input and
@@ -386,15 +383,12 @@ show()
 label{ode:sec:exgr}
 
 Our first example concerns the simple scalar ODE problem
-# #if FORMAT in ("latex", "pdflatex", "sphinx")
+
 !bt
 \[
 \frac{du}{dt}=au\left(1-\frac{u}{R}\right),\quad u(0)=A,
 \]
 !et
-# #else
-$u'=au(1-u/R)$, $u(0)=A$,
-# #endif
 where $A>0$, $a>0$, and $R>0$ are known constants. This is
 a common model for population dynamics in ecology where $u$ is the
 number of individuals, $a$ the initial growth rate, $R$ is the
@@ -538,13 +532,14 @@ As shown, we use `y` for `u`, `x` for `t`, and `x_points` instead
 of `time_points`.
 
 ===== Example: Solving an ODE System =====
+label{ode:sec:ex:osc}
 
 We shall now explain how to solve a system of ODEs using a scalar
 second-order ODE as starting point.
 The angle $\theta$|$theta$ of a pendulum with mass $m$ and length $L$
 is governed by the equation
 (neglecting air resistance for simplicity)
-# #if FORMAT in ("latex", "pdflatex", "sphinx")
+
 !bt
 \[
 mL\ddot\theta + mg\sin\theta = 0,\quad \theta (0)=\Theta,\
@@ -554,13 +549,9 @@ mL\ddot\theta + mg\sin\theta = 0,\quad \theta (0)=\Theta,\
 A dot over $\theta$ implies differentiation with respect to time.
 The ODE can be written as $\ddot\theta + c\sin\theta=0$ by
 introducing $c = g/L$.
-# #else
-# pure ASCII
-_theta'' + c*sin(theta) = 0_, with _theta(0) = Theta_ and _theta'(0) = 0_.
-# #endif
+
 This problem must be expressed as a first-order ODE system if it is
 going to be solved by the tools in the Odespy package.
-# #if FORMAT in ("latex", "pdflatex", "sphinx")
 Introducing $\omega = \dot\theta$ (the angular velocity) as auxiliary
 unknown, we get the system
 !bt
@@ -570,11 +561,6 @@ unknown, we get the system
 \end{align*}
 !et
 with $\theta(0)=\Theta$ and $\omega(0)=0$.
-# #else
-Introducing omega as theta', we get the first equation as
-_theta' = omega_ and the second as _omega' = -c*sin(theta)_.
-The initial conditions are _theta(0) = Theta_ and _omega'(0) = 0_.
-# #endif
 
 Now the `f` function must return a list or array with the two
 right-hand side functions:
@@ -628,11 +614,121 @@ is just a matter of substituting `Heun` by `RK4`:
 @@@CODE src-odespy/osc1b.py  fromto: solver =@method\.set_initial
 The amplitude now becomes constant in time as expected.
 
+===== The EulerCromer Method =====
+
+Physicists will solve the model problem in Section ref{ode:sec:ex:osc} by
+the Euler-Cromer method. For a single degree of freedom system,
+
+!bt
+\[ \ddot x + f(x, \dot x, t) = 0,\]
+!et
+typically modeling an oscillatory system, the Euler-Cromer method
+writes the system as two ODEs,
+
+!bt
+\begin{align*}
+\dot v &= -g(x, v, t),\\
+\dot x &= v\thinspace .
+\end{align*}
+!et
+A Forward Euler scheme is used for the first equation, while a Backward
+Euler scheme is used for the second:
+
+!bt
+\begin{align*}
+v^{n+1} &= v^ - \Delta t\, g(x^n, v^n, n\Delta t),\\
+x^{n+1} &= x^n + \Delta t\,v^{n+1}\thinspace .
+\end{align*}
+!et
+
+For general multi degree of freedom systems, we have some vector ODE
+arising from, typically, Newton's second law of motion,
+
+!bt
+\[ \ddot{\bm{r}} + \bm{g}(\bm{r},\dot{\bm{r}},t) = 0\thinspace .\]
+!et
+This is rewritten as
+
+!bt
+\begin{align*}
+\dot{\bm{v}} &= -\bm{g}(\bm{r}, \bm{v}, t),\\
+\dot{\bm{r}} &= \bm{v},
+\end{align*}
+!et
+and discretized as
+
+!bt
+\begin{align*}
+\bm{v}^{n+1} &= \bm{v}^n -\Delta t\,\bm{g}(\bm{r}^n, \bm{v}^n, t),\\
+\bm{r}^{n+1} &= \bm{r}^n + \Delta t\,\bm{v}^{n+1}\thinspace .
+\end{align*}
+!et
+
+The convention in Odespy is to group all the unknowns as velocity and position
+for each degree of freedom. That is, if
+
+!bt
+\[ \bm{r} = (r^{(0)}, r^{(0)}, \ldots, r^{(N)}),
+\quad \bm{v} = (v^{(0)}, v^{(0)}, \ldots, v^{(N)}),
+\]
+!et
+the $u$ vector of all unknowns in the Euler-Cromer method in Odespy
+must be
+
+!bt
+\[ u=(v^{(0)}, r^{(0)}, v^{(1)}, r^{(1)}, \ldots,v^{(N)}, r^{(N)})\thinspace .\]
+!et
+The corresponding set of ODEs are
+
+!bt
+\begin{align*}
+\dot v^{(0)} &= -g^{(0)}(\bm{r}, \bm{v}, t),\\
+\dot r^{(0)} &= v^{(0)},\\
+\dot v^{(1)} &= -g^{(1)}(\bm{r}, \bm{v}, t),\\
+\dot r^{(1)} &= v^{(1)},\\
+&\cdots\\
+\dot v^{(N)} &= -g^{(N)}(\bm{r}, \bm{v}, t),\\
+\dot r^{(N)} &= v^{(N)}\thinspace .
+\end{align*}
+!et
+
+For a pendulum we write our system as
+
+!bt
+\begin{align*}
+\dot\omega &= -c\sin\theta,\\
+\dot\theta &= \omega,
+\end{align*}
+!et
+and let $u=(\omega, \theta)$. The relevant right-hand side function becomes
+
+@@@CODE src-odespy/osc_EC.py fromto: def f@c = 1
+
+With some imports,
+
+@@@CODE src-odespy/osc_EC.py fromto: import odespy@def f
+we can write the rest of the program in a standard fashion:
+
+@@@CODE src-odespy/osc_EC.py fromto: c = 1@title\(
+
+With $\Theta_0$ as 30 degrees, the fully nonlinear solution is
+slightly out of phase with the solution of the linearized
+problem $\ddot\theta + c\theta =0$, see Figure ref{ode:sec:EC:fig1}.
+As $\Theta_0\rightarrow 0$, the two curves approach each other.
+The Euler-Cromer method is significantly better than Heun's method
+used in the previous section and preserves the amplitude in very
+long time integrations.
+
+FIGURE: [fig-odespy/osc_EC_30, width=500 frac=0.8] Euler-Cromer method applied to the pendulum problem. label{ode:sec:EC:fig1}
+
+
 
 ===== Testing Several Methods =====
 
+[hpl: After Euler-Cromer, change the order of the ODEs and unknowns!]
+
 We shall now make a more advanced solver by
-extending the previous example. More specifically, we shall
+extending the pendulum example. More specifically, we shall
 
   * represent the right-hand side function as class,
   * compare several different solvers,
@@ -642,7 +738,7 @@ Since we want to compare numerical errors in the various
 solvers we need a test problem where the exact solution is known.
 Approximating $\sin(\theta)$|$sin(theta)$ by $\theta$|$theta$
 (valid for small $\theta$|$theta$), gives the ODE system
-# #if FORMAT in ("latex", "pdflatex", "sphinx")
+
 !bt
 \begin{align*}
 \dot\theta &= \omega,\\
@@ -650,10 +746,6 @@ Approximating $\sin(\theta)$|$sin(theta)$ by $\theta$|$theta$
 \end{align*}
 !et
 with $\theta(0)=\Theta$ and $\omega(0)=0$.
-# #else
-_theta' = omega_ and _omega' = -c*theta_ with
-initial conditions _theta(0) = Theta_ and _omega'(0) = 0_.
-# #endif
 
 Right-hand side functions with parameters can be handled by
 including extra arguments via the `f_args` and `f_kwargs` functionality,
@@ -935,16 +1027,13 @@ strategy works between the user-specified time points.
 === The Test Problem ===
 
 We consider the ODE problem for testing adaptive solvers:
-# #if FORMAT in ("latex", "pdflatex", "sphinx")
+
 !bt
 \begin{equation}
 u' = -\frac{t-c}{s^2} (u-1)
 label{gaussian:ode:eq}
 \end{equation}
 !et
-# #else
-$u' = -(u-1)(t-c)/s^2$.
-# #endif
 The exact solution is a Gaussian function,
 !bt
 \[
@@ -1127,13 +1216,10 @@ to test several different adaptive methods.
 
 Many of the solvers offered by Odespy can deal with complex-valued
 ODE problems. Consider
-# #if FORMAT in ("latex", "pdflatex", "sphinx")
+
 !bt
 \[ u' = iwu,\quad u(0)=1,\]
 !et
-# #else
-$u' = iwu$, with $u(0)=1$,
-# #endif
 where $i=\sqrt{-1}$|$i=sqrt(-1)$ is the imaginary unit.
 The right-hand side is implemented as `1j*w*u` in Python since
 Python applies `j` as the imaginary unit in complex numbers.
@@ -1561,7 +1647,7 @@ where `prm1`, `prm2`, etc. are names registered in the global
 
 From a user's point of view, the parameters are set either at
 construction time or through the `set` function:
-!bc py
+!bc pyshell
 >>> from odespy import RK2
 >>> def f(u, t, a, b=0):
 ...   return a*u + b
@@ -1633,7 +1719,7 @@ the subclass solvers:
    to extract data.  For example, the value of
    `self._parameters['myvar']` becomes available as `self.myvar` and
    in the algorithms we use `self.myvar`, perhaps with a test
-   `hasattr(self, 'myvar')` test or a `try`-`except` clause (catching
+   `hasattr(self, 'myvar')` test or a `try-except` clause (catching
    an `AttributeError`).
 
  o The `set` method is called with all keyword arguments given to the
@@ -1894,7 +1980,7 @@ class BackwardEuler(SolverImplicit):
 
 ======= Troubleshooting =======
 
-=== Constructor takes exactly two arguments, 5 given ===
+===== Constructor takes exactly two arguments, 5 given =====
 
 Constructors in the `Solver` hierarchy take only the `f` function
 as positional argument. All other parameters to the constructor
