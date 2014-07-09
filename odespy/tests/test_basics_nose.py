@@ -21,7 +21,7 @@ Exponential = dict(
     # These solvers are not suitable for this ODE problem
     exceptions=['Lsodi', 'Lsodis', 'Lsoibt', 'MyRungeKutta',
                 'MySolver', 'Lsodes', 'SymPy_odefun', 'AdaptiveResidual',
-                'Radau5', 'Radau5Explicit', 'Radau5Implicit'],
+                'Radau5', 'Radau5Explicit', 'Radau5Implicit', 'EulerCromer'],
     time_points=np.linspace(0., 1., 10),
     terminate=lambda u,t,step_number: u[step_number] <= 0.4,
     stop_value=0.4,  # as defined in function terminate
@@ -38,6 +38,7 @@ Sine = dict(
     exceptions=['Lsodi', 'Lsodes', 'Lsodis', 'Lsoibt', 'MyRungeKutta',
                 'MySolver', 'AdaptiveResidual',
                 'Radau5', 'Radau5Explicit', 'Radau5Implicit'],
+    # EulerCromer works, despite the fact that the order of the ODEs is wrong
     terminate=lambda u,t,step_number: u[step_number][0] >= 0.5,
     stop_value=0.5,  # as defined in function terminate
     u0=[0., 1.])
@@ -50,7 +51,8 @@ VanDerPol = dict(
     # These solvers are not suitable for this ODE problem
     exceptions=['RKC', 'Lsodes', 'Leapfrog', 'Lsodi', 'Lsodis', 'Lsoibt',
                 'MyRungeKutta', 'MySolver', 'AdaptiveResidual',
-                'Radau5', 'Radau5Explicit', 'Radau5Implicit'],
+                'Radau5', 'Radau5Explicit', 'Radau5Implicit',
+                'EulerCromer'],
     time_points=np.linspace(0., 1., 50),
     terminate=lambda u,t,step_number: u[step_number][0] <= 1.8,
     stop_value=1.8,  # as defined in function terminate
@@ -123,6 +125,31 @@ def test_vanderpol():
 
 def test_complex():
     _run_test_problems(Complex)
+
+def test_EulerCromer_1dof():
+    """Plain u'' + u = 0."""
+    solver = odespy.EulerCromer(lambda (v, x), t: [-x, v])
+    #solver = odespy.EulerCromer(lambda u, t: [-u[1], u[0]])
+    solver.set_initial_condition([0, 1])
+    P = 2*np.pi
+    N = 60
+    dt = P/N
+    num_periods = 8
+    T = num_periods*P
+    time_points = np.linspace(0, T, num_periods*N+1)
+    u, t = solver.solve(time_points)
+    x = u[:,1]
+    v = u[:,0]
+    x_exact = lambda t: np.cos(t)
+    x_e = x_exact(t)
+    #plot(t, x, t, x_e, legend=('EC', 'exact'))
+    # Difference in final value
+    if N == 60:
+        diff_exact = 0.0014700112828
+        diff_EC = abs(x[-1] - x_e[-1])
+        tol = 1E-14
+        assert abs(diff_exact - diff_EC) < tol, \
+               'diff_exact=%g, diff_EulerCromer=%g' % (diff_exact, diff_EC)
 
 def test_terminate():
     problem = Exponential

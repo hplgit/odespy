@@ -1824,6 +1824,67 @@ class AdamsBashMoulton3(Solver):
         return u_new
 
 
+class EulerCromer(Solver):
+    """
+    Euler-Cromer method for a system of first-order ODEs arising from
+    Newton's 2nd law of motion. The system divided into two parts:
+    1) velocity ODEs and 2) position ODEs. The velocity ODEs are
+    marched forward explicitly by a Forward Euler scheme, while the
+    position ODEs applies the most recently computed velocities and
+    march forward using an explicit Backward Euler scheme.
+
+    All the even equations are taken as velocity ODEs, while the
+    odd ones are position ODEs. It is natural to let the two ODEs,
+    for velocity and position, for one degree of freedom be
+    consecutive. For example, in a planar motion we typically have::
+
+        vx' = f_vx(x, y, vx, vy, t)
+        x' = vx
+        vy' = f_vy(x, y, vx, vy, t)
+        y' = vy
+
+    The ordering of the degrees of freedom are then::
+
+        [vx, x, vy, y]
+
+    and an appropriate right-hand side function can be::
+
+        def f(u, t):
+            vx, x, vy, y = u
+            return [f_vx(x, y, vx, vy, t),
+                    vx,
+                    f_vy(x, y, vx, vy, t),
+                    vy]
+
+    The Euler-Cromer scheme can be expressed as::
+
+        # March forward velocities
+        f_n = f(u[n], t[n])
+        for i in range(0, len(u[n]), 2):
+            u[n+1,i] = u[n,i] + dt*f_n[i]
+        # March forward positions
+        f_np1 = f(u[n+1], t[n+1])
+        for i in range(1, len(u[n]), 2):
+            u[n+1,i] = u[n,i] + dt*f_np1[i]
+    """
+    quick_description = "Explicit Euler-Cromer method for Newton's 2nd law ODEs"
+
+    def advance(self):
+        u, f, n, t = self.u, self.f, self.n, self.t
+        dt = t[n+1] - t[n]
+        u_new = u[n].copy()
+        # March forward velocities
+        f_n = f(u[n], t[n])
+        for i in range(0, len(u[n]), 2):
+            u_new[i] = u[n,i] + dt*f_n[i]
+        # March forward positions (u_new has now updated velocities,
+        # but old positions - but only the velocities are used in
+        # the components of f(u_new, t) that enter the loop below,
+        # so the position values do not matter)
+        f_np1 = f(u_new, t[n+1])
+        for i in range(1, len(u[n]), 2):
+            u_new[i] = u[n,i] + dt*f_np1[i]
+        return u_new
 
 class MidpointIter(Solver):
     """
@@ -2868,8 +2929,5 @@ def list_not_suitable_complex_solvers():
         'RKC', 'RKF45',
         'odefun_sympy', 'lsoda_scipy',
         'Radau5', 'Radau5Explicit', 'Radau5Implicit',
+        'EulerCromer',
         ]
-
-
-
-

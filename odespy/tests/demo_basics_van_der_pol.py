@@ -6,8 +6,8 @@ import scitools.std as st
 solver_no = 1    # number of solvers in figure
 st.figure()
 
-exceptions=['RKC', 'Lsodes', 'Leapfrog', 'Lsodi', 'Lsodis', 'Lsoibt', 
-                'MyRungeKutta', 'MySolver', 'AdaptiveResidual']
+exceptions=['RKC', 'Lsodes', 'Leapfrog', 'Lsodi', 'Lsodis', 'Lsoibt',
+                'MyRungeKutta', 'MySolver', 'AdaptiveResidual', 'EulerCromer']
 solvers = [solver for solver in list_available_solvers() if solver not in exceptions]
 
 f = lambda (u00,u11),t: [u11, 3.*(1 - u00**2)*u11 - u00]
@@ -21,7 +21,7 @@ print """Van der Pol oscillator problem:
 
 # Loop for all possible solvers
 for solver in solvers:
-    try:      
+    try:
         method = eval(solver)(f)
         method.set_initial_condition(u0)
         u,t = method.solve(time_points)
@@ -33,5 +33,3 @@ for solver in solvers:
         print 'Succeed when solver is %s' % solver
     except:
         print 'Failed when solver is %s' % solver
-
-
