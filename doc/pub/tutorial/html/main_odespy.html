@@ -906,11 +906,13 @@ is just a matter of substituting <tt class="docutils literal"><span class="pre">
 <span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The amplitude now becomes constant in time as expected.</p>
+<p>The amplitude now becomes (almost) constant in time as expected.
+Another very good and popular method for this problem is presented next.</p>
 </div>
-<div class="section" id="the-eulercromer-method">
-<h2>The EulerCromer Method<a class="headerlink" href="#the-eulercromer-method" title="Permalink to this headline">¶</a></h2>
-<p>Physicists will solve the model problem in the section <a class="reference internal" href="#ode-sec-ex-osc"><em>Example: Solving an ODE System</em></a> by
+<div class="section" id="the-euler-cromer-method">
+<h2>The Euler-Cromer Method<a class="headerlink" href="#the-euler-cromer-method" title="Permalink to this headline">¶</a></h2>
+<p>Physicists will most likely
+solve the model problem in the section <a class="reference internal" href="#ode-sec-ex-osc"><em>Example: Solving an ODE System</em></a> by
 the Euler-Cromer method. For a single degree of freedom system,</p>
 <div class="math">
 \[\ddot x + f(x, \dot x, t) = 0,\]</div>
@@ -922,8 +924,10 @@ writes the system as two ODEs,</p>
 <p>A Forward Euler scheme is used for the first equation, while a Backward
 Euler scheme is used for the second:</p>
 <div class="math">
-\[\begin{split}v^{n+1} &amp;= v^ - \Delta t\, g(x^n, v^n, n\Delta t),\\
+\[\begin{split}v^{n+1} &amp;= v^n - \Delta t\, g(x^n, v^n, n\Delta t),\\
 x^{n+1} &amp;= x^n + \Delta t\,v^{n+1}\thinspace .\end{split}\]</div>
+<p>The two first-order methods used in this symmetric fashion results in
+a second-order method that will preserve the amplitude of the oscillations.</p>
 <p>For general multi degree of freedom systems, we have some vector ODE
 arising from, typically, Newton&#8217;s second law of motion,</p>
 <div class="math">
@@ -937,7 +941,8 @@ arising from, typically, Newton&#8217;s second law of motion,</p>
 \[\begin{split}\boldsymbol{v}^{n+1} &amp;= \boldsymbol{v}^n -\Delta t\,\boldsymbol{g}(\boldsymbol{r}^n, \boldsymbol{v}^n, t),\\
 \boldsymbol{r}^{n+1} &amp;= \boldsymbol{r}^n + \Delta t\,\boldsymbol{v}^{n+1}\thinspace .\end{split}\]</div>
 <p>The convention in Odespy is to group all the unknowns as velocity and position
-for each degree of freedom. That is, if</p>
+for each degree of freedom. That is, if the component form of <span class="math">\(\boldsymbol{r}\)</span>
+and <span class="math">\(\boldsymbol{v}\)</span> is written as</p>
 <div class="math">
 \[\boldsymbol{r} = (r^{(0)}, r^{(0)}, \ldots, r^{(N)}),
 \quad \boldsymbol{v} = (v^{(0)}, v^{(0)}, \ldots, v^{(N)}),\]</div>
@@ -954,7 +959,7 @@ must be</p>
 &amp;\cdots\\
 \dot v^{(N)} &amp;= -g^{(N)}(\boldsymbol{r}, \boldsymbol{v}, t),\\
 \dot r^{(N)} &amp;= v^{(N)}\thinspace .\end{split}\]</div>
-<p>For a pendulum we write our system as</p>
+<p>For the particular case of a pendulum we write our system as</p>
 <div class="math">
 \[\begin{split}\dot\omega &amp;= -c\sin\theta,\\
 \dot\theta &amp;= \omega,\end{split}\]</div>
@@ -1001,8 +1006,7 @@ slightly out of phase with the solution of the linearized
 problem <span class="math">\(\ddot\theta + c\theta =0\)</span>, see Figure <a class="reference internal" href="#ode-sec-ec-fig1"><em>Euler-Cromer method applied to the pendulum problem</em></a>.
 As <span class="math">\(\Theta_0\rightarrow 0\)</span>, the two curves approach each other.
 The Euler-Cromer method is significantly better than Heun&#8217;s method
-used in the previous section and preserves the amplitude in very
-long time integrations.</p>
+used in the previous section and reproduces the exact amplitude.</p>
 <div class="figure" id="ode-sec-ec-fig1">
 <a class="reference internal image-reference" href="_images/osc_EC_30.png"><img alt="_images/osc_EC_30.png" src="_images/osc_EC_30.png" style="width: 500px;" /></a>
 <p class="caption"><em>Euler-Cromer method applied to the pendulum problem</em></p>
@@ -1034,15 +1038,15 @@ or by using a class where the parameters are attributes and
 an <tt class="docutils literal"><span class="pre">f</span></tt> method defines <span class="math">\(f(u,t)\)</span>. The section <a class="reference internal" href="#ode-sec-exgr-farg"><em>Parameters in the Right-Hand Side Function</em></a> exemplifies the details.
 A minimal class representation of the right-hand side
 function in the present case looks like this:</p>
-<div class="highlight-text"><div class="highlight"><pre>class Problem:
-    def __init__(self, c, Theta):
-        self.c, self.Theta = float(c), float(Theta)
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Problem</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">Theta</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Theta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">Theta</span><span class="p">)</span>
 
-    def f(self, u, t):
-        theta, omega = u;  c = self.c
-        return [omega, -c*theta]
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">theta</span><span class="p">,</span> <span class="n">omega</span> <span class="o">=</span> <span class="n">u</span><span class="p">;</span>  <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">omega</span><span class="p">,</span> <span class="o">-</span><span class="n">c</span><span class="o">*</span><span class="n">theta</span><span class="p">]</span>
 
-problem = Problem(c=1, Theta=pi/4)
+<span class="n">problem</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">Theta</span><span class="o">=</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>It would be convenient to add an attribute <tt class="docutils literal"><span class="pre">period</span></tt> which holds
@@ -2430,6 +2434,8 @@ Jacobian of the system to be solved in each Newton iteration.</p>
 </div>
 <div class="section" id="troubleshooting">
 <h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="constructor-takes-exactly-two-arguments-5-given">
+<h2>Constructor takes exactly two arguments, 5 given<a class="headerlink" href="#constructor-takes-exactly-two-arguments-5-given" title="Permalink to this headline">¶</a></h2>
 <p>Constructors in the <tt class="docutils literal"><span class="pre">Solver</span></tt> hierarchy take only the <tt class="docutils literal"><span class="pre">f</span></tt> function
 as positional argument. All other parameters to the constructor
 must be keyword arguments.</p>
@@ -2437,6 +2443,7 @@ must be keyword arguments.</p>
 This document was written with aid of the
 <a class="reference external" href="https://github.com/hplgit/doconce">DocOnce</a> tool, which allows
 output in many different formats.</p>
+</div>
 </div>
 
 
@@ -2477,7 +2484,7 @@ output in many different formats.</p>
 <li><a class="reference internal" href="#a-class-based-implementation">A Class-Based Implementation</a></li>
 <li><a class="reference internal" href="#using-other-symbols">Using Other Symbols</a></li>
 <li><a class="reference internal" href="#example-solving-an-ode-system">Example: Solving an ODE System</a></li>
-<li><a class="reference internal" href="#the-eulercromer-method">The EulerCromer Method</a></li>
+<li><a class="reference internal" href="#the-euler-cromer-method">The Euler-Cromer Method</a></li>
 <li><a class="reference internal" href="#testing-several-methods">Testing Several Methods</a></li>
 <li><a class="reference internal" href="#make-a-subclass-of-problem">Make a Subclass of Problem</a></li>
 <li><a class="reference internal" href="#using-adaptive-methods">Using Adaptive Methods</a><ul>
@@ -2516,7 +2523,10 @@ output in many different formats.</p>
 <li><a class="reference internal" href="#a-simple-example-of-an-implicit-method">A Simple Example of an Implicit Method</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#constructor-takes-exactly-two-arguments-5-given">Constructor takes exactly two arguments, 5 given</a></li>
+</ul>
+</li>
 </ul>
 
   <h4>Previous topic</h4>

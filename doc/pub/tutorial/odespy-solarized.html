@@ -95,7 +95,7 @@ div { text-align: justify; text-justify: inter-word; }
                2,
                'ode:sec:ex:osc',
                'ode:sec:ex:osc'),
-              (' The EulerCromer Method ', 2, None, '___sec23'),
+              (' The Euler-Cromer Method ', 2, None, '___sec23'),
               (' Testing Several Methods ', 2, None, '___sec24'),
               (' Make a Subclass of Problem ', 2, None, '___sec25'),
               (' Using Adaptive Methods ', 2, None, '___sec26'),
@@ -142,7 +142,7 @@ div { text-align: justify; text-justify: inter-word; }
                '___sec49'),
               (' Troubleshooting ', 1, None, '___sec50'),
               (' Constructor takes exactly two arguments, 5 given ',
-               3,
+               2,
                None,
                '___sec51')]}
 end of tocinfo -->
@@ -1173,11 +1173,13 @@ savefig(<span style="color: #CD5555">&#39;tmppng&#39;</span>); savefig(<span sty
 show()
 </pre></div>
 <p>
-The amplitude now becomes constant in time as expected.
+The amplitude now becomes (almost) constant in time as expected.
+Another very good and popular method for this problem is presented next.
 
-<h2>The EulerCromer Method  <a name="___sec23"></a></h2>
+<h2>The Euler-Cromer Method  <a name="___sec23"></a></h2>
 
-Physicists will solve the model problem in the section <a href="#ode:sec:ex:osc">Example: Solving an ODE System</a> by
+Physicists will most likely
+solve the model problem in the section <a href="#ode:sec:ex:osc">Example: Solving an ODE System</a> by
 the Euler-Cromer method. For a single degree of freedom system,
 
 $$ \ddot x + f(x, \dot x, t) = 0,$$
@@ -1197,11 +1199,13 @@ Euler scheme is used for the second:
 
 $$
 \begin{align*}
-v^{n+1} &= v^ - \Delta t\, g(x^n, v^n, n\Delta t),\\ 
+v^{n+1} &= v^n - \Delta t\, g(x^n, v^n, n\Delta t),\\ 
 x^{n+1} &= x^n + \Delta t\,v^{n+1}\thinspace .
 \end{align*}
 $$
 
+The two first-order methods used in this symmetric fashion results in
+a second-order method that will preserve the amplitude of the oscillations.
 
 <p>
 For general multi degree of freedom systems, we have some vector ODE
@@ -1230,7 +1234,8 @@ $$
 
 <p>
 The convention in Odespy is to group all the unknowns as velocity and position
-for each degree of freedom. That is, if
+for each degree of freedom. That is, if the component form of \( \boldsymbol{r} \)
+and \( \boldsymbol{v} \) is written as
 
 $$ \boldsymbol{r} = (r^{(0)}, r^{(0)}, \ldots, r^{(N)}),
 \quad \boldsymbol{v} = (v^{(0)}, v^{(0)}, \ldots, v^{(N)}),
@@ -1257,7 +1262,7 @@ $$
 
 
 <p>
-For a pendulum we write our system as
+For the particular case of a pendulum we write our system as
 
 $$
 \begin{align*}
@@ -1321,8 +1326,7 @@ slightly out of phase with the solution of the linearized
 problem \( \ddot\theta + c\theta =0 \), see Figure <a href="#ode:sec:EC:fig1">3</a>.
 As \( \Theta_0\rightarrow 0 \), the two curves approach each other.
 The Euler-Cromer method is significantly better than Heun's method
-used in the previous section and preserves the amplitude in very
-long time integrations.
+used in the previous section and reproduces the exact amplitude.
 
 <p>
 <center> <!-- figure -->
@@ -1371,18 +1375,19 @@ an <code>f</code> method defines \( f(u,t) \).
 The section <a href="#ode:sec:exgr:farg">Parameters in the Right-Hand Side Function</a> exemplifies the details.
 A minimal class representation of the right-hand side
 function in the present case looks like this:
+
 <p>
 
-<!-- code=text typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%">class Problem:
-    def __init__(self, c, Theta):
-        self.c, self.Theta = float(c), float(Theta)
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span style="color: #8B008B; font-weight: bold">class</span> <span style="color: #008b45; font-weight: bold">Problem</span>:
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">__init__</span>(<span style="color: #658b00">self</span>, c, Theta):
+        <span style="color: #658b00">self</span>.c, <span style="color: #658b00">self</span>.Theta = <span style="color: #658b00">float</span>(c), <span style="color: #658b00">float</span>(Theta)
 
-    def f(self, u, t):
-        theta, omega = u;  c = self.c
-        return [omega, -c*theta]
+    <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(<span style="color: #658b00">self</span>, u, t):
+        theta, omega = u;  c = <span style="color: #658b00">self</span>.c
+        <span style="color: #8B008B; font-weight: bold">return</span> [omega, -c*theta]
 
-problem = Problem(c=1, Theta=pi/4)
+problem = Problem(c=<span style="color: #B452CD">1</span>, Theta=pi/<span style="color: #B452CD">4</span>)
 </pre></div>
 <p>
 It would be convenient to add an attribute <code>period</code> which holds
@@ -3042,7 +3047,7 @@ Here is an example showing the complete code of the Backward Euler method.
 
 <h1>Troubleshooting  <a name="___sec50"></a></h1>
 
-<h3>Constructor takes exactly two arguments, 5 given  <a name="___sec51"></a></h3>
+<h2>Constructor takes exactly two arguments, 5 given  <a name="___sec51"></a></h2>
 
 Constructors in the <code>Solver</code> hierarchy take only the <code>f</code> function
 as positional argument. All other parameters to the constructor

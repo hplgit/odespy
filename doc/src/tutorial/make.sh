@@ -32,3 +32,6 @@ cp -r fig-odespy $dest
 cp $name.html $dest/tutorial/odespy.html
 doconce format html $name --html_style=solarized
 cp $name.html $dest/odespy-solarized.html
+
+# Add to git if new files have been created
+git add $dest

@@ -957,12 +957,14 @@ is just a matter of substituting ``Heun`` by ``RK4``:
         savefig('tmppng'); savefig('tmp.pdf')
         show()
 
-The amplitude now becomes constant in time as expected.
+The amplitude now becomes (almost) constant in time as expected.
+Another very good and popular method for this problem is presented next.
 
-The EulerCromer Method
-----------------------
+The Euler-Cromer Method
+-----------------------
 
-Physicists will solve the model problem in the section :ref:`ode:sec:ex:osc` by
+Physicists will most likely
+solve the model problem in the section :ref:`ode:sec:ex:osc` by
 the Euler-Cromer method. For a single degree of freedom system,
 
 .. math::
@@ -982,9 +984,12 @@ Euler scheme is used for the second:
 
 .. math::
         
-        v^{n+1} &= v^ - \Delta t\, g(x^n, v^n, n\Delta t),\\ 
+        v^{n+1} &= v^n - \Delta t\, g(x^n, v^n, n\Delta t),\\ 
         x^{n+1} &= x^n + \Delta t\,v^{n+1}\thinspace .
         
+
+The two first-order methods used in this symmetric fashion results in
+a second-order method that will preserve the amplitude of the oscillations.
 
 For general multi degree of freedom systems, we have some vector ODE
 arising from, typically, Newton's second law of motion,
@@ -1009,7 +1014,8 @@ and discretized as
         
 
 The convention in Odespy is to group all the unknowns as velocity and position
-for each degree of freedom. That is, if
+for each degree of freedom. That is, if the component form of :math:`\boldsymbol{r}`
+and :math:`\boldsymbol{v}` is written as
 
 .. math::
          \boldsymbol{r} = (r^{(0)}, r^{(0)}, \ldots, r^{(N)}),
@@ -1035,7 +1041,7 @@ The corresponding set of ODEs are
         \dot r^{(N)} &= v^{(N)}\thinspace .
         
 
-For a pendulum we write our system as
+For the particular case of a pendulum we write our system as
 
 .. math::
         
@@ -1092,8 +1098,7 @@ slightly out of phase with the solution of the linearized
 problem :math:`\ddot\theta + c\theta =0`, see Figure :ref:`ode:sec:EC:fig1`.
 As :math:`\Theta_0\rightarrow 0`, the two curves approach each other.
 The Euler-Cromer method is significantly better than Heun's method
-used in the previous section and preserves the amplitude in very
-long time integrations.
+used in the previous section and reproduces the exact amplitude.
 
 .. _ode:sec:EC:fig1:
 
@@ -1136,7 +1141,7 @@ an ``f`` method defines :math:`f(u,t)`. The section :ref:`ode:sec:exgr:farg` exe
 A minimal class representation of the right-hand side
 function in the present case looks like this:
 
-.. code-block:: text
+.. code-block:: python
 
         class Problem:
             def __init__(self, c, Theta):
@@ -2742,7 +2747,7 @@ Troubleshooting
 ===============
 
 Constructor takes exactly two arguments, 5 given
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------
 
 Constructors in the ``Solver`` hierarchy take only the ``f`` function
 as positional argument. All other parameters to the constructor
