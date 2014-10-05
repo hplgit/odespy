@@ -95,11 +95,36 @@ An incomplete "tutorial":
 development and explains much more of the syntax and provides many
 examples.
 
-===== I have used Odespy in a publication - how to I site it? =====
+===== I have used Odespy in a publication - how do I cite it? =====
 
 Please cite this GitHub repository:
 
+!bquote
+H. P. Langtangen and L. Wang. Odespy software package.
+URL: https://github.com/hplgit/odespy. 2014
+!equote
+
+BibTeX entry:
+
+!bc latexcod
+@misc{odespy,
+  title = {{Odespy} Software Package},
+  author = {H. P. Langtangen and L. Wang},
+  url = {https://github.com/hplgit/odespy},
+  key = {odespy},
+  note = {\url{https://github.com/hplgit/odespy}},
+}
+!ec
+
+"Publish": "https://bitbucket.org/logg/publish"" entry:
+
 !bc
-H. P. Langtangen and L. Wang. The Odespy package.
-URL: https://github.com/hplgit/odespy. 2013
+** {Odespy} Software Package
+   key:       odespy
+   author:    H. P. Langtangen, L. Wang
+   url:       https://github.com/hplgit/odespy
+   status:    published
+   sortkey:   Odespy
+   note:      \url{https://github.com/hplgit/odespy}
+   entrytype: misc
 !ec
