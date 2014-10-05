@@ -116,7 +116,7 @@ BibTeX entry:
 }
 !ec
 
-"Publish": "https://bitbucket.org/logg/publish"" entry:
+"Publish": "https://bitbucket.org/logg/publish" entry:
 
 !bc
 ** {Odespy} Software Package

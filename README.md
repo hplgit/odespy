@@ -112,7 +112,7 @@ BibTeX entry:
 }
 ```
 
-[Publish](https://bitbucket.org/logg/publish)" entry:
+[Publish](https://bitbucket.org/logg/publish) entry:
 
 
 ```
