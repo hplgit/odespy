@@ -656,6 +656,10 @@ class Solver:
         self.initialize()
 
 
+    def name(self):
+        """Return name of method (class name)."""
+        return self.__class__.__name__
+
     def compile_string_functions(self, f, **kwargs):
         """
         Compile functions which are supplied as Fortran strings.
@@ -2071,7 +2075,7 @@ class SolverImplicit(Solver):
         if self.verbose > 1:
             print 'u=%g in %d iterations' % (u_new, i-1)
         if error > self.eps_iter:
-            raise ValueError('%s w/%s not converged:\n   u_diff=%g > eps_iter=%g after %s iterations.' % (self.__class__.__name__, self.nonlinear_solver, error, self.eps_iter, self.max_iter))
+            raise ValueError('%s w/%s not converged:\n   difference in solution between last two iterations: %g > eps_iter=%g after %s iterations.' % (self.__class__.__name__, self.nonlinear_solver, error, self.eps_iter, self.max_iter))
         return u_new
 
 class BackwardEuler(SolverImplicit):

@@ -38,7 +38,7 @@ solver.set_initial_condition([0, x0, 0, y0])
 # at rest, then slightly out of equilibrium
 # k and m should balance
 
-# For large k, this is theta'' + g/L*sin(theta) = 0, so L=g
+# For large k, this is theta'' + g/L0*sin(theta) = 0, so L0=g
 # implies theta'' + theta = 0 equation with theta0*cos(t) as solution
 P = 2*np.pi
 N = 60

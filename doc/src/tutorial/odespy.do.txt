@@ -198,20 +198,27 @@ callback to Python.
 
 ======= Installation =======
 
-The Odespy package is most easily installed by checking out
-the latest version of the source code:
+The Odespy package is most easily installed using `pip`:
+
+!bc sys
+sudo pip install -e \
+   git+https://github.com/hplgit/odespy.git#egg=odespy
+!ec
+Checking out the source code is almost as easy:
 !bc sys
 git clone git@github.com:hplgit/odespy.git
 cd odespy
-!ec
-The installation follows the standard procedure,
-!bc sys
 sudo python setup.py install
 !ec
 You will at least also need Python v2.7 and the "`numpy`":
 "http://numpy.scipy.org/" package.  The FORTRAN codes `rkc.f`,
 `rkf45.f`, `radau5.f`, and ODEPACK comes with Odespy and are compiled
-and installed by `setup.py`.
+and installed by `setup.py`. If you lack a FORTRAN compiler, you
+can drop the installation of the FORTRAN solvers by
+
+!bc sys
+sudo python setup.py install --no-fortran
+!ec
 
 The Odespy package depends on several additional packages:
 
@@ -1755,8 +1762,8 @@ following methods are sometimes useful:
  * `str(solver)`: return a short pretty print string reflecting
    the name of the method and the value of parameters that
    must be known to uniquely define the numerical method.
-   This string is what one would use as legends in a plot or
-   as method identifier in a table.
+   This string, or the class name as given by `solver.name()`,
+   is useful for the legend in a plot or as method identifier in a table.
 
  * `solver.get_parameter_info()`: return or print all registered
    parameters for the current solver and all properties for

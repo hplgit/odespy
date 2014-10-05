@@ -7,20 +7,29 @@ Differential Algebraic Equations (DAEs).
 
 ### How do I install Odespy?
 
-The complete package:
+The simplest procedure is to use `pip`:
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.Bash}
+```
+Terminal> sudo pip install -e git+https://github.com/hplgit/odespy.git#egg=odespy
+```
+
+Alternatively, you can check out this repo and run `setup.py`:
+
+
+```
+Terminal> git clone git@github.com:hplgit/odespy.git
+Terminal> cd odespy
 Terminal> sudo python setup.py install
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 If you face problems with compiling the Fortran parts of Odespy,
 try skipping all Fortran code:
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.Bash}
+```
 Terminal> sudo python setup.py install --no-fortran
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ### Contents of Odespy
 
@@ -32,33 +41,25 @@ implementations:
     Runge-Kutta methods of 2nd, 3rd, and 4th order; Heun's method;
     Adams-Bashforth methods of 2nd, 3rd, and 4th order;
     Adams-Bashforth-Moulton methods of 2nd and 3rd order.
-
   * Pure Python implementations of classical implicit schemes such as
     Backward Euler; 2-step backward scheme; the theta rule;
     the Midpoint (or Trapezoidal) method.
-
   * Pure Python implementations of adaptive explicit Runge-Kutta
     methods of type Runge-Kutta-Fehlberg of order (4,5), Dormand-Prince
     of order (4,5), Cash-Karp of order (4,5), Bogacki-Shampine of order (2,3).
-
   * Wrappers for all FORTRAN solvers in [`ODEPACK`](http://www.netlib.org/odepack).
-
   * Wrappers for the wrappers of FORTRAN solvers in [`scipy`](http://www.scipy.org):
     `vode` and `zvode` (adaptive Adams or BDF from [`vode.f`](http://www.netlib.org/ode/vode.f));
     `dopri5` (adaptive Dormand-Prince method of order (4,5));
     `dop853` (adaptive Dormand-Prince method of order 8(5,3));
     `odeint` (adaptive Adams or BDF, basically the same as `vode`, but in the implementation `lsoda` from [`ODEPACK`](http://www.netlib.org/odepack/)).
-
   * Wrapper for the Runge-Kutta-Chebyshev formulas of order 2 as
     offered by the well-known FORTRAN code [`rkc.f`](http://www.netlib.org/ode/rkc.f).
-
   * Wrapper for the Runge-Kutta-Fehlberg method of
     order (4,5) as provided by the well-known FORTRAN code [`rkf45.f`](http://www.netlib.org/ode/rkf45.f).
-
   * Wrapper for the Radau5 method as provided by the well-known FORTRAN code
     [`radau5.f`](http://www.unige.ch/~hairer/prog/stiff/radau5.f).
     There has been some problems with running this solver (segmentation fault).
-
   * Wrapper for some solvers in the [`odelab`](https://github.com/olivierverdier/odelab).
 
 The ODE problem can always be specified in Python, but for wrappers of
@@ -94,8 +95,8 @@ examples.
 Please cite this GitHub repository:
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 H. P. Langtangen and L. Wang. The Odespy package.
 URL: https://github.com/hplgit/odespy. 2013
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 

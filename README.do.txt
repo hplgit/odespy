@@ -7,9 +7,16 @@ Differential Algebraic Equations (DAEs).
 
 ===== How do I install Odespy? =====
 
-The complete package:
+The simplest procedure is to use `pip`:
 
 !bc sys
+Terminal> sudo pip install -e git+https://github.com/hplgit/odespy.git#egg=odespy
+!ec
+Alternatively, you can check out this repo and run `setup.py`:
+
+!bc sys
+Terminal> git clone git@github.com:hplgit/odespy.git
+Terminal> cd odespy
 Terminal> sudo python setup.py install
 !ec
 If you face problems with compiling the Fortran parts of Odespy,
@@ -18,7 +25,6 @@ try skipping all Fortran code:
 !bc sys
 Terminal> sudo python setup.py install --no-fortran
 !ec
-
 
 
 ===== Contents of Odespy =====
@@ -97,4 +103,3 @@ Please cite this GitHub repository:
 H. P. Langtangen and L. Wang. The Odespy package.
 URL: https://github.com/hplgit/odespy. 2013
 !ec
-
