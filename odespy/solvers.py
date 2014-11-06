@@ -187,13 +187,13 @@ _parameters = dict(
         type=str),
 
     nonlinear_solver = dict(
-        help='Newton or Picard nonlinear solver.',
+        help='Standard Newton or Picard nonlinear solver, or Picard2 (u*f(u_,t)/u_ implicit trick).',
         default='Picard',
         type=str,
-        range=('Newton', 'Picard')),
+        range=('Newton', 'Picard', 'Picard2')),
 
     eps_iter = dict(
-        help='Max error measure in nonlinear solver',
+        help='Max error tolerance in nonlinear solver',
         default=1E-4,
         type=float),
 
@@ -2013,8 +2013,8 @@ class SolverImplicit(Solver):
     Both a Picard iteration and a Newton iteration (with user-provided
     Jacobian or a finite difference-based Jacobian) are implemented.
     Note that the Forward Euler scheme is used to make the first guess,
-    so if that method is unstable for the chosen time step and problem,
-    the iterations may easily diverge.
+    so large time steps may give a too inaccurate start value for
+    fast convergence (or convergence at all).
     """
 
     _optional_parameters = Solver._optional_parameters + \
@@ -2056,11 +2056,13 @@ class SolverImplicit(Solver):
         # control by number of intern steps and error tolerance
         if self.verbose > 1:
             print '%s.advance w/%s: t=%g, n=%d: ' % \
-                  (self.__class__.__name__, self.nonlinear_solver, t_new, n+1)
+                  (self.__class__.__name__, self.nonlinear_solver, t_new, n+1),
 
         while i <= self.max_iter and error > self.eps_iter:
             if self.nonlinear_solver == 'Picard':
                 u_new_ = self.Picard_update(u_new)
+            elif self.nonlinear_solver == 'Picard2':
+                u_new_ = self.Picard2_update(u_new)
             elif self.nonlinear_solver == 'Newton':
                 F, Jac = self.Newton_system(u_new)
                 du = F/Jac if self.neq == 1 else np.linalg.solve(Jac, F)
@@ -2073,10 +2075,14 @@ class SolverImplicit(Solver):
             i += 1
         self.num_iterations_total += i-1
         if self.verbose > 1:
-            print 'u=%g in %d iterations' % (u_new, i-1)
+            print ' u=%g in %d iterations' % (u_new, i-1)
         if error > self.eps_iter:
             raise ValueError('%s w/%s not converged:\n   difference in solution between last two iterations: %g > eps_iter=%g after %s iterations.' % (self.__class__.__name__, self.nonlinear_solver, error, self.eps_iter, self.max_iter))
         return u_new
+
+    def Picard2(self, ukp1):
+        raise NotImplementedError('Picard2 method not implemented for solver %s' % self.__class__.__name__)
+
 
 class BackwardEuler(SolverImplicit):
     """
@@ -2085,6 +2091,14 @@ class BackwardEuler(SolverImplicit):
        u[n+1] = u[n] + dt*f(u[n+1], t[n+1])
 
     The nonlinear system is solved by Newton or Picard iteration.
+
+    The Picard2 iteration can use the implicit trick::
+
+       u[n+1] = u[n] + dt*f(ukp1, t[n+1])*u[n+1]/ukp1
+
+    since::
+
+       (u[n+1]/ukp1 approx 1
     """
     quick_description = "Implicit 1st-order Backward Euler method"
 
@@ -2092,6 +2106,11 @@ class BackwardEuler(SolverImplicit):
         u, f, n, t = self.u, self.f, self.n, self.t
         dt = t[n+1] - t[n]
         return u[n] + dt*f(ukp1, t[n+1])
+
+    def Picard2_update(self, ukp1):
+        u, f, n, t = self.u, self.f, self.n, self.t
+        dt = t[n+1] - t[n]
+        return u[n]/(1 - dt*f(ukp1, t[n+1])/ukp1)
 
     def Newton_system(self, ukp1):
         u, f, n, t = self.u, self.f, self.n, self.t
