@@ -62,7 +62,7 @@ implementations:
 
   * Wrapper for the Radau5 method as provided by the well-known FORTRAN code
     "`radau5.f`": "http://www.unige.ch/~hairer/prog/stiff/radau5.f".
-    There has been some problems with running this solver (segmentation fault).
+    There have been some unidentified problems with running this solver (segmentation fault).
 
   * Wrapper for some solvers in the "`odelab`": "https://github.com/olivierverdier/odelab".
 
