@@ -1,7 +1,7 @@
 ===== What is Odespy? =====
 
 Odespy (ODE Software in Python) offers a unified interface to a
-a large collection of software for solving systems of ordinary
+large collection of software for solving systems of ordinary
 differential equations (ODEs). There is also some support for
 Differential Algebraic Equations (DAEs).
 
