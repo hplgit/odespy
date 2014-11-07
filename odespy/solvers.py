@@ -187,13 +187,13 @@ _parameters = dict(
         type=str),
 
     nonlinear_solver = dict(
-        help='Newton or Picard nonlinear solver.',
+        help='Standard Newton or Picard nonlinear solver, or Picard2 (u*f(u_,t)/u_ implicit trick).',
         default='Picard',
         type=str,
-        range=('Newton', 'Picard')),
+        range=('Newton', 'Picard', 'Picard2')),
 
     eps_iter = dict(
-        help='Max error measure in nonlinear solver',
+        help='Max error tolerance in nonlinear solver',
         default=1E-4,
         type=float),
 
@@ -655,6 +655,10 @@ class Solver:
         # Subclass-specific initialization
         self.initialize()
 
+
+    def name(self):
+        """Return name of method (class name)."""
+        return self.__class__.__name__
 
     def compile_string_functions(self, f, **kwargs):
         """
@@ -1824,6 +1828,67 @@ class AdamsBashMoulton3(Solver):
         return u_new
 
 
+class EulerCromer(Solver):
+    """
+    Euler-Cromer method for a system of first-order ODEs arising from
+    Newton's 2nd law of motion. The system divided into two parts:
+    1) velocity ODEs and 2) position ODEs. The velocity ODEs are
+    marched forward explicitly by a Forward Euler scheme, while the
+    position ODEs applies the most recently computed velocities and
+    march forward using an explicit Backward Euler scheme.
+
+    All the even equations are taken as velocity ODEs, while the
+    odd ones are position ODEs. It is natural to let the two ODEs,
+    for velocity and position, for one degree of freedom be
+    consecutive. For example, in a planar motion we typically have::
+
+        vx' = f_vx(x, y, vx, vy, t)
+        x' = vx
+        vy' = f_vy(x, y, vx, vy, t)
+        y' = vy
+
+    The ordering of the degrees of freedom are then::
+
+        [vx, x, vy, y]
+
+    and an appropriate right-hand side function can be::
+
+        def f(u, t):
+            vx, x, vy, y = u
+            return [f_vx(x, y, vx, vy, t),
+                    vx,
+                    f_vy(x, y, vx, vy, t),
+                    vy]
+
+    The Euler-Cromer scheme can be expressed as::
+
+        # March forward velocities
+        f_n = f(u[n], t[n])
+        for i in range(0, len(u[n]), 2):
+            u[n+1,i] = u[n,i] + dt*f_n[i]
+        # March forward positions
+        f_np1 = f(u[n+1], t[n+1])
+        for i in range(1, len(u[n]), 2):
+            u[n+1,i] = u[n,i] + dt*f_np1[i]
+    """
+    quick_description = "Explicit Euler-Cromer method for Newton's 2nd law ODEs"
+
+    def advance(self):
+        u, f, n, t = self.u, self.f, self.n, self.t
+        dt = t[n+1] - t[n]
+        u_new = u[n].copy()
+        # March forward velocities
+        f_n = f(u[n], t[n])
+        for i in range(0, len(u[n]), 2):
+            u_new[i] = u[n,i] + dt*f_n[i]
+        # March forward positions (u_new has now updated velocities,
+        # but old positions - but only the velocities are used in
+        # the components of f(u_new, t) that enter the loop below,
+        # so the position values do not matter)
+        f_np1 = f(u_new, t[n+1])
+        for i in range(1, len(u[n]), 2):
+            u_new[i] = u[n,i] + dt*f_np1[i]
+        return u_new
 
 class MidpointIter(Solver):
     """
@@ -1948,8 +2013,8 @@ class SolverImplicit(Solver):
     Both a Picard iteration and a Newton iteration (with user-provided
     Jacobian or a finite difference-based Jacobian) are implemented.
     Note that the Forward Euler scheme is used to make the first guess,
-    so if that method is unstable for the chosen time step and problem,
-    the iterations may easily diverge.
+    so large time steps may give a too inaccurate start value for
+    fast convergence (or convergence at all).
     """
 
     _optional_parameters = Solver._optional_parameters + \
@@ -1991,11 +2056,13 @@ class SolverImplicit(Solver):
         # control by number of intern steps and error tolerance
         if self.verbose > 1:
             print '%s.advance w/%s: t=%g, n=%d: ' % \
-                  (self.__class__.__name__, self.nonlinear_solver, t_new, n+1)
+                  (self.__class__.__name__, self.nonlinear_solver, t_new, n+1),
 
         while i <= self.max_iter and error > self.eps_iter:
             if self.nonlinear_solver == 'Picard':
                 u_new_ = self.Picard_update(u_new)
+            elif self.nonlinear_solver == 'Picard2':
+                u_new_ = self.Picard2_update(u_new)
             elif self.nonlinear_solver == 'Newton':
                 F, Jac = self.Newton_system(u_new)
                 du = F/Jac if self.neq == 1 else np.linalg.solve(Jac, F)
@@ -2008,10 +2075,14 @@ class SolverImplicit(Solver):
             i += 1
         self.num_iterations_total += i-1
         if self.verbose > 1:
-            print 'u=%g in %d iterations' % (u_new, i-1)
+            print ' u=%g in %d iterations' % (u_new, i-1)
         if error > self.eps_iter:
-            raise ValueError('%s w/%s not converged:\n   u_diff=%g > eps_iter=%g after %s iterations.' % (self.__class__.__name__, self.nonlinear_solver, error, self.eps_iter, self.max_iter))
+            raise ValueError('%s w/%s not converged:\n   difference in solution between last two iterations: %g > eps_iter=%g after %s iterations.' % (self.__class__.__name__, self.nonlinear_solver, error, self.eps_iter, self.max_iter))
         return u_new
+
+    def Picard2(self, ukp1):
+        raise NotImplementedError('Picard2 method not implemented for solver %s' % self.__class__.__name__)
+
 
 class BackwardEuler(SolverImplicit):
     """
@@ -2020,6 +2091,14 @@ class BackwardEuler(SolverImplicit):
        u[n+1] = u[n] + dt*f(u[n+1], t[n+1])
 
     The nonlinear system is solved by Newton or Picard iteration.
+
+    The Picard2 iteration can use the implicit trick::
+
+       u[n+1] = u[n] + dt*f(ukp1, t[n+1])*u[n+1]/ukp1
+
+    since::
+
+       (u[n+1]/ukp1 approx 1
     """
     quick_description = "Implicit 1st-order Backward Euler method"
 
@@ -2027,6 +2106,11 @@ class BackwardEuler(SolverImplicit):
         u, f, n, t = self.u, self.f, self.n, self.t
         dt = t[n+1] - t[n]
         return u[n] + dt*f(ukp1, t[n+1])
+
+    def Picard2_update(self, ukp1):
+        u, f, n, t = self.u, self.f, self.n, self.t
+        dt = t[n+1] - t[n]
+        return u[n]/(1 - dt*f(ukp1, t[n+1])/ukp1)
 
     def Newton_system(self, ukp1):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -2868,8 +2952,5 @@ def list_not_suitable_complex_solvers():
         'RKC', 'RKF45',
         'odefun_sympy', 'lsoda_scipy',
         'Radau5', 'Radau5Explicit', 'Radau5Implicit',
+        'EulerCromer',
         ]
-
-
-
-

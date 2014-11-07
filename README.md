@@ -7,10 +7,19 @@ Differential Algebraic Equations (DAEs).
 
 ### How do I install Odespy?
 
-The complete package:
+The simplest procedure is to use `pip`:
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Terminal> sudo pip install -e git+https://github.com/hplgit/odespy.git#egg=odespy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Alternatively, you can check out this repo and run `setup.py`:
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Terminal> git clone git@github.com:hplgit/odespy.git
+Terminal> cd odespy
 Terminal> sudo python setup.py install
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -81,13 +90,39 @@ An incomplete [tutorial](http://hplgit.github.io/odespy/doc/tutorial/html/index.
 development and explains much more of the syntax and provides many
 examples.
 
-### I have used Odespy in a publication - how to I site it?
+### I have used Odespy in a publication - how do I cite it?
 
 Please cite this GitHub repository:
 
+> H. P. Langtangen and L. Wang. Odespy software package.
+> URL: <https://github.com/hplgit/odespy.> 2014
+
+
+
+BibTeX entry:
+
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-H. P. Langtangen and L. Wang. The Odespy package.
-URL: https://github.com/hplgit/odespy. 2013
+@misc{odespy,
+  title = {{Odespy} Software Package},
+  author = {H. P. Langtangen and L. Wang},
+  url = {https://github.com/hplgit/odespy},
+  key = {odespy},
+  note = {\url{https://github.com/hplgit/odespy}},
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Publish](https://bitbucket.org/logg/publish) entry:
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+** {Odespy} Software Package
+   key:       odespy
+   author:    H. P. Langtangen, L. Wang
+   url:       https://github.com/hplgit/odespy
+   status:    published
+   sortkey:   Odespy
+   note:      \url{https://github.com/hplgit/odespy}
+   entrytype: misc
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

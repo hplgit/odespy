@@ -14,7 +14,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    './',
         VERSION:     '1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,8 +25,26 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <script src="http://sagecell.sagemath.org/static/jquery.min.js"></script>
+        <script src="http://sagecell.sagemath.org/static/embedded_sagecell.js"></script>
+
+        <script>sagecell.makeSagecell({inputLocation: ".sage"});</script>
+
+        <style type="text/css">
+                .sagecell .CodeMirror-scroll {
+                        overflow-y: hidden;
+                        overflow-x: auto;
+                }
+                .sagecell .CodeMirror {
+                        height: auto;
+                }
+        </style>
+
+    
     <link rel="top" title="A Tutorial for the Odespy Interface to ODE Solvers" href="index.html" />
     <link rel="prev" title="A Tutorial for the Odespy Interface to ODE Solvers" href="index.html" />
+
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 <!--[if lte IE 6]>
@@ -34,7 +52,7 @@
 <![endif]-->
 
   
-   <style type=text/css>
+   <style type="text/css">
      div.admonition {
        background-color: whiteSmoke;
        border: 1px solid #bababa;
@@ -70,7 +88,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Hans Petter Langtangen, Liwei Wang</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Sep 19, 2013</td>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Jul 9, 2014</td>
 </tr>
 </tbody>
 </table>
@@ -179,11 +197,12 @@ a function in a file, say <tt class="docutils literal"><span class="pre">myode.m
 </pre></div>
 </div>
 <p>In MATLAB we can then solve the problem by</p>
-<blockquote>
-<div>&gt;&gt; options = odeset(&#8216;RelTol&#8217;,0.0,&#8217;AbsTol&#8217;,1e-6);
-&gt;&gt; tspan = [0 30];
-&gt;&gt; u0 = [2; 0]
-&gt;&gt; [t, u] = ode45(&#8216;myode&#8217;, tspan, u0, options]);</div></blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="o">&gt;&gt;</span> <span class="n">options</span> <span class="o">=</span> <span class="n">odeset</span><span class="p">(</span><span class="s">&#39;RelTol&#39;</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="s">&#39;AbsTol&#39;</span><span class="p">,</span><span class="mf">1e-6</span><span class="p">);</span>
+<span class="o">&gt;&gt;</span> <span class="n">tspan</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="mi">30</span><span class="p">];</span>
+<span class="o">&gt;&gt;</span> <span class="n">u0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">;</span> <span class="mi">0</span><span class="p">]</span>
+<span class="o">&gt;&gt;</span> <span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="n">ode45</span><span class="p">(</span><span class="s">&#39;myode&#39;</span><span class="p">,</span> <span class="n">tspan</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">options</span><span class="p">]);</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="python">
 <h3>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h3>
@@ -278,12 +297,12 @@ callback to Python.</p>
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>The Odespy package is most easily installed by checking out
 the latest version of the source code:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="go">git clone git@github.com:hplgit/odespy.git</span>
-<span class="go">cd odespy</span>
+<div class="highlight-text"><div class="highlight"><pre>git clone git@github.com:hplgit/odespy.git
+cd odespy
 </pre></div>
 </div>
 <p>The installation follows the standard procedure,</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="go">sudo python setup.py install</span>
+<div class="highlight-text"><div class="highlight"><pre>sudo python setup.py install
 </pre></div>
 </div>
 <p>You will at least also need Python v2.7 and the <a class="reference external" href="http://numpy.scipy.org/">numpy</a> package.  The FORTRAN codes <tt class="docutils literal"><span class="pre">rkc.f</span></tt>,
@@ -307,18 +326,18 @@ for accessing solvers in that package.</li>
 standard <tt class="docutils literal"><span class="pre">setup.py</span></tt> script, as shown above.
 On Ubuntu and other Debian-based Linux systems the following
 line installs all that Odespy may need:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="go">sudo apt-get install python-scipy python-nose python-sympy \</span>
-<span class="go">     python-matplotlib python-scitools python-pip</span>
+<div class="highlight-text"><div class="highlight"><pre>sudo apt-get install python-scipy python-nose python-sympy \
+     python-matplotlib python-scitools python-pip
 </pre></div>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">odelab</span></tt> package is installed by either</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="go">pip install -e git+https://github.com/olivierverdier/odelab#egg=odelab</span>
+<div class="highlight-text"><div class="highlight"><pre>pip install -e git+https://github.com/olivierverdier/odelab#egg=odelab
 </pre></div>
 </div>
 <p>or downloading the source and running <tt class="docutils literal"><span class="pre">setup.py</span></tt>:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="go">git clone git://github.com/olivierverdier/odelab.git</span>
-<span class="go">cd odelab</span>
-<span class="go">sudo python setup.py install</span>
+<div class="highlight-text"><div class="highlight"><pre>git clone git://github.com/olivierverdier/odelab.git
+cd odelab
+sudo python setup.py install
 </pre></div>
 </div>
 </div>
@@ -497,7 +516,7 @@ solution (which is known for this equation):</p>
 </pre></div>
 </div>
 <div class="figure">
-<img alt="_images/logistic1.png" src="_images/logistic1.png" style="width: 400px;" />
+<a class="reference internal image-reference" href="_images/logistic1.png"><img alt="_images/logistic1.png" src="_images/logistic1.png" style="width: 400px;" /></a>
 <p class="caption">Solution of the logistic equation with the 4-th order Runge-Kutta method (solid line) and comparison with the exact solution (dots)</p>
 </div>
 <p>All the examples in this tutorial are found in the GitHub directory
@@ -783,7 +802,7 @@ own nomenclature (<a class="reference external" href="https://github.com/hplgit/
 of <tt class="docutils literal"><span class="pre">time_points</span></tt>.</p>
 </div>
 <div class="section" id="example-solving-an-ode-system">
-<h2>Example: Solving an ODE System<a class="headerlink" href="#example-solving-an-ode-system" title="Permalink to this headline">¶</a></h2>
+<span id="ode-sec-ex-osc"></span><h2>Example: Solving an ODE System<a class="headerlink" href="#example-solving-an-ode-system" title="Permalink to this headline">¶</a></h2>
 <p>We shall now explain how to solve a system of ODEs using a scalar
 second-order ODE as starting point.
 The angle <span class="math">\(\theta\)</span> of a pendulum with mass <span class="math">\(m\)</span> and length <span class="math">\(L\)</span>
@@ -794,8 +813,8 @@ is governed by the equation
 \dot\theta (0)=0 .\]</div>
 <p>A dot over <span class="math">\(\theta\)</span> implies differentiation with respect to time.
 The ODE can be written as <span class="math">\(\ddot\theta + c\sin\theta=0\)</span> by
-introducing <span class="math">\(c = g/L\)</span>.
-This problem must be expressed as a first-order ODE system if it is
+introducing <span class="math">\(c = g/L\)</span>.</p>
+<p>This problem must be expressed as a first-order ODE system if it is
 going to be solved by the tools in the Odespy package.
 Introducing <span class="math">\(\omega = \dot\theta\)</span> (the angular velocity) as auxiliary
 unknown, we get the system</p>
@@ -862,7 +881,7 @@ makes the numerical solution explode.
 The increasing amplitude is a numerical artifact that some of the simple
 solution methods suffer from.</p>
 <div class="figure">
-<img alt="_images/osc1a.png" src="_images/osc1a.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/osc1a.png"><img alt="_images/osc1a.png" src="_images/osc1a.png" style="width: 500px;" /></a>
 <p class="caption">Heun&#8217;s method used to simulate oscillations of a pendulum</p>
 </div>
 <p>Using a more sophisticated method, say the 4-th order Runge-Kutta method,
@@ -887,12 +906,117 @@ is just a matter of substituting <tt class="docutils literal"><span class="pre">
 <span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The amplitude now becomes constant in time as expected.</p>
+<p>The amplitude now becomes (almost) constant in time as expected.
+Another very good and popular method for this problem is presented next.</p>
+</div>
+<div class="section" id="the-euler-cromer-method">
+<h2>The Euler-Cromer Method<a class="headerlink" href="#the-euler-cromer-method" title="Permalink to this headline">¶</a></h2>
+<p>Physicists will most likely
+solve the model problem in the section <a class="reference internal" href="#ode-sec-ex-osc"><em>Example: Solving an ODE System</em></a> by
+the Euler-Cromer method. For a single degree of freedom system,</p>
+<div class="math">
+\[\ddot x + f(x, \dot x, t) = 0,\]</div>
+<p>typically modeling an oscillatory system, the Euler-Cromer method
+writes the system as two ODEs,</p>
+<div class="math">
+\[\begin{split}\dot v &amp;= -g(x, v, t),\\
+\dot x &amp;= v\thinspace .\end{split}\]</div>
+<p>A Forward Euler scheme is used for the first equation, while a Backward
+Euler scheme is used for the second:</p>
+<div class="math">
+\[\begin{split}v^{n+1} &amp;= v^n - \Delta t\, g(x^n, v^n, n\Delta t),\\
+x^{n+1} &amp;= x^n + \Delta t\,v^{n+1}\thinspace .\end{split}\]</div>
+<p>The two first-order methods used in this symmetric fashion results in
+a second-order method that will preserve the amplitude of the oscillations.</p>
+<p>For general multi degree of freedom systems, we have some vector ODE
+arising from, typically, Newton&#8217;s second law of motion,</p>
+<div class="math">
+\[\ddot{\boldsymbol{r}} + \boldsymbol{g}(\boldsymbol{r},\dot{\boldsymbol{r}},t) = 0\thinspace .\]</div>
+<p>This is rewritten as</p>
+<div class="math">
+\[\begin{split}\dot{\boldsymbol{v}} &amp;= -\boldsymbol{g}(\boldsymbol{r}, \boldsymbol{v}, t),\\
+\dot{\boldsymbol{r}} &amp;= \boldsymbol{v},\end{split}\]</div>
+<p>and discretized as</p>
+<div class="math">
+\[\begin{split}\boldsymbol{v}^{n+1} &amp;= \boldsymbol{v}^n -\Delta t\,\boldsymbol{g}(\boldsymbol{r}^n, \boldsymbol{v}^n, t),\\
+\boldsymbol{r}^{n+1} &amp;= \boldsymbol{r}^n + \Delta t\,\boldsymbol{v}^{n+1}\thinspace .\end{split}\]</div>
+<p>The convention in Odespy is to group all the unknowns as velocity and position
+for each degree of freedom. That is, if the component form of <span class="math">\(\boldsymbol{r}\)</span>
+and <span class="math">\(\boldsymbol{v}\)</span> is written as</p>
+<div class="math">
+\[\boldsymbol{r} = (r^{(0)}, r^{(0)}, \ldots, r^{(N)}),
+\quad \boldsymbol{v} = (v^{(0)}, v^{(0)}, \ldots, v^{(N)}),\]</div>
+<p>the <span class="math">\(u\)</span> vector of all unknowns in the Euler-Cromer method in Odespy
+must be</p>
+<div class="math">
+\[u=(v^{(0)}, r^{(0)}, v^{(1)}, r^{(1)}, \ldots,v^{(N)}, r^{(N)})\thinspace .\]</div>
+<p>The corresponding set of ODEs are</p>
+<div class="math">
+\[\begin{split}\dot v^{(0)} &amp;= -g^{(0)}(\boldsymbol{r}, \boldsymbol{v}, t),\\
+\dot r^{(0)} &amp;= v^{(0)},\\
+\dot v^{(1)} &amp;= -g^{(1)}(\boldsymbol{r}, \boldsymbol{v}, t),\\
+\dot r^{(1)} &amp;= v^{(1)},\\
+&amp;\cdots\\
+\dot v^{(N)} &amp;= -g^{(N)}(\boldsymbol{r}, \boldsymbol{v}, t),\\
+\dot r^{(N)} &amp;= v^{(N)}\thinspace .\end{split}\]</div>
+<p>For the particular case of a pendulum we write our system as</p>
+<div class="math">
+\[\begin{split}\dot\omega &amp;= -c\sin\theta,\\
+\dot\theta &amp;= \omega,\end{split}\]</div>
+<p>and let <span class="math">\(u=(\omega, \theta)\)</span>. The relevant right-hand side function becomes</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="n">omega</span><span class="p">,</span> <span class="n">theta</span> <span class="o">=</span> <span class="n">u</span>
+    <span class="k">return</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">omega</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>With some imports,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">odespy</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<p>we can write the rest of the program in a standard fashion:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">Theta0_degrees</span> <span class="o">=</span> <span class="mi">30</span>
+
+<span class="n">solver</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">EulerCromer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="n">Theta0</span> <span class="o">=</span> <span class="n">Theta0_degrees</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span>
+<span class="n">solver</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">Theta0</span><span class="p">])</span>
+<span class="c"># Solve for num_periods periods using formulas for small theta</span>
+<span class="n">freq</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>          <span class="c"># frequency of oscillations</span>
+<span class="n">period</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="n">freq</span>      <span class="c"># one period</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">40</span>                  <span class="c"># intervals per period</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">period</span><span class="o">/</span><span class="n">N</span>           <span class="c"># time step</span>
+<span class="n">num_periods</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">num_periods</span><span class="o">*</span><span class="n">period</span>  <span class="c"># total simulation time</span>
+
+<span class="n">time_points</span> <span class="o">=</span> <span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">num_periods</span><span class="o">*</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">time_points</span><span class="p">)</span>
+
+<span class="c"># Extract components and plot theta</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">omega</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">theta_linear</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">Theta0</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">theta_linear</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+<span class="n">legend</span><span class="p">([</span><span class="s">&#39;Euler-Cromer&#39;</span><span class="p">,</span> <span class="s">&#39;Linearized problem&#39;</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s">&#39;lower left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With <span class="math">\(\Theta_0\)</span> as 30 degrees, the fully nonlinear solution is
+slightly out of phase with the solution of the linearized
+problem <span class="math">\(\ddot\theta + c\theta =0\)</span>, see Figure <a class="reference internal" href="#ode-sec-ec-fig1"><em>Euler-Cromer method applied to the pendulum problem</em></a>.
+As <span class="math">\(\Theta_0\rightarrow 0\)</span>, the two curves approach each other.
+The Euler-Cromer method is significantly better than Heun&#8217;s method
+used in the previous section and reproduces the exact amplitude.</p>
+<div class="figure" id="ode-sec-ec-fig1">
+<a class="reference internal image-reference" href="_images/osc_EC_30.png"><img alt="_images/osc_EC_30.png" src="_images/osc_EC_30.png" style="width: 500px;" /></a>
+<p class="caption"><em>Euler-Cromer method applied to the pendulum problem</em></p>
+</div>
 </div>
 <div class="section" id="testing-several-methods">
 <h2>Testing Several Methods<a class="headerlink" href="#testing-several-methods" title="Permalink to this headline">¶</a></h2>
+<p>(<strong>hpl 1</strong>: After Euler-Cromer, change the order of the ODEs and unknowns!)</p>
 <p>We shall now make a more advanced solver by
-extending the previous example. More specifically, we shall</p>
+extending the pendulum example. More specifically, we shall</p>
 <blockquote>
 <div><ul class="simple">
 <li>represent the right-hand side function as class,</li>
@@ -914,15 +1038,15 @@ or by using a class where the parameters are attributes and
 an <tt class="docutils literal"><span class="pre">f</span></tt> method defines <span class="math">\(f(u,t)\)</span>. The section <a class="reference internal" href="#ode-sec-exgr-farg"><em>Parameters in the Right-Hand Side Function</em></a> exemplifies the details.
 A minimal class representation of the right-hand side
 function in the present case looks like this:</p>
-<div class="highlight-text"><div class="highlight"><pre>class Problem:
-    def __init__(self, c, Theta):
-        self.c, self.Theta = float(c), float(Theta)
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Problem</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">Theta</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Theta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">Theta</span><span class="p">)</span>
 
-    def f(self, u, t):
-        theta, omega = u;  c = self.c
-        return [omega, -c*theta]
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">theta</span><span class="p">,</span> <span class="n">omega</span> <span class="o">=</span> <span class="n">u</span><span class="p">;</span>  <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">omega</span><span class="p">,</span> <span class="o">-</span><span class="n">c</span><span class="o">*</span><span class="n">theta</span><span class="p">]</span>
 
-problem = Problem(c=1, Theta=pi/4)
+<span class="n">problem</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">Theta</span><span class="o">=</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>It would be convenient to add an attribute <tt class="docutils literal"><span class="pre">period</span></tt> which holds
@@ -1015,7 +1139,7 @@ in the current mathematical model.</p>
 </div>
 <p>A complete program is available as <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py">osc2.py</a>.</p>
 <div class="figure">
-<img alt="_images/osc2.png" src="_images/osc2.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/osc2.png"><img alt="_images/osc2.png" src="_images/osc2.png" style="width: 500px;" /></a>
 <p class="caption">Comparison of methods for solving the ODE system for a pendulum</p>
 </div>
 <p>We can extend this program to compute the error in each numerical
@@ -1090,14 +1214,14 @@ the <tt class="docutils literal"><span class="pre">scitools</span></tt> package 
 </pre></div>
 </div>
 <p>With 4 periods we get</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">ThetaRule</span><span class="p">(</span><span class="n">theta</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>   <span class="n">r</span><span class="p">:</span> <span class="mf">4.2</span><span class="p">,</span>  <span class="mf">2.4</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">,</span> <span class="mf">1.3</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">1.9E-01</span>
-<span class="n">LeapfrogFiltered</span>     <span class="n">r</span><span class="p">:</span> <span class="mf">10.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.7</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">1.8E-01</span>
-<span class="n">ThetaRule</span><span class="p">(</span><span class="n">theta</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>   <span class="n">r</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>  <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.8</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">1.3E-01</span>
-<span class="n">ThetaRule</span>            <span class="n">r</span><span class="p">:</span> <span class="mf">2.3</span><span class="p">,</span>  <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">2.1E-03</span>
-<span class="n">RK4</span>                  <span class="n">r</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">,</span>  <span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">1.6E-07</span>
-<span class="n">Leapfrog</span>             <span class="n">r</span><span class="p">:</span> <span class="mf">2.2</span><span class="p">,</span>  <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">2.1E-03</span>
-<span class="n">RK2</span>                  <span class="n">r</span><span class="p">:</span> <span class="mf">2.3</span><span class="p">,</span>  <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">2.1E-03</span>
-<span class="n">MidpointIter</span>         <span class="n">r</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">2.1E-03</span>
+<div class="highlight-text"><div class="highlight"><pre>ThetaRule(theta=0)   r: 4.2,  2.4, 1.7, 1.3 E_min=1.9E-01
+LeapfrogFiltered     r: 10.3, 0.3, 0.5, 0.7 E_min=1.8E-01
+ThetaRule(theta=1)   r: 0.2,  0.4, 0.6, 0.8 E_min=1.3E-01
+ThetaRule            r: 2.3,  2.0, 2.0, 2.0 E_min=2.1E-03
+RK4                  r: 4.0,  4.0, 4.0, 4.0 E_min=1.6E-07
+Leapfrog             r: 2.2,  2.0, 2.0, 2.0 E_min=2.1E-03
+RK2                  r: 2.3,  2.0, 2.0, 2.0 E_min=2.1E-03
+MidpointIter         r: 2.0,  1.0, 2.0, 2.0 E_min=2.1E-03
 </pre></div>
 </div>
 <p>The rates of the Forward and Backward Euler methods (1st and 3rd line) have
@@ -1114,13 +1238,13 @@ time meshes are irrelevant. Also in this case, three of the methods
 are useless, while the others deliver their promised convergence
 rates (Forward Euler, i.e., <tt class="docutils literal"><span class="pre">ThetaRule</span></tt> with <tt class="docutils literal"><span class="pre">theta=0</span></tt> is left
 out because of ridiculous results):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">LeapfrogFiltered</span>     <span class="n">r</span><span class="p">:</span> <span class="mf">63.7</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">4.3E-01</span>
-<span class="n">ThetaRule</span><span class="p">(</span><span class="n">theta</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>   <span class="n">r</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>  <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">3.8E-01</span>
-<span class="n">ThetaRule</span>            <span class="n">r</span><span class="p">:</span> <span class="mf">3.7</span><span class="p">,</span>  <span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">1.0E-02</span>
-<span class="n">RK4</span>                  <span class="n">r</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">,</span>  <span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">8.0E-07</span>
-<span class="n">Leapfrog</span>             <span class="n">r</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>  <span class="mf">1.9</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">1.0E-02</span>
-<span class="n">RK2</span>                  <span class="n">r</span><span class="p">:</span> <span class="mf">3.7</span><span class="p">,</span>  <span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">1.0E-02</span>
-<span class="n">MidpointIter</span>         <span class="n">r</span><span class="p">:</span> <span class="mf">1.8</span><span class="p">,</span>  <span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.9</span><span class="p">,</span> <span class="mf">2.0</span> <span class="n">E_min</span><span class="o">=</span><span class="mf">1.0E-02</span>
+<div class="highlight-text"><div class="highlight"><pre>LeapfrogFiltered     r: 63.7, 0.0, 0.1, 0.2 E_min=4.3E-01
+ThetaRule(theta=1)   r: 0.0,  0.1, 0.1, 0.3 E_min=3.8E-01
+ThetaRule            r: 3.7,  2.1, 2.0, 2.0 E_min=1.0E-02
+RK4                  r: 4.0,  4.0, 4.0, 4.0 E_min=8.0E-07
+Leapfrog             r: 0.5,  1.9, 2.0, 2.0 E_min=1.0E-02
+RK2                  r: 3.7,  2.1, 2.0, 2.0 E_min=1.0E-02
+MidpointIter         r: 1.8,  0.8, 1.9, 2.0 E_min=1.0E-02
 </pre></div>
 </div>
 </div>
@@ -1284,7 +1408,7 @@ such as <tt class="docutils literal"><span class="pre">RK4</span></tt>.
 For curiosity we can mention that the <tt class="docutils literal"><span class="pre">ForwardEuler</span></tt> method produces
 a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.</p>
 <div class="figure" id="gaussian-fig-rk2-41">
-<img alt="_images/gaussian1_RK2_41.png" src="_images/gaussian1_RK2_41.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/gaussian1_RK2_41.png"><img alt="_images/gaussian1_RK2_41.png" src="_images/gaussian1_RK2_41.png" style="width: 500px;" /></a>
 <p class="caption"><em>2nd-order Runge-Kutta method with 41 points</em></p>
 </div>
 <p>A simple program testing one numerical method goes as follows (<a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py">gaussian1.py</a>).</p>
@@ -1335,7 +1459,7 @@ these,</p>
 </div>
 <p>Figure <a class="reference internal" href="#gaussian-fig-fehlberg-41"><em>Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41)</em></a> shows how <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (57 adaptively selected points in time).</p>
 <div class="figure" id="gaussian-fig-fehlberg-41">
-<img alt="_images/gaussian1_Fehlberg_41.png" src="_images/gaussian1_Fehlberg_41.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/gaussian1_Fehlberg_41.png"><img alt="_images/gaussian1_Fehlberg_41.png" src="_images/gaussian1_Fehlberg_41.png" style="width: 500px;" /></a>
 <p class="caption"><em>Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41)</em></p>
 </div>
 <p>Adaptive algorithms apply an error estimate based on considering a higher-order method as exact, in this case a method of order 5, and a method of lower order (here 4) as the numerically predicted solution. The user can specify an error tolerance. In the program above we just relied to the default tolerance, which can be printed by</p>
@@ -1343,13 +1467,13 @@ these,</p>
 </pre></div>
 </div>
 <p>yielding a list of all optional parameters:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&#39;f_kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s">&#39;f_args&#39;</span><span class="p">:</span> <span class="p">(),</span>
- <span class="s">&#39;max_step&#39;</span><span class="p">:</span> <span class="mf">1.5000000000000036</span><span class="p">,</span> <span class="s">&#39;verbose&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
- <span class="s">&#39;min_step&#39;</span><span class="p">:</span> <span class="mf">0.0014999999999999946</span><span class="p">,</span>
- <span class="s">&#39;first_step&#39;</span><span class="p">:</span> <span class="mf">0.14999999999999999</span><span class="p">,</span>
- <span class="s">&#39;rtol&#39;</span><span class="p">:</span> <span class="mf">1e-06</span><span class="p">,</span> <span class="s">&#39;atol&#39;</span><span class="p">:</span> <span class="mf">1e-08</span><span class="p">,</span>
- <span class="s">&#39;name of f&#39;</span><span class="p">:</span> <span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="s">&#39;complex_valued&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
- <span class="s">&#39;disk_storage&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;u_exact&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">}</span>
+<div class="highlight-text"><div class="highlight"><pre>{&#39;f_kwargs&#39;: {}, &#39;f_args&#39;: (),
+ &#39;max_step&#39;: 1.5000000000000036, &#39;verbose&#39;: 0,
+ &#39;min_step&#39;: 0.0014999999999999946,
+ &#39;first_step&#39;: 0.14999999999999999,
+ &#39;rtol&#39;: 1e-06, &#39;atol&#39;: 1e-08,
+ &#39;name of f&#39;: &#39;f&#39;, &#39;complex_valued&#39;: False,
+ &#39;disk_storage&#39;: False, &#39;u_exact&#39;: None}
 </pre></div>
 </div>
 <p>The tolerances involved are of relative and absolute type, i.e.,</p>
@@ -1453,21 +1577,21 @@ results, despite setting <tt class="docutils literal"><span class="pre">Vode</sp
 <tt class="docutils literal"><span class="pre">Lsoda</span></tt> should automatically select between nonstiff and stiff solvers
 (of default order 4 in this case).</p>
 <div class="figure" id="gaussian3-fig1-41">
-<img alt="_images/gaussian3_41.png" src="_images/gaussian3_41.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/gaussian3_41.png"><img alt="_images/gaussian3_41.png" src="_images/gaussian3_41.png" style="width: 500px;" /></a>
 <p class="caption"><em>Comparison of adaptive methods with default parameters (tolerance ``E-6``)</em></p>
 </div>
 <div class="figure" id="gaussian3-fig1err-41">
-<img alt="_images/gaussian3e_41.png" src="_images/gaussian3e_41.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/gaussian3e_41.png"><img alt="_images/gaussian3e_41.png" src="_images/gaussian3e_41.png" style="width: 500px;" /></a>
 <p class="caption"><em>Comparison of errors in adaptive methods with default parameters (tolerance ``E-6``)</em></p>
 </div>
 <p>The program writes out the following results for the
 maximum value of the solution, which should equal 2:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="mf">1.9976</span>  <span class="n">DormandPrince</span>
-<span class="mf">1.6591</span>  <span class="n">BogackiShampine</span>
-<span class="mf">1.9812</span>  <span class="n">RKFehlberg</span>
-<span class="mf">1.0406</span>  <span class="n">Vode</span>
-<span class="mf">1.9734</span>  <span class="n">RKF45</span>
-<span class="mf">3.2905</span>  <span class="n">Lsoda</span>
+<div class="highlight-text"><div class="highlight"><pre>1.9976  DormandPrince
+1.6591  BogackiShampine
+1.9812  RKFehlberg
+1.0406  Vode
+1.9734  RKF45
+3.2905  Lsoda
 </pre></div>
 </div>
 <p>The clearly most accurate solver among these is <tt class="docutils literal"><span class="pre">DormandPrince</span></tt>  - the default
@@ -1477,19 +1601,19 @@ most popular ODE solver.</p>
 choose a much stricter tolerance, say <span class="math">\(10^{-10}\)</span>.
 Figure <a class="reference internal" href="#gaussian3-fig2-41"><em>Comparison of adaptive methods with error tolerance `E-10`</em></a> shows
 coinciding curves. Numerically, we now have</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="mf">1.9991</span>  <span class="n">DormandPrince</span>
-<span class="mf">1.9912</span>  <span class="n">BogackiShampine</span>
-<span class="mf">1.9942</span>  <span class="n">RKFehlberg</span>
-<span class="mf">2.0122</span>  <span class="n">Vode</span>
-<span class="mf">1.9916</span>  <span class="n">RKF45</span>
-<span class="mf">2.0056</span>  <span class="n">Lsoda</span>
+<div class="highlight-text"><div class="highlight"><pre>1.9991  DormandPrince
+1.9912  BogackiShampine
+1.9942  RKFehlberg
+2.0122  Vode
+1.9916  RKF45
+2.0056  Lsoda
 </pre></div>
 </div>
 <p>For the methods <tt class="docutils literal"><span class="pre">DormandPrince</span></tt>,  <tt class="docutils literal"><span class="pre">RKFehlberg</span></tt>, and
 <tt class="docutils literal"><span class="pre">BogackiShampine</span></tt> we have information about the number of adaptive
 time points used: 270, 326, and 3307, respectively.</p>
 <div class="figure" id="gaussian3-fig2-41">
-<img alt="_images/gaussian3_41_Em10.png" src="_images/gaussian3_41_Em10.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/gaussian3_41_Em10.png"><img alt="_images/gaussian3_41_Em10.png" src="_images/gaussian3_41_Em10.png" style="width: 500px;" /></a>
 <p class="caption"><em>Comparison of adaptive methods with error tolerance `E-10`</em></p>
 </div>
 <p>The lesson learned in this example is two-fold: 1) several methods should
@@ -1594,10 +1718,10 @@ out by the following program.</p>
 <p>We remark that the solution and the corresponding time values can always
 be recovered as <tt class="docutils literal"><span class="pre">solver.u</span></tt> and <tt class="docutils literal"><span class="pre">solver.t</span></tt>, respectively.</p>
 <p>The output from the program may read</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">Exact</span><span class="p">:</span> <span class="n">u</span><span class="p">(</span><span class="mi">600</span><span class="p">)</span><span class="o">=</span><span class="mi">1</span>
-<span class="n">Vode</span>            <span class="n">u</span><span class="p">(</span><span class="mi">600</span><span class="p">)</span><span class="o">=</span><span class="mf">1.001587</span> <span class="p">(</span><span class="n">error</span><span class="p">:</span>  <span class="o">-</span><span class="mf">1.59E-03</span><span class="p">,</span> <span class="n">cpu</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">)</span>
-<span class="n">RK4</span>             <span class="n">u</span><span class="p">(</span><span class="mi">600</span><span class="p">)</span><span class="o">=</span><span class="mf">0.997328</span> <span class="p">(</span><span class="n">error</span><span class="p">:</span>   <span class="mf">2.67E-03</span><span class="p">,</span> <span class="n">cpu</span><span class="p">:</span> <span class="mf">1.3</span><span class="p">)</span>
-<span class="n">RKFehlberg</span>      <span class="n">u</span><span class="p">(</span><span class="mi">600</span><span class="p">)</span><span class="o">=</span><span class="mf">1.000953</span> <span class="p">(</span><span class="n">error</span><span class="p">:</span>  <span class="o">-</span><span class="mf">9.53E-04</span><span class="p">,</span> <span class="n">cpu</span><span class="p">:</span> <span class="mf">7.5</span><span class="p">)</span>
+<div class="highlight-text"><div class="highlight"><pre>Exact: u(600)=1
+Vode            u(600)=1.001587 (error:  -1.59E-03, cpu: 1.0)
+RK4             u(600)=0.997328 (error:   2.67E-03, cpu: 1.3)
+RKFehlberg      u(600)=1.000953 (error:  -9.53E-04, cpu: 7.5)
 </pre></div>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">Vode</span></tt> solver is a wrapper of the FORTRAN code <tt class="docutils literal"><span class="pre">zvode.f</span></tt> in
@@ -1896,7 +2020,7 @@ may easily extract the solution of <tt class="docutils literal"><span class="pre
 </pre></div>
 </div>
 <div class="figure">
-<img alt="_images/sode1.png" src="_images/sode1.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/sode1.png"><img alt="_images/sode1.png" src="_images/sode1.png" style="width: 500px;" /></a>
 <p class="caption">Oscillator driven by white noise</p>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">Heun</span></tt> and <tt class="docutils literal"><span class="pre">RK2</span></tt> methods give coinciding solutions while
@@ -2054,7 +2178,7 @@ make use of the attributes rather than the <tt class="docutils literal"><span cl
 to extract data.  For example, the value of
 <tt class="docutils literal"><span class="pre">self._parameters['myvar']</span></tt> becomes available as <tt class="docutils literal"><span class="pre">self.myvar</span></tt> and
 in the algorithms we use <tt class="docutils literal"><span class="pre">self.myvar</span></tt>, perhaps with a test
-<tt class="docutils literal"><span class="pre">hasattr(self,</span> <span class="pre">'myvar')</span></tt> test or a <tt class="docutils literal"><span class="pre">try</span></tt>-<cite>except</cite> clause (catching
+<tt class="docutils literal"><span class="pre">hasattr(self,</span> <span class="pre">'myvar')</span></tt> test or a <tt class="docutils literal"><span class="pre">try-except</span></tt> clause (catching
 an <tt class="docutils literal"><span class="pre">AttributeError</span></tt>).</li>
 <li>The <tt class="docutils literal"><span class="pre">set</span></tt> method is called with all keyword arguments given to the
 constructor, which then modifies the default values of the
@@ -2310,12 +2434,16 @@ Jacobian of the system to be solved in each Newton iteration.</p>
 </div>
 <div class="section" id="troubleshooting">
 <h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="constructor-takes-exactly-two-arguments-5-given">
+<h2>Constructor takes exactly two arguments, 5 given<a class="headerlink" href="#constructor-takes-exactly-two-arguments-5-given" title="Permalink to this headline">¶</a></h2>
 <p>Constructors in the <tt class="docutils literal"><span class="pre">Solver</span></tt> hierarchy take only the <tt class="docutils literal"><span class="pre">f</span></tt> function
 as positional argument. All other parameters to the constructor
 must be keyword arguments.</p>
-<p><em>Remark.</em> This document was written with aid of the
-<a class="reference external" href="https://github.com/hplgit/doconce">Doconce</a> tool, which allows
+<p><strong>Remark.</strong>
+This document was written with aid of the
+<a class="reference external" href="https://github.com/hplgit/doconce">DocOnce</a> tool, which allows
 output in many different formats.</p>
+</div>
 </div>
 
 
@@ -2356,6 +2484,7 @@ output in many different formats.</p>
 <li><a class="reference internal" href="#a-class-based-implementation">A Class-Based Implementation</a></li>
 <li><a class="reference internal" href="#using-other-symbols">Using Other Symbols</a></li>
 <li><a class="reference internal" href="#example-solving-an-ode-system">Example: Solving an ODE System</a></li>
+<li><a class="reference internal" href="#the-euler-cromer-method">The Euler-Cromer Method</a></li>
 <li><a class="reference internal" href="#testing-several-methods">Testing Several Methods</a></li>
 <li><a class="reference internal" href="#make-a-subclass-of-problem">Make a Subclass of Problem</a></li>
 <li><a class="reference internal" href="#using-adaptive-methods">Using Adaptive Methods</a><ul>
@@ -2394,7 +2523,10 @@ output in many different formats.</p>
 <li><a class="reference internal" href="#a-simple-example-of-an-implicit-method">A Simple Example of an Implicit Method</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#constructor-takes-exactly-two-arguments-5-given">Constructor takes exactly two arguments, 5 given</a></li>
+</ul>
+</li>
 </ul>
 
   <h4>Previous topic</h4>
@@ -2430,8 +2562,8 @@ output in many different formats.</p>
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Hans Petter Langtangen and Liwei Wang.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2014, Hans Petter Langtangen and Liwei Wang.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.
     </div>
   </body>
 </html>

@@ -1,4 +1,5 @@
 #!/bin/sh
+sh clean.sh
 doconce spellcheck -d .dict4spell.txt *.do.txt
 if [ $? -ne 0 ]; then
    echo "Spelling errors - abort."
@@ -8,7 +9,7 @@ fi
 name=main_odespy
 
 doconce format pdflatex $name
-ptex2tex -DMINTED $name
+doconce ptex2tex $name envir=minted
 pdflatex -shell-escape $name
 pdflatex -shell-escape $name
 
@@ -32,3 +33,5 @@ cp $name.html $dest/tutorial/odespy.html
 doconce format html $name --html_style=solarized
 cp $name.html $dest/odespy-solarized.html
 
+# Add to git if new files have been created
+git add $dest

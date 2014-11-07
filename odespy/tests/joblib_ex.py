@@ -27,8 +27,6 @@ there!! Totally amazing :-)
 
 Is this the right way to use joblib? Or is the same functionality available
 in better ways?
-
-Now to another thing. SISC...
 """
 
 from joblib import Memory
