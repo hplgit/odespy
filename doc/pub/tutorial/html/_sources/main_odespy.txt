@@ -1,11 +1,13 @@
-.. Automatically generated Sphinx-extended reStructuredText file from Doconce source
+.. Automatically generated Sphinx-extended reStructuredText file from DocOnce source
    (https://github.com/hplgit/doconce/)
 
-A Tutorial for the Odespy Interface to ODE Solvers
-==================================================
+.. !split
 
-:Author: Hans Petter Langtangen, Liwei Wang
-:Date: Jul 9, 2014
+A Tutorial for the Odespy Interface to ODE Solvers
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+:Authors: Hans Petter Langtangen, Liwei Wang
+:Date: Jan 14, 2015
 
 The Odespy package makes it easy to specify an ODE problem in
 Python and get it solved by a wide variety of different numerical
@@ -175,7 +177,7 @@ Odespy's Unified Interface
 
 The Odespy package provides a unified interface to all the three
 mentioned types of methods, which makes it easy to run all of them
-in a loop (program `motivation.py <https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/motivation1.py>`_):
+in a loop (program `motivation.py <https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/motivation1.py>`__):
 
 .. code-block:: python
 
@@ -216,24 +218,24 @@ numerical methods and implementations:
     methods of type Runge-Kutta-Fehlberg of order (4,5), Dormand-Prince
     of order (4,5), Cash-Karp of order (4,5), Bogacki-Shampine of order (2,3).
 
-  * Wrappers for all FORTRAN solvers in `ODEPACK <http://www.netlib.org/odepack/>`_.
+  * Wrappers for all FORTRAN solvers in `ODEPACK <http://www.netlib.org/odepack/>`__.
 
-  * Wrappers for the wrappers of FORTRAN solvers in `scipy <http://www.scipy.org>`_:
-    ``vode`` and ``zvode`` (adaptive Adams or BDF from `vode.f <http://www.netlib.org/ode/vode.f>`_);
+  * Wrappers for the wrappers of FORTRAN solvers in `scipy <http://www.scipy.org>`__:
+    ``vode`` and ``zvode`` (adaptive Adams or BDF from `vode.f <http://www.netlib.org/ode/vode.f>`__);
     ``dopri5`` (adaptive Dormand-Prince method of order (4,5));
     ``dop853`` (adaptive Dormand-Prince method of order 8(5,3));
-    ``odeint`` (adaptive switching between Adams or BDF from the implementation ``LSODA`` in `ODEPACK <http://www.netlib.org/odepack/>`_).
+    ``odeint`` (adaptive switching between Adams or BDF from the implementation ``LSODA`` in `ODEPACK <http://www.netlib.org/odepack/>`__).
 
   * Wrapper for the Runge-Kutta-Chebyshev formulas of order 2 as
-    offered by the well-known FORTRAN code `rkc.f <http://www.netlib.org/ode/rkc.f>`_.
+    offered by the well-known FORTRAN code `rkc.f <http://www.netlib.org/ode/rkc.f>`__.
 
   * Wrapper for the Runge-Kutta-Fehlberg method of
-    order (4,5) as provided by the well-known FORTRAN code `rkf45.f <http://www.netlib.org/ode/rkf45.f>`_.
+    order (4,5) as provided by the well-known FORTRAN code `rkf45.f <http://www.netlib.org/ode/rkf45.f>`__.
 
   * Wrapper for the Radau5 method as provided by the well-known FORTRAN code
-    `radau5.f <http://www.unige.ch/~hairer/prog/stiff/radau5.f>`_.
+    `radau5.f <http://www.unige.ch/~hairer/prog/stiff/radau5.f>`__.
 
-  * Wrapper for some solvers in the `odelab <https://github.com/olivierverdier/odelab>`_ package.
+  * Wrapper for some solvers in the `odelab <https://github.com/olivierverdier/odelab>`__ package.
 
 The ODE problem can always be specified in Python, but for wrappers of
 FORTRAN codes one can also implement the problem in FORTRAN and avoid
@@ -242,38 +244,44 @@ callback to Python.
 Installation
 ============
 
-The Odespy package is most easily installed by checking out
-the latest version of the source code:
+The Odespy package is most easily installed using ``pip``:
+
+.. code-block:: text
+
+        sudo pip install -e \ 
+           git+https://github.com/hplgit/odespy.git#egg=odespy
+
+Checking out the source code is almost as easy:
 
 .. code-block:: text
 
         git clone git@github.com:hplgit/odespy.git
         cd odespy
-
-The installation follows the standard procedure,
-
-.. code-block:: text
-
         sudo python setup.py install
 
-You will at least also need Python v2.7 and the `numpy <http://numpy.scipy.org/>`_ package.  The FORTRAN codes ``rkc.f``,
+You will at least also need Python v2.7 and the `numpy <http://numpy.scipy.org/>`__ package.  The FORTRAN codes ``rkc.f``,
 ``rkf45.f``, ``radau5.f``, and ODEPACK comes with Odespy and are compiled
-and installed by ``setup.py``.
+and installed by ``setup.py``. If you lack a FORTRAN compiler, you
+can drop the installation of the FORTRAN solvers by running
+
+.. code-block:: python
+
+        sudo python setup.py install --no-fortran
 
 The Odespy package depends on several additional packages:
 
- * `scipy <http://scipy.org/>`_ for running the ``Vode`` Adams/BDF solver, the
+ * `scipy <http://scipy.org/>`__ for running the ``Vode`` Adams/BDF solver, the
    Dormand-Prince adaptive methods ``Dop853``, and ``Dopri5``,
    and the ``scipy`` wrapper ``odeint`` of the FORTRAN code ``LSODA``
    (Odespy features an alternative wrapper of the latter, in class ``Lsoda``).
 
- * `sympy <http://sympy.org/en/index.html>`_ for running the
+ * `sympy <http://sympy.org/en/index.html>`__ for running the
    extremely accurate ``odefun_sympy`` solver.
 
- * `odelab <https://github.com/olivierverdier/odelab>`_
+ * `odelab <https://github.com/olivierverdier/odelab>`__
    for accessing solvers in that package.
 
-For plotting you will need `matplotlib <http://matplotlib.sourceforge.net/>`_ or `scitools <http://code.google.com/p/scitools/>`_.
+For plotting you will need `matplotlib <http://matplotlib.sourceforge.net/>`__ or `scitools <http://code.google.com/p/scitools/>`__.
 
 These packages are readily downloaded and installed by the
 standard ``setup.py`` script, as shown above.
@@ -298,6 +306,16 @@ or downloading the source and running ``setup.py``:
         git clone git://github.com/olivierverdier/odelab.git
         cd odelab
         sudo python setup.py install
+
+
+.. admonition:: Note
+
+   Despite Odespy's many dependencies on other software, you can run the
+   basic solvers implemented in pure Python without any additional software
+   packages.
+
+
+
 
 Basic Usage
 ===========
@@ -471,7 +489,7 @@ maximum number of individuals that the environment allows (the so-called
 Using a standard
 Runge-Kutta method of order four, the code for solving the problem in
 the time interval :math:`[0,10]` with :math:`N=30` time steps, looks like this
-(program `logistic1.py <https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/logistic1.py>`_):
+(program `logistic1.py <https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/logistic1.py>`__):
 
 .. code-block:: python
 
@@ -566,7 +584,7 @@ The numerical solution is computed by
         time_points = linspace(0, T, N+1)
         u, t = solver.solve(time_points)
 
-The complete program is available in the file program `logistic2.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic2.py>`_.
+The complete program is available in the file program `logistic2.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic2.py>`__.
 
 Instead of having the problem parameters ``a`` and ``R`` in the ODE as
 global variables or in a class, we may include them as extra arguments
@@ -612,7 +630,7 @@ then continue with :math:`u(T_1)` as new initial condition and simulate for
 :math:`t` in :math:`[T_1, T_2]` and so on. Let us divide the time
 domain into subdomains and compute the solution for
 each subdomain in sequence. The following program performs the steps
-(`logistic4.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic4.py>`_).
+(`logistic4.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic4.py>`__).
 
 .. code-block:: python
 
@@ -682,7 +700,7 @@ a warning will be issued).
 With a ``terminate`` function it is also convenient to specify the
 time step ``dt`` and not the total number of time steps.
 
-A complete program can be as follows (`logistic5.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic5.py>`_):
+A complete program can be as follows (`logistic5.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic5.py>`__):
 
 .. code-block:: python
 
@@ -724,7 +742,7 @@ The previous code example can be recast into a more class-based
 to the problem (the "physics") into a problem class ``Logistic``, while
 all data related to the numerical solution and its quality are
 taken care of by class ``Solver``. The code below illustrates
-the ideas (`logistic6.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic26py>`_):
+the ideas (`logistic6.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic26py>`__):
 
 .. code-block:: python
 
@@ -799,7 +817,7 @@ code.  For example, here is a coding example involving the logistic
 equation written as :math:`y'(x)=au(x)(1-u(x)/R(x))`, where now a variable
 :math:`R=R(x)` is considered. Following the setup from the very first
 program above solving the logistic ODE, we can easily introduce our
-own nomenclature (`logistic7.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic7.py>`_):
+own nomenclature (`logistic7.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic7.py>`__):
 
 .. code-block:: python
 
@@ -919,7 +937,7 @@ components in individual arrays:
         savefig('tmppng'); savefig('tmp.pdf')
         show()
 
-The complete program is available in the file `osc1a.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc1a.py>`_.
+The complete program is available in the file `osc1a.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc1a.py>`__.
 
 Looking at the plot reveals that the numerical solution has
 an alarming feature: the amplitude grows (indicating increasing
@@ -1110,7 +1128,7 @@ used in the previous section and reproduces the exact amplitude.
 Testing Several Methods
 -----------------------
 
-(**hpl 1**: After Euler-Cromer, change the order of the ODEs and unknowns!)
+[**hpl 1**: After Euler-Cromer, change the order of the ODEs and unknowns!]
 
 We shall now make a more advanced solver by
 extending the pendulum example. More specifically, we shall
@@ -1137,7 +1155,8 @@ with :math:`\theta(0)=\Theta` and :math:`\omega(0)=0`.
 Right-hand side functions with parameters can be handled by
 including extra arguments via the ``f_args`` and ``f_kwargs`` functionality,
 or by using a class where the parameters are attributes and
-an ``f`` method defines :math:`f(u,t)`. The section :ref:`ode:sec:exgr:farg` exemplifies the details.
+an ``f`` method defines :math:`f(u,t)`.
+The section :ref:`ode:sec:exgr:farg` exemplifies the details.
 A minimal class representation of the right-hand side
 function in the present case looks like this:
 
@@ -1215,7 +1234,7 @@ For now we explicitly choose a subset of the commonly available solvers:
 To see what a method is and its arguments to the constructor, invoke
 the doc string of the class, e.g., ``help(ThetaRule)`` inside a
 Python shell like IPython, or run ``pydoc odespy.ThetaRule`` in a
-terminal window, or invoke the `Odespy API documentation <http://hplgit.github.com/odespy/doc/api/>`_.
+terminal window, or invoke the `Odespy API documentation <http://hplgit.github.com/odespy/doc/api/>`__.
 
 It will be evident that the ``ThetaRule`` solver with ``theta=0`` and
 ``theta=1`` (Forward and Backward Euler methods) gives growing and
@@ -1252,7 +1271,7 @@ The loop over the chosen solvers may look like
         plt.savefig(plotfile + '.png'); plt.savefig(plotfile + '.pdf')
         plt.show()
 
-A complete program is available as `osc2.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py>`_.
+A complete program is available as `osc2.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py>`__.
 
 .. figure:: osc2.png
    :width: 500
@@ -1284,7 +1303,7 @@ here numerically):
 
 where ``dt`` is the time step size.
 
-Typical loops over solvers and resolutions look as follows (`osc3.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc3.py>`_):
+Typical loops over solvers and resolutions look as follows (`osc3.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc3.py>`__):
 
 .. code-block:: python
 
@@ -1378,8 +1397,8 @@ out because of ridiculous results):
         RK2                  r: 3.7,  2.1, 2.0, 2.0 E_min=1.0E-02
         MidpointIter         r: 1.8,  0.8, 1.9, 2.0 E_min=1.0E-02
 
-Make a Subclass of Problem
---------------------------
+Make a Subclass of Class Problem
+--------------------------------
 
 Odespy features a module ``problems`` for defining ODE problems.
 There is a superclass ``Problem`` in this module defining what we
@@ -1575,7 +1594,7 @@ a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.
 
    *2nd-order Runge-Kutta method with 41 points*
 
-A simple program testing one numerical method goes as follows (`gaussian1.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py>`_).
+A simple program testing one numerical method goes as follows (`gaussian1.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py>`__).
 
 .. code-block:: python
 
@@ -1669,7 +1688,7 @@ selected points results in 1.98. Note that the tolerances used are
 
 We can specify stricter tolerances and also control the minimum
 allowed step size, ``min_step``, which might be too large to achieve
-the desired error level (`gaussian2.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian2.py>`_):
+the desired error level (`gaussian2.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian2.py>`__):
 
 .. code-block:: python
 
@@ -1689,7 +1708,7 @@ Testing More Adaptive Solvers
 
 We have already solved :eq:`gaussian:ode:eq` with sufficient accuracy, but
 let us see how other methods perform, as this will most likely result in
-a surprise. Below is a program (`gaussian3.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian3.py>`_) that compares several famous and
+a surprise. Below is a program (`gaussian3.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian3.py>`__) that compares several famous and
 widely used methods in the same plot.
 
 .. code-block:: python
@@ -1823,7 +1842,7 @@ easy to conduct, and 2) strict tolerances, far below
 the default values, may be necessary for some methods, here ``Vode`` and
 ``Lsoda`` in particular. We remark that it is the ODE problem that causes
 difficulties: changing the problem to ``odespy.problems.Logistic``
-(see the file `logistic9.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic9.py>`_)
+(see the file `logistic9.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic9.py>`__)
 shows that all the curves coincide and cannot be distinguished visually.
 
 The present test problem with a Gaussian function as solution
@@ -1834,7 +1853,7 @@ the right.
 Extensive Testing
 ~~~~~~~~~~~~~~~~~
 
-The program `gaussian4.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian4.py>`_
+The program `gaussian4.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian4.py>`__
 sets up an extensive experiments involving a lot of solvers, several
 :math:`c/s` values, and several error tolerances.  The experiments clearly
 demonstrate how challenging this ODE problem is for many adaptive
@@ -2042,7 +2061,7 @@ Several solvers accept FORTRAN definitions of the right-hand side:
 see exactly what arguments and conventions that the FORTRAN subroutine
 demand.
 
-The file `logistic10.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic10.py>`_ contains a complete program for solving the logistic ODE
+The file `logistic10.py <https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic10.py>`__ contains a complete program for solving the logistic ODE
 with :math:`f(u,t)` implemented in Fortran.
 
 Implementing the van der Pol Equation in FORTRAN
@@ -2293,7 +2312,7 @@ generator is used for all methods, so that the time evolution of
 the force is always the same - otherwise the solutions will be
 different.
 
-The complete code is available in `sode.py <https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/sode1.py>`_.
+The complete code is available in `sode.py <https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/sode1.py>`__.
 
 Inner Workings of the Package
 =============================
@@ -2390,7 +2409,7 @@ where ``prm1``, ``prm2``, etc. are names registered in the global
 From a user's point of view, the parameters are set either at
 construction time or through the ``set`` function:
 
-.. code-block:: text
+.. code-block:: python
 
         >>> from odespy import RK2
         >>> def f(u, t, a, b=0):
@@ -2464,7 +2483,7 @@ the subclass solvers:
    to extract data.  For example, the value of
    ``self._parameters['myvar']`` becomes available as ``self.myvar`` and
    in the algorithms we use ``self.myvar``, perhaps with a test
-   ``hasattr(self, 'myvar')`` test or a ``try-except`` clause (catching
+   ``hasattr(self, 'myvar')`` or a ``try-except`` clause (catching
    an ``AttributeError``).
 
 4. The ``set`` method is called with all keyword arguments given to the
@@ -2496,8 +2515,8 @@ following methods are sometimes useful:
  * ``str(solver)``: return a short pretty print string reflecting
    the name of the method and the value of parameters that
    must be known to uniquely define the numerical method.
-   This string is what one would use as legends in a plot or
-   as method identifier in a table.
+   This string, or the class name as given by ``solver.name()``,
+   is useful for the legend in a plot or as method identifier in a table.
 
  * ``solver.get_parameter_info()``: return or print all registered
    parameters for the current solver and all properties for
@@ -2615,7 +2634,7 @@ Remarks:
    are as close to the mathematical formulas as possible.
 
 Almost equally simple schemes, like explicit Runge-Kutta methods and Heun's
-method are implemented in the same way (see `solvers.py <https://github.com/hplgit/odespy/tree/master/odespy/odespy/solvers.py>`_).
+method are implemented in the same way (see `solvers.py <https://github.com/hplgit/odespy/tree/master/odespy/odespy/solvers.py>`__).
 
 A Subclass with More Code
 -------------------------
@@ -2695,7 +2714,7 @@ extend ``validate_data`` to check that the time spacing given by the
 details of the check.
 
 More advanced implementations of subclasses can be studied
-in the `solvers.py <https://github.com/hplgit/odespy/tree/master/odespy/odespy/solvers.py>`_ and `RungeKutta.py <https://github.com/hplgit/odespy/tree/master/odespy/odespy/RungeKutta.py>`_ files.
+in the `solvers.py <https://github.com/hplgit/odespy/tree/master/odespy/odespy/solvers.py>`__ and `RungeKutta.py <https://github.com/hplgit/odespy/tree/master/odespy/odespy/RungeKutta.py>`__ files.
 
 A Simple Example of an Implicit Method
 --------------------------------------
@@ -2755,5 +2774,5 @@ must be keyword arguments.
 
 **Remark.**
 This document was written with aid of the
-`DocOnce <https://github.com/hplgit/doconce>`_ tool, which allows
+`DocOnce <https://github.com/hplgit/doconce>`__ tool, which allows
 output in many different formats.

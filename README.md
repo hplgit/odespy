@@ -10,26 +10,27 @@ Differential Algebraic Equations (DAEs).
 The simplest procedure is to use `pip`:
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 Terminal> sudo pip install -e git+https://github.com/hplgit/odespy.git#egg=odespy
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 Alternatively, you can check out this repo and run `setup.py`:
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 Terminal> git clone git@github.com:hplgit/odespy.git
 Terminal> cd odespy
 Terminal> sudo python setup.py install
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 If you face problems with compiling the Fortran parts of Odespy,
-try skipping all Fortran code:
+or if you do not have a Fortran compiler, you can install without
+any Fortran code:
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 Terminal> sudo python setup.py install --no-fortran
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ### Contents of Odespy
 
@@ -59,7 +60,7 @@ implementations:
     order (4,5) as provided by the well-known FORTRAN code [`rkf45.f`](http://www.netlib.org/ode/rkf45.f).
   * Wrapper for the Radau5 method as provided by the well-known FORTRAN code
     [`radau5.f`](http://www.unige.ch/~hairer/prog/stiff/radau5.f).
-    There has been some problems with running this solver (segmentation fault).
+    There have been some unidentified problems with running this solver (segmentation fault).
   * Wrapper for some solvers in the [`odelab`](https://github.com/olivierverdier/odelab).
 
 The ODE problem can always be specified in Python, but for wrappers of
@@ -102,7 +103,7 @@ Please cite this GitHub repository:
 BibTeX entry:
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 @misc{odespy,
   title = {{Odespy} Software Package},
   author = {H. P. Langtangen and L. Wang},
@@ -110,12 +111,12 @@ BibTeX entry:
   key = {odespy},
   note = {\url{https://github.com/hplgit/odespy}},
 }
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 [Publish](https://bitbucket.org/logg/publish) entry:
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 ** {Odespy} Software Package
    key:       odespy
    author:    H. P. Langtangen, L. Wang
@@ -124,5 +125,5 @@ BibTeX entry:
    sortkey:   Odespy
    note:      \url{https://github.com/hplgit/odespy}
    entrytype: misc
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 

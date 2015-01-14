@@ -12,28 +12,50 @@ def configuration(parent_package='',top_path=None):
                        delegate_options_to_subpackages=True,
                        quiet=True)
 
-    if fortran:
-        config.add_subpackage('odespy')
+    config.add_subpackage('odespy')
     config.get_version(join('odespy', 'version.py'))
 
     return config
 
 if __name__ == '__main__':
     import sys
+    fortran = True
     if '--no-fortran' in sys.argv:
-        sys.argv.remove('--no-fortran') # interfers with distutils cmlargs
+        sys.argv.remove('--no-fortran') # intefers with distutils sys.argv use
         fortran = False
-    else:
-        fortran = True
 
-    from numpy.distutils.core import setup
-    #setup(**configuration(top_path='').todict())
-    setup(
-        name='odespy',
-        url='...',
-        download_url='...',
-        license='GPL',
-        author='Liwei Wang and Hans Petter Langtangen',
-        author_email='hpl@simula.no',
-        configuration=configuration)
+    name = 'odespy'
+    download_url = 'https://github.com/hplgit/odespy'
+    url = 'http://hplgit.github.io/odespy/doc/web/index.html'
+    author = 'Liwei Wang and Hans Petter Langtangen'
+    author_email = 'hpl@simula.no'
+    license = 'GPL'
+
+    if fortran:
+        from numpy.distutils.core import setup
+        #setup(**configuration(top_path='').todict())
+        setup(
+            name=name,
+            url=url,
+            download_url=download_url,
+            license=license,
+            author=author,
+            author_email=author_email,
+            configuration=configuration)
+    else:
+        # Run plain distutils
+        from distutils.core import setup
+        from odespy.version import full_version
+        setup(
+            version=full_version,
+            name=name,
+            url=url,
+            download_url=download_url,
+            license=license,
+            author=author,
+            author_email=author_email,
+            description='',
+            packages=['odespy'],
+            )
+
 

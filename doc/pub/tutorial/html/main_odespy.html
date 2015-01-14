@@ -14,7 +14,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
+        URL_ROOT:    '',
         VERSION:     '1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,26 +25,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-        <script src="http://sagecell.sagemath.org/static/jquery.min.js"></script>
-        <script src="http://sagecell.sagemath.org/static/embedded_sagecell.js"></script>
-
-        <script>sagecell.makeSagecell({inputLocation: ".sage"});</script>
-
-        <style type="text/css">
-                .sagecell .CodeMirror-scroll {
-                        overflow-y: hidden;
-                        overflow-x: auto;
-                }
-                .sagecell .CodeMirror {
-                        height: auto;
-                }
-        </style>
-
-    
     <link rel="top" title="A Tutorial for the Odespy Interface to ODE Solvers" href="index.html" />
     <link rel="prev" title="A Tutorial for the Odespy Interface to ODE Solvers" href="index.html" />
-
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 <!--[if lte IE 6]>
@@ -86,18 +68,17 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Hans Petter Langtangen, Liwei Wang</td>
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Hans Petter Langtangen, Liwei Wang</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Jul 9, 2014</td>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Jan 14, 2015</td>
 </tr>
 </tbody>
 </table>
 <p>The Odespy package makes it easy to specify an ODE problem in
 Python and get it solved by a wide variety of different numerical
 methods and software.</p>
-</div>
 <div class="section" id="motivation">
-<span id="ode-sec-motivation"></span><h1>Motivation<a class="headerlink" href="#motivation" title="Permalink to this headline">¶</a></h1>
+<span id="ode-sec-motivation"></span><h2>Motivation<a class="headerlink" href="#motivation" title="Permalink to this headline">¶</a></h2>
 <p>The Odespy package grew out of the desire to have a unified interface
 to lots of different methods and software for ODEs. Consider the
 ODE problem</p>
@@ -107,7 +88,7 @@ ODE problem</p>
 desired at 150 equally spaced time levels in
 the interval <tt class="docutils literal"><span class="pre">[0,</span> <span class="pre">30]</span></tt>.</p>
 <div class="section" id="traditional-approach">
-<h2>Traditional Approach<a class="headerlink" href="#traditional-approach" title="Permalink to this headline">¶</a></h2>
+<h3>Traditional Approach<a class="headerlink" href="#traditional-approach" title="Permalink to this headline">¶</a></h3>
 <p>We want to solve this problem
 by three well-known routines:</p>
 <blockquote>
@@ -135,7 +116,7 @@ of the <span class="math">\(f(u,t)\)</span> function:</p>
 through some user-written function that takes <span class="math">\(u\)</span> and <span class="math">\(t\)</span> as input and
 delivers the vector <span class="math">\(f\)</span> as output.</p>
 <div class="section" id="lsode">
-<h3>LSODE<a class="headerlink" href="#lsode" title="Permalink to this headline">¶</a></h3>
+<h4>LSODE<a class="headerlink" href="#lsode" title="Permalink to this headline">¶</a></h4>
 <p>Application of <tt class="docutils literal"><span class="pre">LSODE</span></tt> and other ODEPACK routines requires the
 ODE problem to be specified in FORTRAN and the solver to be called
 from FORTRAN:</p>
@@ -187,7 +168,7 @@ from FORTRAN:</p>
 </div>
 </div>
 <div class="section" id="matlab">
-<h3>MATLAB<a class="headerlink" href="#matlab" title="Permalink to this headline">¶</a></h3>
+<h4>MATLAB<a class="headerlink" href="#matlab" title="Permalink to this headline">¶</a></h4>
 <p>The problem can be solved with very compact code in MATLAB. The definition
 of the ODE system, the <span class="math">\(f(u,t)\)</span> function, is placed in
 a function in a file, say <tt class="docutils literal"><span class="pre">myode.m</span></tt>:</p>
@@ -205,7 +186,7 @@ a function in a file, say <tt class="docutils literal"><span class="pre">myode.m
 </div>
 </div>
 <div class="section" id="python">
-<h3>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h3>
+<h4>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h4>
 <p>Calling up the <tt class="docutils literal"><span class="pre">vode</span></tt> method from the <tt class="docutils literal"><span class="pre">scipy</span></tt> library in Python
 also results in fairly compact code:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
@@ -234,7 +215,7 @@ often a cause of programming errors.</p>
 </div>
 </div>
 <div class="section" id="odespy-s-unified-interface">
-<h2>Odespy&#8217;s Unified Interface<a class="headerlink" href="#odespy-s-unified-interface" title="Permalink to this headline">¶</a></h2>
+<h3>Odespy&#8217;s Unified Interface<a class="headerlink" href="#odespy-s-unified-interface" title="Permalink to this headline">¶</a></h3>
 <p>The Odespy package provides a unified interface to all the three
 mentioned types of methods, which makes it easy to run all of them
 in a loop (program <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/motivation1.py">motivation.py</a>):</p>
@@ -257,7 +238,7 @@ in a loop (program <a class="reference external" href="https://github.com/hplgit
 reused across methods and the underlying software.</p>
 </div>
 <div class="section" id="methods-and-implementations-offered-by-odespy">
-<h2>Methods and Implementations Offered by Odespy<a class="headerlink" href="#methods-and-implementations-offered-by-odespy" title="Permalink to this headline">¶</a></h2>
+<h3>Methods and Implementations Offered by Odespy<a class="headerlink" href="#methods-and-implementations-offered-by-odespy" title="Permalink to this headline">¶</a></h3>
 <p>Odespy features a unified interface to the following collection of
 numerical methods and implementations:</p>
 <blockquote>
@@ -294,20 +275,25 @@ callback to Python.</p>
 </div>
 </div>
 <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>The Odespy package is most easily installed by checking out
-the latest version of the source code:</p>
-<div class="highlight-text"><div class="highlight"><pre>git clone git@github.com:hplgit/odespy.git
-cd odespy
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>The Odespy package is most easily installed using <tt class="docutils literal"><span class="pre">pip</span></tt>:</p>
+<div class="highlight-text"><div class="highlight"><pre>sudo pip install -e \
+   git+https://github.com/hplgit/odespy.git#egg=odespy
 </pre></div>
 </div>
-<p>The installation follows the standard procedure,</p>
-<div class="highlight-text"><div class="highlight"><pre>sudo python setup.py install
+<p>Checking out the source code is almost as easy:</p>
+<div class="highlight-text"><div class="highlight"><pre>git clone git@github.com:hplgit/odespy.git
+cd odespy
+sudo python setup.py install
 </pre></div>
 </div>
 <p>You will at least also need Python v2.7 and the <a class="reference external" href="http://numpy.scipy.org/">numpy</a> package.  The FORTRAN codes <tt class="docutils literal"><span class="pre">rkc.f</span></tt>,
 <tt class="docutils literal"><span class="pre">rkf45.f</span></tt>, <tt class="docutils literal"><span class="pre">radau5.f</span></tt>, and ODEPACK comes with Odespy and are compiled
-and installed by <tt class="docutils literal"><span class="pre">setup.py</span></tt>.</p>
+and installed by <tt class="docutils literal"><span class="pre">setup.py</span></tt>. If you lack a FORTRAN compiler, you
+can drop the installation of the FORTRAN solvers by running</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">sudo</span> <span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">fortran</span>
+</pre></div>
+</div>
 <p>The Odespy package depends on several additional packages:</p>
 <blockquote>
 <div><ul class="simple">
@@ -340,25 +326,31 @@ cd odelab
 sudo python setup.py install
 </pre></div>
 </div>
+<div class="admonition-note admonition">
+<p class="first admonition-title">Note</p>
+<p class="last">Despite Odespy&#8217;s many dependencies on other software, you can run the
+basic solvers implemented in pure Python without any additional software
+packages.</p>
+</div>
 </div>
 <div class="section" id="basic-usage">
-<h1>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h1>
+<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
 <p>This section explains how to use Odespy. The general principles and
 program steps are first explained. Thereafter, we present a series of
 examples with progressive complexity with respect to Python constructs
 and numerical methods.</p>
 <div class="section" id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<h3>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h3>
 <p>A code using Odespy to solve ODEs consists of six steps. These are
 outlined in generic form below.</p>
 <div class="section" id="step-1">
-<h3>Step 1<a class="headerlink" href="#step-1" title="Permalink to this headline">¶</a></h3>
+<h4>Step 1<a class="headerlink" href="#step-1" title="Permalink to this headline">¶</a></h4>
 <p><em>Write the ODE problem in generic form</em> <span class="math">\(u' = f(u, t)\)</span>,
 where <span class="math">\(u(t)\)</span> is the unknown function to be solved for, or a vector
 of unknown functions of time in case of a system of ODEs.</p>
 </div>
 <div class="section" id="step-2">
-<h3>Step 2<a class="headerlink" href="#step-2" title="Permalink to this headline">¶</a></h3>
+<h4>Step 2<a class="headerlink" href="#step-2" title="Permalink to this headline">¶</a></h4>
 <p><em>Implement the right-hand side function</em> <span class="math">\(f(u, t)\)</span> as a Python function
 <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t)</span></tt>.  The argument <tt class="docutils literal"><span class="pre">u</span></tt> is either a <tt class="docutils literal"><span class="pre">float</span></tt> object, in case of a
 scalar ODE, or a <tt class="docutils literal"><span class="pre">numpy</span></tt> array object, in case of a system of ODEs.
@@ -366,7 +358,7 @@ Some solvers in this package also allow implementation of <span class="math">\(f
 FORTRAN for increased efficiency.</p>
 </div>
 <div class="section" id="step-3">
-<h3>Step 3<a class="headerlink" href="#step-3" title="Permalink to this headline">¶</a></h3>
+<h4>Step 3<a class="headerlink" href="#step-3" title="Permalink to this headline">¶</a></h4>
 <p><em>Create a solver object</em></p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">solver</span> <span class="o">=</span> <span class="n">classname</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 </pre></div>
@@ -389,7 +381,7 @@ at construction time, via extra keyword arguments to the constructor,</p>
 </div>
 </div>
 <div class="section" id="step-4">
-<h3>Step 4<a class="headerlink" href="#step-4" title="Permalink to this headline">¶</a></h3>
+<h4>Step 4<a class="headerlink" href="#step-4" title="Permalink to this headline">¶</a></h4>
 <p><em>Set the initial condition</em> <span class="math">\(u(0)=U_0\)</span>,</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">solver</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="n">U0</span><span class="p">)</span>
 </pre></div>
@@ -398,7 +390,7 @@ at construction time, via extra keyword arguments to the constructor,</p>
 <tt class="docutils literal"><span class="pre">numpy</span></tt> array), for a system of ODEs.</p>
 </div>
 <div class="section" id="step-5">
-<h3>Step 5<a class="headerlink" href="#step-5" title="Permalink to this headline">¶</a></h3>
+<h4>Step 5<a class="headerlink" href="#step-5" title="Permalink to this headline">¶</a></h4>
 <p><em>Solve the ODE problem</em>, which means to compute <span class="math">\(u(t)\)</span> at
 some discrete user-specified time points <span class="math">\(t_1, t_2, \ldots, t_N\)</span>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">T</span> <span class="o">=</span> <span class="o">...</span>  <span class="c"># end time</span>
@@ -448,7 +440,7 @@ value. That is, <tt class="docutils literal"><span class="pre">u[step_no]</span>
 are uncomputed future values.)</p>
 </div>
 <div class="section" id="step-6">
-<h3>Step 6<a class="headerlink" href="#step-6" title="Permalink to this headline">¶</a></h3>
+<h4>Step 6<a class="headerlink" href="#step-6" title="Permalink to this headline">¶</a></h4>
 <p><em>Extract solution components</em> for plotting and further analysis.
 Since the <tt class="docutils literal"><span class="pre">u</span></tt> array returned from <tt class="docutils literal"><span class="pre">solver.solve</span></tt> stores all unknown
 functions at all discrete time levels, one usually wants to extract
@@ -466,7 +458,7 @@ and plotted:</p>
 </div>
 </div>
 <div class="section" id="first-example-logistic-growth">
-<span id="ode-sec-exgr"></span><h2>First Example: Logistic Growth<a class="headerlink" href="#first-example-logistic-growth" title="Permalink to this headline">¶</a></h2>
+<span id="ode-sec-exgr"></span><h3>First Example: Logistic Growth<a class="headerlink" href="#first-example-logistic-growth" title="Permalink to this headline">¶</a></h3>
 <p>Our first example concerns the simple scalar ODE problem</p>
 <div class="math">
 \[\frac{du}{dt}=au\left(1-\frac{u}{R}\right),\quad u(0)=A,\]</div>
@@ -516,7 +508,7 @@ solution (which is known for this equation):</p>
 </pre></div>
 </div>
 <div class="figure">
-<a class="reference internal image-reference" href="_images/logistic1.png"><img alt="_images/logistic1.png" src="_images/logistic1.png" style="width: 400px;" /></a>
+<img alt="_images/logistic1.png" src="_images/logistic1.png" style="width: 400px;" />
 <p class="caption">Solution of the logistic equation with the 4-th order Runge-Kutta method (solid line) and comparison with the exact solution (dots)</p>
 </div>
 <p>All the examples in this tutorial are found in the GitHub directory
@@ -525,7 +517,7 @@ If you download the tarball or clone the GitHub repository, the examples
 reside in the directory <tt class="docutils literal"><span class="pre">doc/src/odespy/src-odespy</span></tt>.</p>
 </div>
 <div class="section" id="parameters-in-the-right-hand-side-function">
-<span id="ode-sec-exgr-farg"></span><h2>Parameters in the Right-Hand Side Function<a class="headerlink" href="#parameters-in-the-right-hand-side-function" title="Permalink to this headline">¶</a></h2>
+<span id="ode-sec-exgr-farg"></span><h3>Parameters in the Right-Hand Side Function<a class="headerlink" href="#parameters-in-the-right-hand-side-function" title="Permalink to this headline">¶</a></h3>
 <p>The right-hand side function and all physical parameters are often
 lumped together in a class, for instance,</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Logistic</span><span class="p">:</span>
@@ -593,7 +585,7 @@ of positional and keyword arguments can be used in <tt class="docutils literal">
 <p>Solvers will call <tt class="docutils literal"><span class="pre">f</span></tt> as <tt class="docutils literal"><span class="pre">f(u,</span> <span class="pre">t,</span> <span class="pre">*f_args,</span> <span class="pre">**f_kwargs)</span></tt>.</p>
 </div>
 <div class="section" id="continuing-a-previous-simulation">
-<h2>Continuing a Previous Simulation<a class="headerlink" href="#continuing-a-previous-simulation" title="Permalink to this headline">¶</a></h2>
+<h3>Continuing a Previous Simulation<a class="headerlink" href="#continuing-a-previous-simulation" title="Permalink to this headline">¶</a></h3>
 <p>It is easy to simulate for some time interval <span class="math">\([0, T_1]\)</span>,
 then continue with <span class="math">\(u(T_1)\)</span> as new initial condition and simulate for
 <span class="math">\(t\)</span> in <span class="math">\([T_1, T_2]\)</span> and so on. Let us divide the time
@@ -642,7 +634,7 @@ each subdomain in sequence. The following program performs the steps
 </div>
 </div>
 <div class="section" id="termination-criterion-for-the-simulation">
-<h2>Termination Criterion for the Simulation<a class="headerlink" href="#termination-criterion-for-the-simulation" title="Permalink to this headline">¶</a></h2>
+<h3>Termination Criterion for the Simulation<a class="headerlink" href="#termination-criterion-for-the-simulation" title="Permalink to this headline">¶</a></h3>
 <p>We know that the solution <span class="math">\(u\)</span> of the logistic equation approaches
 <span class="math">\(R\)</span> as <span class="math">\(t\rightarrow\infty\)</span>. Instead of
 using a trial and error process for determining an appropriate
@@ -698,7 +690,7 @@ time step <tt class="docutils literal"><span class="pre">dt</span></tt> and not 
 </div>
 </div>
 <div class="section" id="a-class-based-implementation">
-<h2>A Class-Based Implementation<a class="headerlink" href="#a-class-based-implementation" title="Permalink to this headline">¶</a></h2>
+<h3>A Class-Based Implementation<a class="headerlink" href="#a-class-based-implementation" title="Permalink to this headline">¶</a></h3>
 <p>The previous code example can be recast into a more class-based
 (&#8220;object-oriented programming&#8221;) example. We lump all data related
 to the problem (the &#8220;physics&#8221;) into a problem class <tt class="docutils literal"><span class="pre">Logistic</span></tt>, while
@@ -768,7 +760,7 @@ the ideas (<a class="reference external" href="https://github.com/hplgit/odespy/
 </div>
 </div>
 <div class="section" id="using-other-symbols">
-<h2>Using Other Symbols<a class="headerlink" href="#using-other-symbols" title="Permalink to this headline">¶</a></h2>
+<h3>Using Other Symbols<a class="headerlink" href="#using-other-symbols" title="Permalink to this headline">¶</a></h3>
 <p>The Odespy package applies <tt class="docutils literal"><span class="pre">u</span></tt> for the unknown function or vector of
 unknown functions and <tt class="docutils literal"><span class="pre">t</span></tt> as the name of the independent
 variable. Many problems involve other symbols for functions and
@@ -802,7 +794,7 @@ own nomenclature (<a class="reference external" href="https://github.com/hplgit/
 of <tt class="docutils literal"><span class="pre">time_points</span></tt>.</p>
 </div>
 <div class="section" id="example-solving-an-ode-system">
-<span id="ode-sec-ex-osc"></span><h2>Example: Solving an ODE System<a class="headerlink" href="#example-solving-an-ode-system" title="Permalink to this headline">¶</a></h2>
+<span id="ode-sec-ex-osc"></span><h3>Example: Solving an ODE System<a class="headerlink" href="#example-solving-an-ode-system" title="Permalink to this headline">¶</a></h3>
 <p>We shall now explain how to solve a system of ODEs using a scalar
 second-order ODE as starting point.
 The angle <span class="math">\(\theta\)</span> of a pendulum with mass <span class="math">\(m\)</span> and length <span class="math">\(L\)</span>
@@ -881,7 +873,7 @@ makes the numerical solution explode.
 The increasing amplitude is a numerical artifact that some of the simple
 solution methods suffer from.</p>
 <div class="figure">
-<a class="reference internal image-reference" href="_images/osc1a.png"><img alt="_images/osc1a.png" src="_images/osc1a.png" style="width: 500px;" /></a>
+<img alt="_images/osc1a.png" src="_images/osc1a.png" style="width: 500px;" />
 <p class="caption">Heun&#8217;s method used to simulate oscillations of a pendulum</p>
 </div>
 <p>Using a more sophisticated method, say the 4-th order Runge-Kutta method,
@@ -910,7 +902,7 @@ is just a matter of substituting <tt class="docutils literal"><span class="pre">
 Another very good and popular method for this problem is presented next.</p>
 </div>
 <div class="section" id="the-euler-cromer-method">
-<h2>The Euler-Cromer Method<a class="headerlink" href="#the-euler-cromer-method" title="Permalink to this headline">¶</a></h2>
+<h3>The Euler-Cromer Method<a class="headerlink" href="#the-euler-cromer-method" title="Permalink to this headline">¶</a></h3>
 <p>Physicists will most likely
 solve the model problem in the section <a class="reference internal" href="#ode-sec-ex-osc"><em>Example: Solving an ODE System</em></a> by
 the Euler-Cromer method. For a single degree of freedom system,</p>
@@ -1008,13 +1000,13 @@ As <span class="math">\(\Theta_0\rightarrow 0\)</span>, the two curves approach 
 The Euler-Cromer method is significantly better than Heun&#8217;s method
 used in the previous section and reproduces the exact amplitude.</p>
 <div class="figure" id="ode-sec-ec-fig1">
-<a class="reference internal image-reference" href="_images/osc_EC_30.png"><img alt="_images/osc_EC_30.png" src="_images/osc_EC_30.png" style="width: 500px;" /></a>
+<img alt="_images/osc_EC_30.png" src="_images/osc_EC_30.png" style="width: 500px;" />
 <p class="caption"><em>Euler-Cromer method applied to the pendulum problem</em></p>
 </div>
 </div>
 <div class="section" id="testing-several-methods">
-<h2>Testing Several Methods<a class="headerlink" href="#testing-several-methods" title="Permalink to this headline">¶</a></h2>
-<p>(<strong>hpl 1</strong>: After Euler-Cromer, change the order of the ODEs and unknowns!)</p>
+<h3>Testing Several Methods<a class="headerlink" href="#testing-several-methods" title="Permalink to this headline">¶</a></h3>
+<p>[<strong>hpl 1</strong>: After Euler-Cromer, change the order of the ODEs and unknowns!]</p>
 <p>We shall now make a more advanced solver by
 extending the pendulum example. More specifically, we shall</p>
 <blockquote>
@@ -1035,7 +1027,8 @@ Approximating <span class="math">\(\sin(\theta)\)</span> by <span class="math">\
 <p>Right-hand side functions with parameters can be handled by
 including extra arguments via the <tt class="docutils literal"><span class="pre">f_args</span></tt> and <tt class="docutils literal"><span class="pre">f_kwargs</span></tt> functionality,
 or by using a class where the parameters are attributes and
-an <tt class="docutils literal"><span class="pre">f</span></tt> method defines <span class="math">\(f(u,t)\)</span>. The section <a class="reference internal" href="#ode-sec-exgr-farg"><em>Parameters in the Right-Hand Side Function</em></a> exemplifies the details.
+an <tt class="docutils literal"><span class="pre">f</span></tt> method defines <span class="math">\(f(u,t)\)</span>.
+The section <a class="reference internal" href="#ode-sec-exgr-farg"><em>Parameters in the Right-Hand Side Function</em></a> exemplifies the details.
 A minimal class representation of the right-hand side
 function in the present case looks like this:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Problem</span><span class="p">:</span>
@@ -1139,7 +1132,7 @@ in the current mathematical model.</p>
 </div>
 <p>A complete program is available as <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py">osc2.py</a>.</p>
 <div class="figure">
-<a class="reference internal image-reference" href="_images/osc2.png"><img alt="_images/osc2.png" src="_images/osc2.png" style="width: 500px;" /></a>
+<img alt="_images/osc2.png" src="_images/osc2.png" style="width: 500px;" />
 <p class="caption">Comparison of methods for solving the ODE system for a pendulum</p>
 </div>
 <p>We can extend this program to compute the error in each numerical
@@ -1248,8 +1241,8 @@ MidpointIter         r: 1.8,  0.8, 1.9, 2.0 E_min=1.0E-02
 </pre></div>
 </div>
 </div>
-<div class="section" id="make-a-subclass-of-problem">
-<h2>Make a Subclass of Problem<a class="headerlink" href="#make-a-subclass-of-problem" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="make-a-subclass-of-class-problem">
+<h3>Make a Subclass of Class Problem<a class="headerlink" href="#make-a-subclass-of-class-problem" title="Permalink to this headline">¶</a></h3>
 <p>Odespy features a module <tt class="docutils literal"><span class="pre">problems</span></tt> for defining ODE problems.
 There is a superclass <tt class="docutils literal"><span class="pre">Problem</span></tt> in this module defining what we
 expect of information about an ODE problem, as well as some
@@ -1350,7 +1343,7 @@ in a subclass of <tt class="docutils literal"><span class="pre">Problem</span></
 <p>The module <tt class="docutils literal"><span class="pre">odespy.problems</span></tt> contains many predefined ODE problems.</p>
 </div>
 <div class="section" id="using-adaptive-methods">
-<h2>Using Adaptive Methods<a class="headerlink" href="#using-adaptive-methods" title="Permalink to this headline">¶</a></h2>
+<h3>Using Adaptive Methods<a class="headerlink" href="#using-adaptive-methods" title="Permalink to this headline">¶</a></h3>
 <p>The solvers used in the previous examples have all employed a constant
 time step <span class="math">\(\Delta t\)</span>. Many solvers available through the Odespy
 interface are adaptive in the sense that <span class="math">\(\Delta t\)</span> is adjusted
@@ -1378,7 +1371,7 @@ the user-given time points as returned by this call. One can run <tt class="docu
 arrays are available.  These are of interest to see how the adaptive
 strategy works between the user-specified time points.</p>
 <div class="section" id="the-test-problem">
-<h3>The Test Problem<a class="headerlink" href="#the-test-problem" title="Permalink to this headline">¶</a></h3>
+<h4>The Test Problem<a class="headerlink" href="#the-test-problem" title="Permalink to this headline">¶</a></h4>
 <p>We consider the ODE problem for testing adaptive solvers:</p>
 <div class="math" id="equation-gaussian:ode:eq">
 <span class="eqno">(1)</span>\[     u' = -\frac{t-c}{s^2} (u-1)\]</div>
@@ -1394,7 +1387,7 @@ the resolution when <span class="math">\(u\)</span> changes substantially in the
 of <span class="math">\(t=c\)</span>. We can test if this is the case with several solvers.</p>
 </div>
 <div class="section" id="running-simple-methods">
-<h3>Running Simple Methods<a class="headerlink" href="#running-simple-methods" title="Permalink to this headline">¶</a></h3>
+<h4>Running Simple Methods<a class="headerlink" href="#running-simple-methods" title="Permalink to this headline">¶</a></h4>
 <p>Let us first use a simple standard method like the 2nd- and 4th-order
 Runge-Kutta methods with constant step size. With the former method
 (<tt class="docutils literal"><span class="pre">RK2</span></tt>), <span class="math">\(c=3\)</span>, <span class="math">\(s=0.5\)</span>, and <span class="math">\(41\)</span> uniformly distributed points,
@@ -1408,7 +1401,7 @@ such as <tt class="docutils literal"><span class="pre">RK4</span></tt>.
 For curiosity we can mention that the <tt class="docutils literal"><span class="pre">ForwardEuler</span></tt> method produces
 a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.</p>
 <div class="figure" id="gaussian-fig-rk2-41">
-<a class="reference internal image-reference" href="_images/gaussian1_RK2_41.png"><img alt="_images/gaussian1_RK2_41.png" src="_images/gaussian1_RK2_41.png" style="width: 500px;" /></a>
+<img alt="_images/gaussian1_RK2_41.png" src="_images/gaussian1_RK2_41.png" style="width: 500px;" />
 <p class="caption"><em>2nd-order Runge-Kutta method with 41 points</em></p>
 </div>
 <p>A simple program testing one numerical method goes as follows (<a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py">gaussian1.py</a>).</p>
@@ -1445,7 +1438,7 @@ a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.</p>
 </div>
 </div>
 <div class="section" id="running-the-runge-kutta-fehlberg-method">
-<h3>Running the Runge-Kutta-Fehlberg Method<a class="headerlink" href="#running-the-runge-kutta-fehlberg-method" title="Permalink to this headline">¶</a></h3>
+<h4>Running the Runge-Kutta-Fehlberg Method<a class="headerlink" href="#running-the-runge-kutta-fehlberg-method" title="Permalink to this headline">¶</a></h4>
 <p>One of the most widely used general-purpose, adaptive methods for
 ODE problems is the
 Runge-Kutta-Fehlberg method of order (4,5). This method is available
@@ -1459,7 +1452,7 @@ these,</p>
 </div>
 <p>Figure <a class="reference internal" href="#gaussian-fig-fehlberg-41"><em>Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41)</em></a> shows how <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (57 adaptively selected points in time).</p>
 <div class="figure" id="gaussian-fig-fehlberg-41">
-<a class="reference internal image-reference" href="_images/gaussian1_Fehlberg_41.png"><img alt="_images/gaussian1_Fehlberg_41.png" src="_images/gaussian1_Fehlberg_41.png" style="width: 500px;" /></a>
+<img alt="_images/gaussian1_Fehlberg_41.png" src="_images/gaussian1_Fehlberg_41.png" style="width: 500px;" />
 <p class="caption"><em>Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41)</em></p>
 </div>
 <p>Adaptive algorithms apply an error estimate based on considering a higher-order method as exact, in this case a method of order 5, and a method of lower order (here 4) as the numerically predicted solution. The user can specify an error tolerance. In the program above we just relied to the default tolerance, which can be printed by</p>
@@ -1503,7 +1496,7 @@ value of 2.00005. However, <tt class="docutils literal"><span class="pre">RK4</s
 achieves the same accuracy and is much faster.</p>
 </div>
 <div class="section" id="testing-more-adaptive-solvers">
-<h3>Testing More Adaptive Solvers<a class="headerlink" href="#testing-more-adaptive-solvers" title="Permalink to this headline">¶</a></h3>
+<h4>Testing More Adaptive Solvers<a class="headerlink" href="#testing-more-adaptive-solvers" title="Permalink to this headline">¶</a></h4>
 <p>We have already solved <a href="#equation-gaussian:ode:eq">(1)</a> with sufficient accuracy, but
 let us see how other methods perform, as this will most likely result in
 a surprise. Below is a program (<a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian3.py">gaussian3.py</a>) that compares several famous and
@@ -1577,11 +1570,11 @@ results, despite setting <tt class="docutils literal"><span class="pre">Vode</sp
 <tt class="docutils literal"><span class="pre">Lsoda</span></tt> should automatically select between nonstiff and stiff solvers
 (of default order 4 in this case).</p>
 <div class="figure" id="gaussian3-fig1-41">
-<a class="reference internal image-reference" href="_images/gaussian3_41.png"><img alt="_images/gaussian3_41.png" src="_images/gaussian3_41.png" style="width: 500px;" /></a>
+<img alt="_images/gaussian3_41.png" src="_images/gaussian3_41.png" style="width: 500px;" />
 <p class="caption"><em>Comparison of adaptive methods with default parameters (tolerance ``E-6``)</em></p>
 </div>
 <div class="figure" id="gaussian3-fig1err-41">
-<a class="reference internal image-reference" href="_images/gaussian3e_41.png"><img alt="_images/gaussian3e_41.png" src="_images/gaussian3e_41.png" style="width: 500px;" /></a>
+<img alt="_images/gaussian3e_41.png" src="_images/gaussian3e_41.png" style="width: 500px;" />
 <p class="caption"><em>Comparison of errors in adaptive methods with default parameters (tolerance ``E-6``)</em></p>
 </div>
 <p>The program writes out the following results for the
@@ -1613,7 +1606,7 @@ coinciding curves. Numerically, we now have</p>
 <tt class="docutils literal"><span class="pre">BogackiShampine</span></tt> we have information about the number of adaptive
 time points used: 270, 326, and 3307, respectively.</p>
 <div class="figure" id="gaussian3-fig2-41">
-<a class="reference internal image-reference" href="_images/gaussian3_41_Em10.png"><img alt="_images/gaussian3_41_Em10.png" src="_images/gaussian3_41_Em10.png" style="width: 500px;" /></a>
+<img alt="_images/gaussian3_41_Em10.png" src="_images/gaussian3_41_Em10.png" style="width: 500px;" />
 <p class="caption"><em>Comparison of adaptive methods with error tolerance `E-10`</em></p>
 </div>
 <p>The lesson learned in this example is two-fold: 1) several methods should
@@ -1630,7 +1623,7 @@ increasing the value of <span class="math">\(c/s\)</span>, i.e., a more peaked f
 the right.</p>
 </div>
 <div class="section" id="extensive-testing">
-<h3>Extensive Testing<a class="headerlink" href="#extensive-testing" title="Permalink to this headline">¶</a></h3>
+<h4>Extensive Testing<a class="headerlink" href="#extensive-testing" title="Permalink to this headline">¶</a></h4>
 <p>The program <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian4.py">gaussian4.py</a>
 sets up an extensive experiments involving a lot of solvers, several
 <span class="math">\(c/s\)</span> values, and several error tolerances.  The experiments clearly
@@ -1646,7 +1639,7 @@ to test several different adaptive methods.</p>
 </div>
 </div>
 <div class="section" id="example-solving-a-complex-ode-problem">
-<h2>Example: Solving a Complex ODE Problem<a class="headerlink" href="#example-solving-a-complex-ode-problem" title="Permalink to this headline">¶</a></h2>
+<h3>Example: Solving a Complex ODE Problem<a class="headerlink" href="#example-solving-a-complex-ode-problem" title="Permalink to this headline">¶</a></h3>
 <p>Many of the solvers offered by Odespy can deal with complex-valued
 ODE problems. Consider</p>
 <div class="math">
@@ -1655,7 +1648,7 @@ ODE problems. Consider</p>
 The right-hand side is implemented as <tt class="docutils literal"><span class="pre">1j*w*u</span></tt> in Python since
 Python applies <tt class="docutils literal"><span class="pre">j</span></tt> as the imaginary unit in complex numbers.</p>
 <div class="section" id="quick-implementation">
-<h3>Quick Implementation<a class="headerlink" href="#quick-implementation" title="Permalink to this headline">¶</a></h3>
+<h4>Quick Implementation<a class="headerlink" href="#quick-implementation" title="Permalink to this headline">¶</a></h4>
 <p>For complex-valued ODEs, i.e., complex-valued right-hand side functions
 or initial conditions, the argument <tt class="docutils literal"><span class="pre">complex_valued=True</span></tt> must be
 supplied to the constructor. A complete program reads</p>
@@ -1675,7 +1668,7 @@ returns a list of all the classes in Odespy that are not suitable
 for complex-valued ODE problems.</p>
 </div>
 <div class="section" id="comparison-of-methods">
-<h3>Comparison of Methods<a class="headerlink" href="#comparison-of-methods" title="Permalink to this headline">¶</a></h3>
+<h4>Comparison of Methods<a class="headerlink" href="#comparison-of-methods" title="Permalink to this headline">¶</a></h4>
 <p>We can try three classes that do work for complex-valued ODEs: <tt class="docutils literal"><span class="pre">Vode</span></tt>,
 <tt class="docutils literal"><span class="pre">RK4</span></tt>, and <tt class="docutils literal"><span class="pre">RKFehlberg</span></tt>. Comparing these with respect to CPU time and
 final error for a very long time integration of 600 periods is carried
@@ -1737,7 +1730,7 @@ FORTRAN subroutine <tt class="docutils literal"><span class="pre">zvode</span></
 </div>
 </div>
 <div class="section" id="avoiding-callbacks-to-python">
-<h2>Avoiding Callbacks to Python<a class="headerlink" href="#avoiding-callbacks-to-python" title="Permalink to this headline">¶</a></h2>
+<h3>Avoiding Callbacks to Python<a class="headerlink" href="#avoiding-callbacks-to-python" title="Permalink to this headline">¶</a></h3>
 <p>The ODE solvers that are implemented in FORTRAN calls, by default,
 the user&#8217;s Python implementation of <span class="math">\(f(u,t)\)</span>. Making many calls from
 FORTRAN to Python may introduce significant overhead and slow down the
@@ -1750,7 +1743,7 @@ If we specify the Python interface to this subroutine as an <tt class="docutils 
 argument to the solver&#8217;s constructor, the Odespy class will make sure
 that no callbacks to the <span class="math">\(f(u,t)\)</span> definition go via Python.</p>
 <div class="section" id="the-logistic-ode">
-<h3>The Logistic ODE<a class="headerlink" href="#the-logistic-ode" title="Permalink to this headline">¶</a></h3>
+<h4>The Logistic ODE<a class="headerlink" href="#the-logistic-ode" title="Permalink to this headline">¶</a></h4>
 <p>Here is a minimalistic example involving the logistic ODE from
 the section <a class="reference internal" href="#ode-sec-exgr"><em>First Example: Logistic Growth</em></a>. The FORTRAN implementation of <span class="math">\(f(u,t)\)</span>
 is more complicated than the Python counterpart. The subroutine
@@ -1816,7 +1809,7 @@ demand.</p>
 with <span class="math">\(f(u,t)\)</span> implemented in Fortran.</p>
 </div>
 <div class="section" id="implementing-the-van-der-pol-equation-in-fortran">
-<h3>Implementing the van der Pol Equation in FORTRAN<a class="headerlink" href="#implementing-the-van-der-pol-equation-in-fortran" title="Permalink to this headline">¶</a></h3>
+<h4>Implementing the van der Pol Equation in FORTRAN<a class="headerlink" href="#implementing-the-van-der-pol-equation-in-fortran" title="Permalink to this headline">¶</a></h4>
 <p>As a slightly more complicated example, also involving a subclass
 of <tt class="docutils literal"><span class="pre">Problem</span></tt> and computation of the Jacobian and <span class="math">\(f(u,t)\)</span> in
 FORTRAN, we consider the van der Pol equation,</p>
@@ -1937,7 +1930,7 @@ the source code into Python modules. This is done by
 </div>
 </div>
 <div class="section" id="example-solving-a-stochastic-differential-equation">
-<h2>Example: Solving a Stochastic Differential Equation<a class="headerlink" href="#example-solving-a-stochastic-differential-equation" title="Permalink to this headline">¶</a></h2>
+<h3>Example: Solving a Stochastic Differential Equation<a class="headerlink" href="#example-solving-a-stochastic-differential-equation" title="Permalink to this headline">¶</a></h3>
 <p>We consider an oscillator driven by stochastic white noise:</p>
 <div class="math">
 \[x''(t) + bx'(t) + cx(t) = N(t),\ x(0)=X,\ x'(0) =0,\]</div>
@@ -2020,7 +2013,7 @@ may easily extract the solution of <tt class="docutils literal"><span class="pre
 </pre></div>
 </div>
 <div class="figure">
-<a class="reference internal image-reference" href="_images/sode1.png"><img alt="_images/sode1.png" src="_images/sode1.png" style="width: 500px;" /></a>
+<img alt="_images/sode1.png" src="_images/sode1.png" style="width: 500px;" />
 <p class="caption">Oscillator driven by white noise</p>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">Heun</span></tt> and <tt class="docutils literal"><span class="pre">RK2</span></tt> methods give coinciding solutions while
@@ -2036,7 +2029,7 @@ different.</p>
 </div>
 </div>
 <div class="section" id="inner-workings-of-the-package">
-<h1>Inner Workings of the Package<a class="headerlink" href="#inner-workings-of-the-package" title="Permalink to this headline">¶</a></h1>
+<h2>Inner Workings of the Package<a class="headerlink" href="#inner-workings-of-the-package" title="Permalink to this headline">¶</a></h2>
 <p>There are three basic entities when solving ODEs numerically: the
 definition of the <em>ODE system</em>, the <em>time-stepping method</em>, and
 the <em>solver</em> that runs the &#8220;time loop&#8221; and stores results.</p>
@@ -2062,7 +2055,7 @@ processed and visualized in the user&#8217;s code.</p>
 <p>Below we describe how the classes in the solver hierarchy work and how
 parameters are registered and initialized.</p>
 <div class="section" id="solver-parameters">
-<span id="odes-parameters"></span><h2>Solver Parameters<a class="headerlink" href="#solver-parameters" title="Permalink to this headline">¶</a></h2>
+<span id="odes-parameters"></span><h3>Solver Parameters<a class="headerlink" href="#solver-parameters" title="Permalink to this headline">¶</a></h3>
 <p>The <tt class="docutils literal"><span class="pre">solver</span></tt> module defines a global dictionary <tt class="docutils literal"><span class="pre">_parameters</span></tt> holding
 all legal parameters in Odespy classes. These are parameters that
 the user can adjust. Other modules imports this <tt class="docutils literal"><span class="pre">_parameters</span></tt> dict
@@ -2113,20 +2106,20 @@ initialization of <tt class="docutils literal"><span class="pre">_optional_param
 <tt class="docutils literal"><span class="pre">_parameters</span></tt> dictionary.</p>
 <p>From a user&#8217;s point of view, the parameters are set either at
 construction time or through the <tt class="docutils literal"><span class="pre">set</span></tt> function:</p>
-<div class="highlight-text"><div class="highlight"><pre>&gt;&gt;&gt; from odespy import RK2
-&gt;&gt;&gt; def f(u, t, a, b=0):
-...   return a*u + b
-...
-&gt;&gt;&gt; solver = RK2(f, f_kwargs=dict(b=1))
-&gt;&gt;&gt; solver.f_kwargs
-{&#39;b&#39;: 1}
-&gt;&gt;&gt; solver.set(f_args=(3,))
-&gt;&gt;&gt; solver.f_args
-(3,)
-&gt;&gt;&gt; # Get all registered parameters in the method instance
-&gt;&gt;&gt; solver.get()
-{&#39;f_kwargs&#39;: {&#39;b&#39;: 1}, &#39;f_args&#39;: (3,), &#39;complex_valued&#39;: False,
-&#39;name of f&#39;: &#39;f&#39;}
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">odespy</span> <span class="kn">import</span> <span class="n">RK2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="k">return</span> <span class="n">a</span><span class="o">*</span><span class="n">u</span> <span class="o">+</span> <span class="n">b</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">solver</span> <span class="o">=</span> <span class="n">RK2</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">f_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">solver</span><span class="o">.</span><span class="n">f_kwargs</span>
+<span class="go">{&#39;b&#39;: 1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">solver</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">f_args</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">solver</span><span class="o">.</span><span class="n">f_args</span>
+<span class="go">(3,)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Get all registered parameters in the method instance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">solver</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="go">{&#39;f_kwargs&#39;: {&#39;b&#39;: 1}, &#39;f_args&#39;: (3,), &#39;complex_valued&#39;: False,</span>
+<span class="go">&#39;name of f&#39;: &#39;f&#39;}</span>
 </pre></div>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">set</span></tt> method sets parameters through keyword arguments and can
@@ -2144,12 +2137,12 @@ user-supplied function. The same comment applies to the <tt class="docutils lite
 for specifying the Jacobian used in implicit methods.</p>
 </div>
 <div class="section" id="solver-classes">
-<h2>Solver Classes<a class="headerlink" href="#solver-classes" title="Permalink to this headline">¶</a></h2>
+<h3>Solver Classes<a class="headerlink" href="#solver-classes" title="Permalink to this headline">¶</a></h3>
 <p>Each solver in this package is implemented as a class in a class hierarchy.
 Basic, common functionality is inherited from super classes, and the
 actual solver class implements what is specific for the method in question.</p>
 <div class="section" id="the-inherited-superclass-constructor">
-<h3>The Inherited Superclass Constructor<a class="headerlink" href="#the-inherited-superclass-constructor" title="Permalink to this headline">¶</a></h3>
+<h4>The Inherited Superclass Constructor<a class="headerlink" href="#the-inherited-superclass-constructor" title="Permalink to this headline">¶</a></h4>
 <p>Class <tt class="docutils literal"><span class="pre">Solver</span></tt> is the super class of the hierarchy. Subclasses
 normally just inherit their constructor from class <tt class="docutils literal"><span class="pre">Solver</span></tt>. This
 constructor requires one mandatory argument: the right-hand side of
@@ -2178,7 +2171,7 @@ make use of the attributes rather than the <tt class="docutils literal"><span cl
 to extract data.  For example, the value of
 <tt class="docutils literal"><span class="pre">self._parameters['myvar']</span></tt> becomes available as <tt class="docutils literal"><span class="pre">self.myvar</span></tt> and
 in the algorithms we use <tt class="docutils literal"><span class="pre">self.myvar</span></tt>, perhaps with a test
-<tt class="docutils literal"><span class="pre">hasattr(self,</span> <span class="pre">'myvar')</span></tt> test or a <tt class="docutils literal"><span class="pre">try-except</span></tt> clause (catching
+<tt class="docutils literal"><span class="pre">hasattr(self,</span> <span class="pre">'myvar')</span></tt> or a <tt class="docutils literal"><span class="pre">try-except</span></tt> clause (catching
 an <tt class="docutils literal"><span class="pre">AttributeError</span></tt>).</li>
 <li>The <tt class="docutils literal"><span class="pre">set</span></tt> method is called with all keyword arguments given to the
 constructor, which then modifies the default values of the
@@ -2196,7 +2189,7 @@ of the subclass.</li>
 </ol>
 </div>
 <div class="section" id="useful-methods">
-<h3>Useful Methods<a class="headerlink" href="#useful-methods" title="Permalink to this headline">¶</a></h3>
+<h4>Useful Methods<a class="headerlink" href="#useful-methods" title="Permalink to this headline">¶</a></h4>
 <p>Let <tt class="docutils literal"><span class="pre">solver</span></tt> be some instance of a subclass in the hierarchy. The
 following methods are sometimes useful:</p>
 <blockquote>
@@ -2207,8 +2200,8 @@ complete information on the initialization of a solver.</li>
 <li><tt class="docutils literal"><span class="pre">str(solver)</span></tt>: return a short pretty print string reflecting
 the name of the method and the value of parameters that
 must be known to uniquely define the numerical method.
-This string is what one would use as legends in a plot or
-as method identifier in a table.</li>
+This string, or the class name as given by <tt class="docutils literal"><span class="pre">solver.name()</span></tt>,
+is useful for the legend in a plot or as method identifier in a table.</li>
 <li><tt class="docutils literal"><span class="pre">solver.get_parameter_info()</span></tt>: return or print all registered
 parameters for the current solver and all properties for
 each parameter.</li>
@@ -2223,7 +2216,7 @@ problem.</li>
 </ol>
 </div>
 <div class="section" id="the-solve-method">
-<h3>The Solve Method<a class="headerlink" href="#the-solve-method" title="Permalink to this headline">¶</a></h3>
+<h4>The Solve Method<a class="headerlink" href="#the-solve-method" title="Permalink to this headline">¶</a></h4>
 <p>After the constructor is called, <tt class="docutils literal"><span class="pre">solver.set_initial_condition</span></tt> is
 called to set the initial condition, and then <tt class="docutils literal"><span class="pre">solve</span></tt> is called.
 The <tt class="docutils literal"><span class="pre">solve</span></tt> method features the following steps:</p>
@@ -2248,7 +2241,7 @@ but most subclasses just inherits the general one and implements
 the <tt class="docutils literal"><span class="pre">advance</span></tt> method.</p>
 </div>
 <div class="section" id="solver-attributes">
-<h3>Solver Attributes<a class="headerlink" href="#solver-attributes" title="Permalink to this headline">¶</a></h3>
+<h4>Solver Attributes<a class="headerlink" href="#solver-attributes" title="Permalink to this headline">¶</a></h4>
 <p>All classes have a set of attributes:</p>
 <ol class="arabic simple">
 <li><tt class="docutils literal"><span class="pre">users_f</span></tt>: holds the user&#8217;s function for <span class="math">\(f(u, t)\)</span>.
@@ -2267,7 +2260,7 @@ variable is static in the class, i.e., declared outside any method).</li>
 in the section <a class="reference internal" href="#odes-parameters"><em>Solver Parameters</em></a>.</p>
 </div>
 <div class="section" id="other-superclasses">
-<h3>Other Superclasses<a class="headerlink" href="#other-superclasses" title="Permalink to this headline">¶</a></h3>
+<h4>Other Superclasses<a class="headerlink" href="#other-superclasses" title="Permalink to this headline">¶</a></h4>
 <p>There are superclasses <tt class="docutils literal"><span class="pre">SolverImplicit</span></tt> for implicit methods,
 <tt class="docutils literal"><span class="pre">Adaptive</span></tt> for adaptive methods, <tt class="docutils literal"><span class="pre">RungeKutta1level</span></tt> for general,
 explicit 1-level Runge-Kutta methods, <tt class="docutils literal"><span class="pre">RungeKutta2level</span></tt> for
@@ -2278,7 +2271,7 @@ of solvers.</p>
 </div>
 </div>
 <div class="section" id="a-very-simple-subclass">
-<h2>A Very Simple Subclass<a class="headerlink" href="#a-very-simple-subclass" title="Permalink to this headline">¶</a></h2>
+<h3>A Very Simple Subclass<a class="headerlink" href="#a-very-simple-subclass" title="Permalink to this headline">¶</a></h3>
 <p>To implement a simple explicit scheme for solving a scalar ODE or a system
 of ODEs, you only need to write a subclass of <tt class="docutils literal"><span class="pre">Solver</span></tt> with an
 <tt class="docutils literal"><span class="pre">advance</span></tt> method containing the formula that updates the solution from
@@ -2317,7 +2310,7 @@ are as close to the mathematical formulas as possible.</li>
 method are implemented in the same way (see <a class="reference external" href="https://github.com/hplgit/odespy/tree/master/odespy/odespy/solvers.py">solvers.py</a>).</p>
 </div>
 <div class="section" id="a-subclass-with-more-code">
-<h2>A Subclass with More Code<a class="headerlink" href="#a-subclass-with-more-code" title="Permalink to this headline">¶</a></h2>
+<h3>A Subclass with More Code<a class="headerlink" href="#a-subclass-with-more-code" title="Permalink to this headline">¶</a></h3>
 <p>A 2nd-order Adams-Bashforth scheme is a bit more complicated since it
 involves three time levels and therefore needs a separate method for
 the first step. We should also avoid unnecessary evaluations of <span class="math">\(f(u,t)\)</span>.
@@ -2390,7 +2383,7 @@ details of the check.</p>
 in the <a class="reference external" href="https://github.com/hplgit/odespy/tree/master/odespy/odespy/solvers.py">solvers.py</a> and <a class="reference external" href="https://github.com/hplgit/odespy/tree/master/odespy/odespy/RungeKutta.py">RungeKutta.py</a> files.</p>
 </div>
 <div class="section" id="a-simple-example-of-an-implicit-method">
-<h2>A Simple Example of an Implicit Method<a class="headerlink" href="#a-simple-example-of-an-implicit-method" title="Permalink to this headline">¶</a></h2>
+<h3>A Simple Example of an Implicit Method<a class="headerlink" href="#a-simple-example-of-an-implicit-method" title="Permalink to this headline">¶</a></h3>
 <p>Class <tt class="docutils literal"><span class="pre">SolverImplicit</span></tt> acts as superclass for the implementation of
 implicit methods. This class provides some basic functionality for
 solving the system of nonlinear equations that normally arises in
@@ -2433,9 +2426,9 @@ Jacobian of the system to be solved in each Newton iteration.</p>
 </div>
 </div>
 <div class="section" id="troubleshooting">
-<h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h1>
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="constructor-takes-exactly-two-arguments-5-given">
-<h2>Constructor takes exactly two arguments, 5 given<a class="headerlink" href="#constructor-takes-exactly-two-arguments-5-given" title="Permalink to this headline">¶</a></h2>
+<h3>Constructor takes exactly two arguments, 5 given<a class="headerlink" href="#constructor-takes-exactly-two-arguments-5-given" title="Permalink to this headline">¶</a></h3>
 <p>Constructors in the <tt class="docutils literal"><span class="pre">Solver</span></tt> hierarchy take only the <tt class="docutils literal"><span class="pre">f</span></tt> function
 as positional argument. All other parameters to the constructor
 must be keyword arguments.</p>
@@ -2443,6 +2436,7 @@ must be keyword arguments.</p>
 This document was written with aid of the
 <a class="reference external" href="https://github.com/hplgit/doconce">DocOnce</a> tool, which allows
 output in many different formats.</p>
+</div>
 </div>
 </div>
 
@@ -2454,7 +2448,7 @@ output in many different formats.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">A Tutorial for the Odespy Interface to ODE Solvers</a></li>
+<li><a class="reference internal" href="#">A Tutorial for the Odespy Interface to ODE Solvers</a><ul>
 <li><a class="reference internal" href="#motivation">Motivation</a><ul>
 <li><a class="reference internal" href="#traditional-approach">Traditional Approach</a><ul>
 <li><a class="reference internal" href="#lsode">LSODE</a></li>
@@ -2486,7 +2480,7 @@ output in many different formats.</p>
 <li><a class="reference internal" href="#example-solving-an-ode-system">Example: Solving an ODE System</a></li>
 <li><a class="reference internal" href="#the-euler-cromer-method">The Euler-Cromer Method</a></li>
 <li><a class="reference internal" href="#testing-several-methods">Testing Several Methods</a></li>
-<li><a class="reference internal" href="#make-a-subclass-of-problem">Make a Subclass of Problem</a></li>
+<li><a class="reference internal" href="#make-a-subclass-of-class-problem">Make a Subclass of Class Problem</a></li>
 <li><a class="reference internal" href="#using-adaptive-methods">Using Adaptive Methods</a><ul>
 <li><a class="reference internal" href="#the-test-problem">The Test Problem</a></li>
 <li><a class="reference internal" href="#running-simple-methods">Running Simple Methods</a></li>
@@ -2528,6 +2522,8 @@ output in many different formats.</p>
 </ul>
 </li>
 </ul>
+</li>
+</ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
@@ -2562,8 +2558,8 @@ output in many different formats.</p>
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2014, Hans Petter Langtangen and Liwei Wang.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.
+        &copy; Copyright 2015, Hans Petter Langtangen and Liwei Wang.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

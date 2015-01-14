@@ -19,8 +19,10 @@ Terminal> git clone git@github.com:hplgit/odespy.git
 Terminal> cd odespy
 Terminal> sudo python setup.py install
 !ec
+
 If you face problems with compiling the Fortran parts of Odespy,
-try skipping all Fortran code:
+or if you do not have a Fortran compiler, you can install without
+any Fortran code:
 
 !bc sys
 Terminal> sudo python setup.py install --no-fortran

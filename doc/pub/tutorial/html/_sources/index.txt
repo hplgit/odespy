@@ -7,7 +7,7 @@ A Tutorial for the Odespy Interface to ODE Solvers
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    main_odespy
 

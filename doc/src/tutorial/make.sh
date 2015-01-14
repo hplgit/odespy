@@ -22,7 +22,7 @@ doconce sphinx_dir dirname=sphinx-rootdir title="A Tutorial for the Odespy Inter
 
 python automake_sphinx.py
 
-doconce format html $name
+doconce format html $name --html_style=bootstrap
 
 # Copy to tutorial
 dest=../../pub/tutorial
@@ -30,7 +30,7 @@ cp -r sphinx-rootdir/_build/html $dest
 cp $name.pdf $dest/odespy.pdf
 cp -r fig-odespy $dest
 cp $name.html $dest/tutorial/odespy.html
-doconce format html $name --html_style=solarized
+doconce format html $name --html_style=solarized3
 cp $name.html $dest/odespy-solarized.html
 
 # Add to git if new files have been created
