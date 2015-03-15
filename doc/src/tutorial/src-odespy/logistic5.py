@@ -18,7 +18,7 @@ tol = 100   # tolerance for termination criterion
 
 def terminate(u, t, step_no):
     """u[step_no] holds (the most recent) solution at t[step_no]."""
-    return abs(u[step_no] - R) < tol:
+    return abs(u[step_no] - R) < tol
 
 u, t = solver.solve(time_points, terminate)
 print 'Final u(t=%g)=%g' % (t[-1], u[-1])
