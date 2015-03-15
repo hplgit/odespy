@@ -5,7 +5,7 @@ import odespy
 class Logistic:
     def __init__(self, a, R, A, T):
         """
-        `a` is (initial growth rate), `R` the carrying capacity,
+        a` is (initial growth rate), `R` the carrying capacity,
         `A` the initial amount of u, and `T` is some (very) total
         simulation time when `u` is very close to the asymptotic
         value `R`.

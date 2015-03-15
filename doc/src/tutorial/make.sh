@@ -8,10 +8,9 @@ fi
 
 name=main_odespy
 
-doconce format pdflatex $name
-doconce ptex2tex $name envir=minted
-pdflatex -shell-escape $name
-pdflatex -shell-escape $name
+doconce format pdflatex $name "--latex_code_style=default:lst[style=yellow2_fb]@sys:lst-gray"
+pdflatex $name
+pdflatex $name
 
 doconce format sphinx $name
 theme=pyramid
@@ -22,13 +21,12 @@ doconce sphinx_dir dirname=sphinx-rootdir title="A Tutorial for the Odespy Inter
 
 python automake_sphinx.py
 
-doconce format html $name --html_style=bootstrap
-
 # Copy to tutorial
 dest=../../pub/tutorial
 cp -r sphinx-rootdir/_build/html $dest
 cp $name.pdf $dest/odespy.pdf
 cp -r fig-odespy $dest
+doconce format html $name --html_style=bootswatch_readable --html_code_style=inherit
 cp $name.html $dest/tutorial/odespy.html
 doconce format html $name --html_style=solarized3
 cp $name.html $dest/odespy-solarized.html

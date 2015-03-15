@@ -233,7 +233,7 @@ The Odespy package depends on several additional packages:
 
 For plotting you will need "`matplotlib`":
 "http://matplotlib.sourceforge.net/" or "`scitools`":
-"http://code.google.com/p/scitools/".
+"https://github.com/hplgit/scitools/".
 
 These packages are readily downloaded and installed by the
 standard `setup.py` script, as shown above.
@@ -862,11 +862,11 @@ Assuming the error to be of the form $C\Delta t^r$, we can estimate
 $C$ and $r$ from two consecutive experiments to obtain a sequence
 of $r$ values which (hopefully) convergences to a value that we can
 view as the empirical convergence rate of a method.
-Given the sequence of time steps and errors, a function in
-the `scitools` package automatically computes the sequence of
-$r$ values:
+Given the sequence of time steps and errors, we can compare two
+experiments $i$ and $i-1$, with errors $E_{i}=C\Delta t_i^r$, and
+estimate $r=\ln(E_i/E_{i-1})/\ln(\Delta t_i/\Delta t_{i-1})$:
 
-@@@CODE src-odespy/osc3.py  fromto: \# Analyze@
+@@@CODE src-odespy/osc3.py  fromto: from math import log@
 
 With 4 periods we get
 !bc dat
@@ -1010,7 +1010,7 @@ class MyProblem(odespy.problems.Problem)
 
 The module `odespy.problems` contains many predefined ODE problems.
 
-===== Using Adaptive Methods =====
+===== Adaptive Methods =====
 
 The solvers used in the previous examples have all employed a constant
 time step $\Delta t$. Many solvers available through the Odespy

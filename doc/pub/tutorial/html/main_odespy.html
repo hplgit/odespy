@@ -14,7 +14,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    './',
         VERSION:     '1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,8 +25,26 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <script src="http://sagecell.sagemath.org/static/jquery.min.js"></script>
+        <script src="http://sagecell.sagemath.org/static/embedded_sagecell.js"></script>
+
+        <script>sagecell.makeSagecell({inputLocation: ".sage"});</script>
+
+        <style type="text/css">
+                .sagecell .CodeMirror-scroll {
+                        overflow-y: hidden;
+                        overflow-x: auto;
+                }
+                .sagecell .CodeMirror {
+                        height: auto;
+                }
+        </style>
+
+    
     <link rel="top" title="A Tutorial for the Odespy Interface to ODE Solvers" href="index.html" />
     <link rel="prev" title="A Tutorial for the Odespy Interface to ODE Solvers" href="index.html" />
+
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
 <!--[if lte IE 6]>
@@ -70,7 +88,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Hans Petter Langtangen, Liwei Wang</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Jan 14, 2015</td>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Mar 15, 2015</td>
 </tr>
 </tbody>
 </table>
@@ -120,48 +138,48 @@ delivers the vector <span class="math">\(f\)</span> as output.</p>
 <p>Application of <tt class="docutils literal"><span class="pre">LSODE</span></tt> and other ODEPACK routines requires the
 ODE problem to be specified in FORTRAN and the solver to be called
 from FORTRAN:</p>
-<div class="highlight-fortran"><div class="highlight"><pre>     <span class="k">PROGRAM </span><span class="nv">MAIN</span>
-     <span class="k">EXTERNAL </span><span class="nv">F</span>
-     <span class="kt">INTEGER </span><span class="nv">I</span><span class="p">,</span> <span class="nv">IOPT</span><span class="p">,</span> <span class="nv">IOUT</span><span class="p">,</span> <span class="nv">ISTATE</span><span class="p">,</span> <span class="nv">ITASK</span><span class="p">,</span> <span class="nv">ITOL</span><span class="p">,</span> <span class="nv">IWORK</span><span class="p">,</span>
-    <span class="mi">1</span>   <span class="nv">LRW</span><span class="p">,</span> <span class="nv">LIW</span><span class="p">,</span> <span class="nv">MF</span><span class="p">,</span> <span class="nv">NEQ</span><span class="p">,</span> <span class="nv">NOUT</span>
-     <span class="kt">DOUBLE PRECISION </span><span class="nv">ATOL</span><span class="p">,</span> <span class="nv">T</span><span class="p">,</span> <span class="nv">TOUT</span><span class="p">,</span> <span class="nv">RTOL</span><span class="p">,</span> <span class="nv">RWORK</span><span class="p">,</span> <span class="nv">U</span><span class="p">,</span> <span class="nv">URR</span>
-     <span class="k">DIMENSION </span><span class="nv">U</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="nv">RWORK</span><span class="p">(</span><span class="mi">52</span><span class="p">),</span> <span class="nv">IWORK</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="nv">U1</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="nv">U2</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-     <span class="nv">NEQ</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="nv">C</span>    <span class="nv">SET</span> <span class="nv">ADAMS</span> <span class="nv">METHOD</span><span class="p">:</span>
-     <span class="nv">MF</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="nv">C</span>    <span class="nv">LET</span> <span class="nv">TOLERANCES</span> <span class="nv">BE</span> <span class="nv">SCALARS</span> <span class="p">(</span><span class="nb">NOT </span><span class="nv">ARRAYS</span><span class="p">):</span>
-     <span class="nv">ITOL</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="nv">C</span>    <span class="k">USE </span><span class="nv">ONLY</span> <span class="nv">ABSOLUTE</span> <span class="nv">TOLERANCE</span><span class="p">:</span>
-     <span class="nv">RTOL</span> <span class="o">=</span> <span class="mf">0.0</span><span class="nv">D0</span>
-     <span class="nv">ATOL</span> <span class="o">=</span> <span class="mf">1.0</span><span class="nv">D</span><span class="o">-</span><span class="mi">6</span>
-     <span class="nv">LRW</span> <span class="o">=</span> <span class="mi">52</span>
-     <span class="nv">LIW</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="nv">C</span>    <span class="nv">NUMBER</span> <span class="nv">OF</span> <span class="nb">TIME </span><span class="nv">STEPS</span><span class="p">:</span>
-     <span class="nv">NOUT</span> <span class="o">=</span> <span class="mi">150</span>
-<span class="nv">C</span>    <span class="k">FINAL </span><span class="nb">TIME</span><span class="p">:</span>
-     <span class="nv">TOUT</span> <span class="o">=</span> <span class="mi">3</span><span class="mf">0.0</span><span class="nv">D0</span>
-<span class="nv">C</span>    <span class="nv">INITIAL</span> <span class="nv">CONDITIONS</span>
-     <span class="nv">T</span> <span class="o">=</span> <span class="mf">0.0</span><span class="nv">D0</span>
-     <span class="nv">U</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">=</span> <span class="mf">2.0</span><span class="nv">D0</span>
-     <span class="nv">U</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.0</span><span class="nv">D0</span>
-     <span class="nv">ITASK</span> <span class="o">=</span> <span class="mi">1</span>
-     <span class="nv">ISTATE</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="nv">C</span>    <span class="k">CALL </span><span class="nv">ADAPTIVE</span> <span class="nb">TIME </span><span class="nv">STEPPING</span> <span class="nv">AT</span> <span class="nv">EACH</span> <span class="nv">OF</span> <span class="nv">THE</span> <span class="k">TARGET </span><span class="nb">TIME </span><span class="nv">LEVELS</span>
-     <span class="k">DO </span><span class="mi">100</span> <span class="nv">IOUT</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">NOUT</span>
-       <span class="k">CALL </span><span class="nv">DLSODE</span><span class="p">(</span><span class="nv">F</span><span class="p">,</span><span class="nv">NEQ</span><span class="p">,</span><span class="nv">U</span><span class="p">,</span><span class="nv">T</span><span class="p">,</span><span class="nv">TOUT</span><span class="p">,</span><span class="nv">ITOL</span><span class="p">,</span><span class="nv">RTOL</span><span class="p">,</span><span class="nv">ATOL</span><span class="p">,</span><span class="nv">ITASK</span><span class="p">,</span>
-    <span class="mi">1</span>     <span class="nv">ISTATE</span><span class="p">,</span><span class="nv">IOPT</span><span class="p">,</span><span class="nv">RWORK</span><span class="p">,</span><span class="nv">LRW</span><span class="p">,</span><span class="nv">IWORK</span><span class="p">,</span><span class="nv">LIW</span><span class="p">,</span><span class="nv">JAC</span><span class="p">,</span><span class="nv">MF</span><span class="p">)</span>
-       <span class="nv">U1</span><span class="p">(</span><span class="nv">IOUT</span><span class="p">)</span> <span class="o">=</span> <span class="nv">U</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-       <span class="nv">U2</span><span class="p">(</span><span class="nv">IOUT</span><span class="p">)</span> <span class="o">=</span> <span class="nv">U</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-       <span class="nv">TOUT</span> <span class="o">=</span> <span class="nv">TOUT</span> <span class="o">+</span> <span class="mf">2.0</span><span class="nv">D</span><span class="o">-</span><span class="mi">1</span>
+<div class="highlight-fortran"><div class="highlight"><pre>     <span class="k">PROGRAM </span><span class="n">MAIN</span>
+     <span class="k">EXTERNAL </span><span class="n">F</span>
+     <span class="kt">INTEGER </span><span class="n">I</span><span class="p">,</span> <span class="n">IOPT</span><span class="p">,</span> <span class="n">IOUT</span><span class="p">,</span> <span class="n">ISTATE</span><span class="p">,</span> <span class="n">ITASK</span><span class="p">,</span> <span class="n">ITOL</span><span class="p">,</span> <span class="n">IWORK</span><span class="p">,</span>
+    <span class="mi">1</span>   <span class="n">LRW</span><span class="p">,</span> <span class="n">LIW</span><span class="p">,</span> <span class="n">MF</span><span class="p">,</span> <span class="n">NEQ</span><span class="p">,</span> <span class="n">NOUT</span>
+     <span class="kt">DOUBLE PRECISION </span><span class="n">ATOL</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">TOUT</span><span class="p">,</span> <span class="n">RTOL</span><span class="p">,</span> <span class="n">RWORK</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">URR</span>
+     <span class="k">DIMENSION </span><span class="n">U</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">RWORK</span><span class="p">(</span><span class="mi">52</span><span class="p">),</span> <span class="n">IWORK</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="n">U1</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">U2</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+     <span class="n">NEQ</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">C</span>    <span class="n">SET</span> <span class="n">ADAMS</span> <span class="n">METHOD</span><span class="p">:</span>
+     <span class="n">MF</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">C</span>    <span class="n">LET</span> <span class="n">TOLERANCES</span> <span class="n">BE</span> <span class="n">SCALARS</span> <span class="p">(</span><span class="nb">NOT </span><span class="n">ARRAYS</span><span class="p">):</span>
+     <span class="n">ITOL</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">C</span>    <span class="k">USE </span><span class="n">ONLY</span> <span class="n">ABSOLUTE</span> <span class="n">TOLERANCE</span><span class="p">:</span>
+     <span class="n">RTOL</span> <span class="o">=</span> <span class="mf">0.0</span><span class="n">D0</span>
+     <span class="n">ATOL</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">D</span><span class="o">-</span><span class="mi">6</span>
+     <span class="n">LRW</span> <span class="o">=</span> <span class="mi">52</span>
+     <span class="n">LIW</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">C</span>    <span class="n">NUMBER</span> <span class="n">OF</span> <span class="nb">TIME </span><span class="n">STEPS</span><span class="p">:</span>
+     <span class="n">NOUT</span> <span class="o">=</span> <span class="mi">150</span>
+<span class="n">C</span>    <span class="k">FINAL </span><span class="nb">TIME</span><span class="p">:</span>
+     <span class="n">TOUT</span> <span class="o">=</span> <span class="mi">3</span><span class="mf">0.0</span><span class="n">D0</span>
+<span class="n">C</span>    <span class="n">INITIAL</span> <span class="n">CONDITIONS</span>
+     <span class="n">T</span> <span class="o">=</span> <span class="mf">0.0</span><span class="n">D0</span>
+     <span class="n">U</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">=</span> <span class="mf">2.0</span><span class="n">D0</span>
+     <span class="n">U</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.0</span><span class="n">D0</span>
+     <span class="n">ITASK</span> <span class="o">=</span> <span class="mi">1</span>
+     <span class="n">ISTATE</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">C</span>    <span class="k">CALL </span><span class="n">ADAPTIVE</span> <span class="nb">TIME </span><span class="n">STEPPING</span> <span class="n">AT</span> <span class="n">EACH</span> <span class="n">OF</span> <span class="n">THE</span> <span class="k">TARGET </span><span class="nb">TIME </span><span class="n">LEVELS</span>
+     <span class="k">DO </span><span class="mi">100</span> <span class="n">IOUT</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">NOUT</span>
+       <span class="k">CALL </span><span class="n">DLSODE</span><span class="p">(</span><span class="n">F</span><span class="p">,</span><span class="n">NEQ</span><span class="p">,</span><span class="n">U</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">TOUT</span><span class="p">,</span><span class="n">ITOL</span><span class="p">,</span><span class="n">RTOL</span><span class="p">,</span><span class="n">ATOL</span><span class="p">,</span><span class="n">ITASK</span><span class="p">,</span>
+    <span class="mi">1</span>     <span class="n">ISTATE</span><span class="p">,</span><span class="n">IOPT</span><span class="p">,</span><span class="n">RWORK</span><span class="p">,</span><span class="n">LRW</span><span class="p">,</span><span class="n">IWORK</span><span class="p">,</span><span class="n">LIW</span><span class="p">,</span><span class="n">JAC</span><span class="p">,</span><span class="n">MF</span><span class="p">)</span>
+       <span class="n">U1</span><span class="p">(</span><span class="n">IOUT</span><span class="p">)</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+       <span class="n">U2</span><span class="p">(</span><span class="n">IOUT</span><span class="p">)</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+       <span class="n">TOUT</span> <span class="o">=</span> <span class="n">TOUT</span> <span class="o">+</span> <span class="mf">2.0</span><span class="n">D</span><span class="o">-</span><span class="mi">1</span>
  <span class="mi">100</span> <span class="k">CONTINUE</span>
 <span class="k">     END</span>
 
-<span class="k">     SUBROUTINE </span><span class="nv">F</span><span class="p">(</span><span class="nv">NEQ</span><span class="p">,</span> <span class="nv">T</span><span class="p">,</span> <span class="nv">U</span><span class="p">,</span> <span class="nv">UDOT</span><span class="p">)</span>
-     <span class="kt">INTEGER </span><span class="nv">NEQ</span>
-     <span class="kt">DOUBLE PRECISION </span><span class="nv">T</span><span class="p">,</span> <span class="nv">U</span><span class="p">,</span> <span class="nv">UDOT</span>
-     <span class="k">DIMENSION </span><span class="nv">U</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="nv">UDOT</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-     <span class="nv">UDOT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="nv">U</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-     <span class="nv">UDOT</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="mf">3.0</span><span class="nv">D0</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span><span class="nv">D0</span> <span class="o">-</span> <span class="nv">U</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nv">U</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="nv">U</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="nv">U</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">     SUBROUTINE </span><span class="n">F</span><span class="p">(</span><span class="n">NEQ</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">UDOT</span><span class="p">)</span>
+     <span class="kt">INTEGER </span><span class="n">NEQ</span>
+     <span class="kt">DOUBLE PRECISION </span><span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">UDOT</span>
+     <span class="k">DIMENSION </span><span class="n">U</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">UDOT</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+     <span class="n">UDOT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">U</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+     <span class="n">UDOT</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="mf">3.0</span><span class="n">D0</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span><span class="n">D0</span> <span class="o">-</span> <span class="n">U</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">U</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">U</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">U</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
      <span class="k">RETURN</span>
 <span class="k">     END</span>
 </pre></div>
@@ -178,7 +196,7 @@ a function in a file, say <tt class="docutils literal"><span class="pre">myode.m
 </pre></div>
 </div>
 <p>In MATLAB we can then solve the problem by</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="o">&gt;&gt;</span> <span class="n">options</span> <span class="o">=</span> <span class="n">odeset</span><span class="p">(</span><span class="s">&#39;RelTol&#39;</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="s">&#39;AbsTol&#39;</span><span class="p">,</span><span class="mf">1e-6</span><span class="p">);</span>
+<div class="highlight-ipy"><div class="highlight"><pre><span class="o">&gt;&gt;</span> <span class="n">options</span> <span class="o">=</span> <span class="n">odeset</span><span class="p">(</span><span class="s">&#39;RelTol&#39;</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="s">&#39;AbsTol&#39;</span><span class="p">,</span><span class="mf">1e-6</span><span class="p">);</span>
 <span class="o">&gt;&gt;</span> <span class="n">tspan</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="mi">30</span><span class="p">];</span>
 <span class="o">&gt;&gt;</span> <span class="n">u0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">;</span> <span class="mi">0</span><span class="p">]</span>
 <span class="o">&gt;&gt;</span> <span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="n">ode45</span><span class="p">(</span><span class="s">&#39;myode&#39;</span><span class="p">,</span> <span class="n">tspan</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">options</span><span class="p">]);</span>
@@ -307,7 +325,7 @@ extremely accurate <tt class="docutils literal"><span class="pre">odefun_sympy</
 for accessing solvers in that package.</li>
 </ul>
 </div></blockquote>
-<p>For plotting you will need <a class="reference external" href="http://matplotlib.sourceforge.net/">matplotlib</a> or <a class="reference external" href="http://code.google.com/p/scitools/">scitools</a>.</p>
+<p>For plotting you will need <a class="reference external" href="http://matplotlib.sourceforge.net/">matplotlib</a> or <a class="reference external" href="https://github.com/hplgit/scitools/">scitools</a>.</p>
 <p>These packages are readily downloaded and installed by the
 standard <tt class="docutils literal"><span class="pre">setup.py</span></tt> script, as shown above.
 On Ubuntu and other Debian-based Linux systems the following
@@ -508,7 +526,7 @@ solution (which is known for this equation):</p>
 </pre></div>
 </div>
 <div class="figure">
-<img alt="_images/logistic1.png" src="_images/logistic1.png" style="width: 400px;" />
+<a class="reference internal image-reference" href="_images/logistic1.png"><img alt="_images/logistic1.png" src="_images/logistic1.png" style="width: 400px;" /></a>
 <p class="caption">Solution of the logistic equation with the 4-th order Runge-Kutta method (solid line) and comparison with the exact solution (dots)</p>
 </div>
 <p>All the examples in this tutorial are found in the GitHub directory
@@ -704,7 +722,7 @@ the ideas (<a class="reference external" href="https://github.com/hplgit/odespy/
 <span class="k">class</span> <span class="nc">Logistic</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        `a` is (initial growth rate), `R` the carrying capacity,</span>
+<span class="sd">        a` is (initial growth rate), `R` the carrying capacity,</span>
 <span class="sd">        `A` the initial amount of u, and `T` is some (very) total</span>
 <span class="sd">        simulation time when `u` is very close to the asymptotic</span>
 <span class="sd">        value `R`.</span>
@@ -873,7 +891,7 @@ makes the numerical solution explode.
 The increasing amplitude is a numerical artifact that some of the simple
 solution methods suffer from.</p>
 <div class="figure">
-<img alt="_images/osc1a.png" src="_images/osc1a.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/osc1a.png"><img alt="_images/osc1a.png" src="_images/osc1a.png" style="width: 500px;" /></a>
 <p class="caption">Heun&#8217;s method used to simulate oscillations of a pendulum</p>
 </div>
 <p>Using a more sophisticated method, say the 4-th order Runge-Kutta method,
@@ -1000,7 +1018,7 @@ As <span class="math">\(\Theta_0\rightarrow 0\)</span>, the two curves approach 
 The Euler-Cromer method is significantly better than Heun&#8217;s method
 used in the previous section and reproduces the exact amplitude.</p>
 <div class="figure" id="ode-sec-ec-fig1">
-<img alt="_images/osc_EC_30.png" src="_images/osc_EC_30.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/osc_EC_30.png"><img alt="_images/osc_EC_30.png" src="_images/osc_EC_30.png" style="width: 500px;" /></a>
 <p class="caption"><em>Euler-Cromer method applied to the pendulum problem</em></p>
 </div>
 </div>
@@ -1062,19 +1080,19 @@ equations. An appropriate extension of class <tt class="docutils literal"><span 
 </div>
 <p>The second extension is to loop over many solvers. All
 solvers can be listed by</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">odespy</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">methods</span> <span class="o">=</span> <span class="n">list_all_solvers</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
-<span class="gp">... </span>  <span class="k">print</span> <span class="n">method</span>
-<span class="gp">...</span>
-<span class="go">AdamsBashMoulton2</span>
-<span class="go">AdamsBashMoulton3</span>
-<span class="go">AdamsBashforth2</span>
-<span class="gp">...</span>
-<span class="go">Vode</span>
-<span class="go">lsoda_scipy</span>
-<span class="go">odefun_sympy</span>
-<span class="go">odelab</span>
+<div class="highlight-ipy"><div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">odespy</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">methods</span> <span class="o">=</span> <span class="n">list_all_solvers</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+<span class="o">...</span>   <span class="k">print</span> <span class="n">method</span>
+<span class="o">...</span>
+<span class="n">AdamsBashMoulton2</span>
+<span class="n">AdamsBashMoulton3</span>
+<span class="n">AdamsBashforth2</span>
+<span class="o">...</span>
+<span class="n">Vode</span>
+<span class="n">lsoda_scipy</span>
+<span class="n">odefun_sympy</span>
+<span class="n">odelab</span>
 </pre></div>
 </div>
 <p>A similar function, <tt class="docutils literal"><span class="pre">list_available_solvers</span></tt>, returns a list of the
@@ -1132,7 +1150,7 @@ in the current mathematical model.</p>
 </div>
 <p>A complete program is available as <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/osc2.py">osc2.py</a>.</p>
 <div class="figure">
-<img alt="_images/osc2.png" src="_images/osc2.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/osc2.png"><img alt="_images/osc2.png" src="_images/osc2.png" style="width: 500px;" /></a>
 <p class="caption">Comparison of methods for solving the ODE system for a pendulum</p>
 </div>
 <p>We can extend this program to compute the error in each numerical
@@ -1190,17 +1208,17 @@ here numerically):</p>
 <span class="math">\(C\)</span> and <span class="math">\(r\)</span> from two consecutive experiments to obtain a sequence
 of <span class="math">\(r\)</span> values which (hopefully) convergences to a value that we can
 view as the empirical convergence rate of a method.
-Given the sequence of time steps and errors, a function in
-the <tt class="docutils literal"><span class="pre">scitools</span></tt> package automatically computes the sequence of
-<span class="math">\(r\)</span> values:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># Analyze convergence</span>
-<span class="kn">from</span> <span class="nn">scitools.convergencerate</span> <span class="kn">import</span> <span class="n">OneDiscretizationPrm</span>
-<span class="n">pairwise_rates</span> <span class="o">=</span> <span class="n">OneDiscretizationPrm</span><span class="o">.</span><span class="n">pairwise_rates</span>  <span class="c"># short form</span>
-
+Given the sequence of time steps and errors, we can compare two
+experiments <span class="math">\(i\)</span> and <span class="math">\(i-1\)</span>, with errors <span class="math">\(E_{i}=C\Delta t_i^r\)</span>, and
+estimate <span class="math">\(r=\ln(E_i/E_{i-1})/\ln(\Delta t_i/\Delta t_{i-1})\)</span>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">log</span>
 <span class="k">print</span> <span class="s">&#39;</span><span class="se">\n\n</span><span class="s">Convergence results for </span><span class="si">%d</span><span class="s"> periods&#39;</span> <span class="o">%</span> <span class="n">num_periods</span>
 <span class="k">for</span> <span class="n">solver_name</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-    <span class="n">rates</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">pairwise_rates</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">solver_name</span><span class="p">][</span><span class="s">&#39;dt&#39;</span><span class="p">],</span>
-                              <span class="n">results</span><span class="p">[</span><span class="n">solver_name</span><span class="p">][</span><span class="s">&#39;error&#39;</span><span class="p">])</span>
+    <span class="n">r_h</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">solver_name</span><span class="p">][</span><span class="s">&#39;dt&#39;</span><span class="p">]</span>
+    <span class="n">r_E</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">solver_name</span><span class="p">][</span><span class="s">&#39;error&#39;</span><span class="p">]</span>
+    <span class="n">rates</span> <span class="o">=</span> <span class="p">[</span><span class="n">log</span><span class="p">(</span><span class="n">r_E</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">r_E</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="n">log</span><span class="p">(</span><span class="n">r_h</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">r_h</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span>
+             <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">r_h</span><span class="p">))]</span>
+    <span class="c"># Reformat rates with 1 decimal for rate</span>
     <span class="n">rates</span> <span class="o">=</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;</span><span class="si">%.1f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">rate</span> <span class="k">for</span> <span class="n">rate</span> <span class="ow">in</span> <span class="n">rates</span><span class="p">])</span>
     <span class="k">print</span> <span class="s">&#39;</span><span class="si">%-20s</span><span class="s"> r: </span><span class="si">%s</span><span class="s"> E_min=</span><span class="si">%.1E</span><span class="s">&#39;</span> <span class="o">%</span> \
           <span class="p">(</span><span class="n">solver_name</span><span class="p">,</span> <span class="n">rates</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">solver_name</span><span class="p">][</span><span class="s">&#39;error&#39;</span><span class="p">]))</span>
@@ -1401,7 +1419,7 @@ such as <tt class="docutils literal"><span class="pre">RK4</span></tt>.
 For curiosity we can mention that the <tt class="docutils literal"><span class="pre">ForwardEuler</span></tt> method produces
 a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.</p>
 <div class="figure" id="gaussian-fig-rk2-41">
-<img alt="_images/gaussian1_RK2_41.png" src="_images/gaussian1_RK2_41.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/gaussian1_RK2_41.png"><img alt="_images/gaussian1_RK2_41.png" src="_images/gaussian1_RK2_41.png" style="width: 500px;" /></a>
 <p class="caption"><em>2nd-order Runge-Kutta method with 41 points</em></p>
 </div>
 <p>A simple program testing one numerical method goes as follows (<a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py">gaussian1.py</a>).</p>
@@ -1452,7 +1470,7 @@ these,</p>
 </div>
 <p>Figure <a class="reference internal" href="#gaussian-fig-fehlberg-41"><em>Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41)</em></a> shows how <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (57 adaptively selected points in time).</p>
 <div class="figure" id="gaussian-fig-fehlberg-41">
-<img alt="_images/gaussian1_Fehlberg_41.png" src="_images/gaussian1_Fehlberg_41.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/gaussian1_Fehlberg_41.png"><img alt="_images/gaussian1_Fehlberg_41.png" src="_images/gaussian1_Fehlberg_41.png" style="width: 500px;" /></a>
 <p class="caption"><em>Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41)</em></p>
 </div>
 <p>Adaptive algorithms apply an error estimate based on considering a higher-order method as exact, in this case a method of order 5, and a method of lower order (here 4) as the numerically predicted solution. The user can specify an error tolerance. In the program above we just relied to the default tolerance, which can be printed by</p>
@@ -1570,11 +1588,11 @@ results, despite setting <tt class="docutils literal"><span class="pre">Vode</sp
 <tt class="docutils literal"><span class="pre">Lsoda</span></tt> should automatically select between nonstiff and stiff solvers
 (of default order 4 in this case).</p>
 <div class="figure" id="gaussian3-fig1-41">
-<img alt="_images/gaussian3_41.png" src="_images/gaussian3_41.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/gaussian3_41.png"><img alt="_images/gaussian3_41.png" src="_images/gaussian3_41.png" style="width: 500px;" /></a>
 <p class="caption"><em>Comparison of adaptive methods with default parameters (tolerance ``E-6``)</em></p>
 </div>
 <div class="figure" id="gaussian3-fig1err-41">
-<img alt="_images/gaussian3e_41.png" src="_images/gaussian3e_41.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/gaussian3e_41.png"><img alt="_images/gaussian3e_41.png" src="_images/gaussian3e_41.png" style="width: 500px;" /></a>
 <p class="caption"><em>Comparison of errors in adaptive methods with default parameters (tolerance ``E-6``)</em></p>
 </div>
 <p>The program writes out the following results for the
@@ -1606,7 +1624,7 @@ coinciding curves. Numerically, we now have</p>
 <tt class="docutils literal"><span class="pre">BogackiShampine</span></tt> we have information about the number of adaptive
 time points used: 270, 326, and 3307, respectively.</p>
 <div class="figure" id="gaussian3-fig2-41">
-<img alt="_images/gaussian3_41_Em10.png" src="_images/gaussian3_41_Em10.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/gaussian3_41_Em10.png"><img alt="_images/gaussian3_41_Em10.png" src="_images/gaussian3_41_Em10.png" style="width: 500px;" /></a>
 <p class="caption"><em>Comparison of adaptive methods with error tolerance `E-10`</em></p>
 </div>
 <p>The lesson learned in this example is two-fold: 1) several methods should
@@ -1748,12 +1766,12 @@ that no callbacks to the <span class="math">\(f(u,t)\)</span> definition go via 
 the section <a class="reference internal" href="#ode-sec-exgr"><em>First Example: Logistic Growth</em></a>. The FORTRAN implementation of <span class="math">\(f(u,t)\)</span>
 is more complicated than the Python counterpart. The subroutine
 has the signature</p>
-<div class="highlight-fortran"><div class="highlight"><pre>      <span class="k">subroutine </span><span class="nv">f_f77</span><span class="p">(</span><span class="nv">neq</span><span class="p">,</span> <span class="nv">t</span><span class="p">,</span> <span class="nv">u</span><span class="p">,</span> <span class="nv">udot</span><span class="p">)</span>
-<span class="nv">Cf2py</span> <span class="k">intent</span><span class="p">(</span><span class="nv">hide</span><span class="p">)</span> <span class="nv">neq</span>
-<span class="nv">Cf2py</span> <span class="k">intent</span><span class="p">(</span><span class="nv">out</span><span class="p">)</span> <span class="nv">udot</span>
-      <span class="kt">integer </span><span class="nv">neq</span>
-      <span class="kt">double precision </span><span class="nv">t</span><span class="p">,</span> <span class="nv">u</span><span class="p">,</span> <span class="nv">udot</span>
-      <span class="k">dimension </span><span class="nv">u</span><span class="p">(</span><span class="nv">neq</span><span class="p">),</span> <span class="nv">udot</span><span class="p">(</span><span class="nv">neq</span><span class="p">)</span>
+<div class="highlight-fortran"><div class="highlight"><pre>      <span class="k">subroutine </span><span class="n">f_f77</span><span class="p">(</span><span class="n">neq</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">udot</span><span class="p">)</span>
+<span class="n">Cf2py</span> <span class="k">intent</span><span class="p">(</span><span class="n">hide</span><span class="p">)</span> <span class="n">neq</span>
+<span class="n">Cf2py</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="n">udot</span>
+      <span class="kt">integer </span><span class="n">neq</span>
+      <span class="kt">double precision </span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">udot</span>
+      <span class="k">dimension </span><span class="n">u</span><span class="p">(</span><span class="n">neq</span><span class="p">),</span> <span class="n">udot</span><span class="p">(</span><span class="n">neq</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This means that there are two additional arguments: <tt class="docutils literal"><span class="pre">neq</span></tt> for the number
@@ -2013,7 +2031,7 @@ may easily extract the solution of <tt class="docutils literal"><span class="pre
 </pre></div>
 </div>
 <div class="figure">
-<img alt="_images/sode1.png" src="_images/sode1.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/sode1.png"><img alt="_images/sode1.png" src="_images/sode1.png" style="width: 500px;" /></a>
 <p class="caption">Oscillator driven by white noise</p>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">Heun</span></tt> and <tt class="docutils literal"><span class="pre">RK2</span></tt> methods give coinciding solutions while
@@ -2559,7 +2577,7 @@ output in many different formats.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2015, Hans Petter Langtangen and Liwei Wang.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>
