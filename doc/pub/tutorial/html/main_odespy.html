@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -9,7 +10,7 @@
     
     <title>A Tutorial for the Odespy Interface to ODE Solvers</title>
     
-    <link rel="stylesheet" href="_static/pyramid.css" type="text/css" />
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -25,6 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
 
         <script src="http://sagecell.sagemath.org/static/jquery.min.js"></script>
         <script src="http://sagecell.sagemath.org/static/embedded_sagecell.js"></script>
@@ -44,24 +46,17 @@
     
     <link rel="top" title="A Tutorial for the Odespy Interface to ODE Solvers" href="index.html" />
     <link rel="prev" title="A Tutorial for the Odespy Interface to ODE Solvers" href="index.html" />
-
-<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
-<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
-<!--[if lte IE 6]>
-<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
-<![endif]-->
-
+ 
   
-   <style type="text/css">
-     div.admonition {
-       background-color: whiteSmoke;
-       border: 1px solid #bababa;
-     }
-   </style>
-  </head>
-
+       <style type="text/css">
+         div.admonition {
+           background-color: whiteSmoke;
+           border: 1px solid #bababa;
+         }
+       </style>
+      </head>
+    
   <body>
-
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -88,15 +83,15 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Hans Petter Langtangen, Liwei Wang</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Mar 15, 2015</td>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Apr 14, 2015</td>
 </tr>
 </tbody>
 </table>
 <p>The Odespy package makes it easy to specify an ODE problem in
 Python and get it solved by a wide variety of different numerical
 methods and software.</p>
-<div class="section" id="motivation">
-<span id="ode-sec-motivation"></span><h2>Motivation<a class="headerlink" href="#motivation" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="ode-sec-motivation"></span><div class="section" id="motivation">
+<h2>Motivation<a class="headerlink" href="#motivation" title="Permalink to this headline">¶</a></h2>
 <p>The Odespy package grew out of the desire to have a unified interface
 to lots of different methods and software for ODEs. Consider the
 ODE problem</p>
@@ -660,13 +655,13 @@ time integral for integration, the <tt class="docutils literal"><span class="pre
 a user-defined function <tt class="docutils literal"><span class="pre">terminate</span></tt> that can be used to implement
 a criterion for terminating the solution process.
 Mathematically, the relevant criterion is
-<span class="math">\(||u-R||&lt;\hbox{tol}\)</span>, where tol is an acceptable
+<span class="math">\(||u-R|| &lt; \hbox{tol}\)</span>, where tol is an acceptable
 tolerance, say <span class="math">\(100\)</span> in the present case where <span class="math">\(R=10^5\)</span>.
 The <tt class="docutils literal"><span class="pre">terminate</span></tt> function implements the criterion
 and returns true if the criterion is met:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">step_no</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;u[step_no] holds (the most recent) solution at t[step_no].&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">step_no</span><span class="p">]</span> <span class="o">-</span> <span class="n">R</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">step_no</span><span class="p">]</span> <span class="o">-</span> <span class="n">R</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span>
 </pre></div>
 </div>
 <p>Note that the simulation is anyway stopped for <span class="math">\(t &gt; T\)</span> so <span class="math">\(T\)</span>
@@ -695,7 +690,7 @@ time step <tt class="docutils literal"><span class="pre">dt</span></tt> and not 
 
 <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">step_no</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;u[step_no] holds (the most recent) solution at t[step_no].&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">step_no</span><span class="p">]</span> <span class="o">-</span> <span class="n">R</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">step_no</span><span class="p">]</span> <span class="o">-</span> <span class="n">R</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span>
 
 <span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">time_points</span><span class="p">,</span> <span class="n">terminate</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&#39;Final u(t=</span><span class="si">%g</span><span class="s">)=</span><span class="si">%g</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -1360,8 +1355,8 @@ in a subclass of <tt class="docutils literal"><span class="pre">Problem</span></
 </div>
 <p>The module <tt class="docutils literal"><span class="pre">odespy.problems</span></tt> contains many predefined ODE problems.</p>
 </div>
-<div class="section" id="using-adaptive-methods">
-<h3>Using Adaptive Methods<a class="headerlink" href="#using-adaptive-methods" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="adaptive-methods">
+<h3>Adaptive Methods<a class="headerlink" href="#adaptive-methods" title="Permalink to this headline">¶</a></h3>
 <p>The solvers used in the previous examples have all employed a constant
 time step <span class="math">\(\Delta t\)</span>. Many solvers available through the Odespy
 interface are adaptive in the sense that <span class="math">\(\Delta t\)</span> is adjusted
@@ -1833,7 +1828,7 @@ of <tt class="docutils literal"><span class="pre">Problem</span></tt> and comput
 FORTRAN, we consider the van der Pol equation,</p>
 <div class="math">
 \[y'' = \mu (1 - y^2) y' - y,\quad y(0)=2,\ y'(0)=1,\]</div>
-<p>written as a system as shown in the section <a class="reference internal" href="#ode-sec-motivation"><em>Motivation</em></a>.
+<p>written as a system as shown in the section <em class="xref std std-ref">ode:sec:motivation</em>.
 We start by implementing a problem class with Python code for
 <span class="math">\(f(u,t)\)</span> and its Jacobian:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">odespy</span>
@@ -2464,6 +2459,11 @@ output in many different formats.</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+            <center>
+            <p class="logo"><a href="http://cbc.simula.no/" title="Go to Center for Biomedical Computing">
+              <img class="logo" src="_static/cbc_logo.png" alt="Logo"/>
+            </a></p>
+            </center>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">A Tutorial for the Odespy Interface to ODE Solvers</a><ul>
@@ -2499,7 +2499,7 @@ output in many different formats.</p>
 <li><a class="reference internal" href="#the-euler-cromer-method">The Euler-Cromer Method</a></li>
 <li><a class="reference internal" href="#testing-several-methods">Testing Several Methods</a></li>
 <li><a class="reference internal" href="#make-a-subclass-of-class-problem">Make a Subclass of Class Problem</a></li>
-<li><a class="reference internal" href="#using-adaptive-methods">Using Adaptive Methods</a><ul>
+<li><a class="reference internal" href="#adaptive-methods">Adaptive Methods</a><ul>
 <li><a class="reference internal" href="#the-test-problem">The Test Problem</a></li>
 <li><a class="reference internal" href="#running-simple-methods">Running Simple Methods</a></li>
 <li><a class="reference internal" href="#running-the-runge-kutta-fehlberg-method">Running the Runge-Kutta-Fehlberg Method</a></li>
@@ -2546,6 +2546,11 @@ output in many different formats.</p>
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">A Tutorial for the Odespy Interface to ODE Solvers</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/main_odespy.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -2575,9 +2580,11 @@ output in many different formats.</p>
         <li><a href="index.html">A Tutorial for the Odespy Interface to ODE Solvers</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2015, Hans Petter Langtangen and Liwei Wang.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.3.
-    </div>
+<div class="wrapper">
+  <div class="footer">
+  <a href="http://cbc.simula.no"><img src="_static/cbc_banner.png" width="100%"><a>
+  </div>
+</div>
+
   </body>
 </html>

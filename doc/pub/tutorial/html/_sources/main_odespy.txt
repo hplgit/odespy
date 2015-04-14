@@ -1,19 +1,21 @@
 .. Automatically generated Sphinx-extended reStructuredText file from DocOnce source
    (https://github.com/hplgit/doconce/)
 
-.. !split
+.. Document title:
 
 A Tutorial for the Odespy Interface to ODE Solvers
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :Authors: Hans Petter Langtangen, Liwei Wang
-:Date: Mar 15, 2015
+:Date: Apr 14, 2015
 
 The Odespy package makes it easy to specify an ODE problem in
 Python and get it solved by a wide variety of different numerical
 methods and software.
 
 .. _ode:sec:motivation:
+
+.. !split
 
 Motivation
 ==========
@@ -241,6 +243,8 @@ The ODE problem can always be specified in Python, but for wrappers of
 FORTRAN codes one can also implement the problem in FORTRAN and avoid
 callback to Python.
 
+.. !split
+
 Installation
 ============
 
@@ -316,6 +320,8 @@ or downloading the source and running ``setup.py``:
 
 
 
+
+.. !split
 
 Basic Usage
 ===========
@@ -683,7 +689,7 @@ time integral for integration, the ``solver.solve`` method accepts
 a user-defined function ``terminate`` that can be used to implement
 a criterion for terminating the solution process.
 Mathematically, the relevant criterion is
-:math:`||u-R||<\hbox{tol}`, where tol is an acceptable
+:math:`||u-R|| < \hbox{tol}`, where tol is an acceptable
 tolerance, say :math:`100` in the present case where :math:`R=10^5`.
 The ``terminate`` function implements the criterion
 and returns true if the criterion is met:
@@ -692,7 +698,7 @@ and returns true if the criterion is met:
 
         def terminate(u, t, step_no):
             """u[step_no] holds (the most recent) solution at t[step_no]."""
-            return abs(u[step_no] - R) < tol:
+            return abs(u[step_no] - R) < tol
 
 Note that the simulation is anyway stopped for :math:`t > T` so :math:`T`
 must be large enough for the termination criterion to be reached (if not,
@@ -724,7 +730,7 @@ A complete program can be as follows (`logistic5.py <https://github.com/hplgit/o
         
         def terminate(u, t, step_no):
             """u[step_no] holds (the most recent) solution at t[step_no]."""
-            return abs(u[step_no] - R) < tol:
+            return abs(u[step_no] - R) < tol
         
         u, t = solver.solve(time_points, terminate)
         print 'Final u(t=%g)=%g' % (t[-1], u[-1])
@@ -1509,8 +1515,8 @@ The problem class may also feature additional methods:
 
 The module ``odespy.problems`` contains many predefined ODE problems.
 
-Using Adaptive Methods
-----------------------
+Adaptive Methods
+----------------
 
 The solvers used in the previous examples have all employed a constant
 time step :math:`\Delta t`. Many solvers available through the Odespy
@@ -2314,6 +2320,8 @@ different.
 
 The complete code is available in `sode.py <https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/sode1.py>`__.
 
+.. !split
+
 Inner Workings of the Package
 =============================
 
@@ -2761,6 +2769,8 @@ Here is an example showing the complete code of the Backward Euler method.
                 F = ukp1 - (u[n] + dt*f(ukp1, t[n+1]))
                 J = np.eye(self.neq) - dt*self.jac(ukp1, t[n+1])
                 return F, J
+
+.. !split
 
 Troubleshooting
 ===============

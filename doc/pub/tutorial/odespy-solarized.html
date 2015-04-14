@@ -101,7 +101,7 @@ div { text-align: justify; text-justify: inter-word; }
               (' The Euler-Cromer Method ', 2, None, '___sec23'),
               (' Testing Several Methods ', 2, None, '___sec24'),
               (' Make a Subclass of Class Problem ', 2, None, '___sec25'),
-              (' Using Adaptive Methods ', 2, None, '___sec26'),
+              (' Adaptive Methods ', 2, None, '___sec26'),
               (' The Test Problem ', 3, None, '___sec27'),
               (' Running Simple Methods ', 3, None, '___sec28'),
               (' Running the Runge-Kutta-Fehlberg Method ',
@@ -186,14 +186,47 @@ MathJax.Hub.Config({
 <b>Liwei Wang</b> [2]
 </center>
 
-
 <p>
 <!-- institution(s) -->
 
 <center>[1] <b>Center for Biomedical Computing, Simula Research Laboratory</b></center>
 <center>[2] <b>Department of Informatics, University of Oslo</b></center>
 <p>
-<center><h4>Mar 15, 2015</h4></center> <!-- date -->
+<center><h4>Apr 14, 2015</h4></center> <!-- date -->
+
+<h2>Table of contents</h2>
+
+<p>
+<a href="#ode:sec:motivation"> Motivation </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec1"> Traditional Approach </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec5"> Odespy's Unified Interface </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec6"> Methods and Implementations Offered by Odespy </a><br>
+<a href="#___sec7"> Installation </a><br>
+<a href="#___sec8"> Basic Usage </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec9"> Overview </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#ode:sec:exgr"> First Example: Logistic Growth </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#ode:sec:exgr:farg"> Parameters in the Right-Hand Side Function </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec18"> Continuing a Previous Simulation </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec19"> Termination Criterion for the Simulation </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec20"> A Class-Based Implementation </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec21"> Using Other Symbols </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#ode:sec:ex:osc"> Example: Solving an ODE System </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec23"> The Euler-Cromer Method </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec24"> Testing Several Methods </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec25"> Make a Subclass of Class Problem </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec26"> Adaptive Methods </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec32"> Example: Solving a Complex ODE Problem </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec35"> Avoiding Callbacks to Python </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec38"> Example: Solving a Stochastic Differential Equation </a><br>
+<a href="#___sec39"> Inner Workings of the Package </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#odes:parameters"> Solver Parameters </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec41"> Solver Classes </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec47"> A Very Simple Subclass </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec48"> A Subclass with More Code </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec49"> A Simple Example of an Implicit Method </a><br>
+<a href="#___sec50"> Troubleshooting </a><br>
+&nbsp; &nbsp; &nbsp; <a href="#___sec51"> Constructor takes exactly two arguments, 5 given </a><br>
+</p>
 <p>
 The Odespy package makes it easy to specify an ODE problem in
 Python and get it solved by a wide variety of different numerical
@@ -238,7 +271,6 @@ $$ f^{(0)}(u^{(0)}, u^{(1)}, t) = u^{(1)}, \quad
 
 The corresponding boundary conditions become
 $$ u^{(0)}(0)=2,\quad u^{(1)}(0)=1. $$
-
 
 <p>
 The mentioned ODE software needs a specification of the \( f(u,t) \) formulas
@@ -884,7 +916,7 @@ and returns true if the criterion is met:
 <!-- begin verbatim block  pycod-->
 <pre><code>def terminate(u, t, step_no):
     &quot;&quot;&quot;u[step_no] holds (the most recent) solution at t[step_no].&quot;&quot;&quot;
-    return abs(u[step_no] - R) &lt; tol:
+    return abs(u[step_no] - R) &lt; tol
 </code></pre>
 <!-- end verbatim block -->
 
@@ -920,7 +952,7 @@ tol = 100   # tolerance for termination criterion
 
 def terminate(u, t, step_no):
     &quot;&quot;&quot;u[step_no] holds (the most recent) solution at t[step_no].&quot;&quot;&quot;
-    return abs(u[step_no] - R) &lt; tol:
+    return abs(u[step_no] - R) &lt; tol
 
 u, t = solver.solve(time_points, terminate)
 print 'Final u(t=%g)=%g' % (t[-1], u[-1])
@@ -1252,7 +1284,6 @@ $$
 \end{align*}
 $$
 
-
 <p>
 The convention in Odespy is to group all the unknowns as velocity and position
 for each degree of freedom. That is, if the component form of \( \boldsymbol{r} \)
@@ -1280,7 +1311,6 @@ $$
 \dot r^{(N)} &= v^{(N)}\thinspace .
 \end{align*}
 $$
-
 
 <p>
 For the particular case of a pendulum we write our system as
@@ -1364,7 +1394,6 @@ used in the previous section and reproduces the exact amplitude.
 <!-- begin inline comment -->
 <font color="red">(<b>hpl 1</b>: After Euler-Cromer, change the order of the ODEs and unknowns!)</font>
 <!-- end inline comment -->
-
 
 <p>
 We shall now make a more advanced solver by
@@ -1766,7 +1795,7 @@ The problem class may also feature additional methods:
 <p>
 The module <code>odespy.problems</code> contains many predefined ODE problems.
 
-<h2 id="___sec26">Using Adaptive Methods </h2>
+<h2 id="___sec26">Adaptive Methods </h2>
 
 <p>
 The solvers used in the previous examples have all employed a constant
