@@ -18,6 +18,7 @@ def configuration(parent_package='',top_path=None):
     return config
 
 if __name__ == '__main__':
+    from odespy.version import full_version
     import sys
     fortran = True
     if '--no-fortran' in sys.argv:
@@ -30,12 +31,14 @@ if __name__ == '__main__':
     author = 'Liwei Wang and Hans Petter Langtangen'
     author_email = 'hpl@simula.no'
     license = 'GPL'
+    version = full_version
 
     if fortran:
         from numpy.distutils.core import setup
         #setup(**configuration(top_path='').todict())
         setup(
             name=name,
+            version=version,
             url=url,
             download_url=download_url,
             license=license,
@@ -45,10 +48,9 @@ if __name__ == '__main__':
     else:
         # Run plain distutils
         from distutils.core import setup
-        from odespy.version import full_version
         setup(
-            version=full_version,
             name=name,
+            version=version,
             url=url,
             download_url=download_url,
             license=license,
@@ -57,5 +59,3 @@ if __name__ == '__main__':
             description='',
             packages=['odespy'],
             )
-
-

@@ -67,6 +67,13 @@ The ODE problem can always be specified in Python, but for wrappers of
 FORTRAN codes one can also implement the problem in FORTRAN and avoid
 callback to Python.
 
+*Warning: Potential problems with FORTRAN codes.* 
+Some users have faced problems with some of the FORTRAN-based solvers
+(typically segmentation fault errors), mostly `radau5`, but also `rkf45`.
+It seems that Odespy's Python interface to `radau5` is broken.
+
+
+
 ### How do I use Odespy?
 
 Here is an example on the Odespy syntax::
