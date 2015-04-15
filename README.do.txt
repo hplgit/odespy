@@ -109,7 +109,7 @@ Please cite this GitHub repository:
 
 !bquote
 H. P. Langtangen and L. Wang. Odespy software package.
-URL: https://github.com/hplgit/odespy. 2014
+URL: https://github.com/hplgit/odespy. 2015
 !equote
 
 BibTeX entry:
@@ -121,18 +121,21 @@ BibTeX entry:
   url = {https://github.com/hplgit/odespy},
   key = {odespy},
   note = {\url{https://github.com/hplgit/odespy}},
+  year = {2015},
 }
 !ec
 
 "Publish": "https://bitbucket.org/logg/publish" entry:
 
 !bc
+* misc
 ** {Odespy} Software Package
    key:       odespy
    author:    H. P. Langtangen, L. Wang
    url:       https://github.com/hplgit/odespy
    status:    published
    sortkey:   Odespy
+   year:      2015
    note:      \url{https://github.com/hplgit/odespy}
    entrytype: misc
 !ec
