@@ -5,6 +5,7 @@ Bogacki
 Callbacks
 Chebyshev
 Cromer
+Discretizing
 DocOnce
 Dormand
 EulerCromer
@@ -21,12 +22,14 @@ Liwei
 MATLAB
 MATLAB's
 Moulton
+Nicolson
 NumPyDB
 ODEPACK
 ODEs
 Odespy
 Odespy's
 PDE
+PDEs
 Picard
 RK
 Radau
@@ -39,6 +42,7 @@ Stratonovich
 Superclasses
 TODO
 Ubuntu
+Vectorized
 callback
 callbacks
 casename
@@ -52,6 +56,7 @@ dudt
 eqs
 fsolve
 gaussian
+keepes
 minimalistic
 nonstiff
 odelab

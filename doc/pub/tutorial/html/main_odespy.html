@@ -83,7 +83,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Hans Petter Langtangen, Liwei Wang</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Apr 14, 2015</td>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Apr 16, 2015</td>
 </tr>
 </tbody>
 </table>
@@ -1254,6 +1254,9 @@ MidpointIter         r: 1.8,  0.8, 1.9, 2.0 E_min=1.0E-02
 </pre></div>
 </div>
 </div>
+</div>
+<div class="section" id="more-advanced-implementations">
+<h2>More Advanced Implementations<a class="headerlink" href="#more-advanced-implementations" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="make-a-subclass-of-class-problem">
 <h3>Make a Subclass of Class Problem<a class="headerlink" href="#make-a-subclass-of-class-problem" title="Permalink to this headline">¶</a></h3>
 <p>Odespy features a module <tt class="docutils literal"><span class="pre">problems</span></tt> for defining ODE problems.
@@ -1354,302 +1357,6 @@ in a subclass of <tt class="docutils literal"><span class="pre">Problem</span></
 </pre></div>
 </div>
 <p>The module <tt class="docutils literal"><span class="pre">odespy.problems</span></tt> contains many predefined ODE problems.</p>
-</div>
-<div class="section" id="adaptive-methods">
-<h3>Adaptive Methods<a class="headerlink" href="#adaptive-methods" title="Permalink to this headline">¶</a></h3>
-<p>The solvers used in the previous examples have all employed a constant
-time step <span class="math">\(\Delta t\)</span>. Many solvers available through the Odespy
-interface are adaptive in the sense that <span class="math">\(\Delta t\)</span> is adjusted
-throughout the solution process to meet a prescribed tolerance for
-the estimated error.</p>
-<p>Simple methods such as <tt class="docutils literal"><span class="pre">RK4</span></tt> apply time steps</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">dt</span> <span class="o">=</span> <span class="n">time_points</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">time_points</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>while adaptive methods will use several (smaller) time steps than <tt class="docutils literal"><span class="pre">dt</span></tt>
-in each <tt class="docutils literal"><span class="pre">dt</span></tt> interval to ensure that the estimated numerical error is
-smaller than some prescribed tolerance. The estimated numerical error
-may be a rather crude quantitative measure of the true numerical
-error (which we do not know since the exact solution of the problem is
-in general not known).</p>
-<p>Some adaptive solvers record the intermediate solutions in each <tt class="docutils literal"><span class="pre">dt</span></tt>
-interval in arrays <tt class="docutils literal"><span class="pre">self.u_all</span></tt> and <tt class="docutils literal"><span class="pre">self.t_all</span></tt>.  Examples include
-<tt class="docutils literal"><span class="pre">RKFehlberg</span></tt>, <tt class="docutils literal"><span class="pre">Fehlberg</span></tt>, <tt class="docutils literal"><span class="pre">DormandPrince</span></tt>, <tt class="docutils literal"><span class="pre">CashKarp</span></tt>, and
-<tt class="docutils literal"><span class="pre">BogackiShampine</span></tt>. Other adaptive solvers (<tt class="docutils literal"><span class="pre">Vode</span></tt>, <tt class="docutils literal"><span class="pre">Lsode</span></tt>, <tt class="docutils literal"><span class="pre">Lsoda</span></tt>,
-<tt class="docutils literal"><span class="pre">RKC</span></tt>, <tt class="docutils literal"><span class="pre">RKF45</span></tt>, etc.)  do not give access to intermediate solution
-steps between the user-given time points, specified in the
-<tt class="docutils literal"><span class="pre">solver.solve</span></tt> call, and then we only have access to the solution at
-the user-given time points as returned by this call. One can run <tt class="docutils literal"><span class="pre">if</span>
-<span class="pre">solver.has_u_t_all()</span></tt> to test if the <tt class="docutils literal"><span class="pre">solver.u_all</span></tt> and <tt class="docutils literal"><span class="pre">solver.t_all</span></tt>
-arrays are available.  These are of interest to see how the adaptive
-strategy works between the user-specified time points.</p>
-<div class="section" id="the-test-problem">
-<h4>The Test Problem<a class="headerlink" href="#the-test-problem" title="Permalink to this headline">¶</a></h4>
-<p>We consider the ODE problem for testing adaptive solvers:</p>
-<div class="math" id="equation-gaussian:ode:eq">
-<span class="eqno">(1)</span>\[     u' = -\frac{t-c}{s^2} (u-1)\]</div>
-<p>The exact solution is a Gaussian function,</p>
-<div class="math">
-\[u(t) = 1 + \exp{\left(-\frac{1}{2}\left(\frac{t-c}{s}\right)^2\right)}\]</div>
-<p>centered around <span class="math">\(t=c\)</span> and width characteristic width (&#8220;standard
-deviation&#8221;) <span class="math">\(s\)</span>. The initial condition is taken as the exact <span class="math">\(u\)</span> at <span class="math">\(t=0\)</span>.</p>
-<p>Since the Gaussian function is significantly different from zero only in the
-interval <span class="math">\([c-3s, c+3s]\)</span>, one may expect that adaptive methods will
-efficiently take larger steps when <span class="math">\(u\)</span> is almost constant and increase
-the resolution when <span class="math">\(u\)</span> changes substantially in the vicinity
-of <span class="math">\(t=c\)</span>. We can test if this is the case with several solvers.</p>
-</div>
-<div class="section" id="running-simple-methods">
-<h4>Running Simple Methods<a class="headerlink" href="#running-simple-methods" title="Permalink to this headline">¶</a></h4>
-<p>Let us first use a simple standard method like the 2nd- and 4th-order
-Runge-Kutta methods with constant step size. With the former method
-(<tt class="docutils literal"><span class="pre">RK2</span></tt>), <span class="math">\(c=3\)</span>, <span class="math">\(s=0.5\)</span>, and <span class="math">\(41\)</span> uniformly distributed points,
-the discrepancy between the numerical and exact solution in
-Figure <a class="reference internal" href="#gaussian-fig-rk2-41"><em>2nd-order Runge-Kutta method with 41 points</em></a> is substantial. Increasing the number
-of points by a factor of 10 gives a solution much closer to the
-exact one, and switching to the 4th-order method (<tt class="docutils literal"><span class="pre">RK4</span></tt>) makes the
-curves visually coincide. The problem is therefore quite straightforward
-to solve using a sufficient number of points (400) and a higher-order method
-such as <tt class="docutils literal"><span class="pre">RK4</span></tt>.
-For curiosity we can mention that the <tt class="docutils literal"><span class="pre">ForwardEuler</span></tt> method produces
-a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.</p>
-<div class="figure" id="gaussian-fig-rk2-41">
-<a class="reference internal image-reference" href="_images/gaussian1_RK2_41.png"><img alt="_images/gaussian1_RK2_41.png" src="_images/gaussian1_RK2_41.png" style="width: 500px;" /></a>
-<p class="caption"><em>2nd-order Runge-Kutta method with 41 points</em></p>
-</div>
-<p>A simple program testing one numerical method goes as follows (<a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py">gaussian1.py</a>).</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">odespy</span><span class="o">,</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span><span class="o">,</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-
-<span class="n">center_point</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">s</span> <span class="o">=</span> <span class="mf">0.5</span>
-
-<span class="n">problem</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">problems</span><span class="o">.</span><span class="n">Gaussian1</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="n">center_point</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
-
-<span class="n">npoints</span> <span class="o">=</span> <span class="mi">41</span>
-<span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">center_point</span><span class="p">,</span> <span class="n">npoints</span><span class="p">)</span>
-
-<span class="n">method</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">RK2</span>
-<span class="n">solver</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">f</span><span class="p">)</span>
-<span class="n">solver</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">U0</span><span class="p">)</span>
-
-<span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">tp</span><span class="p">)</span>
-
-<span class="n">method</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
-<span class="k">print</span> <span class="s">&#39;</span><span class="si">%.4f</span><span class="s">  </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">method</span><span class="p">)</span>
-
-<span class="k">if</span> <span class="n">solver</span><span class="o">.</span><span class="n">has_u_t_all</span><span class="p">():</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">t_all</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">u_all</span><span class="p">,</span> <span class="s">&#39;bo&#39;</span><span class="p">,</span>
-             <span class="n">tp</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">tp</span><span class="p">))</span>
-    <span class="k">print</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> used </span><span class="si">%d</span><span class="s"> steps (</span><span class="si">%d</span><span class="s"> specified)&#39;</span> <span class="o">%</span> \
-          <span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">u_all</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">tp</span><span class="p">))</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">tp</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">method</span><span class="p">,</span> <span class="s">&#39;exact&#39;</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmppng&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.pdf&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="running-the-runge-kutta-fehlberg-method">
-<h4>Running the Runge-Kutta-Fehlberg Method<a class="headerlink" href="#running-the-runge-kutta-fehlberg-method" title="Permalink to this headline">¶</a></h4>
-<p>One of the most widely used general-purpose, adaptive methods for
-ODE problems is the
-Runge-Kutta-Fehlberg method of order (4,5). This method is available
-in three alternative implementations in Odespy: a direct Python
-version (<tt class="docutils literal"><span class="pre">RKFehlberg</span></tt>), a specialization of a generalized
-implementation of explicit adaptive Runge-Kutta methods
-(<tt class="docutils literal"><span class="pre">Fehlberg</span></tt>), and as a FORTRAN code (<tt class="docutils literal"><span class="pre">RKF45</span></tt>). We can try one of
-these,</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">method</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">Fehlberg</span>
-</pre></div>
-</div>
-<p>Figure <a class="reference internal" href="#gaussian-fig-fehlberg-41"><em>Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41)</em></a> shows how <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (57 adaptively selected points in time).</p>
-<div class="figure" id="gaussian-fig-fehlberg-41">
-<a class="reference internal image-reference" href="_images/gaussian1_Fehlberg_41.png"><img alt="_images/gaussian1_Fehlberg_41.png" src="_images/gaussian1_Fehlberg_41.png" style="width: 500px;" /></a>
-<p class="caption"><em>Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41)</em></p>
-</div>
-<p>Adaptive algorithms apply an error estimate based on considering a higher-order method as exact, in this case a method of order 5, and a method of lower order (here 4) as the numerically predicted solution. The user can specify an error tolerance. In the program above we just relied to the default tolerance, which can be printed by</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">solver</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>yielding a list of all optional parameters:</p>
-<div class="highlight-text"><div class="highlight"><pre>{&#39;f_kwargs&#39;: {}, &#39;f_args&#39;: (),
- &#39;max_step&#39;: 1.5000000000000036, &#39;verbose&#39;: 0,
- &#39;min_step&#39;: 0.0014999999999999946,
- &#39;first_step&#39;: 0.14999999999999999,
- &#39;rtol&#39;: 1e-06, &#39;atol&#39;: 1e-08,
- &#39;name of f&#39;: &#39;f&#39;, &#39;complex_valued&#39;: False,
- &#39;disk_storage&#39;: False, &#39;u_exact&#39;: None}
-</pre></div>
-</div>
-<p>The tolerances involved are of relative and absolute type, i.e.,</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">estimated_error</span> <span class="o">&lt;=</span> <span class="n">tol</span> <span class="o">=</span> <span class="n">rtol</span><span class="o">*</span><span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">+</span> <span class="n">atol</span>
-</pre></div>
-</div>
-<p>is the typical test on whether the solution is sufficiently.
-For very small <tt class="docutils literal"><span class="pre">u</span></tt>, <tt class="docutils literal"><span class="pre">atol</span></tt> comes into play, while for large <tt class="docutils literal"><span class="pre">u</span></tt>, the
-relative tolerance <tt class="docutils literal"><span class="pre">rtol</span></tt> dominates.</p>
-<p>In this particular example, running <tt class="docutils literal"><span class="pre">RK4</span></tt> with 57 equally spaced points
-yields a maximum value of 1.95, while <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> with 57 adaptively
-selected points results in 1.98. Note that the tolerances used are
-<span class="math">\(10^{-6}\)</span> while the real error is of the order <span class="math">\(10^{-2}\)</span>.</p>
-<p>We can specify stricter tolerances and also control the minimum
-allowed step size, <tt class="docutils literal"><span class="pre">min_step</span></tt>, which might be too large to achieve
-the desired error level (<a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian2.py">gaussian2.py</a>):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">rtol</span> <span class="o">=</span> <span class="mf">1E-12</span>
-<span class="n">atol</span> <span class="o">=</span> <span class="n">rtol</span>
-<span class="n">min_step</span> <span class="o">=</span> <span class="mf">0.000001</span>
-
-<span class="n">solver</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">Fehlberg</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span>
-                         <span class="n">min_step</span><span class="o">=</span><span class="n">min_step</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> solver now applies 701 points and achieves a maximum
-value of 2.00005. However, <tt class="docutils literal"><span class="pre">RK4</span></tt> with the same number of (equally spaced) points
-achieves the same accuracy and is much faster.</p>
-</div>
-<div class="section" id="testing-more-adaptive-solvers">
-<h4>Testing More Adaptive Solvers<a class="headerlink" href="#testing-more-adaptive-solvers" title="Permalink to this headline">¶</a></h4>
-<p>We have already solved <a href="#equation-gaussian:ode:eq">(1)</a> with sufficient accuracy, but
-let us see how other methods perform, as this will most likely result in
-a surprise. Below is a program (<a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian3.py">gaussian3.py</a>) that compares several famous and
-widely used methods in the same plot.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">odespy</span><span class="o">,</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span><span class="o">,</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-
-<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">solver</span><span class="p">):</span>
-    <span class="n">method</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
-
-    <span class="n">solver</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">U0</span><span class="p">)</span>
-
-    <span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">tp</span><span class="p">)</span>
-    <span class="n">solver</span><span class="o">.</span><span class="n">u_max</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-    <span class="k">print</span> <span class="s">&#39;</span><span class="si">%.4f</span><span class="s">  </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">u_max</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">solver</span><span class="o">.</span><span class="n">has_u_t_all</span><span class="p">():</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">t_all</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">u_all</span><span class="p">)</span>
-        <span class="k">print</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> used </span><span class="si">%d</span><span class="s"> steps (</span><span class="si">%d</span><span class="s"> specified)&#39;</span> <span class="o">%</span> \
-              <span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">u_all</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">tp</span><span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
-    <span class="n">legend</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">hold</span><span class="p">(</span><span class="s">&#39;on&#39;</span><span class="p">)</span>
-
-<span class="n">rtol</span> <span class="o">=</span> <span class="mf">1E-6</span>
-<span class="n">atol</span> <span class="o">=</span> <span class="n">rtol</span>
-<span class="n">s</span> <span class="o">=</span> <span class="mf">0.5</span>
-<span class="n">npoints</span> <span class="o">=</span> <span class="mi">41</span>
-<span class="n">center_point</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">problem</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">problems</span><span class="o">.</span><span class="n">Gaussian1</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="n">center_point</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
-<span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">center_point</span><span class="p">,</span> <span class="n">npoints</span><span class="p">)</span>
-<span class="n">min_step</span> <span class="o">=</span> <span class="mf">0.0001</span>
-
-<span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;DormandPrince&#39;</span><span class="p">,</span> <span class="s">&#39;BogackiShampine&#39;</span><span class="p">,</span>
-           <span class="s">&#39;RKFehlberg&#39;</span><span class="p">,</span> <span class="s">&#39;Vode&#39;</span><span class="p">,</span> <span class="s">&#39;RKF45&#39;</span><span class="p">,</span> <span class="s">&#39;Lsoda&#39;</span><span class="p">]</span>
-<span class="n">solvers</span> <span class="o">=</span> <span class="p">[</span><span class="nb">eval</span><span class="p">(</span><span class="s">&#39;odespy.&#39;</span> <span class="o">+</span> <span class="n">method</span><span class="p">)(</span>
-           <span class="n">problem</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span>
-           <span class="n">min_step</span><span class="o">=</span><span class="n">min_step</span><span class="p">)</span>
-           <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">]</span>
-<span class="c"># Run Vode with implicit BDF method of order 5</span>
-<span class="n">solvers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">adams_or_bdf</span><span class="o">=</span><span class="s">&#39;bdf&#39;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">problem</span><span class="o">.</span><span class="n">jac</span><span class="p">)</span>
-
-<span class="n">legend</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">solver</span> <span class="ow">in</span> <span class="n">solvers</span><span class="p">:</span>
-    <span class="n">run</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">solver</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">tp</span><span class="p">))</span>
-<span class="n">legend</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;exact&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legend</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp1.png&#39;</span><span class="p">)</span>
-
-<span class="c"># Plot errors</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-<span class="n">exact</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">tp</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">solver</span> <span class="ow">in</span> <span class="n">solvers</span><span class="p">:</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">exact</span> <span class="o">-</span> <span class="n">solver</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">hold</span><span class="p">(</span><span class="s">&#39;on&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legend</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp2.png&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>The default discretization applies <span class="math">\(N=40\)</span> equal-sized time intervals,
-but adaptive methods should be able to adjust themselves to the
-desired error level <span class="math">\(10^{-6}\)</span>. Figures <a class="reference internal" href="#gaussian3-fig1-41"><em>Comparison of adaptive methods with default parameters (tolerance ``E-6``)</em></a> and
-<a class="reference internal" href="#gaussian3-fig1err-41"><em>Comparison of errors in adaptive methods with default parameters (tolerance ``E-6``)</em></a> show that this expected behavior is not the
-case. There is substantial discrepancy between the methods!
-Surprisingly, the well-known FORTRAN codes accessed by the <tt class="docutils literal"><span class="pre">Vode</span></tt>
-(<tt class="docutils literal"><span class="pre">vode.f</span></tt>) and <tt class="docutils literal"><span class="pre">Lsoda</span></tt> (from ODEPACK) methods give very inaccurate
-results, despite setting <tt class="docutils literal"><span class="pre">Vode</span></tt> to use a stiff BDF solver of order 5, and
-<tt class="docutils literal"><span class="pre">Lsoda</span></tt> should automatically select between nonstiff and stiff solvers
-(of default order 4 in this case).</p>
-<div class="figure" id="gaussian3-fig1-41">
-<a class="reference internal image-reference" href="_images/gaussian3_41.png"><img alt="_images/gaussian3_41.png" src="_images/gaussian3_41.png" style="width: 500px;" /></a>
-<p class="caption"><em>Comparison of adaptive methods with default parameters (tolerance ``E-6``)</em></p>
-</div>
-<div class="figure" id="gaussian3-fig1err-41">
-<a class="reference internal image-reference" href="_images/gaussian3e_41.png"><img alt="_images/gaussian3e_41.png" src="_images/gaussian3e_41.png" style="width: 500px;" /></a>
-<p class="caption"><em>Comparison of errors in adaptive methods with default parameters (tolerance ``E-6``)</em></p>
-</div>
-<p>The program writes out the following results for the
-maximum value of the solution, which should equal 2:</p>
-<div class="highlight-text"><div class="highlight"><pre>1.9976  DormandPrince
-1.6591  BogackiShampine
-1.9812  RKFehlberg
-1.0406  Vode
-1.9734  RKF45
-3.2905  Lsoda
-</pre></div>
-</div>
-<p>The clearly most accurate solver among these is <tt class="docutils literal"><span class="pre">DormandPrince</span></tt>  - the default
-method used by MATLAB&#8217;s <tt class="docutils literal"><span class="pre">ode45</span></tt> solver, which is perhaps the world&#8217;s
-most popular ODE solver.</p>
-<p>The remedy to get all the tested solvers to perform well is to
-choose a much stricter tolerance, say <span class="math">\(10^{-10}\)</span>.
-Figure <a class="reference internal" href="#gaussian3-fig2-41"><em>Comparison of adaptive methods with error tolerance `E-10`</em></a> shows
-coinciding curves. Numerically, we now have</p>
-<div class="highlight-text"><div class="highlight"><pre>1.9991  DormandPrince
-1.9912  BogackiShampine
-1.9942  RKFehlberg
-2.0122  Vode
-1.9916  RKF45
-2.0056  Lsoda
-</pre></div>
-</div>
-<p>For the methods <tt class="docutils literal"><span class="pre">DormandPrince</span></tt>,  <tt class="docutils literal"><span class="pre">RKFehlberg</span></tt>, and
-<tt class="docutils literal"><span class="pre">BogackiShampine</span></tt> we have information about the number of adaptive
-time points used: 270, 326, and 3307, respectively.</p>
-<div class="figure" id="gaussian3-fig2-41">
-<a class="reference internal image-reference" href="_images/gaussian3_41_Em10.png"><img alt="_images/gaussian3_41_Em10.png" src="_images/gaussian3_41_Em10.png" style="width: 500px;" /></a>
-<p class="caption"><em>Comparison of adaptive methods with error tolerance `E-10`</em></p>
-</div>
-<p>The lesson learned in this example is two-fold: 1) several methods should
-be tested to gain reliability of the results, and Odespy makes such tests
-easy to conduct, and 2) strict tolerances, far below
-the default values, may be necessary for some methods, here <tt class="docutils literal"><span class="pre">Vode</span></tt> and
-<tt class="docutils literal"><span class="pre">Lsoda</span></tt> in particular. We remark that it is the ODE problem that causes
-difficulties: changing the problem to <tt class="docutils literal"><span class="pre">odespy.problems.Logistic</span></tt>
-(see the file <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic9.py">logistic9.py</a>)
-shows that all the curves coincide and cannot be distinguished visually.</p>
-<p>The present test problem with a Gaussian function as solution
-can be made increasingly more difficult by
-increasing the value of <span class="math">\(c/s\)</span>, i.e., a more peaked function moved to
-the right.</p>
-</div>
-<div class="section" id="extensive-testing">
-<h4>Extensive Testing<a class="headerlink" href="#extensive-testing" title="Permalink to this headline">¶</a></h4>
-<p>The program <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian4.py">gaussian4.py</a>
-sets up an extensive experiments involving a lot of solvers, several
-<span class="math">\(c/s\)</span> values, and several error tolerances.  The experiments clearly
-demonstrate how challenging this ODE problem is for many adaptive
-solvers unless <span class="math">\(c/s\)</span> is moderate and a strict tolerance (much lower
-than the real accuracy level) is used. One can especially see the
-fundamental difficulties that <tt class="docutils literal"><span class="pre">Vode</span></tt>, <tt class="docutils literal"><span class="pre">Lsode</span></tt>, and <tt class="docutils literal"><span class="pre">Lsoda</span></tt> (all stiff
-and nonstiff versions) face when <span class="math">\(c/s\geq 8\)</span>: these solvers do not
-manage to pick up any variation in <span class="math">\(u\)</span>. Nevertheless, for less
-demanding ODEs these solvers may perform very well, but it is highly
-recommended to always use the power of the unified Odespy interface
-to test several different adaptive methods.</p>
-</div>
 </div>
 <div class="section" id="example-solving-a-complex-ode-problem">
 <h3>Example: Solving a Complex ODE Problem<a class="headerlink" href="#example-solving-a-complex-ode-problem" title="Permalink to this headline">¶</a></h3>
@@ -2039,6 +1746,569 @@ generator is used for all methods, so that the time evolution of
 the force is always the same - otherwise the solutions will be
 different.</p>
 <p>The complete code is available in <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/tutorial/src-odespy/sode1.py">sode.py</a>.</p>
+</div>
+</div>
+<div class="section" id="adaptive-methods">
+<h2>Adaptive Methods<a class="headerlink" href="#adaptive-methods" title="Permalink to this headline">¶</a></h2>
+<p>The solvers used in the previous examples have all employed a constant
+time step <span class="math">\(\Delta t\)</span>. Many solvers available through the Odespy
+interface are adaptive in the sense that <span class="math">\(\Delta t\)</span> is adjusted
+throughout the solution process to meet a prescribed tolerance for
+the estimated error.</p>
+<p>Simple methods such as <tt class="docutils literal"><span class="pre">RK4</span></tt> apply time steps</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">dt</span> <span class="o">=</span> <span class="n">time_points</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">time_points</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>while adaptive methods will use several (smaller) time steps than <tt class="docutils literal"><span class="pre">dt</span></tt>
+in each <tt class="docutils literal"><span class="pre">dt</span></tt> interval to ensure that the estimated numerical error is
+smaller than some prescribed tolerance. The estimated numerical error
+may be a rather crude quantitative measure of the true numerical
+error (which we do not know since the exact solution of the problem is
+in general not known).</p>
+<p>Some adaptive solvers record the intermediate solutions in each <tt class="docutils literal"><span class="pre">dt</span></tt>
+interval in arrays <tt class="docutils literal"><span class="pre">self.u_all</span></tt> and <tt class="docutils literal"><span class="pre">self.t_all</span></tt>.  Examples include
+<tt class="docutils literal"><span class="pre">RKFehlberg</span></tt>, <tt class="docutils literal"><span class="pre">Fehlberg</span></tt>, <tt class="docutils literal"><span class="pre">DormandPrince</span></tt>, <tt class="docutils literal"><span class="pre">CashKarp</span></tt>, and
+<tt class="docutils literal"><span class="pre">BogackiShampine</span></tt>. Other adaptive solvers (<tt class="docutils literal"><span class="pre">Vode</span></tt>, <tt class="docutils literal"><span class="pre">Lsode</span></tt>, <tt class="docutils literal"><span class="pre">Lsoda</span></tt>,
+<tt class="docutils literal"><span class="pre">RKC</span></tt>, <tt class="docutils literal"><span class="pre">RKF45</span></tt>, etc.)  do not give access to intermediate solution
+steps between the user-given time points, specified in the
+<tt class="docutils literal"><span class="pre">solver.solve</span></tt> call, and then we only have access to the solution at
+the user-given time points as returned by this call. One can run <tt class="docutils literal"><span class="pre">if</span>
+<span class="pre">solver.has_u_t_all()</span></tt> to test if the <tt class="docutils literal"><span class="pre">solver.u_all</span></tt> and <tt class="docutils literal"><span class="pre">solver.t_all</span></tt>
+arrays are available.  These are of interest to see how the adaptive
+strategy works between the user-specified time points.</p>
+<div class="section" id="the-test-problem">
+<h3>The Test Problem<a class="headerlink" href="#the-test-problem" title="Permalink to this headline">¶</a></h3>
+<p>We consider the ODE problem for testing adaptive solvers:</p>
+<div class="math" id="equation-gaussian:ode:eq">
+<span class="eqno">(1)</span>\[     u' = -\frac{t-c}{s^2} (u-1)\]</div>
+<p>The exact solution is a Gaussian function,</p>
+<div class="math">
+\[u(t) = 1 + \exp{\left(-\frac{1}{2}\left(\frac{t-c}{s}\right)^2\right)}\]</div>
+<p>centered around <span class="math">\(t=c\)</span> and width characteristic width (&#8220;standard
+deviation&#8221;) <span class="math">\(s\)</span>. The initial condition is taken as the exact <span class="math">\(u\)</span> at <span class="math">\(t=0\)</span>.</p>
+<p>Since the Gaussian function is significantly different from zero only in the
+interval <span class="math">\([c-3s, c+3s]\)</span>, one may expect that adaptive methods will
+efficiently take larger steps when <span class="math">\(u\)</span> is almost constant and increase
+the resolution when <span class="math">\(u\)</span> changes substantially in the vicinity
+of <span class="math">\(t=c\)</span>. We can test if this is the case with several solvers.</p>
+</div>
+<div class="section" id="running-simple-methods">
+<h3>Running Simple Methods<a class="headerlink" href="#running-simple-methods" title="Permalink to this headline">¶</a></h3>
+<p>Let us first use a simple standard method like the 2nd- and 4th-order
+Runge-Kutta methods with constant step size. With the former method
+(<tt class="docutils literal"><span class="pre">RK2</span></tt>), <span class="math">\(c=3\)</span>, <span class="math">\(s=0.5\)</span>, and <span class="math">\(41\)</span> uniformly distributed points,
+the discrepancy between the numerical and exact solution in
+Figure <a class="reference internal" href="#gaussian-fig-rk2-41"><em>2nd-order Runge-Kutta method with 41 points</em></a> is substantial. Increasing the number
+of points by a factor of 10 gives a solution much closer to the
+exact one, and switching to the 4th-order method (<tt class="docutils literal"><span class="pre">RK4</span></tt>) makes the
+curves visually coincide. The problem is therefore quite straightforward
+to solve using a sufficient number of points (400) and a higher-order method
+such as <tt class="docutils literal"><span class="pre">RK4</span></tt>.
+For curiosity we can mention that the <tt class="docutils literal"><span class="pre">ForwardEuler</span></tt> method produces
+a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.</p>
+<div class="figure" id="gaussian-fig-rk2-41">
+<a class="reference internal image-reference" href="_images/gaussian1_RK2_41.png"><img alt="_images/gaussian1_RK2_41.png" src="_images/gaussian1_RK2_41.png" style="width: 500px;" /></a>
+<p class="caption"><em>2nd-order Runge-Kutta method with 41 points</em></p>
+</div>
+<p>A simple program testing one numerical method goes as follows (<a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py">gaussian1.py</a>).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">odespy</span><span class="o">,</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span><span class="o">,</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="n">center_point</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">s</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+<span class="n">problem</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">problems</span><span class="o">.</span><span class="n">Gaussian1</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="n">center_point</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+
+<span class="n">npoints</span> <span class="o">=</span> <span class="mi">41</span>
+<span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">center_point</span><span class="p">,</span> <span class="n">npoints</span><span class="p">)</span>
+
+<span class="n">method</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">RK2</span>
+<span class="n">solver</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">f</span><span class="p">)</span>
+<span class="n">solver</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">U0</span><span class="p">)</span>
+
+<span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">tp</span><span class="p">)</span>
+
+<span class="n">method</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+<span class="k">print</span> <span class="s">&#39;</span><span class="si">%.4f</span><span class="s">  </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">method</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">solver</span><span class="o">.</span><span class="n">has_u_t_all</span><span class="p">():</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">t_all</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">u_all</span><span class="p">,</span> <span class="s">&#39;bo&#39;</span><span class="p">,</span>
+             <span class="n">tp</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">tp</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> used </span><span class="si">%d</span><span class="s"> steps (</span><span class="si">%d</span><span class="s"> specified)&#39;</span> <span class="o">%</span> \
+          <span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">u_all</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">tp</span><span class="p">))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">tp</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">method</span><span class="p">,</span> <span class="s">&#39;exact&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmppng&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp.pdf&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-the-runge-kutta-fehlberg-method">
+<h3>Running the Runge-Kutta-Fehlberg Method<a class="headerlink" href="#running-the-runge-kutta-fehlberg-method" title="Permalink to this headline">¶</a></h3>
+<p>One of the most widely used general-purpose, adaptive methods for
+ODE problems is the
+Runge-Kutta-Fehlberg method of order (4,5). This method is available
+in three alternative implementations in Odespy: a direct Python
+version (<tt class="docutils literal"><span class="pre">RKFehlberg</span></tt>), a specialization of a generalized
+implementation of explicit adaptive Runge-Kutta methods
+(<tt class="docutils literal"><span class="pre">Fehlberg</span></tt>), and as a FORTRAN code (<tt class="docutils literal"><span class="pre">RKF45</span></tt>). We can try one of
+these,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">method</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">Fehlberg</span>
+</pre></div>
+</div>
+<p>Figure <a class="reference internal" href="#gaussian-fig-fehlberg-41"><em>Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41)</em></a> shows how <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (57 adaptively selected points in time).</p>
+<div class="figure" id="gaussian-fig-fehlberg-41">
+<a class="reference internal image-reference" href="_images/gaussian1_Fehlberg_41.png"><img alt="_images/gaussian1_Fehlberg_41.png" src="_images/gaussian1_Fehlberg_41.png" style="width: 500px;" /></a>
+<p class="caption"><em>Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41)</em></p>
+</div>
+<p>Adaptive algorithms apply an error estimate based on considering a higher-order method as exact, in this case a method of order 5, and a method of lower order (here 4) as the numerically predicted solution. The user can specify an error tolerance. In the program above we just relied to the default tolerance, which can be printed by</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">solver</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>yielding a list of all optional parameters:</p>
+<div class="highlight-text"><div class="highlight"><pre>{&#39;f_kwargs&#39;: {}, &#39;f_args&#39;: (),
+ &#39;max_step&#39;: 1.5000000000000036, &#39;verbose&#39;: 0,
+ &#39;min_step&#39;: 0.0014999999999999946,
+ &#39;first_step&#39;: 0.14999999999999999,
+ &#39;rtol&#39;: 1e-06, &#39;atol&#39;: 1e-08,
+ &#39;name of f&#39;: &#39;f&#39;, &#39;complex_valued&#39;: False,
+ &#39;disk_storage&#39;: False, &#39;u_exact&#39;: None}
+</pre></div>
+</div>
+<p>The tolerances involved are of relative and absolute type, i.e.,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">estimated_error</span> <span class="o">&lt;=</span> <span class="n">tol</span> <span class="o">=</span> <span class="n">rtol</span><span class="o">*</span><span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">+</span> <span class="n">atol</span>
+</pre></div>
+</div>
+<p>is the typical test on whether the solution is sufficiently.
+For very small <tt class="docutils literal"><span class="pre">u</span></tt>, <tt class="docutils literal"><span class="pre">atol</span></tt> comes into play, while for large <tt class="docutils literal"><span class="pre">u</span></tt>, the
+relative tolerance <tt class="docutils literal"><span class="pre">rtol</span></tt> dominates.</p>
+<p>In this particular example, running <tt class="docutils literal"><span class="pre">RK4</span></tt> with 57 equally spaced points
+yields a maximum value of 1.95, while <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> with 57 adaptively
+selected points results in 1.98. Note that the tolerances used are
+<span class="math">\(10^{-6}\)</span> while the real error is of the order <span class="math">\(10^{-2}\)</span>.</p>
+<p>We can specify stricter tolerances and also control the minimum
+allowed step size, <tt class="docutils literal"><span class="pre">min_step</span></tt>, which might be too large to achieve
+the desired error level (<a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian2.py">gaussian2.py</a>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">rtol</span> <span class="o">=</span> <span class="mf">1E-12</span>
+<span class="n">atol</span> <span class="o">=</span> <span class="n">rtol</span>
+<span class="n">min_step</span> <span class="o">=</span> <span class="mf">0.000001</span>
+
+<span class="n">solver</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">Fehlberg</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span>
+                         <span class="n">min_step</span><span class="o">=</span><span class="n">min_step</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">Fehlberg</span></tt> solver now applies 701 points and achieves a maximum
+value of 2.00005. However, <tt class="docutils literal"><span class="pre">RK4</span></tt> with the same number of (equally spaced) points
+achieves the same accuracy and is much faster.</p>
+</div>
+<div class="section" id="testing-more-adaptive-solvers">
+<h3>Testing More Adaptive Solvers<a class="headerlink" href="#testing-more-adaptive-solvers" title="Permalink to this headline">¶</a></h3>
+<p>We have already solved <a href="#equation-gaussian:ode:eq">(1)</a> with sufficient accuracy, but
+let us see how other methods perform, as this will most likely result in
+a surprise. Below is a program (<a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian3.py">gaussian3.py</a>) that compares several famous and
+widely used methods in the same plot.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">odespy</span><span class="o">,</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span><span class="o">,</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">solver</span><span class="p">):</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+
+    <span class="n">solver</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">U0</span><span class="p">)</span>
+
+    <span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">tp</span><span class="p">)</span>
+    <span class="n">solver</span><span class="o">.</span><span class="n">u_max</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="k">print</span> <span class="s">&#39;</span><span class="si">%.4f</span><span class="s">  </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">u_max</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">solver</span><span class="o">.</span><span class="n">has_u_t_all</span><span class="p">():</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">t_all</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">u_all</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> used </span><span class="si">%d</span><span class="s"> steps (</span><span class="si">%d</span><span class="s"> specified)&#39;</span> <span class="o">%</span> \
+              <span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">u_all</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">tp</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solver</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">solver</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
+    <span class="n">legend</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">hold</span><span class="p">(</span><span class="s">&#39;on&#39;</span><span class="p">)</span>
+
+<span class="n">rtol</span> <span class="o">=</span> <span class="mf">1E-6</span>
+<span class="n">atol</span> <span class="o">=</span> <span class="n">rtol</span>
+<span class="n">s</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">npoints</span> <span class="o">=</span> <span class="mi">41</span>
+<span class="n">center_point</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">problem</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">problems</span><span class="o">.</span><span class="n">Gaussian1</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="n">center_point</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+<span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">center_point</span><span class="p">,</span> <span class="n">npoints</span><span class="p">)</span>
+<span class="n">min_step</span> <span class="o">=</span> <span class="mf">0.0001</span>
+
+<span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;DormandPrince&#39;</span><span class="p">,</span> <span class="s">&#39;BogackiShampine&#39;</span><span class="p">,</span>
+           <span class="s">&#39;RKFehlberg&#39;</span><span class="p">,</span> <span class="s">&#39;Vode&#39;</span><span class="p">,</span> <span class="s">&#39;RKF45&#39;</span><span class="p">,</span> <span class="s">&#39;Lsoda&#39;</span><span class="p">]</span>
+<span class="n">solvers</span> <span class="o">=</span> <span class="p">[</span><span class="nb">eval</span><span class="p">(</span><span class="s">&#39;odespy.&#39;</span> <span class="o">+</span> <span class="n">method</span><span class="p">)(</span>
+           <span class="n">problem</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span>
+           <span class="n">min_step</span><span class="o">=</span><span class="n">min_step</span><span class="p">)</span>
+           <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">]</span>
+<span class="c"># Run Vode with implicit BDF method of order 5</span>
+<span class="n">solvers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">adams_or_bdf</span><span class="o">=</span><span class="s">&#39;bdf&#39;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">problem</span><span class="o">.</span><span class="n">jac</span><span class="p">)</span>
+
+<span class="n">legend</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">solver</span> <span class="ow">in</span> <span class="n">solvers</span><span class="p">:</span>
+    <span class="n">run</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">solver</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">tp</span><span class="p">))</span>
+<span class="n">legend</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;exact&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legend</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp1.png&#39;</span><span class="p">)</span>
+
+<span class="c"># Plot errors</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">exact</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">tp</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">solver</span> <span class="ow">in</span> <span class="n">solvers</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">exact</span> <span class="o">-</span> <span class="n">solver</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">hold</span><span class="p">(</span><span class="s">&#39;on&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legend</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp2.png&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The default discretization applies <span class="math">\(N=40\)</span> equal-sized time intervals,
+but adaptive methods should be able to adjust themselves to the
+desired error level <span class="math">\(10^{-6}\)</span>. Figures <a class="reference internal" href="#gaussian3-fig1-41"><em>Comparison of adaptive methods with default parameters (tolerance ``E-6``)</em></a> and
+<a class="reference internal" href="#gaussian3-fig1err-41"><em>Comparison of errors in adaptive methods with default parameters (tolerance ``E-6``)</em></a> show that this expected behavior is not the
+case. There is substantial discrepancy between the methods!
+Surprisingly, the well-known FORTRAN codes accessed by the <tt class="docutils literal"><span class="pre">Vode</span></tt>
+(<tt class="docutils literal"><span class="pre">vode.f</span></tt>) and <tt class="docutils literal"><span class="pre">Lsoda</span></tt> (from ODEPACK) methods give very inaccurate
+results, despite setting <tt class="docutils literal"><span class="pre">Vode</span></tt> to use a stiff BDF solver of order 5, and
+<tt class="docutils literal"><span class="pre">Lsoda</span></tt> should automatically select between nonstiff and stiff solvers
+(of default order 4 in this case).</p>
+<div class="figure" id="gaussian3-fig1-41">
+<a class="reference internal image-reference" href="_images/gaussian3_41.png"><img alt="_images/gaussian3_41.png" src="_images/gaussian3_41.png" style="width: 500px;" /></a>
+<p class="caption"><em>Comparison of adaptive methods with default parameters (tolerance ``E-6``)</em></p>
+</div>
+<div class="figure" id="gaussian3-fig1err-41">
+<a class="reference internal image-reference" href="_images/gaussian3e_41.png"><img alt="_images/gaussian3e_41.png" src="_images/gaussian3e_41.png" style="width: 500px;" /></a>
+<p class="caption"><em>Comparison of errors in adaptive methods with default parameters (tolerance ``E-6``)</em></p>
+</div>
+<p>The program writes out the following results for the
+maximum value of the solution, which should equal 2:</p>
+<div class="highlight-text"><div class="highlight"><pre>1.9976  DormandPrince
+1.6591  BogackiShampine
+1.9812  RKFehlberg
+1.0406  Vode
+1.9734  RKF45
+3.2905  Lsoda
+</pre></div>
+</div>
+<p>The clearly most accurate solver among these is <tt class="docutils literal"><span class="pre">DormandPrince</span></tt>  - the default
+method used by MATLAB&#8217;s <tt class="docutils literal"><span class="pre">ode45</span></tt> solver, which is perhaps the world&#8217;s
+most popular ODE solver.</p>
+<p>The remedy to get all the tested solvers to perform well is to
+choose a much stricter tolerance, say <span class="math">\(10^{-10}\)</span>.
+Figure <a class="reference internal" href="#gaussian3-fig2-41"><em>Comparison of adaptive methods with error tolerance `E-10`</em></a> shows
+coinciding curves. Numerically, we now have</p>
+<div class="highlight-text"><div class="highlight"><pre>1.9991  DormandPrince
+1.9912  BogackiShampine
+1.9942  RKFehlberg
+2.0122  Vode
+1.9916  RKF45
+2.0056  Lsoda
+</pre></div>
+</div>
+<p>For the methods <tt class="docutils literal"><span class="pre">DormandPrince</span></tt>,  <tt class="docutils literal"><span class="pre">RKFehlberg</span></tt>, and
+<tt class="docutils literal"><span class="pre">BogackiShampine</span></tt> we have information about the number of adaptive
+time points used: 270, 326, and 3307, respectively.</p>
+<div class="figure" id="gaussian3-fig2-41">
+<a class="reference internal image-reference" href="_images/gaussian3_41_Em10.png"><img alt="_images/gaussian3_41_Em10.png" src="_images/gaussian3_41_Em10.png" style="width: 500px;" /></a>
+<p class="caption"><em>Comparison of adaptive methods with error tolerance `E-10`</em></p>
+</div>
+<p>The lesson learned in this example is two-fold: 1) several methods should
+be tested to gain reliability of the results, and Odespy makes such tests
+easy to conduct, and 2) strict tolerances, far below
+the default values, may be necessary for some methods, here <tt class="docutils literal"><span class="pre">Vode</span></tt> and
+<tt class="docutils literal"><span class="pre">Lsoda</span></tt> in particular. We remark that it is the ODE problem that causes
+difficulties: changing the problem to <tt class="docutils literal"><span class="pre">odespy.problems.Logistic</span></tt>
+(see the file <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic9.py">logistic9.py</a>)
+shows that all the curves coincide and cannot be distinguished visually.</p>
+<p>The present test problem with a Gaussian function as solution
+can be made increasingly more difficult by
+increasing the value of <span class="math">\(c/s\)</span>, i.e., a more peaked function moved to
+the right.</p>
+</div>
+<div class="section" id="extensive-testing">
+<h3>Extensive Testing<a class="headerlink" href="#extensive-testing" title="Permalink to this headline">¶</a></h3>
+<p>The program <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian4.py">gaussian4.py</a>
+sets up an extensive experiments involving a lot of solvers, several
+<span class="math">\(c/s\)</span> values, and several error tolerances.  The experiments clearly
+demonstrate how challenging this ODE problem is for many adaptive
+solvers unless <span class="math">\(c/s\)</span> is moderate and a strict tolerance (much lower
+than the real accuracy level) is used. One can especially see the
+fundamental difficulties that <tt class="docutils literal"><span class="pre">Vode</span></tt>, <tt class="docutils literal"><span class="pre">Lsode</span></tt>, and <tt class="docutils literal"><span class="pre">Lsoda</span></tt> (all stiff
+and nonstiff versions) face when <span class="math">\(c/s\geq 8\)</span>: these solvers do not
+manage to pick up any variation in <span class="math">\(u\)</span>. Nevertheless, for less
+demanding ODEs these solvers may perform very well, but it is highly
+recommended to always use the power of the unified Odespy interface
+to test several different adaptive methods.</p>
+</div>
+</div>
+<div class="section" id="solving-partial-differential-equations">
+<h2>Solving Partial Differential Equations<a class="headerlink" href="#solving-partial-differential-equations" title="Permalink to this headline">¶</a></h2>
+<p>Let us now turn the attention to the method of lines for
+partial differential equations  (PDEs) where one reduces a PDE to
+a system of ODE and then applies standard methods ODEs.</p>
+<p>We address a diffusion problem in one dimension:</p>
+<div class="math" id="equation-odespy:pde:diffusion">
+<span class="eqno">(2)</span>\[     \frac{\partial u(x,t)}{\partial t} = \beta \frac{\partial^{2}u(x,t)}{\partial x^2} + f(x,t), x \in \left(0,L\right),  t \in (0,T],\]</div>
+<div class="math" id="equation-odespy:pde:diffusion:x0">
+<span class="eqno">(3)</span>\[     u(0,t) = s(t),  t \in (0,T],\]</div>
+<div class="math" id="equation-odespy:pde:diffusion:xL">
+<span class="eqno">(4)</span>\[     \frac{\partial}{\partial x}u(L,t) = 0, t \in (0,T],\]</div>
+<div class="math" id="equation-odespy:pde:diffusion:I">
+<span class="eqno">(5)</span>\[     u(x,0) = I(x), x \in \left[0,L\right]\]\[     \thinspace .\]</div>
+<div class="section" id="discretization-in-space">
+<h3>Discretization in Space<a class="headerlink" href="#discretization-in-space" title="Permalink to this headline">¶</a></h3>
+<p>Discretizing the 2nd-order derivative in space with a finite difference,
+on a mesh <span class="math">\(x_i=i\Delta x\)</span>, <span class="math">\(i=1,\ldots,N-1\)</span>, gives the ODEs</p>
+<div class="math">
+\[\frac{\partial u_i(t)}{\partial t} = \beta
+\frac{u_{i+1}(t) - 2u_i(t) + u_{i-1}(t)}{\Delta x^2} + f_i(t),\quad i=1,\ldots,N-1
+\thinspace .\]</div>
+<p>Here we have introduced the notation <span class="math">\(u_i(t)\)</span> as an approximation to the
+exact solution at mesh point <span class="math">\(x_i\)</span>.</p>
+<p>The boundary condition on <span class="math">\(x=0\)</span>, <span class="math">\(u(0,t)=s(t)\)</span>, gives rise to the ODE</p>
+<div class="math">
+\[u_0'(t) = s'(t),\quad u_0(0)=s(0)\thinspace .\]</div>
+<p>At the other end, <span class="math">\(x=L\)</span>, we use a centered difference approximation
+<span class="math">\((u_{N+1}(t)-u_{N-1}(t))/(2\Delta x) =0\)</span> and combine it with the
+scheme for <span class="math">\(i=N\)</span> to obtain the modified boundary ODE</p>
+<div class="math">
+\[\frac{\partial u_N(t)}{\partial t} = \beta
+\frac{2u_{N-1}(t) - 2u_N(t)}{\partial x^2} + f_N(t)\thinspace .\]</div>
+<p>To summarize, the ODE system reads</p>
+<div class="math" id="equation-sec:pde:diff1D:ode1:0">
+<span class="eqno">(6)</span>\[     \frac{du_0}{dt} = s'(t),\]</div>
+<div class="math" id="equation-sec:pde:diff1D:ode1:i">
+<span class="eqno">(7)</span>\[     \frac{du_i}{dt} =  \frac{\beta}{\Delta x^2}
+     (u_{i+1}(t) - 2u_i(t) + u_{i-1}(t)) + f_i(t),\quad i=1,\ldots,N-1,\]</div>
+<div class="math" id="equation-sec:pde:diff1D:ode1:N">
+<span class="eqno">(8)</span>\[     \frac{du_N}{dt} =  \frac{2\beta}{\Delta x^2}
+     (u_{N-1}(t) - u_N(t)) + f_i(t)\thinspace .\]</div>
+<p>The initial conditions are</p>
+<div class="math">
+\[u_0(0) = s(0),\]</div>
+<div class="math">
+\[u_i(0) = I(x_i),\quad i=1,\ldots,N\thinspace .\]</div>
+<p>We can apply any method for systems of ODEs to solve
+<a href="#equation-sec:pde:diff1D:ode1:0">(6)</a>-<a href="#equation-sec:pde:diff1D:ode1:N">(8)</a>.</p>
+</div>
+<div class="section" id="implementation-of-the-right-hand-side-function">
+<h3>Implementation of the Right-Hand Side Function<a class="headerlink" href="#implementation-of-the-right-hand-side-function" title="Permalink to this headline">¶</a></h3>
+<p>Consider
+the evolution of the temperature in a rod modeled by our diffusion problem.
+At <span class="math">\(t=0\)</span>, the rod has the temperature 10 C. We then apply a heat source
+at <span class="math">\(x=0\)</span> which keepes the temperature there at 50 C. This means that
+<span class="math">\(I(x)=283\)</span> K, except at the end point:
+<span class="math">\(I(0)=423\)</span> K, <span class="math">\(s(t) = 423\)</span> K, and <span class="math">\(f=0\)</span>.</p>
+<p>Odespy solvers need the right-hand side function of
+<a href="#equation-sec:pde:diff1D:ode1:0">(6)</a>-<a href="#equation-sec:pde:diff1D:ode1:N">(8)</a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">rhs</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">rhs</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">rhs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dsdt</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+        <span class="n">rhs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> \
+                 <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">rhs</span><span class="p">[</span><span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">N</span><span class="p">],</span> <span class="n">t</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rhs</span>
+</pre></div>
+</div>
+<p>This function requires the variables <tt class="docutils literal"><span class="pre">beta</span></tt>, <tt class="docutils literal"><span class="pre">x</span></tt>, <tt class="docutils literal"><span class="pre">dx</span></tt>, and <tt class="docutils literal"><span class="pre">L</span></tt>, which
+we provide as keyword arguments and that can be transferred to <tt class="docutils literal"><span class="pre">rhs</span></tt>
+through the <tt class="docutils literal"><span class="pre">f_kwargs</span></tt> argument to the Odespy constructors.</p>
+<p>We also need some helper functions</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">s</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">423</span>
+
+<span class="k">def</span> <span class="nf">dsdt</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">0</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>Parameters and initial conditions can be set as</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">N</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">f_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">U_0</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">U_0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">U_0</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="mi">283</span>
+</pre></div>
+</div>
+<p>The construction and execution of a solver is now a matter of</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">odespy</span>
+<span class="n">solver</span> <span class="o">=</span> <span class="n">odespy</span><span class="o">.</span><span class="n">ForwardEuler</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">f_kwargs</span><span class="o">=</span><span class="n">f_kwargs</span><span class="p">)</span>
+<span class="n">solver</span><span class="o">.</span><span class="n">set_initial_condition</span><span class="p">(</span><span class="n">U_0</span><span class="p">)</span>
+
+<span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">beta</span><span class="p">)</span> <span class="c"># Forward Euler limit</span>
+<span class="n">N_t</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">T</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">dt</span><span class="p">)))</span>
+<span class="n">time_points</span> <span class="o">=</span> <span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">N_t</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">u</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">time_points</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can add some flexibility and set up several solvers, also
+implicit methods:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">odespy</span>
+<span class="n">solvers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;FE&#39;</span><span class="p">:</span> <span class="n">odespy</span><span class="o">.</span><span class="n">ForwardEuler</span><span class="p">(</span>
+        <span class="n">rhs</span><span class="p">,</span> <span class="n">f_kwargs</span><span class="o">=</span><span class="n">f_kwargs</span><span class="p">),</span>
+    <span class="s">&#39;BE&#39;</span><span class="p">:</span> <span class="n">odespy</span><span class="o">.</span><span class="n">BackwardEuler</span><span class="p">(</span>
+        <span class="n">rhs</span><span class="p">,</span> <span class="n">f_is_linear</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">K</span><span class="p">,</span>
+        <span class="n">f_kwargs</span><span class="o">=</span><span class="n">f_kwargs</span><span class="p">,</span> <span class="n">jac_kwargs</span><span class="o">=</span><span class="n">f_kwargs</span><span class="p">),</span>
+    <span class="s">&#39;B2&#39;</span><span class="p">:</span> <span class="n">odespy</span><span class="o">.</span><span class="n">Backward2Step</span><span class="p">(</span>
+        <span class="n">rhs</span><span class="p">,</span> <span class="n">f_is_linear</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">K</span><span class="p">,</span>
+        <span class="n">f_kwargs</span><span class="o">=</span><span class="n">f_kwargs</span><span class="p">,</span> <span class="n">jac_kwargs</span><span class="o">=</span><span class="n">f_kwargs</span><span class="p">),</span>
+    <span class="s">&#39;theta&#39;</span><span class="p">:</span> <span class="n">odespy</span><span class="o">.</span><span class="n">ThetaRule</span><span class="p">(</span>
+        <span class="n">rhs</span><span class="p">,</span> <span class="n">f_is_linear</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">K</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">f_kwargs</span><span class="o">=</span><span class="n">f_kwargs</span><span class="p">,</span> <span class="n">jac_kwargs</span><span class="o">=</span><span class="n">f_kwargs</span><span class="p">),</span>
+    <span class="s">&#39;RKF&#39;</span><span class="p">:</span> <span class="n">odespy</span><span class="o">.</span><span class="n">RKFehlberg</span><span class="p">(</span>
+        <span class="n">rhs</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1E-8</span><span class="p">,</span> <span class="n">f_kwargs</span><span class="o">=</span><span class="n">f_kwargs</span><span class="p">),</span>
+    <span class="s">&#39;RKC&#39;</span><span class="p">:</span> <span class="n">odespy</span><span class="o">.</span><span class="n">RKC</span><span class="p">(</span>
+        <span class="n">rhs</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1E-6</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1E-8</span><span class="p">,</span> <span class="n">f_kwargs</span><span class="o">=</span><span class="n">f_kwargs</span><span class="p">,</span>
+        <span class="n">jac_constant</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+    <span class="p">}</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+<span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="s">&#39;FE&#39;</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">beta</span><span class="p">)</span> <span class="c"># Forward Euler limit</span>
+    <span class="k">print</span> <span class="s">&#39;Forward Euler stability limit:&#39;</span><span class="p">,</span> <span class="n">dt</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="mf">1.2</span>
+
+<span class="n">solver</span> <span class="o">=</span> <span class="n">solvers</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The implicit solvers need the Jacobian of the right-hand side function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">K</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">K</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+        <span class="n">K</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">K</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">K</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">K</span><span class="p">[</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span>
+    <span class="n">K</span><span class="p">[</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">K</span>
+</pre></div>
+</div>
+<p>Note that we work with <em>dense square matrices</em> while the mathematics
+allows a tridiagonal matrix and corresponding solver.
+However, in 1D problems, the computations
+are so fast anyway so we can live with dense matrices.</p>
+<p>Finally, some animation of the solution is desirable:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Make movie</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;rm tmp_*.png&#39;</span><span class="p">)</span>  <span class="c"># remove old plot files</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+<span class="n">lines</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">273</span><span class="p">,</span> <span class="mf">1.2</span><span class="o">*</span><span class="n">s</span><span class="p">(</span><span class="mi">0</span><span class="p">)])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;u(x,t)&#39;</span><span class="p">)</span>
+<span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="k">print</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ydata</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">,:])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s">&#39;t=</span><span class="si">%.3f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c"># plot every 5 steps</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;tmp_</span><span class="si">%04d</span><span class="s">.png&#39;</span> <span class="o">%</span> <span class="n">counter</span><span class="p">)</span>
+        <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="c">#time.sleep(0.2)</span>
+</pre></div>
+</div>
+<div class="section" id="vectorized-code">
+<h4>Vectorized Code<a class="headerlink" href="#vectorized-code" title="Permalink to this headline">¶</a></h4>
+<p>It is easy to get rid of the loops in the <tt class="docutils literal"><span class="pre">rhs</span></tt> and <tt class="docutils literal"><span class="pre">K</span></tt> functions:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">rhs_vec</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">rhs</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">rhs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dsdt</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">rhs</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">N</span><span class="p">]</span> <span class="o">+</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> \
+               <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">N</span><span class="p">],</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">N</span>
+    <span class="n">rhs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">N</span><span class="p">],</span> <span class="n">t</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rhs</span>
+
+<span class="k">def</span> <span class="nf">K_vec</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Vectorized computation of K.&quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">K</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">K</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">K</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">K</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">K</span><span class="p">[</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span>
+    <span class="n">K</span><span class="p">[</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="o">/</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">K</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="experiments">
+<h3>Experiments<a class="headerlink" href="#experiments" title="Permalink to this headline">¶</a></h3>
+<p>The program, <a class="reference external" href="https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/pde_diffusion.py">pde_diffusion.py</a>, can be run to test different solvers and illustrate numerical
+methods:</p>
+<p><strong>Forward Euler Method.</strong>
+Run</p>
+<div class="highlight-text"><div class="highlight"><pre>python pde_diffusion.py
+</pre></div>
+</div>
+<p>The graphics takes very long time in this simulation, because of the
+small time step.</p>
+<p><strong>Backward Euler.</strong>
+Run</p>
+<div class="highlight-text"><div class="highlight"><pre>python ode_diffusion.py BE 0.05 1.2
+</pre></div>
+</div>
+<p><strong>Backward 2-step Method.</strong>
+Run</p>
+<div class="highlight-text"><div class="highlight"><pre>python ode_diffusion.py B2 0.05 1.2
+</pre></div>
+</div>
+<p><strong>Crank-Nicolson Method.</strong>
+Run</p>
+<div class="highlight-text"><div class="highlight"><pre>python ode_diffusion.py theta 0.01 1.2
+</pre></div>
+</div>
+<p>Observe the non-physical oscillations because of the steep initial
+condition (and the lack of damping in the Crank-Nicolson scheme).</p>
+<p><strong>Runge-Kutta-Fehlberg Method.</strong>
+Run</p>
+<div class="highlight-text"><div class="highlight"><pre>python ode_diffusion.py RKF 0.01 1.2
+</pre></div>
+</div>
+<p>Note here that we specify a quite large <span class="math">\(\Delta t\)</span>, much larger than
+what a Runge-Kutta method can work with (typically, an RK4 method
+needs a <span class="math">\(\Delta t\)</span> as small as the critical step for the Forward Euler
+method). However, the adaptive method figures out what it needs of
+steps and produces a nice solution.</p>
+<p><strong>Runge-Kutta-Chebyshev Method.</strong>
+Run</p>
+<div class="highlight-text"><div class="highlight"><pre>python ode_diffusion.py RKC 0.05 1.2
+</pre></div>
+</div>
+<p>This is a promising method for the diffusion equation. It works like
+an explicit method and can tolerate large time steps. This method calls
+up the FORTRAN code <tt class="docutils literal"><span class="pre">rkc.f</span></tt>.</p>
 </div>
 </div>
 <div class="section" id="inner-workings-of-the-package">
@@ -2498,15 +2768,10 @@ output in many different formats.</p>
 <li><a class="reference internal" href="#example-solving-an-ode-system">Example: Solving an ODE System</a></li>
 <li><a class="reference internal" href="#the-euler-cromer-method">The Euler-Cromer Method</a></li>
 <li><a class="reference internal" href="#testing-several-methods">Testing Several Methods</a></li>
-<li><a class="reference internal" href="#make-a-subclass-of-class-problem">Make a Subclass of Class Problem</a></li>
-<li><a class="reference internal" href="#adaptive-methods">Adaptive Methods</a><ul>
-<li><a class="reference internal" href="#the-test-problem">The Test Problem</a></li>
-<li><a class="reference internal" href="#running-simple-methods">Running Simple Methods</a></li>
-<li><a class="reference internal" href="#running-the-runge-kutta-fehlberg-method">Running the Runge-Kutta-Fehlberg Method</a></li>
-<li><a class="reference internal" href="#testing-more-adaptive-solvers">Testing More Adaptive Solvers</a></li>
-<li><a class="reference internal" href="#extensive-testing">Extensive Testing</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#more-advanced-implementations">More Advanced Implementations</a><ul>
+<li><a class="reference internal" href="#make-a-subclass-of-class-problem">Make a Subclass of Class Problem</a></li>
 <li><a class="reference internal" href="#example-solving-a-complex-ode-problem">Example: Solving a Complex ODE Problem</a><ul>
 <li><a class="reference internal" href="#quick-implementation">Quick Implementation</a></li>
 <li><a class="reference internal" href="#comparison-of-methods">Comparison of Methods</a></li>
@@ -2518,6 +2783,23 @@ output in many different formats.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#example-solving-a-stochastic-differential-equation">Example: Solving a Stochastic Differential Equation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adaptive-methods">Adaptive Methods</a><ul>
+<li><a class="reference internal" href="#the-test-problem">The Test Problem</a></li>
+<li><a class="reference internal" href="#running-simple-methods">Running Simple Methods</a></li>
+<li><a class="reference internal" href="#running-the-runge-kutta-fehlberg-method">Running the Runge-Kutta-Fehlberg Method</a></li>
+<li><a class="reference internal" href="#testing-more-adaptive-solvers">Testing More Adaptive Solvers</a></li>
+<li><a class="reference internal" href="#extensive-testing">Extensive Testing</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#solving-partial-differential-equations">Solving Partial Differential Equations</a><ul>
+<li><a class="reference internal" href="#discretization-in-space">Discretization in Space</a></li>
+<li><a class="reference internal" href="#implementation-of-the-right-hand-side-function">Implementation of the Right-Hand Side Function</a><ul>
+<li><a class="reference internal" href="#vectorized-code">Vectorized Code</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#experiments">Experiments</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#inner-workings-of-the-package">Inner Workings of the Package</a><ul>
