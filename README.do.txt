@@ -28,6 +28,32 @@ any Fortran code:
 Terminal> sudo python setup.py install --no-fortran
 !ec
 
+There have been various problems with compiling Odespy on Windows,
+usually related to the Fortran compiler.
+One recommended technique is to rely on Anaconda on Windows,
+install the `ming32` compiler, and
+then run
+
+!bc sys
+Terminal> python setup.py install build --compiler=ming32
+!ec
+This may give problems of the type
+
+!bc
+File "C:\Anaconda\lib\site-packages\numpy\distutils\fcompiler\gnu.py",
+line 333, in get_libraries
+raise NotImplementedError("Only MS compiler supported with gfortran on win64")
+NotImplementedError: Only MS compiler supported with gfortran on win64
+!ec
+A remedy is to edit the `gnu.py` file and comment out the
+`NotImplementedError`:
+
+!bc pycod
+else:
+    #raise NotImplementedError("Only MS compiler supported with gfortran on win64")
+    pass
+!ec
+
 
 ===== Contents of Odespy =====
 

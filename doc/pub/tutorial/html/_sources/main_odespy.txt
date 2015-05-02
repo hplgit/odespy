@@ -7,7 +7,7 @@ A Tutorial for the Odespy Interface to ODE Solvers
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :Authors: Hans Petter Langtangen, Liwei Wang
-:Date: Apr 16, 2015
+:Date: May 1, 2015
 
 The Odespy package makes it easy to specify an ODE problem in
 Python and get it solved by a wide variety of different numerical
@@ -271,6 +271,34 @@ can drop the installation of the FORTRAN solvers by running
 .. code-block:: python
 
         sudo python setup.py install --no-fortran
+
+There have been various problems with compiling Odespy on Windows,
+usually related to the Fortran compiler.
+One recommended technique is to rely on Anaconda on Windows,
+install the ``ming32`` compiler, and
+then run
+
+.. code-block:: text
+
+        Terminal> python setup.py install build --compiler=ming32
+
+This may give problems of the type
+
+.. code-block:: text
+
+        File "C:\Anaconda\lib\site-packages\numpy\distutils\fcompiler\gnu.py",
+        line 333, in get_libraries
+        raise NotImplementedError(...)
+        NotImplementedError: Only MS compiler supported with gfortran on win64
+
+A remedy is to edit the ``gnu.py`` file and comment out the
+``NotImplementedError``:
+
+.. code-block:: python
+
+        else:
+            #raise NotImplementedError("Only MS compiler ...")
+            pass
 
 The Odespy package depends on several additional packages:
 
@@ -2438,8 +2466,8 @@ The initial conditions are
 We can apply any method for systems of ODEs to solve
 :eq:`sec:pde:diff1D:ode1:0`-:eq:`sec:pde:diff1D:ode1:N`.
 
-Implementation of the Right-Hand Side Function
-----------------------------------------------
+Implementation
+--------------
 
 Consider
 the evolution of the temperature in a rod modeled by our diffusion problem.

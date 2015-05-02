@@ -32,6 +32,37 @@ any Fortran code:
 Terminal> sudo python setup.py install --no-fortran
 ```
 
+There have been various problems with compiling Odespy on Windows,
+usually related to the Fortran compiler.
+One recommended technique is to rely on Anaconda on Windows,
+install the `ming32` compiler, and
+then run
+
+
+```
+Terminal> python setup.py install build --compiler=ming32
+```
+
+This may give problems of the type
+
+
+```
+File "C:\Anaconda\lib\site-packages\numpy\distutils\fcompiler\gnu.py",
+line 333, in get_libraries
+raise NotImplementedError("Only MS compiler supported with gfortran on win64")
+NotImplementedError: Only MS compiler supported with gfortran on win64
+```
+
+A remedy is to edit the `gnu.py` file and comment out the
+`NotImplementedError`:
+
+
+```python
+else:
+    #raise NotImplementedError("Only MS compiler supported with gfortran on win64")
+    pass
+```
+
 ### Contents of Odespy
 
 Odespy features the following collection of numerical methods and
@@ -103,7 +134,7 @@ examples.
 Please cite this GitHub repository:
 
 > H. P. Langtangen and L. Wang. Odespy software package.
-> URL: <https://github.com/hplgit/odespy.> 2014
+> URL: <https://github.com/hplgit/odespy.> 2015
 
 
 
@@ -117,6 +148,7 @@ BibTeX entry:
   url = {https://github.com/hplgit/odespy},
   key = {odespy},
   note = {\url{https://github.com/hplgit/odespy}},
+  year = {2015},
 }
 ```
 
@@ -124,12 +156,14 @@ BibTeX entry:
 
 
 ```
+* misc
 ** {Odespy} Software Package
    key:       odespy
    author:    H. P. Langtangen, L. Wang
    url:       https://github.com/hplgit/odespy
    status:    published
    sortkey:   Odespy
+   year:      2015
    note:      \url{https://github.com/hplgit/odespy}
    entrytype: misc
 ```

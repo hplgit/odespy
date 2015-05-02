@@ -83,7 +83,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Hans Petter Langtangen, Liwei Wang</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">Apr 16, 2015</td>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">May 1, 2015</td>
 </tr>
 </tbody>
 </table>
@@ -305,6 +305,28 @@ sudo python setup.py install
 and installed by <tt class="docutils literal"><span class="pre">setup.py</span></tt>. If you lack a FORTRAN compiler, you
 can drop the installation of the FORTRAN solvers by running</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">sudo</span> <span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">fortran</span>
+</pre></div>
+</div>
+<p>There have been various problems with compiling Odespy on Windows,
+usually related to the Fortran compiler.
+One recommended technique is to rely on Anaconda on Windows,
+install the <tt class="docutils literal"><span class="pre">ming32</span></tt> compiler, and
+then run</p>
+<div class="highlight-text"><div class="highlight"><pre>Terminal&gt; python setup.py install build --compiler=ming32
+</pre></div>
+</div>
+<p>This may give problems of the type</p>
+<div class="highlight-text"><div class="highlight"><pre>File &quot;C:\Anaconda\lib\site-packages\numpy\distutils\fcompiler\gnu.py&quot;,
+line 333, in get_libraries
+raise NotImplementedError(...)
+NotImplementedError: Only MS compiler supported with gfortran on win64
+</pre></div>
+</div>
+<p>A remedy is to edit the <tt class="docutils literal"><span class="pre">gnu.py</span></tt> file and comment out the
+<tt class="docutils literal"><span class="pre">NotImplementedError</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">else</span><span class="p">:</span>
+    <span class="c">#raise NotImplementedError(&quot;Only MS compiler ...&quot;)</span>
+    <span class="k">pass</span>
 </pre></div>
 </div>
 <p>The Odespy package depends on several additional packages:</p>
@@ -2094,8 +2116,8 @@ scheme for <span class="math">\(i=N\)</span> to obtain the modified boundary ODE
 <p>We can apply any method for systems of ODEs to solve
 <a href="#equation-sec:pde:diff1D:ode1:0">(6)</a>-<a href="#equation-sec:pde:diff1D:ode1:N">(8)</a>.</p>
 </div>
-<div class="section" id="implementation-of-the-right-hand-side-function">
-<h3>Implementation of the Right-Hand Side Function<a class="headerlink" href="#implementation-of-the-right-hand-side-function" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="implementation">
+<h3>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h3>
 <p>Consider
 the evolution of the temperature in a rod modeled by our diffusion problem.
 At <span class="math">\(t=0\)</span>, the rod has the temperature 10 C. We then apply a heat source
@@ -2795,7 +2817,7 @@ output in many different formats.</p>
 </li>
 <li><a class="reference internal" href="#solving-partial-differential-equations">Solving Partial Differential Equations</a><ul>
 <li><a class="reference internal" href="#discretization-in-space">Discretization in Space</a></li>
-<li><a class="reference internal" href="#implementation-of-the-right-hand-side-function">Implementation of the Right-Hand Side Function</a><ul>
+<li><a class="reference internal" href="#implementation">Implementation</a><ul>
 <li><a class="reference internal" href="#vectorized-code">Vectorized Code</a></li>
 </ul>
 </li>
