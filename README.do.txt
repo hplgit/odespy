@@ -54,6 +54,32 @@ else:
     pass
 !ec
 
+===== Install Pre-compiled Version with Conda =====
+
+If you are using "Anaconda": "https://store.continuum.io/cshop/anaconda/" or Miniconda and a build has been published for your system, then you can install a pre-compiled version of odespy. Install using conda with the following command:
+
+!bc sys
+Terminal> conda install -c https://conda.binstar.org/rothnic odespy
+!ec
+
+If a pre-compiled package is not available for your system, and you go through the effort of installing the compilation tools, you can build and upload a conda package as follows from the command line:
+
+!bc shpro
+# Set environment variable in windows to build for python 2
+# Use 34 instead of 27, to compile for python 3
+set CONDA_PY=27
+
+# Build the package
+conda build odespy
+
+# Upload the package
+binstar upload <PATH to the build file>\odespy-<version>-<dependency versions>.tar.bz2
+!ec
+
+!bnotice
+You may have to add/modify the conda build scripts to support your platform type. This has only been tested for Windows currently.
+!enotice
+
 
 ===== Contents of Odespy =====
 
