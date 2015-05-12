@@ -7,7 +7,8 @@ Differential Algebraic Equations (DAEs).
 
 ### How do I install Odespy?
 
-The simplest procedure is to use `pip`:
+Odespy requires Python version 2.7.
+The simplest procedure for installing Odespy is to use `pip`:
 
 
 ```
@@ -63,16 +64,19 @@ else:
     pass
 ```
 
-#### Install Pre-compiled Version with Conda
-If you are using [Anaconda](https://store.continuum.io/cshop/anaconda/) or Miniconda and a build has been published for your system, then you can install a pre-compiled version of odespy. Install using conda with the following command:
+### Install Pre-compiled Version with Conda
+
+If you are using [Anaconda](https://store.continuum.io/cshop/anaconda/) or Miniconda and a build has been published for your system, then you can install a pre-compiled version of Odespy. Install using `conda` with the following command:
+
 
 ```
-conda install -c https://conda.binstar.org/rothnic odespy
+Terminal> conda install -c https://conda.binstar.org/rothnic odespy
 ```
 
 If a pre-compiled package is not available for your system, and you go through the effort of installing the compilation tools, you can build and upload a conda package as follows from the command line:
 
-```
+
+```shell
 # Set environment variable in windows to build for python 2
 # Use 34 instead of 27, to compile for python 3
 set CONDA_PY=27
@@ -84,7 +88,11 @@ conda build odespy
 binstar upload <PATH to the build file>\odespy-<version>-<dependency versions>.tar.bz2
 ```
 
-Note: You may have to add/modify the conda build scripts to support your platform type. This has only been tested for Windows currently.
+*Notice.* 
+You may have to add/modify the conda build scripts to support your platform type. This has only been tested for Windows so far.
+
+
+
 
 ### Contents of Odespy
 
@@ -121,7 +129,7 @@ The ODE problem can always be specified in Python, but for wrappers of
 FORTRAN codes one can also implement the problem in FORTRAN and avoid
 callback to Python.
 
-*Warning: Potential problems with FORTRAN codes.*
+*Warning: Potential problems with FORTRAN codes.* 
 Some users have faced problems with some of the FORTRAN-based solvers
 (typically segmentation fault errors), mostly `radau5`, but also `rkf45`.
 It seems that Odespy's Python interface to `radau5` is broken.
@@ -132,7 +140,8 @@ It seems that Odespy's Python interface to `radau5` is broken.
 
 Here is an example on the Odespy syntax
 
-```
+
+```python
 def f(u, t):
     """2x2 system for a van der Pool oscillator."""
     return [u[1], 3.*(1. - u[0]*u[0])*u[1] - u[0]]
@@ -192,3 +201,4 @@ BibTeX entry:
    note:      \url{https://github.com/hplgit/odespy}
    entrytype: misc
 ```
+

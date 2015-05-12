@@ -7,7 +7,8 @@ Differential Algebraic Equations (DAEs).
 
 ===== How do I install Odespy? =====
 
-The simplest procedure is to use `pip`:
+Odespy requires Python version 2.7.
+The simplest procedure for installing Odespy is to use `pip`:
 
 !bc sys
 Terminal> sudo pip install -e git+https://github.com/hplgit/odespy.git#egg=odespy
@@ -56,7 +57,7 @@ else:
 
 ===== Install Pre-compiled Version with Conda =====
 
-If you are using "Anaconda": "https://store.continuum.io/cshop/anaconda/" or Miniconda and a build has been published for your system, then you can install a pre-compiled version of odespy. Install using conda with the following command:
+If you are using "Anaconda": "https://store.continuum.io/cshop/anaconda/" or Miniconda and a build has been published for your system, then you can install a pre-compiled version of Odespy. Install using `conda` with the following command:
 
 !bc sys
 Terminal> conda install -c https://conda.binstar.org/rothnic odespy
@@ -77,7 +78,7 @@ binstar upload <PATH to the build file>\odespy-<version>-<dependency versions>.t
 !ec
 
 !bnotice
-You may have to add/modify the conda build scripts to support your platform type. This has only been tested for Windows currently.
+You may have to add/modify the conda build scripts to support your platform type. This has only been tested for Windows so far.
 !enotice
 
 
