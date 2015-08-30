@@ -2083,8 +2083,8 @@ class SolverImplicit(Solver):
 
         while i <= self.max_iter and error > self.eps_iter:
             if self.nonlinear_solver == 'Linear':
-                rhs, K = self.linear_update(u_new)
-                u_new = rhs/K if self.neq == 1 else np.linalg.solve(K, rhs)
+                rhs, A = self.linear_update(u_new)
+                u_new = rhs/A if self.neq == 1 else np.linalg.solve(A, rhs)
                 error = 0
                 break
             elif self.nonlinear_solver == 'Picard':
@@ -2127,16 +2127,23 @@ class BackwardEuler(SolverImplicit):
     since::
 
        (u[n+1]/ukp1 approx 1
+
+    If the system is linear, a standard solve is used.
     """
     quick_description = "Implicit 1st-order Backward Euler method"
 
     def linear_update(self, ukp1):
-        """jac contains the coefficient matrix K: f=K*u."""
+        """jac contains the coefficient matrix K: f=K*u+b."""
+        # u[n+1] = u[n] + dt*(K(ukp1)*u[n+1] + b)
+        # (I - dt*K)*u[n+1] = u[n] + dt*b
         u, f, n, t = self.u, self.f, self.n, self.t
         dt = t[n+1] - t[n]
-        rhs = u[n]
-        K = np.eye(self.neq) - dt*self.jac(ukp1, t[n+1])
-        return rhs, K
+        K = self.jac(ukp1, t[n+1])
+        H = np.dot(K, ukp1)
+        b = self.f(ukp1, t[n+1]) - np.dot(K, ukp1)
+        rhs = u[n] + dt*b
+        A = np.eye(self.neq) - dt*K
+        return rhs, A
 
     def Picard_update(self, ukp1):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -2177,18 +2184,22 @@ class Backward2Step(SolverImplicit):
             return 4./3*u[n] - 1./3*u[n-1] + (1./3)*dt2*f(ukp1, t[n+1])
 
     def linear_update(self, ukp1):
-        """jac contains the coefficient matrix K: f=K*u."""
+        """jac contains the coefficient matrix K: f=K*u+b."""
         u, f, n, t = self.u, self.f, self.n, self.t
         if n == 0:
             # Backward Euler as starter
             dt = t[n+1] - t[n]
-            rhs = u[n]
-            K = np.eye(self.neq) - dt*self.jac(ukp1, t[n+1])
+            K = self.jac(ukp1, t[n+1])
+            b = self.f(ukp1, t[n+1]) - np.dot(K, ukp1)
+            rhs = u[n] + dt*b
+            A = np.eye(self.neq) - dt*K
         else:
             dt2 = t[n+1] - t[n-1]
-            rhs = 4./3*u[n] - 1./3*u[n-1]
-            K = np.eye(self.neq) - (1./3)*dt2*self.jac(ukp1, t[n+1])
-        return rhs, K
+            K = self.jac(ukp1, t[n+1])
+            b = self.f(ukp1, t[n+1]) - np.dot(K, ukp1)
+            rhs = 4./3*u[n] - 1./3*u[n-1] + (1./3)*dt2*b
+            A = np.eye(self.neq) - (1./3)*dt2*K
+        return rhs, A
 
     def Newton_system(self, ukp1):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -2233,12 +2244,15 @@ class ThetaRule(SolverImplicit):
         return F, J
 
     def linear_update(self, ukp1):
-        """jac contains the coefficient matrix K: f=K*u."""
+        """jac contains the coefficient matrix K: f=K*u+b."""
         u, f, n, t, theta = self.u, self.f, self.n, self.t, self.theta
         dt = t[n+1] - t[n]
-        rhs = u[n] + (1-theta)*dt*f(u[n],t[n])
-        K = np.eye(self.neq) - theta*dt*self.jac(ukp1, t[n+1])
-        return rhs, K
+        K = self.jac(ukp1, t[n+1])
+        b = self.f(ukp1, t[n+1]) - np.dot(K, ukp1)
+        b_1 = self.f(u[n], t[n]) - np.dot(K, u[n])
+        rhs = u[n] + (1-theta)*dt*f(u[n],t[n]) + dt*(theta*b + (1-theta)*b_1)
+        A = np.eye(self.neq) - theta*dt*K
+        return rhs, A
 
 class MidpointImplicit(SolverImplicit):
     '''
