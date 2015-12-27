@@ -5,10 +5,14 @@ large collection of software for solving systems of ordinary
 differential equations (ODEs). There is also some support for
 Differential Algebraic Equations (DAEs).
 
+You can pronounce Odespy by first saying the acronym *ODE*, for
+ordinary differential equations, in English (or in another language!)
+and then adding "spy" as in the English word *spy*.
+
 ### How do I install Odespy?
 
-Odespy requires Python version 2.7.
-The simplest procedure for installing Odespy is to use `pip`:
+Odespy requires Python version 2.7.  The simplest procedure for
+installing Odespy is to use `pip`:
 
 
 ```
