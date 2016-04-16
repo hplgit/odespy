@@ -141,6 +141,11 @@ _parameters = dict(
         default=False,
         type=bool),
 
+    f_is_linear = dict(
+        help='True if f(u,t) is linear in u.',
+        type=bool,
+        default=False),
+
     jac = dict(
         help='Jacobian of right-hand side function f (df/du).',
         default=None,
@@ -2015,31 +2020,49 @@ class SolverImplicit(Solver):
     Note that the Forward Euler scheme is used to make the first guess,
     so large time steps may give a too inaccurate start value for
     fast convergence (or convergence at all).
+
+    Linear problems can be handled by setting `f_is_linear=True` in
+    the constructor and providing the coefficient matrix as the
+    `jac` argument. Note that the coefficient matrix is the Jacobian
+    of f(u,t).
     """
 
     _optional_parameters = Solver._optional_parameters + \
-        ['jac', 'jac_args', 'jac_kwargs', 'h_in_fd_jac',
+        ['f_is_linear', 'jac', 'jac_args', 'jac_kwargs', 'h_in_fd_jac',
          'nonlinear_solver', 'max_iter', 'eps_iter', 'relaxation']
 
     def initialize_for_solve(self):
         self.num_iterations_total = 0
         # Set appropriate value of nonlinear_solver if undefined
-        if getattr(self, 'jac', None) is None:   # no jac provided
-            if getattr(self, 'nonlinear_solver', None) is None:
-                self.nonlinear_solver = 'Picard'  # default if no jac provided
-            elif getattr(self, 'nonlinear_solver') == 'Newton':
-                 # Approximate jacobian with finite difference approx
-                self.users_jac = approx_Jacobian
+        if getattr(self, 'f_is_linear', False):
+            if getattr(self, 'jac', None) is None:
+                raise ValueError('%s: f_is_linear=True: must provide coefficient matrix as jac argument' % self.__class__.__name__)
+            else:
+                self.nonlinear_solver = 'Linear'
+                # Wrap user-supplied Jacobian in the way f is wrapped
+                self.users_jac = self.jac  # save
+                jac = self.jac
                 self.jac = lambda u, t: \
-                    self.users_jac(self.f, u, t, self.h_in_fd_jac)
+                    np.asarray(jac(u, t, *self.jac_args, **self.jac_kwargs))
+                if not hasattr(self, 'linear_update'):
+                    raise ValueError('%s: f_is_linear=True: but this class has no method linear_update to handle the linear case. Set f_is_linear=False.' % self.__class__.__name__)
         else:
-            if getattr(self, 'nonlinear_solver', None) is None:
-                self.nonlinear_solver = 'Newton'  # default if jac provided
-            # Wrap user-supplied Jacobian in the way f is wrapped
-            self.users_jac = self.jac  # save
-            jac = self.jac
-            self.jac = lambda u, t: \
-                np.asarray(jac(u, t, *self.jac_args, **self.jac_kwargs))
+            if getattr(self, 'jac', None) is None:   # no jac provided
+                if getattr(self, 'nonlinear_solver', None) is None:
+                    self.nonlinear_solver = 'Picard'  # default if no jac provided
+                elif getattr(self, 'nonlinear_solver') == 'Newton':
+                     # Approximate jacobian with finite difference approx
+                    self.users_jac = approx_Jacobian
+                    self.jac = lambda u, t: \
+                        self.users_jac(self.f, u, t, self.h_in_fd_jac)
+            else:
+                if getattr(self, 'nonlinear_solver', None) is None:
+                    self.nonlinear_solver = 'Newton'  # default if jac provided
+                # Wrap user-supplied Jacobian in the way f is wrapped
+                self.users_jac = self.jac  # save
+                jac = self.jac
+                self.jac = lambda u, t: \
+                    np.asarray(jac(u, t, *self.jac_args, **self.jac_kwargs))
 
         Solver.initialize_for_solve(self)
 
@@ -2059,7 +2082,12 @@ class SolverImplicit(Solver):
                   (self.__class__.__name__, self.nonlinear_solver, t_new, n+1),
 
         while i <= self.max_iter and error > self.eps_iter:
-            if self.nonlinear_solver == 'Picard':
+            if self.nonlinear_solver == 'Linear':
+                rhs, A = self.linear_update(u_new)
+                u_new = rhs/A if self.neq == 1 else np.linalg.solve(A, rhs)
+                error = 0
+                break
+            elif self.nonlinear_solver == 'Picard':
                 u_new_ = self.Picard_update(u_new)
             elif self.nonlinear_solver == 'Picard2':
                 u_new_ = self.Picard2_update(u_new)
@@ -2080,7 +2108,7 @@ class SolverImplicit(Solver):
             raise ValueError('%s w/%s not converged:\n   difference in solution between last two iterations: %g > eps_iter=%g after %s iterations.' % (self.__class__.__name__, self.nonlinear_solver, error, self.eps_iter, self.max_iter))
         return u_new
 
-    def Picard2(self, ukp1):
+    def Picard2_update(self, ukp1):
         raise NotImplementedError('Picard2 method not implemented for solver %s' % self.__class__.__name__)
 
 
@@ -2099,8 +2127,23 @@ class BackwardEuler(SolverImplicit):
     since::
 
        (u[n+1]/ukp1 approx 1
+
+    If the system is linear, a standard solve is used.
     """
     quick_description = "Implicit 1st-order Backward Euler method"
+
+    def linear_update(self, ukp1):
+        """jac contains the coefficient matrix K: f=K*u+b."""
+        # u[n+1] = u[n] + dt*(K(ukp1)*u[n+1] + b)
+        # (I - dt*K)*u[n+1] = u[n] + dt*b
+        u, f, n, t = self.u, self.f, self.n, self.t
+        dt = t[n+1] - t[n]
+        K = self.jac(ukp1, t[n+1])
+        H = np.dot(K, ukp1)
+        b = self.f(ukp1, t[n+1]) - np.dot(K, ukp1)
+        rhs = u[n] + dt*b
+        A = np.eye(self.neq) - dt*K
+        return rhs, A
 
     def Picard_update(self, ukp1):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -2139,6 +2182,24 @@ class Backward2Step(SolverImplicit):
         else:
             dt2 = t[n+1] - t[n-1]
             return 4./3*u[n] - 1./3*u[n-1] + (1./3)*dt2*f(ukp1, t[n+1])
+
+    def linear_update(self, ukp1):
+        """jac contains the coefficient matrix K: f=K*u+b."""
+        u, f, n, t = self.u, self.f, self.n, self.t
+        if n == 0:
+            # Backward Euler as starter
+            dt = t[n+1] - t[n]
+            K = self.jac(ukp1, t[n+1])
+            b = self.f(ukp1, t[n+1]) - np.dot(K, ukp1)
+            rhs = u[n] + dt*b
+            A = np.eye(self.neq) - dt*K
+        else:
+            dt2 = t[n+1] - t[n-1]
+            K = self.jac(ukp1, t[n+1])
+            b = self.f(ukp1, t[n+1]) - np.dot(K, ukp1)
+            rhs = 4./3*u[n] - 1./3*u[n-1] + (1./3)*dt2*b
+            A = np.eye(self.neq) - (1./3)*dt2*K
+        return rhs, A
 
     def Newton_system(self, ukp1):
         u, f, n, t = self.u, self.f, self.n, self.t
@@ -2182,6 +2243,16 @@ class ThetaRule(SolverImplicit):
         J = np.eye(self.neq) - theta*dt*self.jac(ukp1, t[n+1])
         return F, J
 
+    def linear_update(self, ukp1):
+        """jac contains the coefficient matrix K: f=K*u+b."""
+        u, f, n, t, theta = self.u, self.f, self.n, self.t, self.theta
+        dt = t[n+1] - t[n]
+        K = self.jac(ukp1, t[n+1])
+        b = self.f(ukp1, t[n+1]) - np.dot(K, ukp1)
+        b_1 = self.f(u[n], t[n]) - np.dot(K, u[n])
+        rhs = u[n] + (1-theta)*dt*f(u[n],t[n]) + dt*(theta*b + (1-theta)*b_1)
+        A = np.eye(self.neq) - theta*dt*K
+        return rhs, A
 
 class MidpointImplicit(SolverImplicit):
     '''

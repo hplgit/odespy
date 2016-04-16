@@ -3,6 +3,8 @@ AUTHOR: Hans Petter Langtangen at Center for Biomedical Computing, Simula Resear
 AUTHOR: Liwei Wang at Department of Informatics, University of Oslo
 DATE: today
 
+TOC: on
+
 # #include "odespy.do.txt"
 
 __Remark.__ This document was written with aid of the

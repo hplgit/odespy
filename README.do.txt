@@ -5,11 +5,16 @@ large collection of software for solving systems of ordinary
 differential equations (ODEs). There is also some support for
 Differential Algebraic Equations (DAEs).
 
+You can pronounce Odespy by first saying the acronym *ODE*, for
+ordinary differential equations, in English (or in another language!)
+and then adding ``spy'' as in the English word *spy*.
+
 ===== How do I install Odespy? =====
 
 === Pip ===
 
-The simplest procedure is to use `pip`:
+Odespy requires Python version 2.7.  The simplest procedure for
+installing Odespy is to use `pip`:
 
 !bc sys
 Terminal> sudo pip install -e git+https://github.com/hplgit/odespy.git#egg=odespy
@@ -35,7 +40,7 @@ any Fortran code:
 Terminal> sudo python setup.py install --no-fortran
 !ec
 
-=== Problems with compiled Fortran modules ===
+=== Problems with compiled Fortran modules and Anaconda ===
 
 Problems with the compiled Fortran libraries appear on different systems.
 If you use Anaconda Python, successfully build the Fortran modules, but
@@ -48,7 +53,62 @@ Terminal> mv libgfortran.so.3.0.0 libgfortran.so.3.0.0.bak
 Terminal> ln -sf /usr/lib/x86_64-linux-gnu/libgfortran.so.3.0.0 \
           libgfortran.so.3.0.0
 !ec
+See also "this link": "http://stackoverflow.com/questions/9628273/libgfortran-version-gfortran-1-4-not-found".
 
+=== Problems with compiled Fortran modules on Windows ===
+
+There have been various problems with compiling Odespy on Windows,
+usually related to the Fortran compiler.
+One recommended technique is to rely on Anaconda on Windows,
+install the `ming32` compiler, and then run
+
+!bc sys
+Terminal> python setup.py install build --compiler=ming32
+!ec
+This may give problems of the type
+
+!bc
+File "C:\Anaconda\lib\site-packages\numpy\distutils\fcompiler\gnu.py",
+line 333, in get_libraries
+raise NotImplementedError("Only MS compiler supported with gfortran on win64")
+NotImplementedError: Only MS compiler supported with gfortran on win64
+!ec
+A remedy is to edit the `gnu.py` file and comment out the
+`NotImplementedError`:
+
+!bc pycod
+else:
+    #raise NotImplementedError("Only MS compiler supported with gfortran on win64")
+    pass
+!ec
+
+===== Install Pre-compiled Version with Conda =====
+
+If you are using "Anaconda": "https://store.continuum.io/cshop/anaconda/" or Miniconda and a build has been published for your system, then you can install a pre-compiled version of Odespy. Install using `conda` with the following command:
+
+!bc sys
+Terminal> conda install -c https://conda.binstar.org/rothnic odespy
+!ec
+
+If a pre-compiled package is not available for your system, and you go
+through the effort of installing the compilation tools, you can build
+and upload a conda package as follows from the command line:
+
+!bc shpro
+# Set environment variable in windows to build for python 2
+# Use 34 instead of 27, to compile for python 3
+set CONDA_PY=27
+
+# Build the package
+conda build odespy
+
+# Upload the package
+binstar upload <PATH to the build file>\odespy-<version>-<dependency versions>.tar.bz2
+!ec
+
+!bnotice
+You may have to add/modify the conda build scripts to support your platform type. This has only been tested for Windows so far.
+!enotice
 
 
 ===== Contents of Odespy =====
@@ -94,25 +154,33 @@ The ODE problem can always be specified in Python, but for wrappers of
 FORTRAN codes one can also implement the problem in FORTRAN and avoid
 callback to Python.
 
+!bwarning Warning: Potential problems with FORTRAN codes.
+Some users have faced problems with some of the FORTRAN-based solvers
+(typically segmentation fault errors), mostly `radau5`, but also `rkf45`.
+It seems that Odespy's Python interface to `radau5` is broken.
+!ewarning
+
 ===== How do I use Odespy? =====
 
-Here is an example on the Odespy syntax::
+Here is an example on the Odespy syntax
 
-        def f(u, t):
-            """2x2 system for a van der Pool oscillator."""
-            return [u[1], 3.*(1. - u[0]*u[0])*u[1] - u[0]]
+!bc pycod
+def f(u, t):
+    """2x2 system for a van der Pool oscillator."""
+    return [u[1], 3.*(1. - u[0]*u[0])*u[1] - u[0]]
 
-        import odespy, numpy
-        solver = odespy.Vode(f, rtol=0.0, atol=1e-6,
-                             adams_or_bdf='adams', order=10)
-        solver.set_initial_condition([2.0, 0.0])
-        t_points = numpy.linspace(0, 30, 150)
-        u, t = solver.solve(t_points)
+import odespy, numpy
+solver = odespy.Vode(f, rtol=0.0, atol=1e-6,
+                     adams_or_bdf='adams', order=10)
+solver.set_initial_condition([2.0, 0.0])
+t_points = numpy.linspace(0, 30, 150)
+u, t = solver.solve(t_points)
 
-        u0 = u[:,0]
-        from matplotlib.pyplot import *
-        plot(t, u0)
-        show()
+u0 = u[:,0]
+from matplotlib.pyplot import *
+plot(t, u0)
+show()
+!ec
 
 An incomplete "tutorial":
 "http://hplgit.github.io/odespy/doc/tutorial/html/index.html" is under
@@ -125,7 +193,7 @@ Please cite this GitHub repository:
 
 !bquote
 H. P. Langtangen and L. Wang. Odespy software package.
-URL: https://github.com/hplgit/odespy. 2014
+URL: https://github.com/hplgit/odespy. 2015
 !equote
 
 BibTeX entry:
@@ -137,18 +205,21 @@ BibTeX entry:
   url = {https://github.com/hplgit/odespy},
   key = {odespy},
   note = {\url{https://github.com/hplgit/odespy}},
+  year = {2015},
 }
 !ec
 
 "Publish": "https://bitbucket.org/logg/publish" entry:
 
 !bc
+* misc
 ** {Odespy} Software Package
    key:       odespy
    author:    H. P. Langtangen, L. Wang
    url:       https://github.com/hplgit/odespy
    status:    published
    sortkey:   Odespy
+   year:      2015
    note:      \url{https://github.com/hplgit/odespy}
    entrytype: misc
 !ec

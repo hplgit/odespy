@@ -220,6 +220,32 @@ can drop the installation of the FORTRAN solvers by running
 sudo python setup.py install --no-fortran
 !ec
 
+There have been various problems with compiling Odespy on Windows,
+usually related to the Fortran compiler.
+One recommended technique is to rely on Anaconda on Windows,
+install the `ming32` compiler, and
+then run
+
+!bc sys
+Terminal> python setup.py install build --compiler=ming32
+!ec
+This may give problems of the type
+
+!bc
+File "C:\Anaconda\lib\site-packages\numpy\distutils\fcompiler\gnu.py",
+line 333, in get_libraries
+raise NotImplementedError(...)
+NotImplementedError: Only MS compiler supported with gfortran on win64
+!ec
+A remedy is to edit the `gnu.py` file and comment out the
+`NotImplementedError`:
+
+!bc pycod
+else:
+    #raise NotImplementedError("Only MS compiler ...")
+    pass
+!ec
+
 The Odespy package depends on several additional packages:
 
  * "`scipy`": "http://scipy.org/" for running the `Vode` Adams/BDF solver, the
@@ -233,7 +259,7 @@ The Odespy package depends on several additional packages:
 
 For plotting you will need "`matplotlib`":
 "http://matplotlib.sourceforge.net/" or "`scitools`":
-"http://code.google.com/p/scitools/".
+"https://github.com/hplgit/scitools/".
 
 These packages are readily downloaded and installed by the
 standard `setup.py` script, as shown above.
@@ -497,7 +523,7 @@ time integral for integration, the `solver.solve` method accepts
 a user-defined function `terminate` that can be used to implement
 a criterion for terminating the solution process.
 Mathematically, the relevant criterion is
-$||u-R||<\hbox{tol}$|$||u - R|| < tol$, where tol is an acceptable
+$||u-R|| < \hbox{tol}$|$||u - R|| < tol$, where tol is an acceptable
 tolerance, say $100$ in the present case where $R=10^5$.
 The `terminate` function implements the criterion
 and returns true if the criterion is met:
@@ -862,11 +888,11 @@ Assuming the error to be of the form $C\Delta t^r$, we can estimate
 $C$ and $r$ from two consecutive experiments to obtain a sequence
 of $r$ values which (hopefully) convergences to a value that we can
 view as the empirical convergence rate of a method.
-Given the sequence of time steps and errors, a function in
-the `scitools` package automatically computes the sequence of
-$r$ values:
+Given the sequence of time steps and errors, we can compare two
+experiments $i$ and $i-1$, with errors $E_{i}=C\Delta t_i^r$, and
+estimate $r=\ln(E_i/E_{i-1})/\ln(\Delta t_i/\Delta t_{i-1})$:
 
-@@@CODE src-odespy/osc3.py  fromto: \# Analyze@
+@@@CODE src-odespy/osc3.py  fromto: from math import log@
 
 With 4 periods we get
 !bc dat
@@ -904,6 +930,7 @@ RK2                  r: 3.7,  2.1, 2.0, 2.0 E_min=1.0E-02
 MidpointIter         r: 1.8,  0.8, 1.9, 2.0 E_min=1.0E-02
 !ec
 
+======= More Advanced Implementations =======
 
 ===== Make a Subclass of Class Problem =====
 
@@ -1009,225 +1036,6 @@ class MyProblem(odespy.problems.Problem)
 !ec
 
 The module `odespy.problems` contains many predefined ODE problems.
-
-===== Using Adaptive Methods =====
-
-The solvers used in the previous examples have all employed a constant
-time step $\Delta t$. Many solvers available through the Odespy
-interface are adaptive in the sense that $\Delta t$ is adjusted
-throughout the solution process to meet a prescribed tolerance for
-the estimated error.
-
-Simple methods such as `RK4` apply time steps
-!bc pycod
-dt = time_points[k+1] - time_points[k]
-!ec
-while adaptive methods will use several (smaller) time steps than `dt`
-in each `dt` interval to ensure that the estimated numerical error is
-smaller than some prescribed tolerance. The estimated numerical error
-may be a rather crude quantitative measure of the true numerical
-error (which we do not know since the exact solution of the problem is
-in general not known).
-
-Some adaptive solvers record the intermediate solutions in each `dt`
-interval in arrays `self.u_all` and `self.t_all`.  Examples include
-`RKFehlberg`, `Fehlberg`, `DormandPrince`, `CashKarp`, and
-`BogackiShampine`. Other adaptive solvers (`Vode`, `Lsode`, `Lsoda`,
-`RKC`, `RKF45`, etc.)  do not give access to intermediate solution
-steps between the user-given time points, specified in the
-`solver.solve` call, and then we only have access to the solution at
-the user-given time points as returned by this call. One can run `if
-solver.has_u_t_all()` to test if the `solver.u_all` and `solver.t_all`
-arrays are available.  These are of interest to see how the adaptive
-strategy works between the user-specified time points.
-
-=== The Test Problem ===
-
-We consider the ODE problem for testing adaptive solvers:
-
-!bt
-\begin{equation}
-u' = -\frac{t-c}{s^2} (u-1)
-label{gaussian:ode:eq}
-\end{equation}
-!et
-The exact solution is a Gaussian function,
-!bt
-\[
-u(t) = 1 + \exp{\left(-\frac{1}{2}\left(\frac{t-c}{s}\right)^2\right)}
-\]
-!et
-centered around $t=c$ and width characteristic width ("standard
-deviation") $s$. The initial condition is taken as the exact $u$ at $t=0$.
-
-Since the Gaussian function is significantly different from zero only in the
-interval $[c-3s, c+3s]$, one may expect that adaptive methods will
-efficiently take larger steps when $u$ is almost constant and increase
-the resolution when $u$ changes substantially in the vicinity
-of $t=c$. We can test if this is the case with several solvers.
-
-=== Running Simple Methods ===
-
-Let us first use a simple standard method like the 2nd- and 4th-order
-Runge-Kutta methods with constant step size. With the former method
-(`RK2`), $c=3$, $s=0.5$, and $41$ uniformly distributed points,
-the discrepancy between the numerical and exact solution in
-Figure ref{gaussian:fig:RK2:41} is substantial. Increasing the number
-of points by a factor of 10 gives a solution much closer to the
-exact one, and switching to the 4th-order method (`RK4`) makes the
-curves visually coincide. The problem is therefore quite straightforward
-to solve using a sufficient number of points (400) and a higher-order method
-such as `RK4`.
-For curiosity we can mention that the `ForwardEuler` method produces
-a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.
-
-FIGURE: [fig-odespy/gaussian1_RK2_41.png, width=500] 2nd-order Runge-Kutta method with 41 points.  label{gaussian:fig:RK2:41}
-
-A simple program testing one numerical method goes as follows ("`gaussian1.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py").
-
-@@@CODE src-odespy/gaussian1.py
-
-
-=== Running the Runge-Kutta-Fehlberg Method ===
-
-One of the most widely used general-purpose, adaptive methods for
-ODE problems is the
-Runge-Kutta-Fehlberg method of order (4,5). This method is available
-in three alternative implementations in Odespy: a direct Python
-version (`RKFehlberg`), a specialization of a generalized
-implementation of explicit adaptive Runge-Kutta methods
-(`Fehlberg`), and as a FORTRAN code (`RKF45`). We can try one of
-these,
-!bc pycod
-method = odespy.Fehlberg
-!ec
-Figure ref{gaussian:fig:Fehlberg:41} shows how `Fehlberg` with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (57 adaptively selected points in time).
-
-FIGURE: [fig-odespy/gaussian1_Fehlberg_41.png, width=500] Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41).  label{gaussian:fig:Fehlberg:41}
-
-Adaptive algorithms apply an error estimate based on considering a higher-order method as exact, in this case a method of order 5, and a method of lower order (here 4) as the numerically predicted solution. The user can specify an error tolerance. In the program above we just relied to the default tolerance, which can be printed by
-!bc pycod
-print solver.get()
-!ec
-yielding a list of all optional parameters:
-!bc dat
-{'f_kwargs': {}, 'f_args': (),
- 'max_step': 1.5000000000000036, 'verbose': 0,
- 'min_step': 0.0014999999999999946,
- 'first_step': 0.14999999999999999,
- 'rtol': 1e-06, 'atol': 1e-08,
- 'name of f': 'f', 'complex_valued': False,
- 'disk_storage': False, 'u_exact': None}
-!ec
-The tolerances involved are of relative and absolute type, i.e.,
-!bc pycod
-estimated_error <= tol = rtol*abs(u) + atol
-!ec
-is the typical test on whether the solution is sufficiently.
-For very small `u`, `atol` comes into play, while for large `u`, the
-relative tolerance `rtol` dominates.
-
-In this particular example, running `RK4` with 57 equally spaced points
-yields a maximum value of 1.95, while `Fehlberg` with 57 adaptively
-selected points results in 1.98. Note that the tolerances used are
-$10^{-6}$ while the real error is of the order $10^{-2}$.
-
-We can specify stricter tolerances and also control the minimum
-allowed step size, `min_step`, which might be too large to achieve
-the desired error level ("`gaussian2.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian2.py"):
-
-@@@CODE src-odespy/gaussian2.py fromto: rtol = @solver\.set_initial_
-
-The `Fehlberg` solver now applies 701 points and achieves a maximum
-value of 2.00005. However, `RK4` with the same number of (equally spaced) points
-achieves the same accuracy and is much faster.
-
-=== Testing More Adaptive Solvers ===
-
-We have already solved (ref{gaussian:ode:eq}) with sufficient accuracy, but
-let us see how other methods perform, as this will most likely result in
-a surprise. Below is a program ("`gaussian3.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian3.py") that compares several famous and
-widely used methods in the same plot.
-
-@@@CODE src-odespy/gaussian3.py
-
-The default discretization applies $N=40$ equal-sized time intervals,
-but adaptive methods should be able to adjust themselves to the
-desired error level $10^{-6}$. Figures ref{gaussian3:fig1:41} and
-ref{gaussian3:fig1err:41} show that this expected behavior is not the
-case. There is substantial discrepancy between the methods!
-Surprisingly, the well-known FORTRAN codes accessed by the `Vode`
-(`vode.f`) and `Lsoda` (from ODEPACK) methods give very inaccurate
-results, despite setting `Vode` to use a stiff BDF solver of order 5, and
-`Lsoda` should automatically select between nonstiff and stiff solvers
-(of default order 4 in this case).
-
-FIGURE: [fig-odespy/gaussian3_41.png, width=500] Comparison of adaptive methods with default parameters (tolerance `E-6`).  label{gaussian3:fig1:41}
-
-FIGURE: [fig-odespy/gaussian3e_41.png, width=500] Comparison of errors in adaptive methods with default parameters (tolerance `E-6`).  label{gaussian3:fig1err:41}
-
-The program writes out the following results for the
-maximum value of the solution, which should equal 2:
-!bc dat
-1.9976  DormandPrince
-1.6591  BogackiShampine
-1.9812  RKFehlberg
-1.0406  Vode
-1.9734  RKF45
-3.2905  Lsoda
-!ec
-The clearly most accurate solver among these is `DormandPrince`  - the default
-method used by MATLAB's `ode45` solver, which is perhaps the world's
-most popular ODE solver.
-
-The remedy to get all the tested solvers to perform well is to
-choose a much stricter tolerance, say $10^{-10}$.
-Figure ref{gaussian3:fig2:41} shows
-coinciding curves. Numerically, we now have
-!bc dat
-1.9991  DormandPrince
-1.9912  BogackiShampine
-1.9942  RKFehlberg
-2.0122  Vode
-1.9916  RKF45
-2.0056  Lsoda
-!ec
-For the methods `DormandPrince`,  `RKFehlberg`, and
-`BogackiShampine` we have information about the number of adaptive
-time points used: 270, 326, and 3307, respectively.
-
-FIGURE: [fig-odespy/gaussian3_41_Em10.png, width=500] Comparison of adaptive methods with error tolerance `E-10`.  label{gaussian3:fig2:41}
-
-The lesson learned in this example is two-fold: 1) several methods should
-be tested to gain reliability of the results, and Odespy makes such tests
-easy to conduct, and 2) strict tolerances, far below
-the default values, may be necessary for some methods, here `Vode` and
-`Lsoda` in particular. We remark that it is the ODE problem that causes
-difficulties: changing the problem to `odespy.problems.Logistic`
-(see the file "`logistic9.py`":
-"https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic9.py")
-shows that all the curves coincide and cannot be distinguished visually.
-
-The present test problem with a Gaussian function as solution
-can be made increasingly more difficult by
-increasing the value of $c/s$, i.e., a more peaked function moved to
-the right.
-
-=== Extensive Testing ===
-
-The program "`gaussian4.py`":
-"https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian4.py"
-sets up an extensive experiments involving a lot of solvers, several
-$c/s$ values, and several error tolerances.  The experiments clearly
-demonstrate how challenging this ODE problem is for many adaptive
-solvers unless $c/s$ is moderate and a strict tolerance (much lower
-than the real accuracy level) is used. One can especially see the
-fundamental difficulties that `Vode`, `Lsode`, and `Lsoda` (all stiff
-and nonstiff versions) face when $c/s\geq 8$: these solvers do not
-manage to pick up any variation in $u$. Nevertheless, for less
-demanding ODEs these solvers may perform very well, but it is highly
-recommended to always use the power of the unified Odespy interface
-to test several different adaptive methods.
 
 ===== Example: Solving a Complex ODE Problem =====
 
@@ -1569,10 +1377,424 @@ The complete code is available in "sode.py": "${src_odespy}/sode1.py".
   * Using adaptive methods: planet orbit or Gaussian
   * Setting parameters, seeing parameters (doc str and get),
     describe this feature under internals too
-
-===== Example: Solving a PDE =====
-
 # #endif
+
+======= Adaptive Methods =======
+
+The solvers used in the previous examples have all employed a constant
+time step $\Delta t$. Many solvers available through the Odespy
+interface are adaptive in the sense that $\Delta t$ is adjusted
+throughout the solution process to meet a prescribed tolerance for
+the estimated error.
+
+Simple methods such as `RK4` apply time steps
+!bc pycod
+dt = time_points[k+1] - time_points[k]
+!ec
+while adaptive methods will use several (smaller) time steps than `dt`
+in each `dt` interval to ensure that the estimated numerical error is
+smaller than some prescribed tolerance. The estimated numerical error
+may be a rather crude quantitative measure of the true numerical
+error (which we do not know since the exact solution of the problem is
+in general not known).
+
+Some adaptive solvers record the intermediate solutions in each `dt`
+interval in arrays `self.u_all` and `self.t_all`.  Examples include
+`RKFehlberg`, `Fehlberg`, `DormandPrince`, `CashKarp`, and
+`BogackiShampine`. Other adaptive solvers (`Vode`, `Lsode`, `Lsoda`,
+`RKC`, `RKF45`, etc.)  do not give access to intermediate solution
+steps between the user-given time points, specified in the
+`solver.solve` call, and then we only have access to the solution at
+the user-given time points as returned by this call. One can run `if
+solver.has_u_t_all()` to test if the `solver.u_all` and `solver.t_all`
+arrays are available.  These are of interest to see how the adaptive
+strategy works between the user-specified time points.
+
+===== The Test Problem =====
+
+We consider the ODE problem for testing adaptive solvers:
+
+!bt
+\begin{equation}
+u' = -\frac{t-c}{s^2} (u-1)
+label{gaussian:ode:eq}
+\end{equation}
+!et
+The exact solution is a Gaussian function,
+!bt
+\[
+u(t) = 1 + \exp{\left(-\frac{1}{2}\left(\frac{t-c}{s}\right)^2\right)}
+\]
+!et
+centered around $t=c$ and width characteristic width ("standard
+deviation") $s$. The initial condition is taken as the exact $u$ at $t=0$.
+
+Since the Gaussian function is significantly different from zero only in the
+interval $[c-3s, c+3s]$, one may expect that adaptive methods will
+efficiently take larger steps when $u$ is almost constant and increase
+the resolution when $u$ changes substantially in the vicinity
+of $t=c$. We can test if this is the case with several solvers.
+
+===== Running Simple Methods =====
+
+Let us first use a simple standard method like the 2nd- and 4th-order
+Runge-Kutta methods with constant step size. With the former method
+(`RK2`), $c=3$, $s=0.5$, and $41$ uniformly distributed points,
+the discrepancy between the numerical and exact solution in
+Figure ref{gaussian:fig:RK2:41} is substantial. Increasing the number
+of points by a factor of 10 gives a solution much closer to the
+exact one, and switching to the 4th-order method (`RK4`) makes the
+curves visually coincide. The problem is therefore quite straightforward
+to solve using a sufficient number of points (400) and a higher-order method
+such as `RK4`.
+For curiosity we can mention that the `ForwardEuler` method produces
+a maximum value of 0.98 with 20,000 points and 0.998 with 200,000 points.
+
+FIGURE: [fig-odespy/gaussian1_RK2_41.png, width=500] 2nd-order Runge-Kutta method with 41 points.  label{gaussian:fig:RK2:41}
+
+A simple program testing one numerical method goes as follows ("`gaussian1.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian1.py").
+
+@@@CODE src-odespy/gaussian1.py
+
+
+===== Running the Runge-Kutta-Fehlberg Method =====
+
+One of the most widely used general-purpose, adaptive methods for
+ODE problems is the
+Runge-Kutta-Fehlberg method of order (4,5). This method is available
+in three alternative implementations in Odespy: a direct Python
+version (`RKFehlberg`), a specialization of a generalized
+implementation of explicit adaptive Runge-Kutta methods
+(`Fehlberg`), and as a FORTRAN code (`RKF45`). We can try one of
+these,
+!bc pycod
+method = odespy.Fehlberg
+!ec
+Figure ref{gaussian:fig:Fehlberg:41} shows how `Fehlberg` with 40 intervals produces a solution of reasonable accuracy. The dots show the actual computational points used by the algorithm (57 adaptively selected points in time).
+
+FIGURE: [fig-odespy/gaussian1_Fehlberg_41.png, width=500] Adaptive Runge-Kutta-Fehlberg method with 57 points (starting with 41).  label{gaussian:fig:Fehlberg:41}
+
+Adaptive algorithms apply an error estimate based on considering a higher-order method as exact, in this case a method of order 5, and a method of lower order (here 4) as the numerically predicted solution. The user can specify an error tolerance. In the program above we just relied to the default tolerance, which can be printed by
+!bc pycod
+print solver.get()
+!ec
+yielding a list of all optional parameters:
+!bc dat
+{'f_kwargs': {}, 'f_args': (),
+ 'max_step': 1.5000000000000036, 'verbose': 0,
+ 'min_step': 0.0014999999999999946,
+ 'first_step': 0.14999999999999999,
+ 'rtol': 1e-06, 'atol': 1e-08,
+ 'name of f': 'f', 'complex_valued': False,
+ 'disk_storage': False, 'u_exact': None}
+!ec
+The tolerances involved are of relative and absolute type, i.e.,
+!bc pycod
+estimated_error <= tol = rtol*abs(u) + atol
+!ec
+is the typical test on whether the solution is sufficiently.
+For very small `u`, `atol` comes into play, while for large `u`, the
+relative tolerance `rtol` dominates.
+
+In this particular example, running `RK4` with 57 equally spaced points
+yields a maximum value of 1.95, while `Fehlberg` with 57 adaptively
+selected points results in 1.98. Note that the tolerances used are
+$10^{-6}$ while the real error is of the order $10^{-2}$.
+
+We can specify stricter tolerances and also control the minimum
+allowed step size, `min_step`, which might be too large to achieve
+the desired error level ("`gaussian2.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian2.py"):
+
+@@@CODE src-odespy/gaussian2.py fromto: rtol = @solver\.set_initial_
+
+The `Fehlberg` solver now applies 701 points and achieves a maximum
+value of 2.00005. However, `RK4` with the same number of (equally spaced) points
+achieves the same accuracy and is much faster.
+
+===== Testing More Adaptive Solvers =====
+
+We have already solved (ref{gaussian:ode:eq}) with sufficient accuracy, but
+let us see how other methods perform, as this will most likely result in
+a surprise. Below is a program ("`gaussian3.py`": "https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian3.py") that compares several famous and
+widely used methods in the same plot.
+
+@@@CODE src-odespy/gaussian3.py
+
+The default discretization applies $N=40$ equal-sized time intervals,
+but adaptive methods should be able to adjust themselves to the
+desired error level $10^{-6}$. Figures ref{gaussian3:fig1:41} and
+ref{gaussian3:fig1err:41} show that this expected behavior is not the
+case. There is substantial discrepancy between the methods!
+Surprisingly, the well-known FORTRAN codes accessed by the `Vode`
+(`vode.f`) and `Lsoda` (from ODEPACK) methods give very inaccurate
+results, despite setting `Vode` to use a stiff BDF solver of order 5, and
+`Lsoda` should automatically select between nonstiff and stiff solvers
+(of default order 4 in this case).
+
+FIGURE: [fig-odespy/gaussian3_41.png, width=500] Comparison of adaptive methods with default parameters (tolerance `E-6`).  label{gaussian3:fig1:41}
+
+FIGURE: [fig-odespy/gaussian3e_41.png, width=500] Comparison of errors in adaptive methods with default parameters (tolerance `E-6`).  label{gaussian3:fig1err:41}
+
+The program writes out the following results for the
+maximum value of the solution, which should equal 2:
+!bc dat
+1.9976  DormandPrince
+1.6591  BogackiShampine
+1.9812  RKFehlberg
+1.0406  Vode
+1.9734  RKF45
+3.2905  Lsoda
+!ec
+The clearly most accurate solver among these is `DormandPrince`  - the default
+method used by MATLAB's `ode45` solver, which is perhaps the world's
+most popular ODE solver.
+
+The remedy to get all the tested solvers to perform well is to
+choose a much stricter tolerance, say $10^{-10}$.
+Figure ref{gaussian3:fig2:41} shows
+coinciding curves. Numerically, we now have
+!bc dat
+1.9991  DormandPrince
+1.9912  BogackiShampine
+1.9942  RKFehlberg
+2.0122  Vode
+1.9916  RKF45
+2.0056  Lsoda
+!ec
+For the methods `DormandPrince`,  `RKFehlberg`, and
+`BogackiShampine` we have information about the number of adaptive
+time points used: 270, 326, and 3307, respectively.
+
+FIGURE: [fig-odespy/gaussian3_41_Em10.png, width=500] Comparison of adaptive methods with error tolerance `E-10`.  label{gaussian3:fig2:41}
+
+The lesson learned in this example is two-fold: 1) several methods should
+be tested to gain reliability of the results, and Odespy makes such tests
+easy to conduct, and 2) strict tolerances, far below
+the default values, may be necessary for some methods, here `Vode` and
+`Lsoda` in particular. We remark that it is the ODE problem that causes
+difficulties: changing the problem to `odespy.problems.Logistic`
+(see the file "`logistic9.py`":
+"https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/logistic9.py")
+shows that all the curves coincide and cannot be distinguished visually.
+
+The present test problem with a Gaussian function as solution
+can be made increasingly more difficult by
+increasing the value of $c/s$, i.e., a more peaked function moved to
+the right.
+
+===== Extensive Testing =====
+
+The program "`gaussian4.py`":
+"https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/gaussian4.py"
+sets up an extensive experiments involving a lot of solvers, several
+$c/s$ values, and several error tolerances.  The experiments clearly
+demonstrate how challenging this ODE problem is for many adaptive
+solvers unless $c/s$ is moderate and a strict tolerance (much lower
+than the real accuracy level) is used. One can especially see the
+fundamental difficulties that `Vode`, `Lsode`, and `Lsoda` (all stiff
+and nonstiff versions) face when $c/s\geq 8$: these solvers do not
+manage to pick up any variation in $u$. Nevertheless, for less
+demanding ODEs these solvers may perform very well, but it is highly
+recommended to always use the power of the unified Odespy interface
+to test several different adaptive methods.
+
+
+======= Solving Partial Differential Equations =======
+
+Let us now turn the attention to the method of lines for
+partial differential equations  (PDEs) where one reduces a PDE to
+a system of ODE and then applies standard methods ODEs.
+
+We address a diffusion problem in one dimension:
+
+!bt
+\begin{align}
+\frac{\partial u(x,t)}{\partial t} &= \beta \frac{\partial^{2}u(x,t)}{\partial x^2} + f(x,t), &x \in \left(0,L\right), & t \in (0,T],
+label{odespy:pde:diffusion}  \\
+u(0,t) &= s(t), & t \in (0,T],
+label{odespy:pde:diffusion:x0}  \\
+\frac{\partial}{\partial x}u(L,t) &= 0, &t \in (0,T],
+label{odespy:pde:diffusion:xL}  \\
+u(x,0) &= I(x), &x \in \left[0,L\right]
+label{odespy:pde:diffusion:I}
+\thinspace .
+\end{align}
+!et
+
+===== Discretization in Space =====
+
+Discretizing the 2nd-order derivative in space with a finite difference,
+on a mesh $x_i=i\Delta x$, $i=1,\ldots,N-1$, gives the ODEs
+
+!bt
+\begin{equation}
+\frac{\partial u_i(t)}{\partial t} = \beta
+\frac{u_{i+1}(t) - 2u_i(t) + u_{i-1}(t)}{\Delta x^2} + f_i(t),\quad i=1,\ldots,N-1
+\thinspace .
+\end{equation}
+!et
+Here we have introduced the notation $u_i(t)$ as an approximation to the
+exact solution at mesh point $x_i$.
+
+The boundary condition on $x=0$, $u(0,t)=s(t)$, gives rise to the ODE
+
+!bt
+\[ u_0'(t) = s'(t),\quad u_0(0)=s(0)\thinspace .\]
+!et
+At the other end, $x=L$, we use a centered difference approximation
+$(u_{N+1}(t)-u_{N-1}(t))/(2\Delta x) =0$ and combine it with the
+scheme for $i=N$ to obtain the modified boundary ODE
+
+!bt
+\begin{equation}
+\frac{\partial u_N(t)}{\partial t} = \beta
+\frac{2u_{N-1}(t) - 2u_N(t)}{\partial x^2} + f_N(t)\thinspace .
+\end{equation}
+!et
+
+To summarize, the ODE system reads
+
+!bt
+\begin{align}
+\frac{du_0}{dt} &= s'(t),
+label{sec:pde:diff1D:ode1:0}\\
+\frac{du_i}{dt} &=  \frac{\beta}{\Delta x^2}
+(u_{i+1}(t) - 2u_i(t) + u_{i-1}(t)) + f_i(t),\quad i=1,\ldots,N-1,
+label{sec:pde:diff1D:ode1:i}\\
+\frac{du_N}{dt} &=  \frac{2\beta}{\Delta x^2}
+(u_{N-1}(t) - u_N(t)) + f_i(t)\thinspace .
+label{sec:pde:diff1D:ode1:N}
+\end{align}
+!et
+The initial conditions are
+
+!bt
+\begin{align}
+u_0(0) &= s(0),\\
+u_i(0) &= I(x_i),\quad i=1,\ldots,N\thinspace .
+\end{align}
+!et
+We can apply any method for systems of ODEs to solve
+(ref{sec:pde:diff1D:ode1:0})-(ref{sec:pde:diff1D:ode1:N}).
+
+===== Implementation =====
+
+Consider
+the evolution of the temperature in a rod modeled by our diffusion problem.
+At $t=0$, the rod has the temperature 10 C. We then apply a heat source
+at $x=0$ which keepes the temperature there at 50 C. This means that
+$I(x)=283$ K, except at the end point:
+$I(0)=423$ K, $s(t) = 423$ K, and $f=0$.
+
+Odespy solvers need the right-hand side function of
+(ref{sec:pde:diff1D:ode1:0})-(ref{sec:pde:diff1D:ode1:N}):
+
+@@@CODE src-odespy/pde_diffusion.py def rhs@def K\(
+This function requires the variables `beta`, `x`, `dx`, and `L`, which
+we provide as keyword arguments and that can be transferred to `rhs`
+through the `f_kwargs` argument to the Odespy constructors.
+
+We also need some helper functions
+
+@@@CODE src-odespy/pde_diffusion.py def s\(@N = 40
+Parameters and initial conditions can be set as
+
+@@@CODE src-odespy/pde_diffusion.py N = 40@import odespy
+
+The construction and execution of a solver is now a matter of
+
+!bc pycod
+import odespy
+solver = odespy.ForwardEuler(rhs, f_kwargs=f_kwargs)
+solver.set_initial_condition(U_0)
+
+dx = x[1] - x[0]
+dt = dx**2/(2*beta) # Forward Euler limit
+N_t = int(round(T/float(dt)))
+time_points = linspace(0, T, N_t+1)
+
+u, t = solver.solve(time_points)
+!ec
+
+We can add some flexibility and set up several solvers, also
+implicit methods:
+
+@@@CODE src-odespy/pde_diffusion.py import odespy@solver\.set_initial
+
+The implicit solvers need the Jacobian of the right-hand side function:
+
+@@@CODE src-odespy/pde_diffusion.py def K\(@def rhs_vec
+Note that we work with *dense square matrices* while the mathematics
+allows a tridiagonal matrix and corresponding solver.
+However, in 1D problems, the computations
+are so fast anyway so we can live with dense matrices.
+
+Finally, some animation of the solution is desirable:
+
+@@@CODE src-odespy/pde_diffusion.py # Make movie@
+
+=== Vectorized Code ===
+
+It is easy to get rid of the loops in the `rhs` and `K` functions:
+
+@@@CODE src-odespy/pde_diffusion.py def rhs_vec@def s\(
+
+===== Experiments =====
+
+The program, "`pde_diffusion.py`":
+"https://github.com/hplgit/odespy/blob/master/doc/src/odespy/src-odespy/pde_diffusion.py", can be run to test different solvers and illustrate numerical
+methods:
+
+# Note: the "Run" after the paragraph, before code, is essential for
+# latex to produce correct code (a latex, not a doconce, problem).
+
+__Forward Euler Method.__ Run
+
+!bc sys
+python pde_diffusion.py
+!ec
+The graphics takes very long time in this simulation, because of the
+small time step.
+
+__Backward Euler.__ Run
+
+!bc sys
+python ode_diffusion.py BE 0.05 1.2
+!ec
+
+__Backward 2-step Method.__ Run
+
+!bc sys
+python ode_diffusion.py B2 0.05 1.2
+!ec
+
+__Crank-Nicolson Method.__ Run
+
+!bc sys
+python ode_diffusion.py theta 0.01 1.2
+!ec
+Observe the non-physical oscillations because of the steep initial
+condition (and the lack of damping in the Crank-Nicolson scheme).
+
+__Runge-Kutta-Fehlberg Method.__ Run
+
+!bc sys
+python ode_diffusion.py RKF 0.01 1.2
+!ec
+Note here that we specify a quite large $\Delta t$, much larger than
+what a Runge-Kutta method can work with (typically, an RK4 method
+needs a $\Delta t$ as small as the critical step for the Forward Euler
+method). However, the adaptive method figures out what it needs of
+steps and produces a nice solution.
+
+__Runge-Kutta-Chebyshev Method.__ Run
+
+!bc sys
+python ode_diffusion.py RKC 0.05 1.2
+!ec
+This is a promising method for the diffusion equation. It works like
+an explicit method and can tolerate large time steps. This method calls
+up the FORTRAN code `rkc.f`.
 
 
 

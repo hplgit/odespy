@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -9,12 +10,12 @@
     
     <title>A Tutorial for the Odespy Interface to ODE Solvers</title>
     
-    <link rel="stylesheet" href="_static/pyramid.css" type="text/css" />
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    './',
         VERSION:     '1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -25,25 +26,37 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+
+        <script src="http://sagecell.sagemath.org/static/jquery.min.js"></script>
+        <script src="http://sagecell.sagemath.org/static/embedded_sagecell.js"></script>
+
+        <script>sagecell.makeSagecell({inputLocation: ".sage"});</script>
+
+        <style type="text/css">
+                .sagecell .CodeMirror-scroll {
+                        overflow-y: hidden;
+                        overflow-x: auto;
+                }
+                .sagecell .CodeMirror {
+                        height: auto;
+                }
+        </style>
+
+    
     <link rel="top" title="A Tutorial for the Odespy Interface to ODE Solvers" href="#" />
     <link rel="next" title="A Tutorial for the Odespy Interface to ODE Solvers" href="main_odespy.html" />
-<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
-<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
-<!--[if lte IE 6]>
-<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
-<![endif]-->
-
+ 
   
-   <style type="text/css">
-     div.admonition {
-       background-color: whiteSmoke;
-       border: 1px solid #bababa;
-     }
-   </style>
-  </head>
-
+       <style type="text/css">
+         div.admonition {
+           background-color: whiteSmoke;
+           border: 1px solid #bababa;
+         }
+       </style>
+      </head>
+    
   <body>
-
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -86,11 +99,27 @@
 <li class="toctree-l3"><a class="reference internal" href="main_odespy.html#example-solving-an-ode-system">Example: Solving an ODE System</a></li>
 <li class="toctree-l3"><a class="reference internal" href="main_odespy.html#the-euler-cromer-method">The Euler-Cromer Method</a></li>
 <li class="toctree-l3"><a class="reference internal" href="main_odespy.html#testing-several-methods">Testing Several Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main_odespy.html#more-advanced-implementations">More Advanced Implementations</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="main_odespy.html#make-a-subclass-of-class-problem">Make a Subclass of Class Problem</a></li>
-<li class="toctree-l3"><a class="reference internal" href="main_odespy.html#using-adaptive-methods">Using Adaptive Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="main_odespy.html#example-solving-a-complex-ode-problem">Example: Solving a Complex ODE Problem</a></li>
 <li class="toctree-l3"><a class="reference internal" href="main_odespy.html#avoiding-callbacks-to-python">Avoiding Callbacks to Python</a></li>
 <li class="toctree-l3"><a class="reference internal" href="main_odespy.html#example-solving-a-stochastic-differential-equation">Example: Solving a Stochastic Differential Equation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main_odespy.html#adaptive-methods">Adaptive Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="main_odespy.html#the-test-problem">The Test Problem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="main_odespy.html#running-simple-methods">Running Simple Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="main_odespy.html#running-the-runge-kutta-fehlberg-method">Running the Runge-Kutta-Fehlberg Method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="main_odespy.html#testing-more-adaptive-solvers">Testing More Adaptive Solvers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="main_odespy.html#extensive-testing">Extensive Testing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main_odespy.html#solving-partial-differential-equations">Solving Partial Differential Equations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="main_odespy.html#discretization-in-space">Discretization in Space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="main_odespy.html#implementation">Implementation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="main_odespy.html#experiments">Experiments</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="main_odespy.html#inner-workings-of-the-package">Inner Workings of the Package</a><ul>
@@ -125,17 +154,25 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+            <center>
+            <p class="logo"><a href="http://cbc.simula.no/" title="Go to Center for Biomedical Computing">
+              <img class="logo" src="_static/cbc_logo.png" alt="Logo"/>
+            </a></p>
+            </center>
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">A Tutorial for the Odespy Interface to ODE Solvers</a><ul>
-</ul>
-</li>
+<li><a class="reference internal" href="#">A Tutorial for the Odespy Interface to ODE Solvers</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 
   <h4>Next topic</h4>
   <p class="topless"><a href="main_odespy.html"
                         title="next chapter">A Tutorial for the Odespy Interface to ODE Solvers</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -165,9 +202,11 @@
         <li><a href="#">A Tutorial for the Odespy Interface to ODE Solvers</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2015, Hans Petter Langtangen and Liwei Wang.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
-    </div>
+<div class="wrapper">
+  <div class="footer">
+  <a href="http://cbc.simula.no"><img src="_static/cbc_banner.png" width="100%"><a>
+  </div>
+</div>
+
   </body>
 </html>
