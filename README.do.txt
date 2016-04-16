@@ -7,11 +7,16 @@ Differential Algebraic Equations (DAEs).
 
 ===== How do I install Odespy? =====
 
+=== Pip ===
+
 The simplest procedure is to use `pip`:
 
 !bc sys
 Terminal> sudo pip install -e git+https://github.com/hplgit/odespy.git#egg=odespy
 !ec
+
+=== Clone/fork repo ===
+
 Alternatively, you can check out this repo and run `setup.py`:
 
 !bc sys
@@ -20,6 +25,8 @@ Terminal> cd odespy
 Terminal> sudo python setup.py install
 !ec
 
+=== Turning off Fortran compilation ===
+
 If you face problems with compiling the Fortran parts of Odespy,
 or if you do not have a Fortran compiler, you can install without
 any Fortran code:
@@ -27,6 +34,21 @@ any Fortran code:
 !bc sys
 Terminal> sudo python setup.py install --no-fortran
 !ec
+
+=== Problems with compiled Fortran modules ===
+
+Problems with the compiled Fortran libraries appear on different systems.
+If you use Anaconda Python, successfully build the Fortran modules, but
+get error messages like `cannot find extension module _rkf`, the problem
+may be related to GFortran 1.4. You may try
+
+!bc sys
+Terminal> cd /path/to/anaconda/lib/
+Terminal> mv libgfortran.so.3.0.0 libgfortran.so.3.0.0.bak
+Terminal> ln -sf /usr/lib/x86_64-linux-gnu/libgfortran.so.3.0.0 \
+          libgfortran.so.3.0.0
+!ec
+
 
 
 ===== Contents of Odespy =====
