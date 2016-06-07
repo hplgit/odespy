@@ -1,4 +1,4 @@
-# Author: Liwei Wang, Hans Petter Langtangen
+# Authors: Liwei Wang, Hans Petter Langtangen
 
 '''
 This module contains the base class ``Solver``
@@ -1871,7 +1871,7 @@ class EulerCromer(Solver):
         f_n = f(u[n], t[n])
         for i in range(0, len(u[n]), 2):
             u[n+1,i] = u[n,i] + dt*f_n[i]
-        # March forward positions
+        # March "forward" positions by backward formula
         f_np1 = f(u[n+1], t[n+1])
         for i in range(1, len(u[n]), 2):
             u[n+1,i] = u[n,i] + dt*f_np1[i]
@@ -1879,6 +1879,10 @@ class EulerCromer(Solver):
     quick_description = "Explicit Euler-Cromer method for Newton's 2nd law ODEs"
 
     def advance(self):
+        """
+        u[0], u[2], etc. are velocities.
+        u[1], u[3], etc. are positions.
+        """
         u, f, n, t = self.u, self.f, self.n, self.t
         dt = t[n+1] - t[n]
         u_new = u[n].copy()
@@ -1886,6 +1890,43 @@ class EulerCromer(Solver):
         f_n = f(u[n], t[n])
         for i in range(0, len(u[n]), 2):
             u_new[i] = u[n,i] + dt*f_n[i]
+        # March forward positions (u_new has now updated velocities,
+        # but old positions - but only the velocities are used in
+        # the components of f(u_new, t) that enter the loop below,
+        # so the position values do not matter)
+        f_np1 = f(u_new, t[n+1])
+        for i in range(1, len(u[n]), 2):
+            u_new[i] = u[n,i] + dt*f_np1[i]
+        return u_new
+
+
+class StaggeredMidpoint(Solver):
+    """
+    Variant of the Euler-Cromer method based on staggered grid for
+    positions and velocities and explicit centered (midpont) differences
+    everywhere.
+    Classical, intuitive, symplectic solver of second-order accuracy.
+    """
+    quick_description = "Explicit Staggared midpoint for Newton's 2nd law ODEs"
+
+    def advance(self):
+        """
+        u[0], u[2], etc. are velocities at t=(i+1/2)*dt.
+        u[1], u[3], etc. are positions at t=i*dt.
+        """
+        u, f, n, t = self.u, self.f, self.n, self.t
+        dt = t[n+1] - t[n]
+        u_new = u[n].copy()  # just need to allocate
+        f_n = f(u[n], t[n])
+        # March forward velocities
+        if n == 0:
+            # First step: use special formula for updating velocities
+            for i in range(0, len(u[n]), 2):
+                u_new[i] = u[n,i] + dt/2*f_n[i]
+        else:
+            # Later: standard formula centered around n
+            for i in range(0, len(u[n]), 2):
+                u_new[i] = u[n,i] + dt*f_n[i]
         # March forward positions (u_new has now updated velocities,
         # but old positions - but only the velocities are used in
         # the components of f(u_new, t) that enter the loop below,
